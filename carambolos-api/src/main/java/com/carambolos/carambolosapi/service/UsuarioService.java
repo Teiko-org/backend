@@ -4,6 +4,7 @@ import com.carambolos.carambolosapi.model.Usuario;
 import com.carambolos.carambolosapi.repository.UsuarioRepository;
 import com.carambolos.carambolosapi.utils.JwtUtil;
 import com.carambolos.carambolosapi.utils.PasswordEncoderUtil;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,9 +37,12 @@ public class UsuarioService {
                    usuarioExistente.setNome(usuario.getNome());
                    usuarioExistente.setEmail(usuario.getEmail());
 
-                   if (usuario.getSenha() != null && !usuario.getSenha().equals(usuarioExistente.getSenha())) {
-                       String senhaCriptografada = passwordEncoderUtil.senhaCodificada().encode(usuario.getSenha());
-                        usuarioExistente.setSenha(senhaCriptografada);
+                   String senhaAntiga = usuarioExistente.getSenha();
+                   String senhaNova = usuario.getSenha();
+
+                   if (senhaNova != null && !senhaNova.equals(senhaAntiga)) {
+                       String senhaCriptografada = passwordEncoderUtil.senhaCodificada().encode(senhaNova);
+                       usuarioExistente.setSenha(senhaCriptografada);
                    }
 
                    return usuarioRepository.save(usuarioExistente);
