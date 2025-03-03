@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -18,33 +17,65 @@ public class UsuarioController {
     private UsuarioService usuarioService;
 
     @GetMapping
-    public List<Usuario> listar(){
-        return usuarioService.listar();
+    public ResponseEntity<List<Usuario>> listar(){
+        List<Usuario> usuarios = usuarioService.listar();
+
+        if (usuarios.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+
+        return ResponseEntity.status(200).body(usuarios);
     }
 
     @GetMapping("/{id}")
-    public Optional<Usuario> buscarPorId(@PathVariable Integer id) {
-        return usuarioService.buscarPorId(id);
+    public ResponseEntity<Usuario> buscarPorId(@PathVariable Integer id) {
+        return ResponseEntity.of(usuarioService.buscarPorId(id));
     }
 
     @PostMapping
-    public Usuario cadastrar(@RequestBody Usuario usuario) {
-        return usuarioService.cadastrar(usuario);
+    public ResponseEntity<Usuario> cadastrar(@RequestBody Usuario usuario) {
+        Usuario usuarioRegistrado = usuarioService.cadastrar(usuario);
+        return ResponseEntity.status(201).body(usuarioRegistrado);
     }
 
     @PostMapping("/login")
-    public Usuario login(@RequestBody LoginRequest loginRequest) {
-        return usuarioService.login(loginRequest.getEmail(), loginRequest.getSenha());
+    public ResponseEntity<Usuario> login(@RequestBody LoginRequest loginRequest) {
+        try {
+            Usuario usuarioAutenticado = usuarioService
+                    .login(loginRequest.getEmail(), loginRequest.getSenha());
+
+            return ResponseEntity.status(200).body(usuarioAutenticado);
+
+        } catch (RuntimeException e) {
+            String mensagemErro = e.getMessage();
+            if (mensagemErro.contains("Usuário não encontrado") || mensagemErro.contains("Senha incorreta")) {
+                return ResponseEntity.status(401).build();
+            }
+        }
+
+        return ResponseEntity.status(500).build();
     }
 
     @PutMapping("/{id}")
-    public Usuario atualizar(@PathVariable Integer id, @RequestBody Usuario usuario) {
-        return usuarioService.atualizar(id, usuario);
+    public ResponseEntity<Usuario> atualizar(@PathVariable Integer id, @RequestBody Usuario usuario) {
+        Usuario usuarioAtualizado = usuarioService.atualizar(id, usuario);
+
+        if (usuarioAtualizado == null) {
+            return ResponseEntity.status(404).build();
+        }
+
+        return ResponseEntity.status(200).body(usuarioAtualizado);
     }
 
     @DeleteMapping("/{id}")
-    public void deletar(@PathVariable Integer id) {
-        usuarioService.deletar(id);
+    public ResponseEntity<Void> deletar(@PathVariable Integer id) {
+        Boolean usuarioDeletado = usuarioService.deletar(id);
+
+        if (usuarioDeletado) {
+            return ResponseEntity.status(204).build();
+        }
+
+        return ResponseEntity.status(404).build();
     }
 
 

@@ -4,7 +4,6 @@ import com.carambolos.carambolosapi.model.Usuario;
 import com.carambolos.carambolosapi.repository.UsuarioRepository;
 import com.carambolos.carambolosapi.utils.JwtUtil;
 import com.carambolos.carambolosapi.utils.PasswordEncoderUtil;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -64,11 +63,15 @@ public class UsuarioService {
         }
 
         return usuario;
-
     }
 
-    public void deletar(Integer id) {
-        usuarioRepository.deleteById(id);
+    public boolean deletar(Integer id) {
+        if (usuarioRepository.existsById(id)) {
+            usuarioRepository.deleteById(id);
+            return true;
+        }
+
+        return false;
     }
 
 }
