@@ -14,11 +14,12 @@ public class Usuario {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(unique = true, nullable = false)
-    private String telefone;
-
     @Column(nullable = false)
     private String senha;
+
+    @Column(unique = true, nullable = false)
+    private String contato;
+
 
     public Integer getId() {
         return id;
@@ -44,12 +45,12 @@ public class Usuario {
         this.email = email;
     }
 
-    public String getTelefone() {
-        return telefone;
+    public String getContato() {
+        return contato;
     }
 
-    public void setTelefone(String telefone) {
-        this.telefone = telefone;
+    public void setContato(String contato) {
+        this.contato = contato;
     }
 
     public String getSenha() {
