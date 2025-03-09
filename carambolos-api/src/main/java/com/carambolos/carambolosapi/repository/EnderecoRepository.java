@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
-public interface EnderecoRepository extends JpaRepository<Endereco, String> {
-    public Optional<Endereco> findByUsuarioAndCepAndNumeroEquals(Integer usuario, String cep, String numero);
+public interface EnderecoRepository extends JpaRepository<Endereco, Integer> {
+    Integer countByUsuarioAndCepAndNumeroEquals(Integer usuario, String cep, String numero);
 }

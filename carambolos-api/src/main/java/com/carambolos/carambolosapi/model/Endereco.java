@@ -32,6 +32,7 @@ public class Endereco {
     @Column(length = 70)
     private String referencia;
 
+    @Column(name = "usuario_id")
     private Integer usuario;
 
     public int getId() {

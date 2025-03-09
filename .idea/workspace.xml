@@ -5,16 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d18db469-eff1-47ca-a4da-1a31722c314d" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/model/Endereco.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/carambolos-api/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/carambolos-api/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/model/Usuario.java" beforeDir="false" afterPath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/model/Usuario.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/controller/EnderecoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/controller/EnderecoController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/model/Endereco.java" beforeDir="false" afterPath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/model/Endereco.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/repository/EnderecoRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/repository/EnderecoRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/service/EnderecoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/service/EnderecoService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/utils/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/utils/SecurityConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/carambolos-api/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/carambolos-api/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/carambolos-api/src/main/resources/script-bd.sql" beforeDir="false" afterPath="$PROJECT_DIR$/carambolos-api/src/main/resources/script-bd.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,10 +29,10 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 8
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 8
+}</component>
   <component name="ProjectId" id="2u2bGgcud1FhhGzSFIotGDq561n" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -80,5 +77,20 @@
       <updated>1741449522543</updated>
     </task>
     <servers />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-method">
+          <url>file://$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/repository/EnderecoRepository.java</url>
+          <line>10</line>
+          <properties class="com.carambolos.carambolosapi.repository.EnderecoRepository" method="countByUsuarioAndCepAndNumeroEquals">
+            <option name="EMULATED" value="true" />
+            <option name="WATCH_EXIT" value="false" />
+          </properties>
+          <option name="timeStamp" value="12" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
