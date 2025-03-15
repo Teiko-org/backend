@@ -4,7 +4,6 @@ import com.carambolos.carambolosapi.model.Endereco;
 import com.carambolos.carambolosapi.model.Usuario;
 import com.carambolos.carambolosapi.service.EnderecoService;
 import com.carambolos.carambolosapi.service.UsuarioService;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

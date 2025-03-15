@@ -25,12 +25,12 @@ public class EnderecoService {
     }
 
     public Endereco cadastrar(Endereco endereco) throws BadRequestException {
-        varificarDuplicidade(endereco);
+        verificarDuplicidade(endereco);
         return enderecoRepository.save(endereco);
     }
 
     public Endereco atualizar(Endereco endereco) throws BadRequestException {
-        varificarDuplicidade(endereco);
+        verificarDuplicidade(endereco);
         return enderecoRepository.save(endereco);
     }
 
@@ -43,7 +43,7 @@ public class EnderecoService {
         return enderecoRepository.existsById(id);
     }
 
-    public Boolean varificarDuplicidade(Endereco endereco) throws BadRequestException {
+    public Boolean verificarDuplicidade(Endereco endereco) throws BadRequestException {
         Integer enderecoDuplicado = enderecoRepository.countByUsuarioAndCepAndNumeroEquals(endereco.getUsuario(), endereco.getCep(), endereco.getNumero());
 
         if (enderecoDuplicado > 0) {
