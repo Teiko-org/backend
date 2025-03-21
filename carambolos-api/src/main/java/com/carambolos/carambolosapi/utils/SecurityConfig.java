@@ -13,8 +13,8 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console/**").permitAll() // Libera o H2 Console
-                        .requestMatchers("/usuarios/**").permitAll() // Libera todas as rotas da API
-                        // .requestMatchers("/**").permitAll() // Libera tudo
+//                        .requestMatchers("/usuarios/**").permitAll() // Libera todas as rotas da API
+                         .requestMatchers("/**").permitAll() // Libera tudo
                         .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable()) // Desativa CSRF (obrigatório para Postman e H2 Console)
