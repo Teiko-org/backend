@@ -1,6 +1,9 @@
 package com.carambolos.carambolosapi.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 @Entity
 public class Endereco {
@@ -8,28 +11,34 @@ public class Endereco {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(length = 8, nullable = false)
+    @NotBlank
+    @Pattern(regexp = "\\d{8}", message = "O CEP deve ter exatamente 8 dígitos numéricos.")
     private String cep;
 
-    @Column(length = 20, nullable = false)
+    @NotBlank
+    @Size(max = 20)
     private String estado;
 
-    @Column(length = 100, nullable = false)
+    @NotBlank
+    @Size(max = 100)
     private String cidade;
 
-    @Column(length = 100, nullable = false)
+    @NotBlank
+    @Size(max = 100)
     private String bairro;
 
-    @Column(length = 100, nullable = false)
+    @NotBlank
+    @Size(max = 100)
     private String logradouro;
 
-    @Column(length = 6, nullable = false)
+    @NotBlank
+    @Size(max = 6)
     private String numero;
 
-    @Column(length = 20)
+    @Size(max = 20)
     private String complemento;
 
-    @Column(length = 70)
+    @Size(max = 70)
     private String referencia;
 
     @Column(name = "usuario_id")

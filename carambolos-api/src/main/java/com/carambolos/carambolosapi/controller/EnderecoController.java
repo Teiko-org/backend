@@ -4,7 +4,7 @@ import com.carambolos.carambolosapi.model.Endereco;
 import com.carambolos.carambolosapi.model.Usuario;
 import com.carambolos.carambolosapi.service.EnderecoService;
 import com.carambolos.carambolosapi.service.UsuarioService;
-import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,33 +24,25 @@ public class EnderecoController {
 
     @GetMapping
     public ResponseEntity<List<Endereco>> listar() {
-        return ResponseEntity.of(enderecoService.listar());
+        List<Endereco> enderecos = enderecoService.listar();
+        if (enderecos.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.status(200).body(enderecos);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Endereco> buscarPorId(
             @PathVariable Integer id
     ) {
-        return ResponseEntity.of(enderecoService.buscarPorId(id));
+        return ResponseEntity.status(200).body(enderecoService.buscarPorId(id));
     }
 
     @PostMapping
     public ResponseEntity<Endereco> cadastrar(
-            @RequestBody Endereco endereco
+            @Valid @RequestBody Endereco endereco
     ) {
-        try {
-            if (endereco.getUsuario() != null) {
-                Optional<Usuario> usuarioExiste = usuarioService.buscarPorId(endereco.getUsuario());
-
-                if (usuarioExiste.isEmpty()) {
-                    return ResponseEntity.status(400).build();
-                }
-            }
-
-            return ResponseEntity.status(201).body(enderecoService.cadastrar(endereco));
-        } catch (Exception e) {
-            return ResponseEntity.status(409).build();
-        }
+        return ResponseEntity.status(201).body(enderecoService.cadastrar(endereco));
     }
 
     @PutMapping("/{id}")
@@ -58,28 +50,14 @@ public class EnderecoController {
             @PathVariable Integer id,
             @RequestBody Endereco endereco
     ) {
-        try {
-            endereco.setId(id);
-
-            if (!enderecoService.existePorId(id)) {
-                return ResponseEntity.status(404).build();
-            }
-
-            return ResponseEntity.status(200).body(enderecoService.atualizar(endereco));
-        } catch (Exception e) {
-            return ResponseEntity.status(409).build();
-        }
+            return ResponseEntity.status(200).body(enderecoService.atualizar(id, endereco));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(
             @PathVariable Integer id
     ) {
-        if (!enderecoService.existePorId(id)) {
-            return ResponseEntity.status(404).build();
-        }
-
         enderecoService.deletar(id);
-        return ResponseEntity.status(200).build();
+        return ResponseEntity.status(204).build();
     }
 }
