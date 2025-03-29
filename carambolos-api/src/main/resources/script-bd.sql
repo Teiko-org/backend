@@ -1,3 +1,4 @@
+
 CREATE DATABASE IF NOT EXISTS teiko;
 USE teiko ;
 
@@ -180,50 +181,62 @@ CREATE TABLE IF NOT EXISTS teiko.recheio_pedido (
     REFERENCES teiko.recheio_exclusivo (recheio_unitario_id)
 );
 
+-- -----------------------------------------------------
+-- Table teiko.bolo
+-- -----------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS teiko.bolo (
+  id INT NOT NULL,
+  recheio_pedido_id INT NOT NULL,
+  massa_id INT NOT NULL,
+  cobertura_id INT NOT NULL,
+  decoracao_id INT NULL,
+  formato VARCHAR(45) NULL,
+  tamanho INT NULL,
+  PRIMARY KEY (id, recheio_pedido_id, massa_id, cobertura_id),
+  INDEX fk_Bolo_massa1_idx (massa_id ASC) VISIBLE,
+  INDEX fk_Bolo_decoracao1_idx (decoracao_id ASC) VISIBLE,
+  INDEX fk_Bolo_cobertura1_idx (cobertura_id ASC) VISIBLE,
+  CONSTRAINT fk_Bolo_recheio_pedido1
+    FOREIGN KEY (recheio_pedido_id)
+    REFERENCES teiko.recheio_pedido (id),
+  CONSTRAINT fk_Bolo_massa1
+    FOREIGN KEY (massa_id)
+    REFERENCES teiko.massa (id),
+  CONSTRAINT fk_Bolo_decoracao1
+    FOREIGN KEY (decoracao_id)
+    REFERENCES teiko.decoracao (id),
+  CONSTRAINT fk_Bolo_cobertura1
+    FOREIGN KEY (cobertura_id)
+    REFERENCES teiko.cobertura (id)
+);
 
 -- -----------------------------------------------------
 -- Table teiko.pedido_bolo
 -- -----------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS teiko.pedido_bolo (
-  id INT NOT NULL AUTO_INCREMENT,
+  id INT NOT NULL,
   endereco_id INT NOT NULL,
+  bolo_id INT NOT NULL,
   usuario_id INT NULL,
-  massa_id INT NOT NULL,
-  cobertura_id INT NOT NULL,
-  recheio_pedido_id INT NOT NULL,
-  formato VARCHAR(45) NOT NULL,
-  decoracao_id INT NULL,
   observacao VARCHAR(70) NULL,
-  tamanho INT NOT NULL,
   data_previsao_entrega DATE NOT NULL,
   data_ultima_atualizacao DATETIME NOT NULL,
-  PRIMARY KEY (id, endereco_id, recheio_pedido_id, cobertura_id, massa_id),
-  INDEX fk_resumo_massa1_idx (massa_id ASC) VISIBLE,
-  INDEX fk_resumo_cobertura1_idx (cobertura_id ASC) VISIBLE,
-  INDEX fk_resumo_decoracao1_idx (decoracao_id ASC) VISIBLE,
+  PRIMARY KEY (id, endereco_id, Bolo_id),
   INDEX fk_pedido_bolo_usuario1_idx (usuario_id ASC) VISIBLE,
   INDEX fk_pedido_bolo_endereco1_idx (endereco_id ASC) VISIBLE,
-  INDEX fk_pedido_bolo_recheio_pedido1_idx (recheio_pedido_id ASC) VISIBLE,
-  CONSTRAINT fk_resumo_massa1
-    FOREIGN KEY (massa_id)
-    REFERENCES teiko.massa (id),
-  CONSTRAINT fk_resumo_cobertura1
-    FOREIGN KEY (cobertura_id)
-    REFERENCES teiko.cobertura (id),
-  CONSTRAINT fk_resumo_decoracao1
-    FOREIGN KEY (decoracao_id)
-    REFERENCES teiko.decoracao (id),
+  INDEX fk_pedido_bolo_Bolo1_idx (Bolo_id ASC) VISIBLE,
   CONSTRAINT fk_pedido_bolo_usuario1
     FOREIGN KEY (usuario_id)
     REFERENCES teiko.usuario (id),
   CONSTRAINT fk_pedido_bolo_endereco1
     FOREIGN KEY (endereco_id)
     REFERENCES teiko.endereco (id),
-  CONSTRAINT fk_pedido_bolo_recheio_pedido1
-    FOREIGN KEY (recheio_pedido_id)
-    REFERENCES teiko.recheio_pedido (id)
+  CONSTRAINT fk_pedido_bolo_Bolo1
+    FOREIGN KEY (bolo_id)
+    REFERENCES teiko.bolo (id)
 );
-
 
 -- -----------------------------------------------------
 -- Table teiko.resumo_pedido
