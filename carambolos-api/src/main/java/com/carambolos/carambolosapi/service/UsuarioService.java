@@ -82,7 +82,7 @@ public class UsuarioService {
                 .orElseThrow(() -> new CredenciaisInvalidasException("Usuário com e-mail %s não encontrado".formatted(email)));
 
         if (!usuario.getSenha().equals(senha)) {
-            throw new CredenciaisInvalidasException("Senha incorreta");
+            throw new CredenciaisInvalidasException("E-mail ou Senha incorretos");
         }
 
         return usuario;
