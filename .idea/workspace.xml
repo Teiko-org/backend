@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="d18db469-eff1-47ca-a4da-1a31722c314d" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/controller/EnderecoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/controller/EnderecoController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/model/Endereco.java" beforeDir="false" afterPath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/model/Endereco.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/repository/EnderecoRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/repository/EnderecoRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/service/EnderecoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/service/EnderecoService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/utils/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/utils/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/carambolos-api/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/carambolos-api/src/main/resources/application.properties" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+        <option value="Interface" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="2u2bGgcud1FhhGzSFIotGDq561n" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.CarambolosApiApplication.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "feature/crud-adicional-endereco",
+    "kotlin-language-version-configured": "true"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration name="CarambolosApiApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.carambolos.carambolosapi.CarambolosApiApplication" />
+      <module name="carambolos-api" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.carambolos.carambolosapi.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.CarambolosApiApplication" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="d18db469-eff1-47ca-a4da-1a31722c314d" name="Changes" comment="" />
+      <created>1741449522543</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1741449522543</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-method">
+          <url>file://$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/repository/EnderecoRepository.java</url>
+          <line>10</line>
+          <properties class="com.carambolos.carambolosapi.repository.EnderecoRepository" method="countByUsuarioAndCepAndNumeroEquals">
+            <option name="EMULATED" value="true" />
+            <option name="WATCH_EXIT" value="false" />
+          </properties>
+          <option name="timeStamp" value="12" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>

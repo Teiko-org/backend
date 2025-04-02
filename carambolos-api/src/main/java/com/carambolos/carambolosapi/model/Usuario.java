@@ -1,6 +1,9 @@
 package com.carambolos.carambolosapi.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "usuario")
@@ -9,17 +12,21 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false)
+    @NotBlank
     private String nome;
 
-    @Column(unique = true, nullable = false)
+    @Email
+    @NotBlank
     private String email;
 
-    @Column(unique = true, nullable = false)
-    private String telefone;
-
-    @Column(nullable = false)
+    @NotBlank
+    @Size(min = 6)
     private String senha;
+
+    @NotBlank
+    @Size(max = 14)
+    private String contato;
+
 
     public Integer getId() {
         return id;
@@ -45,12 +52,12 @@ public class Usuario {
         this.email = email;
     }
 
-    public String getTelefone() {
-        return telefone;
+    public String getContato() {
+        return contato;
     }
 
-    public void setTelefone(String telefone) {
-        this.telefone = telefone;
+    public void setContato(String contato) {
+        this.contato = contato;
     }
 
     public String getSenha() {
