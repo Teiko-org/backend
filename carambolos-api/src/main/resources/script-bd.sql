@@ -1,3 +1,4 @@
+
 CREATE DATABASE IF NOT EXISTS teiko;
 USE teiko ;
 
@@ -5,7 +6,7 @@ USE teiko ;
 -- Table teiko.usuario
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS teiko.usuario (
-  id INT NOT NULL,
+  id INT NOT NULL AUTO_INCREMENT,
   nome VARCHAR(60) NOT NULL,
   email VARCHAR(80) NOT NULL,
   senha VARCHAR(16) NOT NULL,
@@ -21,7 +22,7 @@ CREATE TABLE IF NOT EXISTS teiko.usuario (
 -- Table teiko.endereco
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS teiko.endereco (
-  id INT NOT NULL,
+  id INT NOT NULL AUTO_INCREMENT,
   cep CHAR(8) NOT NULL,
   estado VARCHAR(20) NOT NULL,
   cidade VARCHAR(100) NOT NULL,
@@ -43,7 +44,7 @@ CREATE TABLE IF NOT EXISTS teiko.endereco (
 -- Table teiko.produto_fornada
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS teiko.produto_fornada (
-  id INT NOT NULL,
+  id INT NOT NULL AUTO_INCREMENT,
   produto VARCHAR(50) NULL,
   descricao VARCHAR(70) NULL,
   valor DOUBLE NULL,
@@ -56,7 +57,7 @@ CREATE TABLE IF NOT EXISTS teiko.produto_fornada (
 -- Table teiko.fornada
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS teiko.fornada (
-  id INT NOT NULL,
+  id INT NOT NULL AUTO_INCREMENT,
   data_inicio DATE NULL,
   data_fim DATE NULL,
   PRIMARY KEY (id),
@@ -68,7 +69,7 @@ CREATE TABLE IF NOT EXISTS teiko.fornada (
 -- Table teiko.fornada_da_vez
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS teiko.fornada_da_vez (
-  id INT NOT NULL,
+  id INT NOT NULL AUTO_INCREMENT,
   produto_fornada_id INT NOT NULL,
   fornada_id INT NOT NULL,
   quantidade INT NULL,
@@ -87,7 +88,7 @@ CREATE TABLE IF NOT EXISTS teiko.fornada_da_vez (
 -- Table teiko.pedido_fornada
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS teiko.pedido_fornada (
-  id INT NOT NULL,
+  id INT NOT NULL AUTO_INCREMENT,
   fornada_da_vez_id INT NOT NULL,
   endereco_id INT NOT NULL,
   usuario_id INT NULL,
@@ -112,7 +113,7 @@ CREATE TABLE IF NOT EXISTS teiko.pedido_fornada (
 -- Table teiko.massa
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS teiko.massa (
-  id INT NOT NULL,
+  id INT NOT NULL AUTO_INCREMENT,
   sabor VARCHAR(50) NOT NULL,
   valor DOUBLE NOT NULL,
   PRIMARY KEY (id)
@@ -122,7 +123,7 @@ CREATE TABLE IF NOT EXISTS teiko.massa (
 -- Table teiko.cobertura
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS teiko.cobertura (
-  id INT NOT NULL,
+  id INT NOT NULL AUTO_INCREMENT,
   cor VARCHAR(20) NOT NULL,
   descricao VARCHAR(70) NULL,
   PRIMARY KEY (id)
@@ -132,7 +133,7 @@ CREATE TABLE IF NOT EXISTS teiko.cobertura (
 -- Table teiko.decoracao
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS teiko.decoracao (
-  id INT NOT NULL,
+  id INT NOT NULL AUTO_INCREMENT,
   imagem_referencia BLOB NULL,
   PRIMARY KEY (id)
 );
@@ -141,7 +142,7 @@ CREATE TABLE IF NOT EXISTS teiko.decoracao (
 -- Table teiko.recheio_unitario
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS teiko.recheio_unitario (
-  id INT NOT NULL,
+  id INT NOT NULL AUTO_INCREMENT,
   sabor VARCHAR(50) NOT NULL,
   descricao VARCHAR(70) NULL,
   valor DOUBLE NOT NULL,
@@ -152,7 +153,7 @@ CREATE TABLE IF NOT EXISTS teiko.recheio_unitario (
 -- Table teiko.recheio_exclusivo
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS teiko.recheio_exclusivo (
-  id INT NOT NULL,
+  id INT NOT NULL AUTO_INCREMENT,
   recheio_unitario_id INT NOT NULL,
   nome VARCHAR(50) NOT NULL,
   recheio_exclusivocol VARCHAR(45) NOT NULL,
@@ -167,7 +168,7 @@ CREATE TABLE IF NOT EXISTS teiko.recheio_exclusivo (
 -- Table teiko.recheio_pedido
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS teiko.recheio_pedido (
-  id INT NOT NULL,
+  id INT NOT NULL AUTO_INCREMENT,
   recheio_unitario_id INT NULL,
   recheio_exclusivo INT NULL,
   PRIMARY KEY (id),
@@ -180,56 +181,68 @@ CREATE TABLE IF NOT EXISTS teiko.recheio_pedido (
     REFERENCES teiko.recheio_exclusivo (recheio_unitario_id)
 );
 
+-- -----------------------------------------------------
+-- Table teiko.bolo
+-- -----------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS teiko.bolo (
+  id INT NOT NULL,
+  recheio_pedido_id INT NOT NULL,
+  massa_id INT NOT NULL,
+  cobertura_id INT NOT NULL,
+  decoracao_id INT NULL,
+  formato VARCHAR(45) NULL,
+  tamanho INT NULL,
+  PRIMARY KEY (id, recheio_pedido_id, massa_id, cobertura_id),
+  INDEX fk_Bolo_massa1_idx (massa_id ASC) VISIBLE,
+  INDEX fk_Bolo_decoracao1_idx (decoracao_id ASC) VISIBLE,
+  INDEX fk_Bolo_cobertura1_idx (cobertura_id ASC) VISIBLE,
+  CONSTRAINT fk_Bolo_recheio_pedido1
+    FOREIGN KEY (recheio_pedido_id)
+    REFERENCES teiko.recheio_pedido (id),
+  CONSTRAINT fk_Bolo_massa1
+    FOREIGN KEY (massa_id)
+    REFERENCES teiko.massa (id),
+  CONSTRAINT fk_Bolo_decoracao1
+    FOREIGN KEY (decoracao_id)
+    REFERENCES teiko.decoracao (id),
+  CONSTRAINT fk_Bolo_cobertura1
+    FOREIGN KEY (cobertura_id)
+    REFERENCES teiko.cobertura (id)
+);
 
 -- -----------------------------------------------------
 -- Table teiko.pedido_bolo
 -- -----------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS teiko.pedido_bolo (
   id INT NOT NULL,
   endereco_id INT NOT NULL,
+  bolo_id INT NOT NULL,
   usuario_id INT NULL,
-  massa_id INT NOT NULL,
-  cobertura_id INT NOT NULL,
-  recheio_pedido_id INT NOT NULL,
-  formato VARCHAR(45) NOT NULL,
-  decoracao_id INT NULL,
   observacao VARCHAR(70) NULL,
-  tamanho INT NOT NULL,
   data_previsao_entrega DATE NOT NULL,
   data_ultima_atualizacao DATETIME NOT NULL,
-  PRIMARY KEY (id, endereco_id, recheio_pedido_id, cobertura_id, massa_id),
-  INDEX fk_resumo_massa1_idx (massa_id ASC) VISIBLE,
-  INDEX fk_resumo_cobertura1_idx (cobertura_id ASC) VISIBLE,
-  INDEX fk_resumo_decoracao1_idx (decoracao_id ASC) VISIBLE,
+  PRIMARY KEY (id, endereco_id, Bolo_id),
   INDEX fk_pedido_bolo_usuario1_idx (usuario_id ASC) VISIBLE,
   INDEX fk_pedido_bolo_endereco1_idx (endereco_id ASC) VISIBLE,
-  INDEX fk_pedido_bolo_recheio_pedido1_idx (recheio_pedido_id ASC) VISIBLE,
-  CONSTRAINT fk_resumo_massa1
-    FOREIGN KEY (massa_id)
-    REFERENCES teiko.massa (id),
-  CONSTRAINT fk_resumo_cobertura1
-    FOREIGN KEY (cobertura_id)
-    REFERENCES teiko.cobertura (id),
-  CONSTRAINT fk_resumo_decoracao1
-    FOREIGN KEY (decoracao_id)
-    REFERENCES teiko.decoracao (id),
+  INDEX fk_pedido_bolo_Bolo1_idx (Bolo_id ASC) VISIBLE,
   CONSTRAINT fk_pedido_bolo_usuario1
     FOREIGN KEY (usuario_id)
     REFERENCES teiko.usuario (id),
   CONSTRAINT fk_pedido_bolo_endereco1
     FOREIGN KEY (endereco_id)
     REFERENCES teiko.endereco (id),
-  CONSTRAINT fk_pedido_bolo_recheio_pedido1
-    FOREIGN KEY (recheio_pedido_id)
-    REFERENCES teiko.recheio_pedido (id)
+  CONSTRAINT fk_pedido_bolo_Bolo1
+    FOREIGN KEY (bolo_id)
+    REFERENCES teiko.bolo (id)
 );
-
 
 -- -----------------------------------------------------
 -- Table teiko.resumo_pedido
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS teiko.resumo_pedido (
-  id INT NOT NULL,
+  id INT NOT NULL AUTO_INCREMENT,
   status VARCHAR(45) NOT NULL,
   valor DOUBLE NOT NULL,
   data_pedido DATETIME NOT NULL,
