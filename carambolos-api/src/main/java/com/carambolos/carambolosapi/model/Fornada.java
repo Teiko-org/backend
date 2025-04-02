@@ -1,26 +1,23 @@
 package com.carambolos.carambolosapi.model;
 
 import jakarta.persistence.*;
-
-import javax.xml.crypto.Data;
-import java.time.LocalDate;
 import java.util.Date;
+import java.util.UUID;
 
 @Entity
-@Table(name = "fornada")
 public class Fornada {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
     private Date data_inicio;
     private Date data_fim;
 
-    public Integer getId() {
-        return id;
+    public UUID getId() {
+        return id = UUID.randomUUID();
     }
 
-    public void setId(Integer id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 

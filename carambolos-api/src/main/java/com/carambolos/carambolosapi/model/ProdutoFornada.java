@@ -1,23 +1,23 @@
 package com.carambolos.carambolosapi.model;
 
 import jakarta.persistence.*;
+import java.util.UUID;
 
 @Entity
-@Table(name = "produto_fornada")
 public class ProdutoFornada {
 
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private Integer id;
-        private String produto;
-        private String descricao;
-        private Double valor;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
+    private String produto;
+    private String descricao;
+    private Double valor;
 
-    public Integer getId() {
-        return id;
+    public UUID getId() {
+        return id = UUID.randomUUID();
     }
 
-    public void setId(Integer id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
