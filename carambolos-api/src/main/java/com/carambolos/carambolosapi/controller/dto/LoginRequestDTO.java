@@ -1,7 +1,15 @@
-package com.carambolos.carambolosapi.controller.request;
+package com.carambolos.carambolosapi.controller.dto;
 
-public class LoginRequest {
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+public class LoginRequestDTO {
+    @Email
+    @NotBlank
     private String email;
+    @NotBlank
+    @Size(min = 6)
     private String senha;
 
     public String getEmail() {

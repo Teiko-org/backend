@@ -11,19 +11,12 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @NotBlank
     private String nome;
 
-    @Email
-    @NotBlank
     private String email;
 
-    @NotBlank
-    @Size(min = 6)
     private String senha;
 
-    @NotBlank
-    @Size(max = 14)
     private String contato;
 
 
