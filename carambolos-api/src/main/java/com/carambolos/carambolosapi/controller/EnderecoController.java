@@ -2,10 +2,7 @@ package com.carambolos.carambolosapi.controller;
 
 import com.carambolos.carambolosapi.controller.dto.EnderecoRequestDTO;
 import com.carambolos.carambolosapi.controller.dto.EnderecoResponseDTO;
-import com.carambolos.carambolosapi.controller.dto.UsuarioRequestDTO;
-import com.carambolos.carambolosapi.controller.dto.UsuarioResponseDTO;
 import com.carambolos.carambolosapi.model.Endereco;
-import com.carambolos.carambolosapi.model.Usuario;
 import com.carambolos.carambolosapi.service.EnderecoService;
 import com.carambolos.carambolosapi.service.UsuarioService;
 import jakarta.validation.Valid;
@@ -14,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/enderecos")
