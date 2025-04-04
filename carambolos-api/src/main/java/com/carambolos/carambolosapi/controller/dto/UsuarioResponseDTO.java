@@ -1,21 +1,24 @@
-package com.carambolos.carambolosapi.model;
+package com.carambolos.carambolosapi.controller.dto;
 
-import jakarta.persistence.*;
+import com.carambolos.carambolosapi.model.Usuario;
 
-@Entity
-public class Usuario {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class UsuarioResponseDTO {
     private Integer id;
-
     private String nome;
-
     private String email;
-
-    private String senha;
-
     private String contato;
 
+    public static UsuarioResponseDTO toResponseDTO(Usuario usuario) {
+        UsuarioResponseDTO responseDto = new UsuarioResponseDTO();
+
+        responseDto.setId(usuario.getId());
+        responseDto.setNome(usuario.getNome());
+        responseDto.setEmail(usuario.getEmail());
+        responseDto.setContato(usuario.getContato());
+
+        return responseDto;
+
+    }
 
     public Integer getId() {
         return id;
@@ -47,13 +50,5 @@ public class Usuario {
 
     public void setContato(String contato) {
         this.contato = contato;
-    }
-
-    public String getSenha() {
-        return senha;
-    }
-
-    public void setSenha(String senha) {
-        this.senha = senha;
     }
 }

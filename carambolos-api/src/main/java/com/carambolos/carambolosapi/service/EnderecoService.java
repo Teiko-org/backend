@@ -1,13 +1,13 @@
 package com.carambolos.carambolosapi.service;
 
+import com.carambolos.carambolosapi.exception.EntidadeJaExisteException;
+import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.model.Endereco;
 import com.carambolos.carambolosapi.repository.EnderecoRepository;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 
 @Service
@@ -16,39 +16,42 @@ public class EnderecoService {
     @Autowired
     private EnderecoRepository enderecoRepository;
 
-    public Optional<List<Endereco>> listar() {
-        return Optional.of(enderecoRepository.findAll());
+    public List<Endereco> listar() {
+        return enderecoRepository.findAll();
     }
 
-    public Optional<Endereco> buscarPorId(Integer id) {
-        return enderecoRepository.findById(id);
+    public Endereco buscarPorId(Integer id) {
+        return enderecoRepository.findById(id)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Endereço com Id %d não encontrado.".formatted(id)));
     }
 
-    public Endereco cadastrar(Endereco endereco) throws BadRequestException {
-        varificarDuplicidade(endereco);
-        return enderecoRepository.save(endereco);
-    }
-
-    public Endereco atualizar(Endereco endereco) throws BadRequestException {
-        varificarDuplicidade(endereco);
-        return enderecoRepository.save(endereco);
-    }
-
-    public Void deletar(Integer id) {
-        enderecoRepository.deleteById(id);
-        return null;
-    }
-
-    public boolean existePorId(Integer id) {
-        return enderecoRepository.existsById(id);
-    }
-
-    public Boolean varificarDuplicidade(Endereco endereco) throws BadRequestException {
-        Integer enderecoDuplicado = enderecoRepository.countByUsuarioAndCepAndNumeroEquals(endereco.getUsuario(), endereco.getCep(), endereco.getNumero());
-
-        if (enderecoDuplicado > 0) {
-            throw new BadRequestException("endereço ja cadastrado");
+    public Endereco cadastrar(Endereco endereco) {
+        if (existeEnderecoDuplicado(endereco)) {
+            throw new EntidadeJaExisteException("Endereço já cadastrado");
         }
-        return false;
+        return enderecoRepository.save(endereco);
+    }
+
+    public Endereco atualizar(Integer id, Endereco endereco) {
+        if (!enderecoRepository.existsById(id)) {
+            throw new EntidadeNaoEncontradaException(("Endereço com Id %d não encontrado.".formatted(id)));
+        }
+        if (existeEnderecoDuplicado(endereco)) {
+            throw new EntidadeJaExisteException("Endereço já cadastrado");
+        }
+        endereco.setId(id);
+        return enderecoRepository.save(endereco);
+    }
+
+    public void deletar(Integer id) {
+        if (!enderecoRepository.existsById(id)) {
+            throw new EntidadeNaoEncontradaException("Endereço com Id %d não encontrado.".formatted(id));
+        }
+        enderecoRepository.deleteById(id);
+    }
+
+    public Boolean existeEnderecoDuplicado(Endereco endereco) {
+        return enderecoRepository.countByUsuarioAndCepAndNumeroEquals(
+                endereco.getUsuario(), endereco.getCep(), endereco.getNumero()) > 0;
     }
 }

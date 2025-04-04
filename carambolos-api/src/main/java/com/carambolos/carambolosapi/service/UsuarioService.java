@@ -1,5 +1,8 @@
 package com.carambolos.carambolosapi.service;
 
+import com.carambolos.carambolosapi.exception.CredenciaisInvalidasException;
+import com.carambolos.carambolosapi.exception.EntidadeJaExisteException;
+import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.model.Usuario;
 import com.carambolos.carambolosapi.repository.UsuarioRepository;
 import com.carambolos.carambolosapi.utils.JwtUtil;
@@ -8,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UsuarioService {
@@ -26,52 +28,71 @@ public class UsuarioService {
         return usuarioRepository.findAll();
     }
 
-    public Optional<Usuario> buscarPorId(Integer id) {
-        return usuarioRepository.findById(id);
+    public Usuario buscarPorId(Integer id) {
+        return usuarioRepository.findById(id)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Usuario com Id %d não encontrado.".formatted(id)));
     }
 
     public Usuario atualizar(Integer id, Usuario usuario) {
-       return usuarioRepository.findById(id)
-               .map(usuarioExistente -> {
-                   usuarioExistente.setNome(usuario.getNome());
-                   usuarioExistente.setEmail(usuario.getEmail());
+       Usuario usuarioExistente = usuarioRepository.findById(id)
+               .orElseThrow(() -> new EntidadeNaoEncontradaException("Usuario com Id %d não encontrado.".formatted(id)));
 
-                   String senhaAntiga = usuarioExistente.getSenha();
-                   String senhaNova = usuario.getSenha();
+       boolean existePorEmail = usuarioRepository.existsByEmailAndIdNot(usuario.getEmail(), id);
+       boolean existePorContato = usuarioRepository.existsByContatoAndIdNot(usuario.getContato(), id);
 
-                   if (senhaNova != null && !senhaNova.equals(senhaAntiga)) {
-                       String senhaCriptografada = passwordEncoderUtil.senhaCodificada().encode(senhaNova);
-                       usuarioExistente.setSenha(senhaCriptografada);
-                   }
+       if (existePorEmail) {
+           throw new EntidadeJaExisteException("Esse e-mail já existe no sistema.");
+       }
 
-                   return usuarioRepository.save(usuarioExistente);
-               }).orElse(null);
+       if (existePorContato) {
+           throw new EntidadeJaExisteException("Esse contato já existe no sistema.");
+       }
+
+       if (usuario.getNome() != null) {
+            usuarioExistente.setNome(usuario.getNome());
+       }
+       if (usuario.getEmail() != null) {
+            usuarioExistente.setEmail(usuario.getEmail());
+       }
+       if (usuario.getContato() != null) {
+            usuarioExistente.setContato(usuario.getContato());
+       }
+       if (usuario.getSenha() != null) {
+            usuarioExistente.setSenha(usuario.getSenha());
+       }
+
+       usuario.setId(id);
+       return usuarioRepository.save(usuarioExistente);
     }
 
     public Usuario cadastrar(Usuario usuario)  {
-        String senhaCriptografada = passwordEncoderUtil.senhaCodificada().encode(usuario.getSenha());
-        usuario.setSenha(senhaCriptografada);
+        if (usuarioRepository.findByEmail(usuario.getEmail()).isPresent()) {
+            throw new EntidadeJaExisteException("Esse e-mail já está em uso.");
+        }
+
+        if (usuarioRepository.findByContato(usuario.getContato()).isPresent()) {
+            throw new EntidadeJaExisteException("Esse telefone já está em uso.");
+        }
+
         return usuarioRepository.save(usuario);
     }
 
     public Usuario login(String email, String senha) {
         Usuario usuario = usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new CredenciaisInvalidasException("Usuário com e-mail %s não encontrado".formatted(email)));
 
-        if (!passwordEncoderUtil.senhaCodificada().matches(senha, usuario.getSenha())) {
-            throw new RuntimeException("Senha incorreta");
+        if (!usuario.getSenha().equals(senha)) {
+            throw new CredenciaisInvalidasException("E-mail ou Senha incorretos");
         }
 
         return usuario;
     }
 
-    public boolean deletar(Integer id) {
-        if (usuarioRepository.existsById(id)) {
-            usuarioRepository.deleteById(id);
-            return true;
+    public void deletar(Integer id) {
+        if (!usuarioRepository.existsById(id)) {
+            throw new EntidadeNaoEncontradaException("Usuario com Id %d não encontrado.".formatted(id));
         }
-
-        return false;
+            usuarioRepository.deleteById(id);
     }
 
 }
