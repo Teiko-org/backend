@@ -2,22 +2,25 @@ package com.carambolos.carambolosapi.model;
 
 import jakarta.persistence.*;
 import java.util.Date;
-import java.util.UUID;
+import java.util.List;
 
 @Entity
 public class Fornada {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
     private Date data_inicio;
     private Date data_fim;
 
-    public UUID getId() {
-        return id = UUID.randomUUID();
+    @OneToMany(mappedBy = "fornada")
+    private List<FornadaDaVez> fornadasDaVez;
+
+    public Integer getId() {
+        return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -35,5 +38,13 @@ public class Fornada {
 
     public void setData_fim(Date data_fim) {
         this.data_fim = data_fim;
+    }
+
+    public List<FornadaDaVez> getFornadasDaVez() {
+        return fornadasDaVez;
+    }
+
+    public void setFornadasDaVez(List<FornadaDaVez> fornadasDaVez) {
+        this.fornadasDaVez = fornadasDaVez;
     }
 }
