@@ -1,4 +1,7 @@
 package com.carambolos.carambolosapi.repository;
 
-public interface BoloRepository {
+import com.carambolos.carambolosapi.model.Bolo;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface BoloRepository extends JpaRepository<Bolo,Integer> {
 }
