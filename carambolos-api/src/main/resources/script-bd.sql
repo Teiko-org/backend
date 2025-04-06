@@ -1,4 +1,3 @@
-
 CREATE DATABASE IF NOT EXISTS teiko;
 USE teiko ;
 
@@ -156,7 +155,6 @@ CREATE TABLE IF NOT EXISTS teiko.recheio_exclusivo (
   id INT NOT NULL AUTO_INCREMENT,
   recheio_unitario_id INT NOT NULL,
   nome VARCHAR(50) NOT NULL,
-  recheio_exclusivocol VARCHAR(45) NOT NULL,
   PRIMARY KEY (id, recheio_unitario_id),
   INDEX recheio_unitario1_idx (recheio_unitario_id ASC) VISIBLE,
   CONSTRAINT fk_recheio_exclusivo_recheio_unitario1

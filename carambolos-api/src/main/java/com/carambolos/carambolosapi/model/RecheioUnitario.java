@@ -15,8 +15,6 @@ public class RecheioUnitario {
     private String descricao;
     private Double valor;
 
-
-
     public Integer getId() {
         return id;
     }

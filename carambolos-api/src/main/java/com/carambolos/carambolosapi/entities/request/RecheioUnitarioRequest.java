@@ -8,7 +8,6 @@ import jakarta.validation.constraints.NotNull;
 public record RecheioUnitarioRequest(
     @NotBlank
     String sabor,
-    @NotBlank
     String descricao,
     @NotNull
     @DecimalMin("0.0")
