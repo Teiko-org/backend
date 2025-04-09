@@ -153,12 +153,16 @@ CREATE TABLE IF NOT EXISTS teiko.recheio_unitario (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS teiko.recheio_exclusivo (
   id INT NOT NULL AUTO_INCREMENT,
-  recheio_unitario_id INT NOT NULL,
+  recheio_unitario_id1 INT NOT NULL,
+  recheio_unitario_id2 INT NOT NULL,
   nome VARCHAR(50) NOT NULL,
-  PRIMARY KEY (id, recheio_unitario_id),
+  PRIMARY KEY (id, recheio_unitario_id1, recheio_unitario_id2),
   INDEX recheio_unitario1_idx (recheio_unitario_id ASC) VISIBLE,
   CONSTRAINT fk_recheio_exclusivo_recheio_unitario1
     FOREIGN KEY (recheio_unitario_id)
+    REFERENCES teiko.recheio_unitario (id),
+CONSTRAINT fk_recheio_exclusivo_recheio_unitario2
+    FOREIGN KEY (recheio_unitario_id2)
     REFERENCES teiko.recheio_unitario (id)
 );
 
