@@ -4,22 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d18db469-eff1-47ca-a4da-1a31722c314d" name="Changes" comment="adiciona crud recheios unitarios">
-      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/entities/RecheioExclusivoProjection.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/entities/request/RecheioExclusivoRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/entities/response/RecheioExclusivoResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/repository/RecheioExclusivoRepository.java" afterDir="false" />
+    <list default="true" id="d18db469-eff1-47ca-a4da-1a31722c314d" name="Changes" comment="script bd">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/CarambolosApiApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/CarambolosApiApplication.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/controller/BoloController.java" beforeDir="false" afterPath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/controller/BoloController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/entities/request/RecheioUnitarioRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/entities/request/RecheioUnitarioRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/model/RecheioExclusivo.java" beforeDir="false" afterPath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/model/RecheioExclusivo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/model/RecheioUnitario.java" beforeDir="false" afterPath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/model/RecheioUnitario.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/repository/RecheioExclusivoRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/repository/RecheioExclusivoRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/repository/RecheioUnitarioRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/repository/RecheioUnitarioRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/service/BoloService.java" beforeDir="false" afterPath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/service/BoloService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/utils/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/carambolos-api/src/main/java/com/carambolos/carambolosapi/utils/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/carambolos-api/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/carambolos-api/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/carambolos-api/src/main/resources/script-bd.sql" beforeDir="false" afterPath="$PROJECT_DIR$/carambolos-api/src/main/resources/script-bd.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,6 +29,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "PajorVi"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/Teiko-org/backend.git",
+    "accountId": "ef1fae58-dc0a-41f7-8f74-418e685be827"
+  }
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 8
@@ -47,19 +50,20 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.CarambolosApiApplication.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;feature/crud-bolos&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/JOOJ/Documents/GitHub/backend&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.CarambolosApiApplication.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "feature/crud-bolos",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/JOOJ/Documents/GitHub/backend",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0"
   }
-}</component>
+}]]></component>
   <component name="RunManager">
     <configuration name="CarambolosApiApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.carambolos.carambolosapi.CarambolosApiApplication" />
@@ -105,12 +109,38 @@
       <option name="project" value="LOCAL" />
       <updated>1743867489559</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="git ignore">
+      <option name="closed" value="true" />
+      <created>1744063982679</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1744063982679</updated>
+    </task>
+    <task id="LOCAL-00004" summary="git ignore">
+      <option name="closed" value="true" />
+      <created>1744238714896</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1744238714896</updated>
+    </task>
+    <task id="LOCAL-00005" summary="script bd">
+      <option name="closed" value="true" />
+      <created>1744239320952</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1744239320952</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="adiciona crud recheios unitarios" />
-    <option name="LAST_COMMIT_MESSAGE" value="adiciona crud recheios unitarios" />
+    <MESSAGE value="git ignore" />
+    <MESSAGE value="script bd" />
+    <option name="LAST_COMMIT_MESSAGE" value="script bd" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

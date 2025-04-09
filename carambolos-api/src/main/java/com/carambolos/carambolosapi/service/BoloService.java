@@ -40,7 +40,7 @@ public class BoloService {
         RecheioUnitario recheioExistente = recheioUnitarioRepository.findById(id)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Recheio com o id %d não encontrado".formatted(id)));
 
-        if(recheioUnitarioRepository.countBySaborIgnoreCase(recheioUnitario.getSabor()) > 0) {
+        if(recheioUnitarioRepository.countBySaborIgnoreCaseAndIdNot(recheioUnitario.getSabor(), id) > 0) {
             throw new EntidadeJaExisteException("Recheio com o sabor %s já existe".formatted(recheioUnitario.getSabor()));
         }
 
@@ -66,17 +66,26 @@ public class BoloService {
         recheioUnitarioRepository.deleteById(id);
     }
 
-    public RecheioExclusivo cadastrarRecheioExclusivo(RecheioExclusivo recheioExclusivo) {
+    public RecheioExclusivoProjection cadastrarRecheioExclusivo(RecheioExclusivo recheioExclusivo){
+        int id1 = recheioExclusivo.getRecheioUnitarioId1();
+        int id2 = recheioExclusivo.getRecheioUnitarioId2();
+
+        boolean recheiosExistem = recheioUnitarioRepository.existsById(id1) && recheioUnitarioRepository.existsById(id2);
+        if (!recheiosExistem) {
+            throw new EntidadeNaoEncontradaException("Um ou mais recheios cadastrados não existem");
+        }
+
         Integer recheiosExistentes = recheioExclusivoRepository.countByRecheioUnitarioIds(
-                recheioExclusivo.getRecheioUnitarioId1(),
-                recheioExclusivo.getRecheioUnitarioId2()
+                id1,
+                id2
         );
 
         if(recheiosExistentes > 0) {
             throw new EntidadeJaExisteException("Recheio exclusivo já existente");
         }
 
-        return recheioExclusivoRepository.save(recheioExclusivo);
+        RecheioExclusivo recheioSalvo = recheioExclusivoRepository.save(recheioExclusivo);
+        return recheioExclusivoRepository.buscarRecheioExclusivoPorId(recheioSalvo.getId());
     }
 
     public RecheioExclusivoProjection buscarRecheioExclusivoPorId(Integer id) {
