@@ -157,9 +157,10 @@ CREATE TABLE IF NOT EXISTS teiko.recheio_exclusivo (
   recheio_unitario_id2 INT NOT NULL,
   nome VARCHAR(50) NOT NULL,
   PRIMARY KEY (id, recheio_unitario_id1, recheio_unitario_id2),
-  INDEX recheio_unitario1_idx (recheio_unitario_id ASC) VISIBLE,
+  INDEX recheio_unitario1_idx (recheio_unitario_id1 ASC) VISIBLE,
+  INDEX recheio_unitario2_idx (recheio_unitario_id2 ASC) VISIBLE,
   CONSTRAINT fk_recheio_exclusivo_recheio_unitario1
-    FOREIGN KEY (recheio_unitario_id)
+    FOREIGN KEY (recheio_unitario_id1)
     REFERENCES teiko.recheio_unitario (id),
 CONSTRAINT fk_recheio_exclusivo_recheio_unitario2
     FOREIGN KEY (recheio_unitario_id2)
@@ -171,16 +172,20 @@ CONSTRAINT fk_recheio_exclusivo_recheio_unitario2
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS teiko.recheio_pedido (
   id INT NOT NULL AUTO_INCREMENT,
-  recheio_unitario_id INT NULL,
+  recheio_unitario_id1 INT NULL,
+  recheio_unitario_id2 INT NULL,
   recheio_exclusivo INT NULL,
   PRIMARY KEY (id),
   INDEX exclusivo1_idx (recheio_exclusivo ASC) VISIBLE,
   CONSTRAINT fk_unitario1
-    FOREIGN KEY (recheio_unitario_id)
+    FOREIGN KEY (recheio_unitario_id1)
+    REFERENCES teiko.recheio_unitario (id),
+  CONSTRAINT fk_unitario2
+    FOREIGN KEY (recheio_unitario_id2)
     REFERENCES teiko.recheio_unitario (id),
   CONSTRAINT fk_recheio_exclusivo1
     FOREIGN KEY (recheio_exclusivo)
-    REFERENCES teiko.recheio_exclusivo (recheio_unitario_id)
+    REFERENCES teiko.recheio_exclusivo (id)
 );
 
 -- -----------------------------------------------------
