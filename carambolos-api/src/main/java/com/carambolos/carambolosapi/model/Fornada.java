@@ -1,6 +1,10 @@
 package com.carambolos.carambolosapi.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -10,11 +14,14 @@ public class Fornada {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Date data_inicio;
-    private Date data_fim;
 
-    @OneToMany(mappedBy = "fornada")
-    private List<FornadaDaVez> fornadasDaVez;
+    @Column(name = "data_inicio")
+    @NotNull
+    private LocalDate dataInicio;
+
+    @Column(name = "data_fim")
+    @NotNull
+    private LocalDate dataFim;
 
     public Integer getId() {
         return id;
@@ -24,27 +31,19 @@ public class Fornada {
         this.id = id;
     }
 
-    public Date getData_inicio() {
-        return data_inicio;
+    public LocalDate getDataInicio() {
+        return dataInicio;
     }
 
-    public void setData_inicio(Date data_inicio) {
-        this.data_inicio = data_inicio;
+    public void setDataInicio(LocalDate dataInicio) {
+        this.dataInicio = dataInicio;
     }
 
-    public Date getData_fim() {
-        return data_fim;
+    public LocalDate getDataFim() {
+        return dataFim;
     }
 
-    public void setData_fim(Date data_fim) {
-        this.data_fim = data_fim;
-    }
-
-    public List<FornadaDaVez> getFornadasDaVez() {
-        return fornadasDaVez;
-    }
-
-    public void setFornadasDaVez(List<FornadaDaVez> fornadasDaVez) {
-        this.fornadasDaVez = fornadasDaVez;
+    public void setDataFim(LocalDate dataFim) {
+        this.dataFim = dataFim;
     }
 }

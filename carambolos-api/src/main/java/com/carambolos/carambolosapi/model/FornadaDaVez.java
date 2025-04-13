@@ -1,22 +1,31 @@
 package com.carambolos.carambolosapi.model;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
 @Entity
+@Table(name = "fornada_da_vez")
 public class FornadaDaVez {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     @ManyToOne
-    @JoinColumn(name = "produto_fornada_id")
+    @JoinColumn(name = "produto_fornada_id", referencedColumnName = "id", nullable = false)
+    @NotNull
     private ProdutoFornada produtoFornada;
 
     @ManyToOne
-    @JoinColumn(name = "fornada_id")
+    @JoinColumn(name = "fornada_id", referencedColumnName = "id", nullable = false)
+    @NotNull
     private Fornada fornada;
 
+    @NotNull
+    @Min(1)
     private Integer quantidade;
 
     public Integer getId() {

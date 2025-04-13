@@ -1,10 +1,13 @@
 package com.carambolos.carambolosapi.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
+@Table(name = "pedido_fornada")
 public class PedidoFornada {
 
     @Id
@@ -13,18 +16,25 @@ public class PedidoFornada {
 
     @ManyToOne
     @JoinColumn(name = "fornada_da_vez_id")
+    @NotNull
     private FornadaDaVez fornadaDaVez;
 
     @OneToOne
     @JoinColumn(name = "endereco_id")
+    @NotNull
     private Endereco endereco;
 
     @OneToOne(optional = true)
     @JoinColumn(name = "usuario_id")
+    @NotNull
     private Usuario usuario;
 
+    @NotNull
     private Integer quantidade;
-    private Date data_previsao_entrega;
+
+    @Column(name = "data_previsao_entrega")
+    @NotNull
+    private LocalDate dataPrevisaoEntrega;
 
     public Integer getId() {
         return id;
@@ -66,11 +76,11 @@ public class PedidoFornada {
         this.quantidade = quantidade;
     }
 
-    public Date getData_previsao_entrega() {
-        return data_previsao_entrega;
+    public LocalDate getDataPrevisaoEntrega() {
+        return dataPrevisaoEntrega;
     }
 
-    public void setData_previsao_entrega(Date data_previsao_entrega) {
-        this.data_previsao_entrega = data_previsao_entrega;
+    public void setDataPrevisaoEntrega(LocalDate dataPrevisaoEntrega) {
+        this.dataPrevisaoEntrega = dataPrevisaoEntrega;
     }
 }
