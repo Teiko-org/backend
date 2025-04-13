@@ -91,4 +91,27 @@ public class BoloService {
     public RecheioExclusivoProjection buscarRecheioExclusivoPorId(Integer id) {
         return recheioExclusivoRepository.buscarRecheioExclusivoPorId(id);
     }
+
+    public List<RecheioExclusivoProjection> listarRecheiosExclusivos() {
+        return recheioExclusivoRepository.listarRecheiosExclusivos();
+    }
+
+    public RecheioExclusivoProjection editarRecheioExclusivo(RecheioExclusivo recheioExclusivo, Integer id) {
+        RecheioExclusivo recheioExistente = recheioExclusivoRepository.findById(id)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Recheio com o id %d não encontrado".formatted(id)));
+
+        if(recheioExclusivo.getNome() != null) {
+            recheioExistente.setNome(recheioExclusivo.getNome());
+        }
+        if(recheioExclusivo.getRecheioUnitarioId1() != null) {
+            recheioExistente.setRecheioUnitarioId1(recheioExclusivo.getRecheioUnitarioId1());
+        }
+        if(recheioExclusivo.getRecheioUnitarioId2() != null) {
+            recheioExistente.setRecheioUnitarioId2(recheioExclusivo.getRecheioUnitarioId2());
+        }
+        recheioExistente.setId(id);
+        recheioExclusivoRepository.save(recheioExclusivo);
+
+        return buscarRecheioExclusivoPorId(id);
+    }
 }

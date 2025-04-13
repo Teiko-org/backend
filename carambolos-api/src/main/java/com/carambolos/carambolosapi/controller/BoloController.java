@@ -96,7 +96,23 @@ public class BoloController {
     }
 
     @GetMapping("/recheio-exclusivo")
-    ResponseEntity<List<RecheioUnitarioResponse>> listarRecheiosExclusivos() {
+    ResponseEntity<List<RecheioExclusivoResponse>> listarRecheiosExclusivos() {
+        List<RecheioExclusivoProjection> recheiosEncontrados = boloService.listarRecheiosExclusivos();
+        return ResponseEntity.status(200).body(
+                RecheioExclusivoResponse.toRecheioExclusivoResponse(recheiosEncontrados)
+        );
+    }
 
+    //TODO - testar o PUT
+    @PutMapping("recheio-exclusivo/{id}")
+    ResponseEntity<RecheioExclusivoResponse> atualizarRecheioExclusivo(
+            @PathVariable Integer id,
+            @RequestBody RecheioExclusivoRequest request
+    ) {
+        RecheioExclusivo recheioExclusivo = RecheioExclusivoRequest.toRecheioExclusivo(request);
+        RecheioExclusivoProjection recheioSalvo = boloService.editarRecheioExclusivo(recheioExclusivo, id);
+        return ResponseEntity.status(200).body(
+                RecheioExclusivoResponse.toRecheioExclusivoResponse(recheioSalvo)
+        );
     }
 }

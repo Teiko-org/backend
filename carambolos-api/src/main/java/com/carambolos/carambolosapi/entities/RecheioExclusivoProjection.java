@@ -1,7 +1,5 @@
 package com.carambolos.carambolosapi.entities;
 
-import com.carambolos.carambolosapi.model.RecheioUnitario;
-
 public class RecheioExclusivoProjection {
     private Integer id;
     private String nome;

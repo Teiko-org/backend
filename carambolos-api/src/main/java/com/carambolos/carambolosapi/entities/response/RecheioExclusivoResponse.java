@@ -2,6 +2,8 @@ package com.carambolos.carambolosapi.entities.response;
 
 import com.carambolos.carambolosapi.entities.RecheioExclusivoProjection;
 
+import java.util.List;
+
 public record RecheioExclusivoResponse(
         Integer id,
         String nome,
@@ -9,6 +11,9 @@ public record RecheioExclusivoResponse(
         String sabor2
 
 ) {
+    public static List<RecheioExclusivoResponse> toRecheioExclusivoResponse(List<RecheioExclusivoProjection> projections) {
+        return projections.stream().map(RecheioExclusivoResponse::toRecheioExclusivoResponse).toList();
+    }
     public static RecheioExclusivoResponse toRecheioExclusivoResponse(RecheioExclusivoProjection projection) {
         return new RecheioExclusivoResponse(
                 projection.getId(),
