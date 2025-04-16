@@ -6,9 +6,8 @@ import com.carambolos.carambolosapi.model.PedidoFornada;
 import com.carambolos.carambolosapi.model.Usuario;
 
 import java.time.LocalDate;
-import java.util.Date;
 
-public record PedidoFornadaRequest(
+public record PedidoFornadaRequestDTO(
         Integer fornadaDaVezId,
         Integer enderecoId,
         Integer usuarioId,

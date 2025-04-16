@@ -1,6 +1,6 @@
 package com.carambolos.carambolosapi.controller.request;
 
-public class LoginRequest {
+public class LoginRequestDTO {
     private String email;
     private String senha;
 

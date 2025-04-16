@@ -1,13 +1,10 @@
 package com.carambolos.carambolosapi.service;
-import com.carambolos.carambolosapi.controller.request.ProdutoFornadaRequest;
+import com.carambolos.carambolosapi.controller.request.ProdutoFornadaRequestDTO;
 import com.carambolos.carambolosapi.exception.EntidadeJaExisteException;
 import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.model.ProdutoFornada;
 import com.carambolos.carambolosapi.repository.ProdutoFornadaRepository;
-import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -20,7 +17,7 @@ public class ProdutoFornadaService {
         this.produtoFornadaRepository = produtoFornadaRepository;
     }
 
-    public ProdutoFornada criarProdutoFornada(ProdutoFornadaRequest request) {
+    public ProdutoFornada criarProdutoFornada(ProdutoFornadaRequestDTO request) {
         if (produtoFornadaRepository.existsByProduto(request.produto())) {
             throw new EntidadeJaExisteException("Já existe um ProdutoFornada com o nome informado: " + request.produto());
         }
@@ -45,7 +42,7 @@ public class ProdutoFornadaService {
         produtoFornadaRepository.deleteById(id);
     }
 
-    public ProdutoFornada atualizarProdutoFornada(Integer id, ProdutoFornadaRequest request) {
+    public ProdutoFornada atualizarProdutoFornada(Integer id, ProdutoFornadaRequestDTO request) {
         ProdutoFornada produtoFornada = produtoFornadaRepository.findById(id)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("ProdutoFornada com ID " + id + " não encontrado para atualização."));
 

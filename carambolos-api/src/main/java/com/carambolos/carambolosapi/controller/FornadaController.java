@@ -42,7 +42,7 @@ public class FornadaController {
     // ------------ FORNADA -----------------
 
     @PostMapping
-    public ResponseEntity<Fornada> criarFornada(@RequestBody @Valid FornadaRequest request) {
+    public ResponseEntity<Fornada> criarFornada(@RequestBody @Valid FornadaRequestDTO request) {
         return ResponseEntity.status(201).body(fornadaService.criarFornada(request));
     }
 
@@ -57,7 +57,7 @@ public class FornadaController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Fornada> atualizarFornada(@PathVariable Integer id, @RequestBody @Valid FornadaRequest request) {
+    public ResponseEntity<Fornada> atualizarFornada(@PathVariable Integer id, @RequestBody @Valid FornadaRequestDTO request) {
         fornadaService.atualizarFornada(id, request);
         Fornada fornada = request.toEntity();
         return ResponseEntity.status(200).body(fornada);
@@ -73,7 +73,7 @@ public class FornadaController {
 
     @PostMapping("/produto-fornada")
     public ResponseEntity<ProdutoFornada> criarProdutoFornada(
-            @RequestBody @Valid ProdutoFornadaRequest request
+            @RequestBody @Valid ProdutoFornadaRequestDTO request
     ){
         return ResponseEntity.status(201).body(produtoFornadaService.criarProdutoFornada(request));
     }
@@ -91,7 +91,7 @@ public class FornadaController {
     @PutMapping("/produto-fornada/{id}")
     public ResponseEntity<ProdutoFornada> atualizarProdutoFornada(
             @PathVariable Integer id,
-            @RequestBody @Valid ProdutoFornadaRequest request) {
+            @RequestBody @Valid ProdutoFornadaRequestDTO request) {
         return ResponseEntity.status(200).body(produtoFornadaService.atualizarProdutoFornada(id, request));
     }
 
@@ -104,7 +104,7 @@ public class FornadaController {
     // ----------------- FORNADA DA VEZ -----------------
 
     @PostMapping("/da-vez")
-    public ResponseEntity<FornadaDaVez> criarFornadaDaVez(@RequestBody @Valid FornadaDaVezRequest request) {
+    public ResponseEntity<FornadaDaVez> criarFornadaDaVez(@RequestBody @Valid FornadaDaVezRequestDTO request) {
         return ResponseEntity.status(201).body(fornadaDaVezService.criarFornadaDaVez(request));
     }
 
@@ -121,7 +121,7 @@ public class FornadaController {
     @PutMapping("/da-vez/{id}")
     public ResponseEntity<FornadaDaVez> atualizarFornadaDaVez(
             @PathVariable Integer id,
-            @RequestBody @Valid FornadaDaVezUpdateRequest request) {
+            @RequestBody @Valid FornadaDaVezUpdateRequestDTO request) {
         return ResponseEntity.status(200).body(fornadaDaVezService.atualizarQuantidade(id, request));
     }
 
@@ -135,7 +135,7 @@ public class FornadaController {
 
     @PostMapping("/pedidos")
     public ResponseEntity<PedidoFornada> criarPedidoFornada(
-            @RequestBody @Valid PedidoFornadaRequest request
+            @RequestBody @Valid PedidoFornadaRequestDTO request
     ){
         return ResponseEntity.status(201).body(pedidoFornadaService.criarPedidoFornada(request));
     }
@@ -153,7 +153,7 @@ public class FornadaController {
     @PutMapping("/pedidos/{id}")
     public ResponseEntity<PedidoFornada> atualizarPedidoFornada(
             @PathVariable Integer id,
-            @RequestBody @Valid PedidoFornadaUpdateRequest request) {
+            @RequestBody @Valid PedidoFornadaUpdateRequestDTO request) {
         return ResponseEntity.status(200).body(pedidoFornadaService.atualizarPedidoFornada(id, request));
     }
 

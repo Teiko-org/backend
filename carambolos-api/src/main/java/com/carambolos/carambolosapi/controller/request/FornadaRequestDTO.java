@@ -3,7 +3,7 @@ package com.carambolos.carambolosapi.controller.request;
 import com.carambolos.carambolosapi.model.Fornada;
 import java.time.LocalDate;
 
-public record FornadaRequest(
+public record FornadaRequestDTO(
         Integer id,
         LocalDate dataInicio,
         LocalDate dataFim

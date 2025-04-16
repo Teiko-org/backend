@@ -2,7 +2,7 @@ package com.carambolos.carambolosapi.controller.request;
 
 import com.carambolos.carambolosapi.model.FornadaDaVez;
 
-public record FornadaDaVezUpdateRequest(
+public record FornadaDaVezUpdateRequestDTO(
         Integer quantidade
 ) {
     public FornadaDaVez toEntity() {

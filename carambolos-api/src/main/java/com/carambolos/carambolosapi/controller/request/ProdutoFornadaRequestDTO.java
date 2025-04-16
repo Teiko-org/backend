@@ -2,7 +2,7 @@ package com.carambolos.carambolosapi.controller.request;
 
 import com.carambolos.carambolosapi.model.ProdutoFornada;
 
-public record ProdutoFornadaRequest(
+public record ProdutoFornadaRequestDTO(
         String produto,
         String descricao,
         Double valor

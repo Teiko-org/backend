@@ -1,6 +1,6 @@
 package com.carambolos.carambolosapi.service;
 
-import com.carambolos.carambolosapi.controller.request.FornadaRequest;
+import com.carambolos.carambolosapi.controller.request.FornadaRequestDTO;
 import com.carambolos.carambolosapi.exception.EntidadeJaExisteException;
 import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.model.Fornada;
@@ -18,7 +18,7 @@ public class FornadaService {
         this.fornadaRepository = fornadaRepository;
     }
 
-    public Fornada criarFornada(FornadaRequest request) {
+    public Fornada criarFornada(FornadaRequestDTO request) {
         Fornada fornada = request.toEntity();
 
         if (fornada.getId() != null && fornadaRepository.existsById(fornada.getId())) {
@@ -44,7 +44,7 @@ public class FornadaService {
         fornadaRepository.deleteById(id);
     }
 
-    public Fornada atualizarFornada(Integer id, FornadaRequest request) {
+    public Fornada atualizarFornada(Integer id, FornadaRequestDTO request) {
         Fornada fornada = fornadaRepository.findById(id).orElseThrow(()
                 -> new EntidadeNaoEncontradaException("Fornada com cadastro " + id + " não encontrada para atualização."));
 

@@ -4,7 +4,7 @@ import com.carambolos.carambolosapi.model.PedidoFornada;
 
 import java.time.LocalDate;
 
-public record PedidoFornadaUpdateRequest(
+public record PedidoFornadaUpdateRequestDTO(
         Integer quantidade,
         LocalDate dataPrevisaoEntrega
 ) {

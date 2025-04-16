@@ -1,7 +1,7 @@
 package com.carambolos.carambolosapi.service;
 
-import com.carambolos.carambolosapi.controller.request.PedidoFornadaRequest;
-import com.carambolos.carambolosapi.controller.request.PedidoFornadaUpdateRequest;
+import com.carambolos.carambolosapi.controller.request.PedidoFornadaRequestDTO;
+import com.carambolos.carambolosapi.controller.request.PedidoFornadaUpdateRequestDTO;
 import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.model.Endereco;
 import com.carambolos.carambolosapi.model.FornadaDaVez;
@@ -33,7 +33,7 @@ public class PedidoFornadaService {
         this.usuarioRepository = usuarioRepository;
     }
 
-    public PedidoFornada criarPedidoFornada(PedidoFornadaRequest request) {
+    public PedidoFornada criarPedidoFornada(PedidoFornadaRequestDTO request) {
         FornadaDaVez fornadaDaVez = fornadaDaVezRepository.findById(request.fornadaDaVezId())
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("FornadaDaVez com ID " + request.fornadaDaVezId() + " não encontrada."));
 
@@ -66,7 +66,7 @@ public class PedidoFornadaService {
         pedidoFornadaRepository.deleteById(id);
     }
 
-    public PedidoFornada atualizarPedidoFornada(Integer id, PedidoFornadaUpdateRequest request) {
+    public PedidoFornada atualizarPedidoFornada(Integer id, PedidoFornadaUpdateRequestDTO request) {
         PedidoFornada pedidoFornada = pedidoFornadaRepository.findById(id)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("PedidoFornada com ID " + id + " não encontrado para atualização."));
 

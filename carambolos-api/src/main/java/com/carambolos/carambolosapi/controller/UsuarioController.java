@@ -1,6 +1,6 @@
 package com.carambolos.carambolosapi.controller;
 
-import com.carambolos.carambolosapi.controller.request.LoginRequest;
+import com.carambolos.carambolosapi.controller.request.LoginRequestDTO;
 import com.carambolos.carambolosapi.model.Usuario;
 import com.carambolos.carambolosapi.service.UsuarioService;
 import jakarta.validation.Valid;
@@ -38,7 +38,7 @@ public class UsuarioController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Usuario> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<Usuario> login(@RequestBody LoginRequestDTO loginRequest) {
         Usuario usuarioAutenticado = usuarioService
                 .login(loginRequest.getEmail(), loginRequest.getSenha());
         return ResponseEntity.status(200).body(usuarioAutenticado);

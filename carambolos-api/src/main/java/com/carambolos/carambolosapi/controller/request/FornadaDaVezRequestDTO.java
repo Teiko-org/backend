@@ -4,7 +4,7 @@ import com.carambolos.carambolosapi.model.Fornada;
 import com.carambolos.carambolosapi.model.FornadaDaVez;
 import com.carambolos.carambolosapi.model.ProdutoFornada;
 
-public record FornadaDaVezRequest(
+public record FornadaDaVezRequestDTO(
         Integer produtoFornadaId,
         Integer fornadaId,
         Integer quantidade
