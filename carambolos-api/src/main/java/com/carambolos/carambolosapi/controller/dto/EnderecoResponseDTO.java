@@ -1,31 +1,36 @@
-package com.carambolos.carambolosapi.model;
+package com.carambolos.carambolosapi.controller.dto;
 
-import jakarta.persistence.*;
+import com.carambolos.carambolosapi.model.Endereco;
 
-@Entity
-public class Endereco {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class EnderecoResponseDTO {
     private int id;
-
     private String cep;
-
     private String estado;
-
     private String cidade;
-
     private String bairro;
-
     private String logradouro;
-
     private String numero;
-
     private String complemento;
-
     private String referencia;
-
-    @Column(name = "usuario_id")
     private Integer usuario;
+
+    public static EnderecoResponseDTO toResponseDTO(Endereco endereco) {
+        EnderecoResponseDTO responseDto = new EnderecoResponseDTO();
+
+        responseDto.setId(endereco.getId());
+        responseDto.setCep(endereco.getCep());
+        responseDto.setEstado(endereco.getEstado());
+        responseDto.setCidade(endereco.getCidade());
+        responseDto.setBairro(endereco.getBairro());
+        responseDto.setLogradouro(endereco.getLogradouro());
+        responseDto.setNumero(endereco.getNumero());
+        responseDto.setComplemento(endereco.getComplemento());
+        responseDto.setReferencia(endereco.getReferencia());
+        responseDto.setUsuario(endereco.getUsuario());
+
+        return responseDto;
+
+    }
 
     public int getId() {
         return id;
@@ -103,7 +108,7 @@ public class Endereco {
         return usuario;
     }
 
-    public void setUsuario(int usuario) {
+    public void setUsuario(Integer usuario) {
         this.usuario = usuario;
     }
 }
