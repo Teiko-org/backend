@@ -1,6 +1,8 @@
 package com.carambolos.carambolosapi.controller;
 
-import com.carambolos.carambolosapi.entities.RecheioExclusivoProjection;
+import com.carambolos.carambolosapi.entities.request.RecheioPedidoRequest;
+import com.carambolos.carambolosapi.entities.response.RecheioPedidoResponse;
+import com.carambolos.carambolosapi.model.projection.RecheioExclusivoProjection;
 import com.carambolos.carambolosapi.entities.request.RecheioExclusivoRequest;
 import com.carambolos.carambolosapi.entities.request.RecheioUnitarioRequest;
 import com.carambolos.carambolosapi.entities.response.RecheioExclusivoResponse;
@@ -8,6 +10,7 @@ import com.carambolos.carambolosapi.entities.response.RecheioUnitarioResponse;
 import com.carambolos.carambolosapi.model.RecheioExclusivo;
 import com.carambolos.carambolosapi.model.RecheioPedido;
 import com.carambolos.carambolosapi.model.RecheioUnitario;
+import com.carambolos.carambolosapi.model.projection.RecheioPedidoProjection;
 import com.carambolos.carambolosapi.service.BoloService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +49,7 @@ public class BoloController {
     }
 
     @GetMapping("/recheio-unitario/{id}")
-    public ResponseEntity<RecheioUnitarioResponse> buscarPorId(
+    public ResponseEntity<RecheioUnitarioResponse> buscarRecheioUnitarioPorId(
             @PathVariable Integer id
     ) {
         RecheioUnitario recheioUnitario = boloService.buscarPorId(id);
@@ -87,7 +90,7 @@ public class BoloController {
     }
 
     @GetMapping("/recheio-exclusivo/{id}")
-    ResponseEntity<RecheioExclusivoResponse> buscarRecheioExclusivoPorId(
+    public ResponseEntity<RecheioExclusivoResponse> buscarRecheioExclusivoPorId(
             @PathVariable Integer id
     ) {
         RecheioExclusivoProjection projection = boloService.buscarRecheioExclusivoPorId(id);
@@ -97,15 +100,15 @@ public class BoloController {
     }
 
     @GetMapping("/recheio-exclusivo")
-    ResponseEntity<List<RecheioExclusivoResponse>> listarRecheiosExclusivos() {
+    public ResponseEntity<List<RecheioExclusivoResponse>> listarRecheiosExclusivos() {
         List<RecheioExclusivoProjection> recheiosEncontrados = boloService.listarRecheiosExclusivos();
         return ResponseEntity.status(200).body(
                 RecheioExclusivoResponse.toRecheioExclusivoResponse(recheiosEncontrados)
         );
     }
 
-    @PutMapping("recheio-exclusivo/{id}")
-    ResponseEntity<RecheioExclusivoResponse> atualizarRecheioExclusivo(
+    @PutMapping("/recheio-exclusivo/{id}")
+    public ResponseEntity<RecheioExclusivoResponse> atualizarRecheioExclusivo(
             @PathVariable Integer id,
             @RequestBody RecheioExclusivoRequest request
     ) {
@@ -116,20 +119,38 @@ public class BoloController {
         );
     }
 
-    @DeleteMapping("recheio-exclusivo/{id}")
-    ResponseEntity<Void> excluirRecheioUnitario(
+    @DeleteMapping("/recheio-exclusivo/{id}")
+    public ResponseEntity<Void> excluirRecheioExclusivo(
             @PathVariable Integer id
     ) {
-        boloService.excluirRecheioUnitario(id);
+        boloService.excluirRecheioExclusivo(id);
         return ResponseEntity.status(200).build();
     }
 
-    @PostMapping("recheio-pedido")
-    ResponseEntity<RecheioPedido> cadastrarRecheioPedido(
-            @RequestBody RecheioPedido recheioPedido
+    @PostMapping("/recheio-pedido")
+    public ResponseEntity<RecheioPedidoResponse> cadastrarRecheioPedido(
+            @RequestBody RecheioPedidoRequest request
     ) {
+        RecheioPedido recheioPedido = RecheioPedidoRequest.toRecheioPedido(request);
+        RecheioPedidoProjection projection = boloService.cadastrarRecheioPedido(recheioPedido);
+        RecheioPedidoResponse response = RecheioPedidoResponse.toResponse(projection);
         return ResponseEntity.status(201).body(
-                boloService.cadastrarRecheioPedido(recheioPedido)
+                response
         );
     }
+
+    @GetMapping("/recheio-pedido/{id}")
+    public ResponseEntity<RecheioPedidoResponse> buscarRecheioPedidoPorId(
+            @PathVariable Integer id
+    ) {
+        RecheioPedidoProjection projection =  boloService.buscarRecheioPedidoPorId(id);
+        return ResponseEntity.status(200).body(RecheioPedidoResponse.toResponse(projection));
+    }
+
+//    @GetMapping("/recheio-pedido")
+//    public ResponseEntity<List<RecheioPedidoResponse>> listarRecheiosPedido() {
+//        return ResponseEntity.status(200).body(
+//
+//        );
+//    }
 }

@@ -1,16 +1,16 @@
-package com.carambolos.carambolosapi.entities;
+package com.carambolos.carambolosapi.model.projection;
 
-public class RecheioExclusivoProjection {
-    private Integer id;
-    private String nome;
-    private String sabor1;
-    private String sabor2;
+public class RecheioPedidoProjection {
+    Integer id;
+    String sabor1;
+    String sabor2;
+    Double valor;
 
-    public RecheioExclusivoProjection(Integer id, String nome, String sabor1, String sabor2) {
+    public RecheioPedidoProjection(Integer id, String sabor1, String sabor2, Double valor) {
         this.id = id;
-        this.nome = nome;
         this.sabor1 = sabor1;
         this.sabor2 = sabor2;
+        this.valor = valor;
     }
 
     public Integer getId() {
@@ -19,14 +19,6 @@ public class RecheioExclusivoProjection {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
     }
 
     public String getSabor1() {
@@ -43,5 +35,13 @@ public class RecheioExclusivoProjection {
 
     public void setSabor2(String sabor2) {
         this.sabor2 = sabor2;
+    }
+
+    public Double getValor() {
+        return valor;
+    }
+
+    public void setValor(Double valor) {
+        this.valor = valor;
     }
 }

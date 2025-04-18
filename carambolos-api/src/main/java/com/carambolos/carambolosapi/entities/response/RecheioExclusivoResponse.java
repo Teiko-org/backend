@@ -1,6 +1,6 @@
 package com.carambolos.carambolosapi.entities.response;
 
-import com.carambolos.carambolosapi.entities.RecheioExclusivoProjection;
+import com.carambolos.carambolosapi.model.projection.RecheioExclusivoProjection;
 
 import java.util.List;
 

@@ -1,6 +1,6 @@
 package com.carambolos.carambolosapi.repository;
 
-import com.carambolos.carambolosapi.entities.RecheioExclusivoProjection;
+import com.carambolos.carambolosapi.model.projection.RecheioExclusivoProjection;
 import com.carambolos.carambolosapi.model.RecheioExclusivo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

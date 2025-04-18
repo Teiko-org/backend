@@ -2,18 +2,47 @@ package com.carambolos.carambolosapi.model;
 
 import jakarta.persistence.*;
 
-@Entity
+@Entity(name = "recheio_pedido")
 public class RecheioPedido {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @Column(name = "recheio_unitario_id1")
+    private Integer recheioUnitarioId1;
+    @Column(name = "recheio_unitario_id2")
+    private Integer recheioUnitarioId2;
+    @Column(name = "recheio_exclusivo")
+    private Integer recheioExclusivo;
 
-    @ManyToOne
-    private RecheioUnitario recheio_unitario_id1;
+    public Integer getId() {
+        return id;
+    }
 
-    @ManyToOne
-    private RecheioUnitario recheio_unitario_id2;
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-    @OneToOne
-    private RecheioExclusivo recheio_exclusivo;
+    public Integer getRecheioUnitarioId1() {
+        return recheioUnitarioId1;
+    }
+
+    public void setRecheioUnitarioId1(Integer recheioUnitarioId1) {
+        this.recheioUnitarioId1 = recheioUnitarioId1;
+    }
+
+    public Integer getRecheioUnitarioId2() {
+        return recheioUnitarioId2;
+    }
+
+    public void setRecheioUnitarioId2(Integer recheioUnitarioId2) {
+        this.recheioUnitarioId2 = recheioUnitarioId2;
+    }
+
+    public Integer getRecheioExclusivo() {
+        return recheioExclusivo;
+    }
+
+    public void setRecheioExclusivo(Integer recheioExclusivo) {
+        this.recheioExclusivo = recheioExclusivo;
+    }
 }
