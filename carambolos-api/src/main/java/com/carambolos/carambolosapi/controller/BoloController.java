@@ -6,6 +6,7 @@ import com.carambolos.carambolosapi.entities.request.RecheioUnitarioRequest;
 import com.carambolos.carambolosapi.entities.response.RecheioExclusivoResponse;
 import com.carambolos.carambolosapi.entities.response.RecheioUnitarioResponse;
 import com.carambolos.carambolosapi.model.RecheioExclusivo;
+import com.carambolos.carambolosapi.model.RecheioPedido;
 import com.carambolos.carambolosapi.model.RecheioUnitario;
 import com.carambolos.carambolosapi.service.BoloService;
 import jakarta.validation.Valid;
@@ -103,7 +104,6 @@ public class BoloController {
         );
     }
 
-    //TODO - testar o PUT
     @PutMapping("recheio-exclusivo/{id}")
     ResponseEntity<RecheioExclusivoResponse> atualizarRecheioExclusivo(
             @PathVariable Integer id,
@@ -113,6 +113,23 @@ public class BoloController {
         RecheioExclusivoProjection recheioSalvo = boloService.editarRecheioExclusivo(recheioExclusivo, id);
         return ResponseEntity.status(200).body(
                 RecheioExclusivoResponse.toRecheioExclusivoResponse(recheioSalvo)
+        );
+    }
+
+    @DeleteMapping("recheio-exclusivo/{id}")
+    ResponseEntity<Void> excluirRecheioUnitario(
+            @PathVariable Integer id
+    ) {
+        boloService.excluirRecheioUnitario(id);
+        return ResponseEntity.status(200).build();
+    }
+
+    @PostMapping("recheio-pedido")
+    ResponseEntity<RecheioPedido> cadastrarRecheioPedido(
+            @RequestBody RecheioPedido recheioPedido
+    ) {
+        return ResponseEntity.status(201).body(
+                boloService.cadastrarRecheioPedido(recheioPedido)
         );
     }
 }

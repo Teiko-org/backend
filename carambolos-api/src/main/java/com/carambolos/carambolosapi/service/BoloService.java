@@ -4,8 +4,10 @@ import com.carambolos.carambolosapi.entities.RecheioExclusivoProjection;
 import com.carambolos.carambolosapi.exception.EntidadeJaExisteException;
 import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.model.RecheioExclusivo;
+import com.carambolos.carambolosapi.model.RecheioPedido;
 import com.carambolos.carambolosapi.model.RecheioUnitario;
 import com.carambolos.carambolosapi.repository.RecheioExclusivoRepository;
+import com.carambolos.carambolosapi.repository.RecheioPedidoRepository;
 import com.carambolos.carambolosapi.repository.RecheioUnitarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,9 @@ public class BoloService {
 
     @Autowired
     private RecheioExclusivoRepository recheioExclusivoRepository;
+
+    @Autowired
+    private RecheioPedidoRepository recheioPedidoRepository;
 
     public RecheioUnitario cadastrarRecheioUnitario(RecheioUnitario recheioUnitario) {
         if(recheioUnitarioRepository.countBySaborIgnoreCase(recheioUnitario.getSabor()) > 0) {
@@ -75,12 +80,10 @@ public class BoloService {
             throw new EntidadeNaoEncontradaException("Um ou mais recheios cadastrados não existem");
         }
 
-        Integer recheiosExistentes = recheioExclusivoRepository.countByRecheioUnitarioIds(
-                id1,
-                id2
-        );
+        Integer recheiosExistentes1 = recheioExclusivoRepository.countByRecheioUnitarioIds(id1, id2);
+        Integer recheiosExistentes2 = recheioExclusivoRepository.countByRecheioUnitarioIds(id2, id1);
 
-        if(recheiosExistentes > 0) {
+        if(recheiosExistentes1 > 0 || recheiosExistentes2 > 0) {
             throw new EntidadeJaExisteException("Recheio exclusivo já existente");
         }
 
@@ -100,6 +103,31 @@ public class BoloService {
         RecheioExclusivo recheioExistente = recheioExclusivoRepository.findById(id)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Recheio com o id %d não encontrado".formatted(id)));
 
+        Integer id1 = recheioExistente.getRecheioUnitarioId1();
+        Integer id2 = recheioExistente.getRecheioUnitarioId2();
+        Integer recheiosExistentes1 = recheioExclusivoRepository.countByRecheioUnitarioIds(id1, id2);
+        Integer recheiosExistentes2 = recheioExclusivoRepository.countByRecheioUnitarioIds(id2, id1);
+
+        if (recheiosExistentes1 > 0 || recheiosExistentes2 > 0) {
+            throw new EntidadeJaExisteException("Recheio exclusivo já existente");
+        }
+
+        recheioExistente = verificarCampos(recheioExclusivo, recheioExistente);
+        recheioExistente.setId(id);
+        recheioExclusivoRepository.save(recheioExclusivo);
+
+        return buscarRecheioExclusivoPorId(id);
+    }
+
+    public Void excluirRecheioUnitario(Integer id) {
+        if(recheioExclusivoRepository.existsById(id)) {
+            recheioExclusivoRepository.deleteById(id);
+            return null;
+        }
+        throw new EntidadeNaoEncontradaException("Recheio exclusivo com id %s não encontrado".formatted(id));
+    }
+
+    private RecheioExclusivo verificarCampos(RecheioExclusivo recheioExclusivo, RecheioExclusivo recheioExistente) {
         if(recheioExclusivo.getNome() != null) {
             recheioExistente.setNome(recheioExclusivo.getNome());
         }
@@ -109,9 +137,10 @@ public class BoloService {
         if(recheioExclusivo.getRecheioUnitarioId2() != null) {
             recheioExistente.setRecheioUnitarioId2(recheioExclusivo.getRecheioUnitarioId2());
         }
-        recheioExistente.setId(id);
-        recheioExclusivoRepository.save(recheioExclusivo);
+        return recheioExistente;
+    }
 
-        return buscarRecheioExclusivoPorId(id);
+    public RecheioPedido cadastrarRecheioPedido(RecheioPedido recheioPedido) {
+        return recheioPedidoRepository.save(recheioPedido);
     }
 }
