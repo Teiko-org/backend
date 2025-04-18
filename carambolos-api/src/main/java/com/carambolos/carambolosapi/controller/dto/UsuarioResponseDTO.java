@@ -7,6 +7,7 @@ public class UsuarioResponseDTO {
     private String nome;
     private String email;
     private String contato;
+    private boolean isAtivo;
 
     public static UsuarioResponseDTO toResponseDTO(Usuario usuario) {
         UsuarioResponseDTO responseDto = new UsuarioResponseDTO();
@@ -15,6 +16,7 @@ public class UsuarioResponseDTO {
         responseDto.setNome(usuario.getNome());
         responseDto.setEmail(usuario.getEmail());
         responseDto.setContato(usuario.getContato());
+        responseDto.setAtivo(usuario.isAtivo());
 
         return responseDto;
 
@@ -50,5 +52,13 @@ public class UsuarioResponseDTO {
 
     public void setContato(String contato) {
         this.contato = contato;
+    }
+
+    public boolean isAtivo() {
+        return isAtivo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        isAtivo = ativo;
     }
 }

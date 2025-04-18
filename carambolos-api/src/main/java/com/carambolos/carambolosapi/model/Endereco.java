@@ -1,6 +1,7 @@
 package com.carambolos.carambolosapi.model;
 
 import jakarta.persistence.*;
+import org.springframework.beans.factory.annotation.Value;
 
 @Entity
 public class Endereco {
@@ -23,6 +24,9 @@ public class Endereco {
     private String complemento;
 
     private String referencia;
+
+//    @Column(name = "is_ativo")
+//    private boolean isAtivo = true;
 
     @Column(name = "usuario_id")
     private Integer usuario;
@@ -106,4 +110,12 @@ public class Endereco {
     public void setUsuario(int usuario) {
         this.usuario = usuario;
     }
+
+//    public Boolean isAtivo() {
+//        return isAtivo;
+//    }
+//
+//    public void setAtivo(Boolean ativo) {
+//        isAtivo = ativo;
+//    }
 }
