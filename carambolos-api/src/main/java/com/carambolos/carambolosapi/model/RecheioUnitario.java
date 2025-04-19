@@ -1,6 +1,5 @@
 package com.carambolos.carambolosapi.model;
 
-import com.carambolos.carambolosapi.entities.response.RecheioUnitarioResponse;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

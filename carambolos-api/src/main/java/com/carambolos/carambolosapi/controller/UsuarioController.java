@@ -1,8 +1,8 @@
 package com.carambolos.carambolosapi.controller;
 
-import com.carambolos.carambolosapi.controller.dto.LoginRequestDTO;
-import com.carambolos.carambolosapi.controller.dto.UsuarioRequestDTO;
-import com.carambolos.carambolosapi.controller.dto.UsuarioResponseDTO;
+import com.carambolos.carambolosapi.controller.request.LoginRequestDTO;
+import com.carambolos.carambolosapi.controller.request.UsuarioRequestDTO;
+import com.carambolos.carambolosapi.controller.response.UsuarioResponseDTO;
 import com.carambolos.carambolosapi.model.Usuario;
 import com.carambolos.carambolosapi.service.UsuarioService;
 import jakarta.validation.Valid;

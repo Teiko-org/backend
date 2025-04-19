@@ -1,14 +1,13 @@
-package com.carambolos.carambolosapi.entities.request;
+package com.carambolos.carambolosapi.controller.request;
 
-import com.carambolos.carambolosapi.exception.EntidadeImprocessavelException;
 import com.carambolos.carambolosapi.model.RecheioPedido;
 
-public record RecheioPedidoRequest (
+public record RecheioPedidoRequestDTO(
     Integer idExclusivo,
     Integer idUnitario1,
     Integer idUnitario2
 ){
-    public static RecheioPedido toRecheioPedido(RecheioPedidoRequest request) {
+    public static RecheioPedido toRecheioPedido(RecheioPedidoRequestDTO request) {
         if(request == null) {
             return null;
         }

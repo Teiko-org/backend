@@ -1,12 +1,12 @@
 package com.carambolos.carambolosapi.controller;
 
-import com.carambolos.carambolosapi.entities.request.RecheioPedidoRequest;
-import com.carambolos.carambolosapi.entities.response.RecheioPedidoResponse;
+import com.carambolos.carambolosapi.controller.request.RecheioPedidoRequestDTO;
+import com.carambolos.carambolosapi.controller.response.RecheioPedidoResponseDTO;
 import com.carambolos.carambolosapi.model.projection.RecheioExclusivoProjection;
-import com.carambolos.carambolosapi.entities.request.RecheioExclusivoRequest;
-import com.carambolos.carambolosapi.entities.request.RecheioUnitarioRequest;
-import com.carambolos.carambolosapi.entities.response.RecheioExclusivoResponse;
-import com.carambolos.carambolosapi.entities.response.RecheioUnitarioResponse;
+import com.carambolos.carambolosapi.controller.request.RecheioExclusivoRequestDTO;
+import com.carambolos.carambolosapi.controller.request.RecheioUnitarioRequestDTO;
+import com.carambolos.carambolosapi.controller.response.RecheioExclusivoResponseDTO;
+import com.carambolos.carambolosapi.controller.response.RecheioUnitarioResponseDTO;
 import com.carambolos.carambolosapi.model.RecheioExclusivo;
 import com.carambolos.carambolosapi.model.RecheioPedido;
 import com.carambolos.carambolosapi.model.RecheioUnitario;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.carambolos.carambolosapi.entities.request.RecheioUnitarioRequest.toRecheioUnitario;
+import static com.carambolos.carambolosapi.controller.request.RecheioUnitarioRequestDTO.toRecheioUnitario;
 
 @RestController
 @RequestMapping("/bolos")
@@ -29,44 +29,44 @@ public class BoloController {
     private BoloService boloService;
 
     @PostMapping("/recheio-unitario")
-    public ResponseEntity<RecheioUnitarioResponse> cadastrarRecheioUnitario(
+    public ResponseEntity<RecheioUnitarioResponseDTO> cadastrarRecheioUnitario(
             @Valid
-            @RequestBody RecheioUnitarioRequest request
+            @RequestBody RecheioUnitarioRequestDTO request
     ) {
         RecheioUnitario recheioUnitario = toRecheioUnitario(request);
         RecheioUnitario recheioSalvo = boloService.cadastrarRecheioUnitario(recheioUnitario);
         return ResponseEntity.status(201).body(
-                RecheioUnitarioResponse.toRecheioUnitarioResponse(recheioSalvo)
+                RecheioUnitarioResponseDTO.toRecheioUnitarioResponse(recheioSalvo)
         );
     }
 
     @GetMapping("/recheio-unitario")
-    public ResponseEntity<List<RecheioUnitarioResponse>> listarRecheioUnitario() {
+    public ResponseEntity<List<RecheioUnitarioResponseDTO>> listarRecheioUnitario() {
         List<RecheioUnitario> recheiosUnitarios = boloService.listarRecheiosUnitarios();
         return ResponseEntity.status(200).body(
-                RecheioUnitarioResponse.toRecheioUnitarioResponse(recheiosUnitarios)
+                RecheioUnitarioResponseDTO.toRecheioUnitarioResponse(recheiosUnitarios)
         );
     }
 
     @GetMapping("/recheio-unitario/{id}")
-    public ResponseEntity<RecheioUnitarioResponse> buscarRecheioUnitarioPorId(
+    public ResponseEntity<RecheioUnitarioResponseDTO> buscarRecheioUnitarioPorId(
             @PathVariable Integer id
     ) {
         RecheioUnitario recheioUnitario = boloService.buscarPorId(id);
         return ResponseEntity.status(200).body(
-                RecheioUnitarioResponse.toRecheioUnitarioResponse(recheioUnitario)
+                RecheioUnitarioResponseDTO.toRecheioUnitarioResponse(recheioUnitario)
         );
     }
 
     @PutMapping("/recheio-unitario/{id}")
-    public ResponseEntity<RecheioUnitarioResponse> atualizarRecheioUnitario(
-            @RequestBody RecheioUnitarioRequest request,
+    public ResponseEntity<RecheioUnitarioResponseDTO> atualizarRecheioUnitario(
+            @RequestBody RecheioUnitarioRequestDTO request,
             @PathVariable Integer id
     ) {
-        RecheioUnitario recheioUnitario = RecheioUnitarioRequest.toRecheioUnitario(request);
+        RecheioUnitario recheioUnitario = RecheioUnitarioRequestDTO.toRecheioUnitario(request);
         RecheioUnitario recheioCadastrado = boloService.atualizarRecheioUnitario(recheioUnitario, id);
         return ResponseEntity.status(200).body(
-                RecheioUnitarioResponse.toRecheioUnitarioResponse(recheioCadastrado)
+                RecheioUnitarioResponseDTO.toRecheioUnitarioResponse(recheioCadastrado)
         );
     }
 
@@ -79,43 +79,43 @@ public class BoloController {
     }
 
     @PostMapping("/recheio-exclusivo")
-    public ResponseEntity<RecheioExclusivoResponse> cadastrarRecheioExclusivo(
-            @RequestBody RecheioExclusivoRequest request
+    public ResponseEntity<RecheioExclusivoResponseDTO> cadastrarRecheioExclusivo(
+            @RequestBody RecheioExclusivoRequestDTO request
     ) {
-        RecheioExclusivo recheioExclusivo = RecheioExclusivoRequest.toRecheioExclusivo(request);
+        RecheioExclusivo recheioExclusivo = RecheioExclusivoRequestDTO.toRecheioExclusivo(request);
         RecheioExclusivoProjection recheioSalvo = boloService.cadastrarRecheioExclusivo(recheioExclusivo);
         return ResponseEntity.status(200).body(
-                RecheioExclusivoResponse.toRecheioExclusivoResponse(recheioSalvo)
+                RecheioExclusivoResponseDTO.toRecheioExclusivoResponse(recheioSalvo)
         );
     }
 
     @GetMapping("/recheio-exclusivo/{id}")
-    public ResponseEntity<RecheioExclusivoResponse> buscarRecheioExclusivoPorId(
+    public ResponseEntity<RecheioExclusivoResponseDTO> buscarRecheioExclusivoPorId(
             @PathVariable Integer id
     ) {
         RecheioExclusivoProjection projection = boloService.buscarRecheioExclusivoPorId(id);
         return ResponseEntity.status(200).body(
-                RecheioExclusivoResponse.toRecheioExclusivoResponse(projection)
+                RecheioExclusivoResponseDTO.toRecheioExclusivoResponse(projection)
         );
     }
 
     @GetMapping("/recheio-exclusivo")
-    public ResponseEntity<List<RecheioExclusivoResponse>> listarRecheiosExclusivos() {
+    public ResponseEntity<List<RecheioExclusivoResponseDTO>> listarRecheiosExclusivos() {
         List<RecheioExclusivoProjection> recheiosEncontrados = boloService.listarRecheiosExclusivos();
         return ResponseEntity.status(200).body(
-                RecheioExclusivoResponse.toRecheioExclusivoResponse(recheiosEncontrados)
+                RecheioExclusivoResponseDTO.toRecheioExclusivoResponse(recheiosEncontrados)
         );
     }
 
     @PutMapping("/recheio-exclusivo/{id}")
-    public ResponseEntity<RecheioExclusivoResponse> atualizarRecheioExclusivo(
+    public ResponseEntity<RecheioExclusivoResponseDTO> atualizarRecheioExclusivo(
             @PathVariable Integer id,
-            @RequestBody RecheioExclusivoRequest request
+            @RequestBody RecheioExclusivoRequestDTO request
     ) {
-        RecheioExclusivo recheioExclusivo = RecheioExclusivoRequest.toRecheioExclusivo(request);
+        RecheioExclusivo recheioExclusivo = RecheioExclusivoRequestDTO.toRecheioExclusivo(request);
         RecheioExclusivoProjection recheioSalvo = boloService.editarRecheioExclusivo(recheioExclusivo, id);
         return ResponseEntity.status(200).body(
-                RecheioExclusivoResponse.toRecheioExclusivoResponse(recheioSalvo)
+                RecheioExclusivoResponseDTO.toRecheioExclusivoResponse(recheioSalvo)
         );
     }
 
@@ -128,28 +128,28 @@ public class BoloController {
     }
 
     @PostMapping("/recheio-pedido")
-    public ResponseEntity<RecheioPedidoResponse> cadastrarRecheioPedido(
-            @RequestBody RecheioPedidoRequest request
+    public ResponseEntity<RecheioPedidoResponseDTO> cadastrarRecheioPedido(
+            @RequestBody RecheioPedidoRequestDTO request
     ) {
-        RecheioPedido recheioPedido = RecheioPedidoRequest.toRecheioPedido(request);
+        RecheioPedido recheioPedido = RecheioPedidoRequestDTO.toRecheioPedido(request);
         RecheioPedidoProjection projection = boloService.cadastrarRecheioPedido(recheioPedido);
-        RecheioPedidoResponse response = RecheioPedidoResponse.toResponse(projection);
+        RecheioPedidoResponseDTO response = RecheioPedidoResponseDTO.toResponse(projection);
         return ResponseEntity.status(201).body(
                 response
         );
     }
 
     @GetMapping("/recheio-pedido/{id}")
-    public ResponseEntity<RecheioPedidoResponse> buscarRecheioPedidoPorId(
+    public ResponseEntity<RecheioPedidoResponseDTO> buscarRecheioPedidoPorId(
             @PathVariable Integer id
     ) {
         RecheioPedidoProjection projection =  boloService.buscarRecheioPedidoPorId(id);
-        return ResponseEntity.status(200).body(RecheioPedidoResponse.toResponse(projection));
+        return ResponseEntity.status(200).body(RecheioPedidoResponseDTO.toResponse(projection));
     }
 
     @GetMapping("/recheio-pedido")
-    public ResponseEntity<List<RecheioPedidoResponse>> listarRecheiosPedido() {
-        List<RecheioPedidoResponse> response = RecheioPedidoResponse.toResponse(
+    public ResponseEntity<List<RecheioPedidoResponseDTO>> listarRecheiosPedido() {
+        List<RecheioPedidoResponseDTO> response = RecheioPedidoResponseDTO.toResponse(
                 boloService.listarRecheiosPedido()
         );
 
