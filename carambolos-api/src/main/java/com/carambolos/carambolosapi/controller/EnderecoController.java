@@ -1,7 +1,8 @@
 package com.carambolos.carambolosapi.controller;
 
+import com.carambolos.carambolosapi.controller.dto.EnderecoRequestDTO;
+import com.carambolos.carambolosapi.controller.dto.EnderecoResponseDTO;
 import com.carambolos.carambolosapi.model.Endereco;
-import com.carambolos.carambolosapi.model.Usuario;
 import com.carambolos.carambolosapi.service.EnderecoService;
 import com.carambolos.carambolosapi.service.UsuarioService;
 import jakarta.validation.Valid;
@@ -10,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/enderecos")
@@ -23,34 +23,43 @@ public class EnderecoController {
     private UsuarioService usuarioService;
 
     @GetMapping
-    public ResponseEntity<List<Endereco>> listar() {
+    public ResponseEntity<List<EnderecoResponseDTO>> listar() {
         List<Endereco> enderecos = enderecoService.listar();
         if (enderecos.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
-        return ResponseEntity.status(200).body(enderecos);
+        List<EnderecoResponseDTO> enderecosResponse = enderecos.stream().map(EnderecoResponseDTO::toResponseDTO).toList();
+        return ResponseEntity.status(200).body(enderecosResponse);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Endereco> buscarPorId(
+    public ResponseEntity<EnderecoResponseDTO> buscarPorId(
             @PathVariable Integer id
     ) {
-        return ResponseEntity.status(200).body(enderecoService.buscarPorId(id));
+        Endereco endereco = enderecoService.buscarPorId(id);
+        EnderecoResponseDTO enderecoResponse = EnderecoResponseDTO.toResponseDTO(endereco);
+        return ResponseEntity.status(200).body(enderecoResponse);
     }
 
     @PostMapping
-    public ResponseEntity<Endereco> cadastrar(
-            @Valid @RequestBody Endereco endereco
+    public ResponseEntity<EnderecoResponseDTO> cadastrar(
+            @Valid @RequestBody EnderecoRequestDTO enderecoRequest
     ) {
-        return ResponseEntity.status(201).body(enderecoService.cadastrar(endereco));
+        Endereco endereco = EnderecoRequestDTO.toEntity(enderecoRequest);
+        Endereco enderecoRegistrado = enderecoService.cadastrar(endereco);
+        EnderecoResponseDTO enderecoResponse = EnderecoResponseDTO.toResponseDTO(enderecoRegistrado);
+        return ResponseEntity.status(201).body(enderecoResponse);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Endereco> atualizar(
+    public ResponseEntity<EnderecoResponseDTO> atualizar(
             @PathVariable Integer id,
-            @RequestBody Endereco endereco
+            @RequestBody EnderecoRequestDTO enderecoRequest
     ) {
-            return ResponseEntity.status(200).body(enderecoService.atualizar(id, endereco));
+        Endereco endereco = EnderecoRequestDTO.toEntity(enderecoRequest);
+        Endereco enderecoAtualizado = enderecoService.atualizar(id, endereco);
+        EnderecoResponseDTO enderecoResponse = EnderecoResponseDTO.toResponseDTO(enderecoAtualizado);
+        return ResponseEntity.status(200).body(enderecoResponse);
     }
 
     @DeleteMapping("/{id}")
