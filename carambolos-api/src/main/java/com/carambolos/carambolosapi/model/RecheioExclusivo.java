@@ -12,6 +12,8 @@ public class RecheioExclusivo {
     @Column(name = "recheio_unitario_id2")
     private Integer recheioUnitarioId2;
     private String nome;
+    @Column(name = "is_ativo")
+    private Boolean isAtivo = true;
 
     public Integer getId() {
         return id;
@@ -43,5 +45,13 @@ public class RecheioExclusivo {
 
     public void setNome(String nome) {
         this.nome = nome;
+    }
+
+    public Boolean getAtivo() {
+        return isAtivo;
+    }
+
+    public void setAtivo(Boolean ativo) {
+        isAtivo = ativo;
     }
 }

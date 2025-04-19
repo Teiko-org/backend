@@ -1,6 +1,7 @@
 package com.carambolos.carambolosapi.model;
 
 import jakarta.persistence.*;
+import org.hibernate.validator.constraints.Currency;
 
 @Entity(name = "recheio_pedido")
 public class RecheioPedido {
@@ -13,6 +14,8 @@ public class RecheioPedido {
     private Integer recheioUnitarioId2;
     @Column(name = "recheio_exclusivo")
     private Integer recheioExclusivo;
+    @Column(name = "is_ativo")
+    private Boolean isAtivo = true;
 
     public Integer getId() {
         return id;
@@ -44,5 +47,13 @@ public class RecheioPedido {
 
     public void setRecheioExclusivo(Integer recheioExclusivo) {
         this.recheioExclusivo = recheioExclusivo;
+    }
+
+    public Boolean getAtivo() {
+        return isAtivo;
+    }
+
+    public void setAtivo(Boolean ativo) {
+        isAtivo = ativo;
     }
 }

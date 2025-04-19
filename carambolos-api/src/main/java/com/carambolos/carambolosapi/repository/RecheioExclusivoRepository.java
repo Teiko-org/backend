@@ -24,7 +24,7 @@ public interface RecheioExclusivoRepository extends JpaRepository<RecheioExclusi
     RecheioExclusivoProjection buscarRecheioExclusivoPorId(Integer id);
 
     @Query(value = """
-            select re.id, re.nome, ru1.sabor, ru2.sabor
+            select re.id, re.nome, ru1.sabor, ru2.sabor, re.is_ativo
             from recheio_exclusivo re\s
             join recheio_unitario ru1 on re.recheio_unitario_id1 = ru1.id
             join recheio_unitario ru2 on re.recheio_unitario_id2 = ru2.id;

@@ -124,7 +124,7 @@ public class BoloController {
             @PathVariable Integer id
     ) {
         boloService.excluirRecheioExclusivo(id);
-        return ResponseEntity.status(200).build();
+        return ResponseEntity.status(204).build();
     }
 
     @PostMapping("/recheio-pedido")
@@ -137,6 +137,16 @@ public class BoloController {
         return ResponseEntity.status(201).body(
                 response
         );
+    }
+
+    @PutMapping("/recheio-pedido/{id}")
+    public ResponseEntity<RecheioPedidoResponseDTO> atualizarRecheioPedido(
+            @PathVariable Integer id,
+            @RequestBody RecheioPedidoRequestDTO request
+    ) {
+        RecheioPedido recheioPedido = RecheioPedidoRequestDTO.toRecheioPedido(request);
+        RecheioPedidoResponseDTO response = RecheioPedidoResponseDTO.toResponse(boloService.atualizarRecheioPedido(recheioPedido, id));
+        return ResponseEntity.status(200).body(response);
     }
 
     @GetMapping("/recheio-pedido/{id}")
@@ -159,5 +169,14 @@ public class BoloController {
 
         return ResponseEntity.status(200).body(response);
     }
+
+    @DeleteMapping("/recheio-pedido/{id}")
+    public ResponseEntity<Void> deletarRecheioPedido(
+            @PathVariable Integer id
+    ) {
+        boloService.deletarRecheioPedido(id);
+        return ResponseEntity.status(204).build();
+    }
+
 
 }

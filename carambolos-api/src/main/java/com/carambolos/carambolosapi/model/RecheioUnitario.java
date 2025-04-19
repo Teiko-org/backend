@@ -1,9 +1,6 @@
 package com.carambolos.carambolosapi.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity(name = "recheio_unitario")
 public class RecheioUnitario {
@@ -13,6 +10,8 @@ public class RecheioUnitario {
     private String sabor;
     private String descricao;
     private Double valor;
+    @Column(name = "is_ativo")
+    private Boolean isAtivo = true;
 
     public Integer getId() {
         return id;
@@ -44,5 +43,13 @@ public class RecheioUnitario {
 
     public void setValor(Double valor) {
         this.valor = valor;
+    }
+
+    public Boolean getAtivo() {
+        return isAtivo;
+    }
+
+    public void setAtivo(Boolean ativo) {
+        isAtivo = ativo;
     }
 }

@@ -36,7 +36,7 @@ public class BoloService {
     }
 
     public List<RecheioUnitario> listarRecheiosUnitarios() {
-        return recheioUnitarioRepository.findAll();
+        return recheioUnitarioRepository.findAll().stream().filter(RecheioUnitario::getAtivo).toList();
     }
 
     public RecheioUnitario buscarPorId(Integer id) {
@@ -68,10 +68,13 @@ public class BoloService {
     }
 
     public void deletarRecheioUnitario(Integer id) {
-        if (!recheioUnitarioRepository.existsById(id)) {
+        Optional<RecheioUnitario> possivelRecheio = recheioUnitarioRepository.findById(id);
+        if (possivelRecheio.isEmpty()) {
             throw new EntidadeNaoEncontradaException("Recheio com id %d não existe".formatted(id));
         }
-        recheioUnitarioRepository.deleteById(id);
+        RecheioUnitario recheio = possivelRecheio.get();
+        recheio.setAtivo(false);
+        recheioUnitarioRepository.save(recheio);
     }
 
     public RecheioExclusivoProjection cadastrarRecheioExclusivo(RecheioExclusivo recheioExclusivo) {
@@ -99,7 +102,9 @@ public class BoloService {
     }
 
     public List<RecheioExclusivoProjection> listarRecheiosExclusivos() {
-        return recheioExclusivoRepository.listarRecheiosExclusivos();
+        return recheioExclusivoRepository.listarRecheiosExclusivos().stream().filter(
+                recheioExclusivo -> recheioExclusivo.getIsAtivo() != 0
+        ).toList();
     }
 
     public RecheioExclusivoProjection editarRecheioExclusivo(RecheioExclusivo recheioExclusivo, Integer id) {
@@ -122,11 +127,15 @@ public class BoloService {
         return buscarRecheioExclusivoPorId(id);
     }
 
-    public Void excluirRecheioExclusivo(Integer id) {
-        if (recheioExclusivoRepository.existsById(id)) {
-            recheioExclusivoRepository.deleteById(id);
-            return null;
+    public void excluirRecheioExclusivo(Integer id) {
+        Optional<RecheioExclusivo> possivelRecheio = recheioExclusivoRepository.findById(id);
+        if (possivelRecheio.isPresent()) {
+            RecheioExclusivo recheio = possivelRecheio.get();
+            recheio.setAtivo(false);
+            recheioExclusivoRepository.save(recheio);
+            return;
         }
+
         throw new EntidadeNaoEncontradaException("Recheio exclusivo com id %s não encontrado".formatted(id));
     }
 
@@ -137,6 +146,18 @@ public class BoloService {
             RecheioPedido recheioSalvo = recheioPedidoRepository.save(recheioPedido);
             return recheioPedidoRepository.buscarRecheioPedidoExclusivoPorId(recheioSalvo.getId());
         }
+        RecheioPedido recheioSalvo = recheioPedidoRepository.save(recheioPedido);
+        return recheioPedidoRepository.buscarRecheioPedidoUnitariosPorId(recheioSalvo.getId());
+    }
+
+    public RecheioPedidoProjection atualizarRecheioPedido(RecheioPedido recheioPedido, Integer id) {
+        verificarCampos(recheioPedido);
+
+        if (recheioPedido.getRecheioExclusivo() != null) {
+            RecheioPedido recheioSalvo = recheioPedidoRepository.save(recheioPedido);
+            return recheioPedidoRepository.buscarRecheioPedidoExclusivoPorId(recheioSalvo.getId());
+        }
+        recheioPedido.setId(id);
         RecheioPedido recheioSalvo = recheioPedidoRepository.save(recheioPedido);
         return recheioPedidoRepository.buscarRecheioPedidoUnitariosPorId(recheioSalvo.getId());
     }
@@ -159,7 +180,22 @@ public class BoloService {
     }
 
     public List<RecheioPedidoProjection> listarRecheiosPedido() {
-        return recheioPedidoRepository.listarRecheiosPedido();
+        return recheioPedidoRepository.listarRecheiosPedido().stream().filter(
+                recheioPedido -> recheioPedido.getIsAtivo() != 0
+        ).toList();
+    }
+
+    public void deletarRecheioPedido(Integer id) {
+        Optional<RecheioPedido> possivelRecheioPedido = recheioPedidoRepository.findById(id);
+
+        if(possivelRecheioPedido.isPresent()) {
+            RecheioPedido recheioPedido = possivelRecheioPedido.get();
+            recheioPedido.setAtivo(false);
+            recheioPedidoRepository.save(recheioPedido);
+            return;
+        }
+
+        throw new EntidadeNaoEncontradaException("Recheio exclusivo com id %s não encontrado".formatted(id));
     }
 
     private RecheioExclusivo verificarCampos(RecheioExclusivo recheioExclusivo, RecheioExclusivo recheioExistente) {

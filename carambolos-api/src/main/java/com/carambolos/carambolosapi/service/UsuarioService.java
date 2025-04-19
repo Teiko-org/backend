@@ -34,38 +34,38 @@ public class UsuarioService {
     }
 
     public Usuario atualizar(Integer id, Usuario usuario) {
-       Usuario usuarioExistente = usuarioRepository.findById(id)
-               .orElseThrow(() -> new EntidadeNaoEncontradaException("Usuario com Id %d não encontrado.".formatted(id)));
+        Usuario usuarioExistente = usuarioRepository.findById(id)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Usuario com Id %d não encontrado.".formatted(id)));
 
-       boolean existePorEmail = usuarioRepository.existsByEmailAndIdNot(usuario.getEmail(), id);
-       boolean existePorContato = usuarioRepository.existsByContatoAndIdNot(usuario.getContato(), id);
+        boolean existePorEmail = usuarioRepository.existsByEmailAndIdNot(usuario.getEmail(), id);
+        boolean existePorContato = usuarioRepository.existsByContatoAndIdNot(usuario.getContato(), id);
 
-       if (existePorEmail) {
-           throw new EntidadeJaExisteException("Esse e-mail já existe no sistema.");
-       }
+        if (existePorEmail) {
+            throw new EntidadeJaExisteException("Esse e-mail já existe no sistema.");
+        }
 
-       if (existePorContato) {
-           throw new EntidadeJaExisteException("Esse contato já existe no sistema.");
-       }
+        if (existePorContato) {
+            throw new EntidadeJaExisteException("Esse contato já existe no sistema.");
+        }
 
-       if (usuario.getNome() != null) {
+        if (usuario.getNome() != null) {
             usuarioExistente.setNome(usuario.getNome());
-       }
-       if (usuario.getEmail() != null) {
+        }
+        if (usuario.getEmail() != null) {
             usuarioExistente.setEmail(usuario.getEmail());
-       }
-       if (usuario.getContato() != null) {
+        }
+        if (usuario.getContato() != null) {
             usuarioExistente.setContato(usuario.getContato());
-       }
-       if (usuario.getSenha() != null) {
+        }
+        if (usuario.getSenha() != null) {
             usuarioExistente.setSenha(usuario.getSenha());
-       }
+        }
 
-       usuario.setId(id);
-       return usuarioRepository.save(usuarioExistente);
+        usuario.setId(id);
+        return usuarioRepository.save(usuarioExistente);
     }
 
-    public Usuario cadastrar(Usuario usuario)  {
+    public Usuario cadastrar(Usuario usuario) {
         if (usuarioRepository.findByEmail(usuario.getEmail()).isPresent()) {
             throw new EntidadeJaExisteException("Esse e-mail já está em uso.");
         }
@@ -84,7 +84,6 @@ public class UsuarioService {
         if (!usuario.getSenha().equals(senha)) {
             throw new CredenciaisInvalidasException("E-mail ou Senha incorretos");
         }
-
         return usuario;
     }
 
@@ -92,7 +91,6 @@ public class UsuarioService {
         if (!usuarioRepository.existsById(id)) {
             throw new EntidadeNaoEncontradaException("Usuario com Id %d não encontrado.".formatted(id));
         }
-            usuarioRepository.deleteById(id);
+        usuarioRepository.deleteById(id);
     }
-
 }
