@@ -1,9 +1,12 @@
 package com.carambolos.carambolosapi.repository;
 
 import com.carambolos.carambolosapi.model.RecheioPedido;
+import com.carambolos.carambolosapi.model.projection.RecheioExclusivoProjection;
 import com.carambolos.carambolosapi.model.projection.RecheioPedidoProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
 
 public interface RecheioPedidoRepository extends JpaRepository<RecheioPedido, Integer> {
     @Query(value = """
@@ -33,4 +36,18 @@ public interface RecheioPedidoRepository extends JpaRepository<RecheioPedido, In
             group by ru1.sabor, ru2.sabor;
             """, nativeQuery = true)
     RecheioPedidoProjection buscarRecheioPedidoExclusivoPorId(Integer id);
+
+    @Query(value = """
+            select\s
+            rp.id,
+            ru1.sabor sabor1,
+            ru2.sabor sabor2,
+            sum(ru1.valor + ru2.valor) valor
+            from teiko.recheio_pedido rp
+            join teiko.recheio_exclusivo re on rp.recheio_exclusivo = re.id
+            join teiko.recheio_unitario ru1 on re.recheio_unitario_id1 = ru1.id
+            join teiko.recheio_unitario ru2 on re.recheio_unitario_id2 = ru2.id
+            group by rp.id, ru1.sabor, ru2.sabor;
+            """, nativeQuery = true)
+    List<RecheioPedidoProjection> listarRecheiosPedido();
 }

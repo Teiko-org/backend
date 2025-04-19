@@ -147,10 +147,17 @@ public class BoloController {
         return ResponseEntity.status(200).body(RecheioPedidoResponse.toResponse(projection));
     }
 
-//    @GetMapping("/recheio-pedido")
-//    public ResponseEntity<List<RecheioPedidoResponse>> listarRecheiosPedido() {
-//        return ResponseEntity.status(200).body(
-//
-//        );
-//    }
+    @GetMapping("/recheio-pedido")
+    public ResponseEntity<List<RecheioPedidoResponse>> listarRecheiosPedido() {
+        List<RecheioPedidoResponse> response = RecheioPedidoResponse.toResponse(
+                boloService.listarRecheiosPedido()
+        );
+
+        if (response.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+
+        return ResponseEntity.status(200).body(response);
+    }
+
 }

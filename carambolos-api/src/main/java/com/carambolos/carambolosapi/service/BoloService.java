@@ -158,9 +158,9 @@ public class BoloService {
         throw new EntidadeImprocessavelException("Falha ao buscar recheio do pedido");
     }
 
-//    public List<RecheioPedidoProjection> listarRecheiosPedido() {
-//
-//    }
+    public List<RecheioPedidoProjection> listarRecheiosPedido() {
+        return recheioPedidoRepository.listarRecheiosPedido();
+    }
 
     private RecheioExclusivo verificarCampos(RecheioExclusivo recheioExclusivo, RecheioExclusivo recheioExistente) {
         if (recheioExclusivo.getNome() != null) {
