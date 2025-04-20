@@ -1,7 +1,10 @@
 package com.carambolos.carambolosapi.controller;
 
+import com.carambolos.carambolosapi.controller.request.CoberturaRequestDTO;
 import com.carambolos.carambolosapi.controller.request.RecheioPedidoRequestDTO;
+import com.carambolos.carambolosapi.controller.response.CoberturaResponseDTO;
 import com.carambolos.carambolosapi.controller.response.RecheioPedidoResponseDTO;
+import com.carambolos.carambolosapi.model.Cobertura;
 import com.carambolos.carambolosapi.model.projection.RecheioExclusivoProjection;
 import com.carambolos.carambolosapi.controller.request.RecheioExclusivoRequestDTO;
 import com.carambolos.carambolosapi.controller.request.RecheioUnitarioRequestDTO;
@@ -153,7 +156,7 @@ public class BoloController {
     public ResponseEntity<RecheioPedidoResponseDTO> buscarRecheioPedidoPorId(
             @PathVariable Integer id
     ) {
-        RecheioPedidoProjection projection =  boloService.buscarRecheioPedidoPorId(id);
+        RecheioPedidoProjection projection = boloService.buscarRecheioPedidoPorId(id);
         return ResponseEntity.status(200).body(RecheioPedidoResponseDTO.toResponse(projection));
     }
 
@@ -178,5 +181,26 @@ public class BoloController {
         return ResponseEntity.status(204).build();
     }
 
+    @PostMapping("/cobertura")
+    public ResponseEntity<CoberturaResponseDTO> cadastrarCobertura(
+            @RequestBody CoberturaRequestDTO request
+    ) {
+        Cobertura cobertura = CoberturaRequestDTO.toCobertura(request);
+        boloService.cadastrarCobertura(cobertura);
+        return ResponseEntity.status(201).body(
+                CoberturaResponseDTO.toResponse(cobertura)
+        );
+    }
 
+    @PutMapping("/cobertura/{id}")
+    public ResponseEntity<CoberturaResponseDTO> atualizarCobertura(
+            @PathVariable Integer id,
+            @RequestBody CoberturaRequestDTO request
+    ) {
+        Cobertura cobertura = CoberturaRequestDTO.toCobertura(request);
+        CoberturaResponseDTO response = CoberturaResponseDTO.toResponse(
+                boloService.atualizarCobertura(cobertura, id)
+        );
+        return ResponseEntity.status(200).body(response);
+    }
 }
