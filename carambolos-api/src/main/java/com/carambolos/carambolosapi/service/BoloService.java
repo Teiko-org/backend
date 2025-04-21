@@ -1,18 +1,13 @@
 package com.carambolos.carambolosapi.service;
 
 import com.carambolos.carambolosapi.exception.EntidadeImprocessavelException;
-import com.carambolos.carambolosapi.model.Cobertura;
+import com.carambolos.carambolosapi.model.*;
 import com.carambolos.carambolosapi.model.projection.RecheioExclusivoProjection;
 import com.carambolos.carambolosapi.exception.EntidadeJaExisteException;
 import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
-import com.carambolos.carambolosapi.model.RecheioExclusivo;
-import com.carambolos.carambolosapi.model.RecheioPedido;
-import com.carambolos.carambolosapi.model.RecheioUnitario;
 import com.carambolos.carambolosapi.model.projection.RecheioPedidoProjection;
-import com.carambolos.carambolosapi.repository.CoberturaRepository;
-import com.carambolos.carambolosapi.repository.RecheioExclusivoRepository;
-import com.carambolos.carambolosapi.repository.RecheioPedidoRepository;
-import com.carambolos.carambolosapi.repository.RecheioUnitarioRepository;
+import com.carambolos.carambolosapi.repository.*;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +16,10 @@ import java.util.Optional;
 
 @Service
 public class BoloService {
+
+    @Autowired
+    private BoloRepository boloRepository;
+
     @Autowired
     private RecheioUnitarioRepository recheioUnitarioRepository;
 
@@ -32,6 +31,13 @@ public class BoloService {
 
     @Autowired
     CoberturaRepository coberturaRepository;
+
+    @Autowired
+    MassaRepository massaRepository;
+
+    public List<Bolo> listarBolos() {
+        return boloRepository.findAll();
+    }
 
     public RecheioUnitario cadastrarRecheioUnitario(RecheioUnitario recheioUnitario) {
         if (recheioUnitarioRepository.countBySaborIgnoreCase(recheioUnitario.getSabor()) > 0) {
@@ -238,6 +244,72 @@ public class BoloService {
         }
 
         throw new EntidadeNaoEncontradaException("Copbertura com id %d não encontrada".formatted(id));
+    }
+
+    public List<Cobertura> listarCoberturas() {
+        return coberturaRepository.findAll().stream().filter(Cobertura::getAtivo).toList();
+    }
+
+    public Cobertura buscarCoberturaPorId(Integer id) {
+        Optional<Cobertura> possivelCobertura = coberturaRepository.findById(id);
+
+        if (possivelCobertura.isEmpty()) {
+            throw new EntidadeJaExisteException("Cobertura com id %d não encontrar".formatted(id));
+        }
+
+        return possivelCobertura.get();
+    }
+
+    public void deletarCobertura(Integer id) {
+        Optional<Cobertura> possivelCobertura = coberturaRepository.findById(id);
+        if (possivelCobertura.isEmpty()) {
+            throw new EntidadeNaoEncontradaException("Cobertura com o id %d não encontrada".formatted(id));
+        }
+
+        Cobertura cobertura = possivelCobertura.get();
+        cobertura.setAtivo(false);
+        coberturaRepository.save(cobertura);
+    }
+
+    public Massa cadastrarMassa(Massa massa) {
+        if(massaRepository.countBySabor(massa.getSabor()) > 0) {
+            throw new EntidadeJaExisteException("Massa com sabor %s já existente".formatted(massa.getSabor()));
+        }
+        return massaRepository.save(massa);
+    }
+
+    public Massa atualizarMassa(Massa massa, Integer id) {
+        if(!massaRepository.existsById(id)) {
+            throw new EntidadeNaoEncontradaException("Massa com id %d não existente".formatted(id));
+        }
+        if (massaRepository.countBySaborAndIdNot(massa.getSabor(), id) > 0) {
+            throw new EntidadeJaExisteException("Massa com saber %s ja existente".formatted(massa.getSabor()));
+        }
+        massa.setId(id);
+        return massaRepository.save(massa);
+    }
+
+    public List<Massa> listarMassas() {
+        return massaRepository.findAll().stream().filter(Massa::getAtivo).toList();
+    }
+
+    public Massa buscarMassaPorId(Integer id) {
+        Optional<Massa> possivelMassa = massaRepository.findById(id);
+        if(possivelMassa.isEmpty()) {
+            throw new EntidadeNaoEncontradaException("Massa com id %d não encontrada".formatted(id));
+        }
+
+        return possivelMassa.get();
+    }
+
+    public void deletarMassa(Integer id) {
+        Optional<Massa> possivelMassa = massaRepository.findById(id);
+        if (possivelMassa.isEmpty()) {
+            throw new EntidadeNaoEncontradaException("Massa com id %d não encontrada".formatted(id));
+        }
+        Massa massa = possivelMassa.get();
+        massa.setAtivo(false);
+        massaRepository.save(massa);
     }
 
     private RecheioExclusivo verificarCampos(RecheioExclusivo recheioExclusivo, RecheioExclusivo recheioExistente) {

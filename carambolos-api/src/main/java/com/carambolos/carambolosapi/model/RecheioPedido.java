@@ -1,7 +1,6 @@
 package com.carambolos.carambolosapi.model;
 
 import jakarta.persistence.*;
-import org.hibernate.validator.constraints.Currency;
 
 @Entity(name = "recheio_pedido")
 public class RecheioPedido {

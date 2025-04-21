@@ -1,18 +1,9 @@
 package com.carambolos.carambolosapi.controller;
 
-import com.carambolos.carambolosapi.controller.request.CoberturaRequestDTO;
-import com.carambolos.carambolosapi.controller.request.RecheioPedidoRequestDTO;
-import com.carambolos.carambolosapi.controller.response.CoberturaResponseDTO;
-import com.carambolos.carambolosapi.controller.response.RecheioPedidoResponseDTO;
-import com.carambolos.carambolosapi.model.Cobertura;
+import com.carambolos.carambolosapi.controller.request.*;
+import com.carambolos.carambolosapi.controller.response.*;
+import com.carambolos.carambolosapi.model.*;
 import com.carambolos.carambolosapi.model.projection.RecheioExclusivoProjection;
-import com.carambolos.carambolosapi.controller.request.RecheioExclusivoRequestDTO;
-import com.carambolos.carambolosapi.controller.request.RecheioUnitarioRequestDTO;
-import com.carambolos.carambolosapi.controller.response.RecheioExclusivoResponseDTO;
-import com.carambolos.carambolosapi.controller.response.RecheioUnitarioResponseDTO;
-import com.carambolos.carambolosapi.model.RecheioExclusivo;
-import com.carambolos.carambolosapi.model.RecheioPedido;
-import com.carambolos.carambolosapi.model.RecheioUnitario;
 import com.carambolos.carambolosapi.model.projection.RecheioPedidoProjection;
 import com.carambolos.carambolosapi.service.BoloService;
 import jakarta.validation.Valid;
@@ -30,6 +21,11 @@ public class BoloController {
 
     @Autowired
     private BoloService boloService;
+
+    @GetMapping
+    public ResponseEntity<List<Bolo>> listarBolos() {
+        return ResponseEntity.status(200).body(boloService.listarBolos());
+    }
 
     @PostMapping("/recheio-unitario")
     public ResponseEntity<RecheioUnitarioResponseDTO> cadastrarRecheioUnitario(
@@ -202,5 +198,88 @@ public class BoloController {
                 boloService.atualizarCobertura(cobertura, id)
         );
         return ResponseEntity.status(200).body(response);
+    }
+
+    @GetMapping("/cobertura")
+    public ResponseEntity<List<CoberturaResponseDTO>> listarCoberturas() {
+        List<Cobertura> coberturas = boloService.listarCoberturas();
+        if (coberturas.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+
+        return ResponseEntity.status(200).body(
+                CoberturaResponseDTO.toResponse(coberturas)
+        );
+    }
+
+    @GetMapping("/cobertura/{id}")
+    public ResponseEntity<CoberturaResponseDTO> buscarCoberturaPorId(
+            @PathVariable Integer id
+    ) {
+        Cobertura cobertura = boloService.buscarCoberturaPorId(id);
+        return ResponseEntity.status(200).body(
+                CoberturaResponseDTO.toResponse(cobertura)
+        );
+    }
+
+    @DeleteMapping("/cobertura/{id}")
+    public ResponseEntity<Void> deletarCobertura(
+            @PathVariable Integer id
+    ) {
+        boloService.deletarCobertura(id);
+        return ResponseEntity.status(200).build();
+    }
+
+    @PostMapping("/massa")
+    public ResponseEntity<MassaResponseDTO> cadastrarMassa(
+            @Valid @RequestBody MassaRequestDTO request
+    ) {
+        Massa massa = MassaRequestDTO.toMassa(request);
+        boloService.cadastrarMassa(massa);
+        return ResponseEntity.status(201).body(
+                MassaResponseDTO.toMassaResponse(massa)
+        );
+    }
+
+    @PutMapping("/massa/{id}")
+    public ResponseEntity<MassaResponseDTO> atualizarMassa(
+            @PathVariable Integer id,
+            @RequestBody MassaRequestDTO request
+    ) {
+        Massa massa = MassaRequestDTO.toMassa(request);
+        Massa cadastrada = boloService.atualizarMassa(massa, id);
+        return ResponseEntity.status(200).body(
+          MassaResponseDTO.toMassaResponse(cadastrada)
+        );
+    }
+
+    @GetMapping("/massa")
+    public ResponseEntity<List<MassaResponseDTO>> listarMassas() {
+        List<Massa> massas = boloService.listarMassas();
+
+        if (massas.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.status(200).body(
+                MassaResponseDTO.toMassaResponse(massas)
+        );
+    }
+
+    @GetMapping("/massa/{id}")
+    public ResponseEntity<MassaResponseDTO> buscarMassaPorId(
+            @PathVariable Integer id
+    ) {
+        Massa massa = boloService.buscarMassaPorId(id);
+        return ResponseEntity.status(200).body(
+            MassaResponseDTO.toMassaResponse(massa)
+        );
+    }
+
+    @DeleteMapping("/massa/{id}")
+    public ResponseEntity<Void> deletarMassa(
+            @PathVariable Integer id
+    ) {
+        boloService.deletarMassa(id);
+        return ResponseEntity.status(200).build();
     }
 }
