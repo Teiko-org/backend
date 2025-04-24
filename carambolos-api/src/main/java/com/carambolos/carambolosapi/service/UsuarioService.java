@@ -95,11 +95,13 @@ public class UsuarioService {
     }
 
     public void deletar(Integer id) {
-        Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new EntidadeNaoEncontradaException("Usuario com Id %d não encontrado.".formatted(id)));
-
-        usuario.setAtivo(false);
-        usuarioRepository.save(usuario);
+        Usuario usuario = usuarioRepository.findByIdAndIsAtivoTrue(id);
+        if (usuario != null) {
+            usuario.setAtivo(false);
+            usuarioRepository.save(usuario);
+            return;
+        }
+        throw new EntidadeNaoEncontradaException("Usuario com Id %d não encontrado.".formatted(id));
     }
 
 }

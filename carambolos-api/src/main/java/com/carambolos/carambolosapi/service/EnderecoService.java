@@ -3,6 +3,7 @@ package com.carambolos.carambolosapi.service;
 import com.carambolos.carambolosapi.exception.EntidadeJaExisteException;
 import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.model.Endereco;
+import com.carambolos.carambolosapi.model.Usuario;
 import com.carambolos.carambolosapi.repository.EnderecoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,24 +17,39 @@ public class EnderecoService {
     @Autowired
     private EnderecoRepository enderecoRepository;
 
+    @Autowired
+    private UsuarioService usuarioService;
+
     public List<Endereco> listar() {
-        return enderecoRepository.findAll();
+        return enderecoRepository.findAllByIsAtivoTrue();
     }
 
     public Endereco buscarPorId(Integer id) {
-        return enderecoRepository.findById(id)
-                .orElseThrow(() -> new EntidadeNaoEncontradaException("Endereço com Id %d não encontrado.".formatted(id)));
+        Endereco enderecoExistente = enderecoRepository.findByIdAndIsAtivoTrue(id);
+        if (enderecoExistente != null) {
+            return enderecoExistente;
+        }
+        throw new EntidadeNaoEncontradaException("Endereço com Id %d não encontrado.".formatted(id));
     }
 
     public Endereco cadastrar(Endereco endereco) {
-        if (existeEnderecoDuplicado(endereco)) {
-            throw new EntidadeJaExisteException("Endereço já cadastrado");
+        if (endereco.getUsuario() != null) {
+            if (existeEnderecoDuplicado(endereco) && endereco.isAtivo()) {
+                throw new EntidadeJaExisteException("Endereço já cadastrado");
+            }
+
+            Usuario usuarioFk = usuarioService.buscarPorId(endereco.getUsuario());
+
+            //mudar a exception para UNPROCESSABLE(422)
+            if (endereco.getUsuario() != usuarioFk.getId()) {
+                throw new EntidadeNaoEncontradaException("Usuariofk não existe no banco");
+            }
         }
         return enderecoRepository.save(endereco);
     }
 
     public Endereco atualizar(Integer id, Endereco endereco) {
-        if (!enderecoRepository.existsById(id)) {
+        if (!enderecoRepository.existsByIdAndIsAtivoTrue(id)) {
             throw new EntidadeNaoEncontradaException(("Endereço com Id %d não encontrado.".formatted(id)));
         }
         if (existeEnderecoDuplicado(endereco)) {
@@ -44,14 +60,17 @@ public class EnderecoService {
     }
 
     public void deletar(Integer id) {
-        if (!enderecoRepository.existsById(id)) {
-            throw new EntidadeNaoEncontradaException("Endereço com Id %d não encontrado.".formatted(id));
+        Endereco endereco = enderecoRepository.findByIdAndIsAtivoTrue(id);
+        if (endereco != null) {
+            endereco.setAtivo(false);
+            enderecoRepository.save(endereco);
+            return;
         }
-        enderecoRepository.deleteById(id);
+        throw new EntidadeNaoEncontradaException("Endereço com Id %d não encontrado.".formatted(id));
     }
 
     public Boolean existeEnderecoDuplicado(Endereco endereco) {
-        return enderecoRepository.countByUsuarioAndCepAndNumeroEquals(
-                endereco.getUsuario(), endereco.getCep(), endereco.getNumero()) > 0;
+        return enderecoRepository.countByUsuarioAndCepAndNumeroAndIsAtivoEquals(
+                endereco.getUsuario(), endereco.getCep(), endereco.getNumero(), true) > 0;
     }
 }

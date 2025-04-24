@@ -12,6 +12,7 @@ public class EnderecoResponseDTO {
     private String numero;
     private String complemento;
     private String referencia;
+    private boolean isAtivo;
     private Integer usuario;
 
     public static EnderecoResponseDTO toResponseDTO(Endereco endereco) {
@@ -26,6 +27,7 @@ public class EnderecoResponseDTO {
         responseDto.setNumero(endereco.getNumero());
         responseDto.setComplemento(endereco.getComplemento());
         responseDto.setReferencia(endereco.getReferencia());
+        responseDto.setAtivo(endereco.isAtivo());
         responseDto.setUsuario(endereco.getUsuario());
 
         return responseDto;
@@ -102,6 +104,14 @@ public class EnderecoResponseDTO {
 
     public void setReferencia(String referencia) {
         this.referencia = referencia;
+    }
+
+    public boolean isAtivo() {
+        return isAtivo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        isAtivo = ativo;
     }
 
     public Integer getUsuario() {
