@@ -12,7 +12,6 @@ CREATE TABLE IF NOT EXISTS teiko.usuario (
   sys_admin TINYINT NULL,
   is_ativo TINYINT NULL,
   PRIMARY KEY (id),
-  UNIQUE INDEX email_UNIQUE (email ASC) VISIBLE,
   INDEX nome_idx (nome ASC) VISIBLE,
   INDEX contato_idx (contato ASC) VISIBLE
 );

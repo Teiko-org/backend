@@ -1,7 +1,6 @@
 package com.carambolos.carambolosapi.controller.request;
 
 import com.carambolos.carambolosapi.model.Endereco;
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -37,7 +36,6 @@ public class EnderecoRequestDTO {
     @Size(max = 70)
     private String referencia;
 
-    @Column(name = "usuario_id")
     private Integer usuario;
 
     public static Endereco toEntity(EnderecoRequestDTO requestDto) {

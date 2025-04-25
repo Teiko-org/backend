@@ -51,7 +51,7 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UsuarioResponseDTO> atualizar(@PathVariable Integer id, @RequestBody UsuarioRequestDTO usuarioRequest) {
+    public ResponseEntity<UsuarioResponseDTO> atualizar(@PathVariable Integer id, @Valid @RequestBody UsuarioRequestDTO usuarioRequest) {
         Usuario usuario = UsuarioRequestDTO.toEntity(usuarioRequest);
         Usuario usuarioAtualizado = usuarioService.atualizar(id, usuario);
         UsuarioResponseDTO usuarioResponse = UsuarioResponseDTO.toResponseDTO(usuarioAtualizado);

@@ -24,6 +24,9 @@ public class Endereco {
 
     private String referencia;
 
+    @Column(name = "is_ativo")
+    private boolean isAtivo = true;
+
     @Column(name = "usuario_id")
     private Integer usuario;
 
@@ -103,7 +106,15 @@ public class Endereco {
         return usuario;
     }
 
-    public void setUsuario(int usuario) {
+    public void setUsuario(Integer usuario) {
         this.usuario = usuario;
+    }
+
+    public Boolean isAtivo() {
+        return isAtivo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        isAtivo = ativo;
     }
 }

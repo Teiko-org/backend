@@ -17,6 +17,9 @@ public class Usuario {
 
     private String contato;
 
+    @Column(name = "is_ativo")
+    private boolean isAtivo = true;
+
     public Integer getId() {
         return id;
     }
@@ -55,5 +58,13 @@ public class Usuario {
 
     public void setSenha(String senha) {
         this.senha = senha;
+    }
+
+    public boolean isAtivo() {
+        return isAtivo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        isAtivo = ativo;
     }
 }
