@@ -17,7 +17,6 @@ public class Usuario {
 
     private String contato;
 
-
     public Integer getId() {
         return id;
     }

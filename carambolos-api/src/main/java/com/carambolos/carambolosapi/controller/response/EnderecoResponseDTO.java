@@ -1,4 +1,4 @@
-package com.carambolos.carambolosapi.controller.dto;
+package com.carambolos.carambolosapi.controller.response;
 
 import com.carambolos.carambolosapi.model.Endereco;
 
