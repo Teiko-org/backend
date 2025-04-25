@@ -7,9 +7,7 @@ import com.carambolos.carambolosapi.model.Usuario;
 import com.carambolos.carambolosapi.repository.EnderecoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
-
 
 @Service
 public class EnderecoService {

@@ -1,7 +1,5 @@
-
 CREATE DATABASE IF NOT EXISTS teiko;
 USE teiko ;
-
 -- -----------------------------------------------------
 -- Table teiko.usuario
 -- -----------------------------------------------------
@@ -32,6 +30,7 @@ CREATE TABLE IF NOT EXISTS teiko.endereco (
   complemento VARCHAR(20) NULL,
   referencia VARCHAR(70) NULL,
   usuario_id INT NULL,
+  is_ativo TINYINT NULL,
   PRIMARY KEY (id),
   INDEX fk_endereco_usuario1_idx (usuario_id ASC) VISIBLE,
   INDEX cep_idx (cep ASC) VISIBLE,
@@ -61,6 +60,7 @@ CREATE TABLE IF NOT EXISTS teiko.fornada (
   id INT NOT NULL AUTO_INCREMENT,
   data_inicio DATE NULL,
   data_fim DATE NULL,
+  is_ativo TINYINT NULL,
   PRIMARY KEY (id),
   INDEX data_inicio_idx (data_inicio ASC) VISIBLE,
   INDEX data_fim_idx (data_fim ASC) VISIBLE
@@ -74,6 +74,7 @@ CREATE TABLE IF NOT EXISTS teiko.fornada_da_vez (
   produto_fornada_id INT NOT NULL,
   fornada_id INT NOT NULL,
   quantidade INT NULL,
+  is_ativo TINYINT NULL,
   PRIMARY KEY (id, produto_fornada_id, fornada_id),
   INDEX fornada_idx (fornada_id ASC) VISIBLE,
   INDEX produto_fornada_idx (produto_fornada_id ASC) VISIBLE,
@@ -95,6 +96,7 @@ CREATE TABLE IF NOT EXISTS teiko.pedido_fornada (
   usuario_id INT NULL,
   quantidade INT NOT NULL,
   data_previsao_entrega DATE NOT NULL,
+  is_ativo TINYINT NULL,
   PRIMARY KEY (id, fornada_da_vez_id, endereco_id),
   INDEX endereco1_idx (endereco_id ASC) VISIBLE,
   INDEX usuario1_idx (usuario_id ASC) VISIBLE,
@@ -182,6 +184,7 @@ CREATE TABLE IF NOT EXISTS teiko.recheio_pedido (
   recheio_unitario_id1 INT NULL,
   recheio_unitario_id2 INT NULL,
   recheio_exclusivo INT NULL,
+  is_ativo TINYINT NULL,
   PRIMARY KEY (id),
   INDEX exclusivo1_idx (recheio_exclusivo ASC) VISIBLE,
   CONSTRAINT fk_unitario1
@@ -238,6 +241,7 @@ CREATE TABLE IF NOT EXISTS teiko.pedido_bolo (
   observacao VARCHAR(70) NULL,
   data_previsao_entrega DATE NOT NULL,
   data_ultima_atualizacao DATETIME NOT NULL,
+  is_ativo TINYINT NULL,
   PRIMARY KEY (id, endereco_id, Bolo_id),
   INDEX fk_pedido_bolo_usuario1_idx (usuario_id ASC) VISIBLE,
   INDEX fk_pedido_bolo_endereco1_idx (endereco_id ASC) VISIBLE,
@@ -264,6 +268,7 @@ CREATE TABLE IF NOT EXISTS teiko.resumo_pedido (
   data_entrega DATETIME NULL,
   pedido_fornada_id INT NULL,
   pedido_bolo_id INT NULL,
+  is_ativo TINYINT NULL,
   PRIMARY KEY (id),
   INDEX fk_fornada1_idx (pedido_fornada_id ASC) VISIBLE,
   INDEX fk_pedido_bolo1_idx (pedido_bolo_id ASC) VISIBLE,

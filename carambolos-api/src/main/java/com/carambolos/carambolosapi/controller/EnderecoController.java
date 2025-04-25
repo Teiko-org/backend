@@ -1,7 +1,7 @@
 package com.carambolos.carambolosapi.controller;
 
-import com.carambolos.carambolosapi.controller.dto.EnderecoRequestDTO;
-import com.carambolos.carambolosapi.controller.dto.EnderecoResponseDTO;
+import com.carambolos.carambolosapi.controller.request.EnderecoRequestDTO;
+import com.carambolos.carambolosapi.controller.response.EnderecoResponseDTO;
 import com.carambolos.carambolosapi.model.Endereco;
 import com.carambolos.carambolosapi.service.EnderecoService;
 import com.carambolos.carambolosapi.service.UsuarioService;
