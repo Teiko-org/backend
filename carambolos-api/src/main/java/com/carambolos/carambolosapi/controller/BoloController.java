@@ -22,10 +22,10 @@ public class BoloController {
     @Autowired
     private BoloService boloService;
 
-    @GetMapping
-    public ResponseEntity<List<Bolo>> listarBolos() {
-        return ResponseEntity.status(200).body(boloService.listarBolos());
-    }
+//    @GetMapping
+//    public ResponseEntity<List<Bolo>> listarBolos() {
+//        return ResponseEntity.status(200).body(boloService.listarBolos());
+//    }
 
     @PostMapping("/recheio-unitario")
     public ResponseEntity<RecheioUnitarioResponseDTO> cadastrarRecheioUnitario(

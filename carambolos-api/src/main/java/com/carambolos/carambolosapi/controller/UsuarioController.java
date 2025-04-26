@@ -1,8 +1,10 @@
 package com.carambolos.carambolosapi.controller;
 
+//import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import com.carambolos.carambolosapi.controller.request.LoginRequestDTO;
 import com.carambolos.carambolosapi.controller.request.UsuarioRequestDTO;
 import com.carambolos.carambolosapi.controller.response.UsuarioResponseDTO;
+import com.carambolos.carambolosapi.controller.response.UsuarioTokenDTO;
 import com.carambolos.carambolosapi.model.Usuario;
 import com.carambolos.carambolosapi.service.UsuarioService;
 import jakarta.validation.Valid;
@@ -37,6 +39,7 @@ public class UsuarioController {
     }
 
     @PostMapping
+    //@SecurityRequirement(name = "Bearer") //colocar quando implementar o swagger
     public ResponseEntity<UsuarioResponseDTO> cadastrar(@Valid @RequestBody UsuarioRequestDTO usuarioRequest) {
         Usuario usuario = UsuarioRequestDTO.toEntity(usuarioRequest);
         Usuario usuarioRegistrado = usuarioService.cadastrar(usuario);
@@ -45,9 +48,11 @@ public class UsuarioController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequestDTO loginRequestDTO) {
-        usuarioService.login(loginRequestDTO.getEmail(), loginRequestDTO.getSenha());
-        return ResponseEntity.status(200).body("Usuário autenticado com sucesso");
+    public ResponseEntity<UsuarioTokenDTO> login(@RequestBody LoginRequestDTO loginRequestDTO) {
+        final Usuario usuario = LoginRequestDTO.toEntity(loginRequestDTO);
+        UsuarioTokenDTO usuarioTokenDto = usuarioService.autenticar(usuario);
+
+        return ResponseEntity.status(200).body(usuarioTokenDto);
     }
 
     @PutMapping("/{id}")

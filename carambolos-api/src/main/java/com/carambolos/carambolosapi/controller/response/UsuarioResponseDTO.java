@@ -5,7 +5,6 @@ import com.carambolos.carambolosapi.model.Usuario;
 public class UsuarioResponseDTO {
     private Integer id;
     private String nome;
-    private String email;
     private String contato;
     private boolean isAtivo;
 
@@ -14,7 +13,6 @@ public class UsuarioResponseDTO {
 
         responseDto.setId(usuario.getId());
         responseDto.setNome(usuario.getNome());
-        responseDto.setEmail(usuario.getEmail());
         responseDto.setContato(usuario.getContato());
         responseDto.setAtivo(usuario.isAtivo());
 
@@ -36,14 +34,6 @@ public class UsuarioResponseDTO {
 
     public void setNome(String nome) {
         this.nome = nome;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getContato() {
