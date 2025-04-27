@@ -11,11 +11,9 @@ public class UsuarioResponseDTO {
     @Schema(description = "Nome do usuário", example = "Luciana Bernardes")
     private String nome;
 
-    @Schema(description = "Email do usuário", example = "luciana-bernardes@gmail.com")
-    private String email;
-
     @Schema(description = "Celular do usuário", example = "556826852415")
     private String contato;
+
     private boolean isAtivo;
 
     public static UsuarioResponseDTO toResponseDTO(Usuario usuario) {
@@ -23,7 +21,6 @@ public class UsuarioResponseDTO {
 
         responseDto.setId(usuario.getId());
         responseDto.setNome(usuario.getNome());
-        responseDto.setEmail(usuario.getEmail());
         responseDto.setContato(usuario.getContato());
         responseDto.setAtivo(usuario.isAtivo());
 
@@ -45,14 +42,6 @@ public class UsuarioResponseDTO {
 
     public void setNome(String nome) {
         this.nome = nome;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getContato() {

@@ -1,13 +1,18 @@
 package com.carambolos.carambolosapi.service;
 
+import com.carambolos.carambolosapi.controller.response.UsuarioTokenDTO;
 import com.carambolos.carambolosapi.exception.CredenciaisInvalidasException;
 import com.carambolos.carambolosapi.exception.EntidadeJaExisteException;
 import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.model.Usuario;
 import com.carambolos.carambolosapi.repository.UsuarioRepository;
-import com.carambolos.carambolosapi.utils.JwtUtil;
-import com.carambolos.carambolosapi.utils.PasswordEncoderUtil;
+import com.carambolos.carambolosapi.utils.GerenciadorTokenJwt;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,10 +24,13 @@ public class UsuarioService {
     private UsuarioRepository usuarioRepository;
 
     @Autowired
-    private PasswordEncoderUtil passwordEncoderUtil;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private JwtUtil jwtUtil;
+    private GerenciadorTokenJwt gerenciadorTokenJwt;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     public List<Usuario> listar() {
         return usuarioRepository.findAllByIsAtivoTrue();
@@ -43,55 +51,45 @@ public class UsuarioService {
            throw new EntidadeNaoEncontradaException("Usuario com Id %d não encontrado.".formatted(id));
        }
 
-       boolean existePorEmail = usuarioRepository.existsByEmailAndIdNot(usuarioExistente.getEmail(), id);
-       boolean existePorContato = usuarioRepository.existsByContatoAndIdNot(usuarioExistente.getContato(), id);
-
-       if (existePorEmail) {
-           throw new EntidadeJaExisteException("Esse e-mail já existe no sistema.");
-       }
+       boolean existePorContato = usuarioRepository.existsByContatoAndIdNotAndIsAtivoTrue(usuario.getContato(), id);
 
        if (existePorContato) {
            throw new EntidadeJaExisteException("Esse contato já existe no sistema.");
        }
 
-       if (usuario.getNome() != null) {
-            usuarioExistente.setNome(usuario.getNome());
-       }
-       if (usuario.getEmail() != null) {
-            usuarioExistente.setEmail(usuario.getEmail());
-       }
-       if (usuario.getContato() != null) {
-            usuarioExistente.setContato(usuario.getContato());
-       }
-       if (usuario.getSenha() != null) {
-            usuarioExistente.setSenha(usuario.getSenha());
-       }
-
        usuario.setId(id);
-       return usuarioRepository.save(usuarioExistente);
+       return usuarioRepository.save(usuario);
     }
 
     public Usuario cadastrar(Usuario usuario)  {
-        if (usuarioRepository.findByEmailAndIsAtivoTrue(usuario.getEmail()).isPresent()) {
-            throw new EntidadeJaExisteException("Esse e-mail já está em uso.");
-        }
-
         if (usuarioRepository.findByContatoAndIsAtivoTrue(usuario.getContato()).isPresent()) {
             throw new EntidadeJaExisteException("Esse telefone já está em uso.");
         }
 
+        String senhaCriptografada = passwordEncoder.encode(usuario.getSenha());
+        usuario.setSenha(senhaCriptografada);
+
         return usuarioRepository.save(usuario);
     }
 
-    public Usuario login(String email, String senha) {
-        Usuario usuario = usuarioRepository.findByEmailAndIsAtivoTrue(email)
-                .orElseThrow(() -> new CredenciaisInvalidasException("Usuário com e-mail %s não encontrado".formatted(email)));
+    public UsuarioTokenDTO autenticar(Usuario usuario) {
 
-        if (!usuario.getSenha().equals(senha)) {
-            throw new CredenciaisInvalidasException("E-mail ou Senha incorretos");
-        }
+        final UsernamePasswordAuthenticationToken credentials = new UsernamePasswordAuthenticationToken(
+                usuario.getContato(), usuario.getSenha());
 
-        return usuario;
+        final Authentication authentication = this.authenticationManager.authenticate(credentials);
+
+        Usuario usuarioAutenticado =
+                usuarioRepository.findByContatoAndIsAtivoTrue(usuario.getContato())
+                        .orElseThrow(
+                                () -> new EntidadeNaoEncontradaException("Contato do usuário não cadastrado")
+                        );
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        final String token = gerenciadorTokenJwt.generateToken(authentication);
+
+        return UsuarioTokenDTO.toTokenDTO(usuarioAutenticado, token);
     }
 
     public void deletar(Integer id) {

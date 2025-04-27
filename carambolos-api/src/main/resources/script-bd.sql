@@ -6,8 +6,7 @@ USE teiko ;
 CREATE TABLE IF NOT EXISTS teiko.usuario (
   id INT NOT NULL AUTO_INCREMENT,
   nome VARCHAR(60) NOT NULL,
-  email VARCHAR(80) NOT NULL,
-  senha VARCHAR(16) NOT NULL,
+  senha VARCHAR(60) NOT NULL,
   contato VARCHAR(14) NOT NULL,
   sys_admin TINYINT NULL,
   is_ativo TINYINT NULL,

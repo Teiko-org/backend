@@ -1,23 +1,37 @@
 package com.carambolos.carambolosapi.controller.request;
 
-import jakarta.validation.constraints.Email;
+import com.carambolos.carambolosapi.model.Usuario;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public class LoginRequestDTO {
-    @Email
-    @NotBlank
-    private String email;
+
+    @NotBlank(message = "contato não pode ser nulo")
+    @Size(max = 14)
+    @Schema(description = "Contato do usuário", example = "11995843106")
+    private String contato;
+
     @NotBlank
     @Size(min = 6)
+    @Schema(description = "Senha do usuário (mínimo 6 caracteres)", example = "gD8otDamss")
     private String senha;
 
-    public String getEmail() {
-        return email;
+    public static Usuario toEntity(LoginRequestDTO loginDto) {
+        Usuario usuario = new Usuario();
+
+        usuario.setContato(loginDto.getContato());
+        usuario.setSenha(loginDto.getSenha());
+
+        return usuario;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public @NotBlank(message = "contato não pode ser nulo") @Size(max = 14) String getContato() {
+        return contato;
+    }
+
+    public void setContato(@NotBlank(message = "contato não pode ser nulo") @Size(max = 14) String contato) {
+        this.contato = contato;
     }
 
     public String getSenha() {

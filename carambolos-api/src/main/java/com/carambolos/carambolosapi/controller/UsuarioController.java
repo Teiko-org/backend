@@ -1,8 +1,9 @@
 package com.carambolos.carambolosapi.controller;
 
-import com.carambolos.carambolosapi.controller.dto.LoginRequestDTO;
-import com.carambolos.carambolosapi.controller.dto.UsuarioRequestDTO;
+import com.carambolos.carambolosapi.controller.request.LoginRequestDTO;
+import com.carambolos.carambolosapi.controller.request.UsuarioRequestDTO;
 import com.carambolos.carambolosapi.controller.response.UsuarioResponseDTO;
+import com.carambolos.carambolosapi.controller.response.UsuarioTokenDTO;
 import com.carambolos.carambolosapi.model.Usuario;
 import com.carambolos.carambolosapi.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +40,7 @@ public class UsuarioController {
                     content = @Content())
     })
     @GetMapping
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<List<UsuarioResponseDTO>> listar() {
         List<Usuario> usuarios = usuarioService.listar();
         if (usuarios.isEmpty()) {
@@ -98,9 +101,11 @@ public class UsuarioController {
                     content = @Content())
     })
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequestDTO loginRequestDTO) {
-        usuarioService.login(loginRequestDTO.getEmail(), loginRequestDTO.getSenha());
-        return ResponseEntity.status(200).body("Usuário autenticado com sucesso");
+    public ResponseEntity<UsuarioTokenDTO> login(@RequestBody LoginRequestDTO loginRequestDTO) {
+        final Usuario usuario = LoginRequestDTO.toEntity(loginRequestDTO);
+        UsuarioTokenDTO usuarioTokenDto = usuarioService.autenticar(usuario);
+
+        return ResponseEntity.status(200).body(usuarioTokenDto);
     }
 
     @Operation(
