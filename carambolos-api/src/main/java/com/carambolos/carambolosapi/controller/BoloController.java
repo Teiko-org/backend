@@ -1,6 +1,6 @@
 package com.carambolos.carambolosapi.controller;
 
-import com.carambolos.carambolosapi.controller.dto.*;
+import com.carambolos.carambolosapi.controller.request.*;
 import com.carambolos.carambolosapi.controller.response.*;
 import com.carambolos.carambolosapi.model.*;
 import com.carambolos.carambolosapi.model.projection.RecheioExclusivoProjection;
@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import static com.carambolos.carambolosapi.controller.dto.RecheioUnitarioRequestDTO.toRecheioUnitario;
+import static com.carambolos.carambolosapi.controller.request.RecheioUnitarioRequestDTO.toRecheioUnitario;
 
 @RestController
 @RequestMapping("/bolos")

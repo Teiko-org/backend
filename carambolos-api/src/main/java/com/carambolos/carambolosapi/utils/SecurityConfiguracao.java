@@ -35,9 +35,6 @@ public class SecurityConfiguracao {
     @Autowired
     private AutenticacaoService autenticacaoService;
 
-    @Autowired
-    private AutenticacaoEntryPoint autenticacaoJwtEntryPoint;
-
     private static final AntPathRequestMatcher[] URLS_PERMITIDAS = {
             new AntPathRequestMatcher("/swagger-ui/**"),
             new AntPathRequestMatcher("/swagger-ui.html"),
@@ -50,7 +47,8 @@ public class SecurityConfiguracao {
             new AntPathRequestMatcher("/webjars/**"),
             new AntPathRequestMatcher("/v3/api-docs/**"),
             new AntPathRequestMatcher("/actuator/*"),
-            new AntPathRequestMatcher("/usuarios/login/**"),
+            new AntPathRequestMatcher("/usuarios/login", "POST"),
+            new AntPathRequestMatcher("/usuarios", "POST"),
             new AntPathRequestMatcher("/h2-console/**"),
             new AntPathRequestMatcher("/h2-console/**/**"),
             new AntPathRequestMatcher("/error/**")
@@ -69,7 +67,7 @@ public class SecurityConfiguracao {
                         .authenticated()
                 )
                 .exceptionHandling(handling -> handling
-                        .authenticationEntryPoint(autenticacaoJwtEntryPoint))
+                        .authenticationEntryPoint(jwtAuthenticationEntryPointBean()))
                 .sessionManagement(management -> management
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
