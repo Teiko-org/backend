@@ -1,4 +1,4 @@
-package com.carambolos.carambolosapi.controller.dto;
+package com.carambolos.carambolosapi.controller.response;
 
 import com.carambolos.carambolosapi.model.Usuario;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,6 +16,7 @@ public class UsuarioResponseDTO {
 
     @Schema(description = "Celular do usuário", example = "556826852415")
     private String contato;
+    private boolean isAtivo;
 
     public static UsuarioResponseDTO toResponseDTO(Usuario usuario) {
         UsuarioResponseDTO responseDto = new UsuarioResponseDTO();
@@ -24,6 +25,7 @@ public class UsuarioResponseDTO {
         responseDto.setNome(usuario.getNome());
         responseDto.setEmail(usuario.getEmail());
         responseDto.setContato(usuario.getContato());
+        responseDto.setAtivo(usuario.isAtivo());
 
         return responseDto;
 
@@ -59,5 +61,13 @@ public class UsuarioResponseDTO {
 
     public void setContato(String contato) {
         this.contato = contato;
+    }
+
+    public boolean isAtivo() {
+        return isAtivo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        isAtivo = ativo;
     }
 }

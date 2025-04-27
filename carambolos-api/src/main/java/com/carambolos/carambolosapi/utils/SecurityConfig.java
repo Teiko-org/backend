@@ -13,7 +13,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console/**").permitAll() // Libera o H2 Console
-//                        .requestMatchers("/usuarios/**").permitAll() // Libera todas as rotas da API
+                        .requestMatchers("/usuarios/**").permitAll() // Libera todas as rotas da API
                          .requestMatchers("/**").permitAll() // Libera tudo
                         .anyRequest().authenticated()
                 )

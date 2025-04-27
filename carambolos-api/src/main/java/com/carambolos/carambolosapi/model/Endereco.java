@@ -36,6 +36,9 @@ public class Endereco {
     @Schema(description = "Referência para localização", example = "Próximo à praça central")
     private String referencia;
 
+    @Column(name = "is_ativo")
+    private boolean isAtivo = true;
+
     @Column(name = "usuario_id")
     @Schema(description = "ID do usuário associado ao endereço", example = "5")
     private Integer usuario;
@@ -116,7 +119,15 @@ public class Endereco {
         return usuario;
     }
 
-    public void setUsuario(int usuario) {
+    public void setUsuario(Integer usuario) {
         this.usuario = usuario;
+    }
+
+    public Boolean isAtivo() {
+        return isAtivo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        isAtivo = ativo;
     }
 }

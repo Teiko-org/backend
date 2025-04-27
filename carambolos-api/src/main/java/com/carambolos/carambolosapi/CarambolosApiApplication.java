@@ -22,5 +22,4 @@ public class CarambolosApiApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(CarambolosApiApplication.class, args);
 	}
-
 }

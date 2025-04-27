@@ -25,20 +25,26 @@ public class UsuarioService {
     private JwtUtil jwtUtil;
 
     public List<Usuario> listar() {
-        return usuarioRepository.findAll();
+        return usuarioRepository.findAllByIsAtivoTrue();
     }
 
     public Usuario buscarPorId(Integer id) {
-        return usuarioRepository.findById(id)
-                .orElseThrow(() -> new EntidadeNaoEncontradaException("Usuario com Id %d não encontrado.".formatted(id)));
+        Usuario usuarioExistente = usuarioRepository.findByIdAndIsAtivoTrue(id);
+        if (usuarioExistente != null) {
+            return usuarioExistente;
+        }
+        throw new EntidadeNaoEncontradaException("Usuario com Id %d não encontrado.".formatted(id));
     }
 
     public Usuario atualizar(Integer id, Usuario usuario) {
-       Usuario usuarioExistente = usuarioRepository.findById(id)
-               .orElseThrow(() -> new EntidadeNaoEncontradaException("Usuario com Id %d não encontrado.".formatted(id)));
+       Usuario usuarioExistente = usuarioRepository.findByIdAndIsAtivoTrue(id);
 
-       boolean existePorEmail = usuarioRepository.existsByEmailAndIdNot(usuario.getEmail(), id);
-       boolean existePorContato = usuarioRepository.existsByContatoAndIdNot(usuario.getContato(), id);
+       if (usuarioExistente == null) {
+           throw new EntidadeNaoEncontradaException("Usuario com Id %d não encontrado.".formatted(id));
+       }
+
+       boolean existePorEmail = usuarioRepository.existsByEmailAndIdNot(usuarioExistente.getEmail(), id);
+       boolean existePorContato = usuarioRepository.existsByContatoAndIdNot(usuarioExistente.getContato(), id);
 
        if (existePorEmail) {
            throw new EntidadeJaExisteException("Esse e-mail já existe no sistema.");
@@ -66,11 +72,11 @@ public class UsuarioService {
     }
 
     public Usuario cadastrar(Usuario usuario)  {
-        if (usuarioRepository.findByEmail(usuario.getEmail()).isPresent()) {
+        if (usuarioRepository.findByEmailAndIsAtivoTrue(usuario.getEmail()).isPresent()) {
             throw new EntidadeJaExisteException("Esse e-mail já está em uso.");
         }
 
-        if (usuarioRepository.findByContato(usuario.getContato()).isPresent()) {
+        if (usuarioRepository.findByContatoAndIsAtivoTrue(usuario.getContato()).isPresent()) {
             throw new EntidadeJaExisteException("Esse telefone já está em uso.");
         }
 
@@ -78,7 +84,7 @@ public class UsuarioService {
     }
 
     public Usuario login(String email, String senha) {
-        Usuario usuario = usuarioRepository.findByEmail(email)
+        Usuario usuario = usuarioRepository.findByEmailAndIsAtivoTrue(email)
                 .orElseThrow(() -> new CredenciaisInvalidasException("Usuário com e-mail %s não encontrado".formatted(email)));
 
         if (!usuario.getSenha().equals(senha)) {
@@ -89,10 +95,13 @@ public class UsuarioService {
     }
 
     public void deletar(Integer id) {
-        if (!usuarioRepository.existsById(id)) {
-            throw new EntidadeNaoEncontradaException("Usuario com Id %d não encontrado.".formatted(id));
+        Usuario usuario = usuarioRepository.findByIdAndIsAtivoTrue(id);
+        if (usuario != null) {
+            usuario.setAtivo(false);
+            usuarioRepository.save(usuario);
+            return;
         }
-            usuarioRepository.deleteById(id);
+        throw new EntidadeNaoEncontradaException("Usuario com Id %d não encontrado.".formatted(id));
     }
 
 }

@@ -1,7 +1,7 @@
 package com.carambolos.carambolosapi.controller;
 
 import com.carambolos.carambolosapi.controller.dto.EnderecoRequestDTO;
-import com.carambolos.carambolosapi.controller.dto.EnderecoResponseDTO;
+import com.carambolos.carambolosapi.controller.response.EnderecoResponseDTO;
 import com.carambolos.carambolosapi.model.Endereco;
 import com.carambolos.carambolosapi.service.EnderecoService;
 import com.carambolos.carambolosapi.service.UsuarioService;
@@ -86,7 +86,7 @@ public class EnderecoController {
     @PutMapping("/{id}")
     public ResponseEntity<EnderecoResponseDTO> atualizar(
             @PathVariable Integer id,
-            @RequestBody EnderecoRequestDTO enderecoRequest
+            @Valid @RequestBody EnderecoRequestDTO enderecoRequest
     ) {
         Endereco endereco = EnderecoRequestDTO.toEntity(enderecoRequest);
         Endereco enderecoAtualizado = enderecoService.atualizar(id, endereco);

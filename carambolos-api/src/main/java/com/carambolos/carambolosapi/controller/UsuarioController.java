@@ -2,7 +2,7 @@ package com.carambolos.carambolosapi.controller;
 
 import com.carambolos.carambolosapi.controller.dto.LoginRequestDTO;
 import com.carambolos.carambolosapi.controller.dto.UsuarioRequestDTO;
-import com.carambolos.carambolosapi.controller.dto.UsuarioResponseDTO;
+import com.carambolos.carambolosapi.controller.response.UsuarioResponseDTO;
 import com.carambolos.carambolosapi.model.Usuario;
 import com.carambolos.carambolosapi.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -117,9 +117,7 @@ public class UsuarioController {
                     content = @Content())
     })
     @PutMapping("/{id}")
-    public ResponseEntity<UsuarioResponseDTO> atualizar(
-            @PathVariable Integer id,
-            @RequestBody UsuarioRequestDTO usuarioRequest) {
+    public ResponseEntity<UsuarioResponseDTO> atualizar(@PathVariable Integer id, @Valid @RequestBody UsuarioRequestDTO usuarioRequest) {
         Usuario usuario = UsuarioRequestDTO.toEntity(usuarioRequest);
         Usuario usuarioAtualizado = usuarioService.atualizar(id, usuario);
         UsuarioResponseDTO usuarioResponse = UsuarioResponseDTO.toResponseDTO(usuarioAtualizado);

@@ -1,4 +1,4 @@
-package com.carambolos.carambolosapi.controller.dto;
+package com.carambolos.carambolosapi.controller.response;
 
 import com.carambolos.carambolosapi.model.Endereco;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -32,6 +32,7 @@ public class EnderecoResponseDTO {
 
     @Schema(description = "Referência do endereço", example = "Próximo à praça central")
     private String referencia;
+    private boolean isAtivo;
 
     @Schema(description = "ID do usuário associado ao endereço", example = "5")
     private Integer usuario;
@@ -51,6 +52,7 @@ public class EnderecoResponseDTO {
         responseDto.setNumero(endereco.getNumero());
         responseDto.setComplemento(endereco.getComplemento());
         responseDto.setReferencia(endereco.getReferencia());
+        responseDto.setAtivo(endereco.isAtivo());
         responseDto.setUsuario(endereco.getUsuario());
 
         return responseDto;
@@ -126,6 +128,14 @@ public class EnderecoResponseDTO {
 
     public void setReferencia(String referencia) {
         this.referencia = referencia;
+    }
+
+    public boolean isAtivo() {
+        return isAtivo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        isAtivo = ativo;
     }
 
     public Integer getUsuario() {

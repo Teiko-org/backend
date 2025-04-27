@@ -1,0 +1,350 @@
+package com.carambolos.carambolosapi.service;
+
+import com.carambolos.carambolosapi.exception.EntidadeImprocessavelException;
+import com.carambolos.carambolosapi.model.*;
+import com.carambolos.carambolosapi.model.projection.RecheioExclusivoProjection;
+import com.carambolos.carambolosapi.exception.EntidadeJaExisteException;
+import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
+import com.carambolos.carambolosapi.model.projection.RecheioPedidoProjection;
+import com.carambolos.carambolosapi.repository.*;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class BoloService {
+
+    @Autowired
+    private BoloRepository boloRepository;
+
+    @Autowired
+    private RecheioUnitarioRepository recheioUnitarioRepository;
+
+    @Autowired
+    private RecheioExclusivoRepository recheioExclusivoRepository;
+
+    @Autowired
+    private RecheioPedidoRepository recheioPedidoRepository;
+
+    @Autowired
+    CoberturaRepository coberturaRepository;
+
+    @Autowired
+    MassaRepository massaRepository;
+
+    public List<Bolo> listarBolos() {
+        return boloRepository.findAll();
+    }
+
+    public RecheioUnitario cadastrarRecheioUnitario(RecheioUnitario recheioUnitario) {
+        if (recheioUnitarioRepository.countBySaborIgnoreCase(recheioUnitario.getSabor()) > 0) {
+            throw new EntidadeJaExisteException("Recheio com o sabor %s já existe".formatted(recheioUnitario.getSabor()));
+        }
+        return recheioUnitarioRepository.save(recheioUnitario);
+    }
+
+    public List<RecheioUnitario> listarRecheiosUnitarios() {
+        return recheioUnitarioRepository.findAll().stream().filter(RecheioUnitario::getAtivo).toList();
+    }
+
+    public RecheioUnitario buscarPorId(Integer id) {
+        return recheioUnitarioRepository.findById(id)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Recheio com o id %d não encontrado".formatted(id)));
+    }
+
+    public RecheioUnitario atualizarRecheioUnitario(RecheioUnitario recheioUnitario, Integer id) {
+        RecheioUnitario recheioExistente = recheioUnitarioRepository.findById(id)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Recheio com o id %d não encontrado".formatted(id)));
+
+        if (recheioUnitarioRepository.countBySaborIgnoreCaseAndIdNot(recheioUnitario.getSabor(), id) > 0) {
+            throw new EntidadeJaExisteException("Recheio com o sabor %s já existe".formatted(recheioUnitario.getSabor()));
+        }
+
+        if (recheioUnitario.getSabor() != null) {
+            recheioExistente.setSabor(recheioUnitario.getSabor());
+        }
+        if (recheioUnitario.getDescricao() != null) {
+            recheioExistente.setDescricao(recheioUnitario.getDescricao());
+        }
+        if (recheioUnitario.getValor() != null) {
+            recheioExistente.setValor(recheioUnitario.getValor());
+        }
+
+        recheioExistente.setId(id);
+
+        return recheioUnitarioRepository.save(recheioExistente);
+    }
+
+    public void deletarRecheioUnitario(Integer id) {
+        Optional<RecheioUnitario> possivelRecheio = recheioUnitarioRepository.findById(id);
+        if (possivelRecheio.isEmpty()) {
+            throw new EntidadeNaoEncontradaException("Recheio com id %d não existe".formatted(id));
+        }
+        RecheioUnitario recheio = possivelRecheio.get();
+        recheio.setAtivo(false);
+        recheioUnitarioRepository.save(recheio);
+    }
+
+    public RecheioExclusivoProjection cadastrarRecheioExclusivo(RecheioExclusivo recheioExclusivo) {
+        int id1 = recheioExclusivo.getRecheioUnitarioId1();
+        int id2 = recheioExclusivo.getRecheioUnitarioId2();
+
+        boolean recheiosExistem = recheioUnitarioRepository.existsById(id1) && recheioUnitarioRepository.existsById(id2);
+        if (!recheiosExistem) {
+            throw new EntidadeNaoEncontradaException("Um ou mais recheios cadastrados não existem");
+        }
+
+        Integer recheiosExistentes1 = recheioExclusivoRepository.countByRecheioUnitarioIds(id1, id2);
+        Integer recheiosExistentes2 = recheioExclusivoRepository.countByRecheioUnitarioIds(id2, id1);
+
+        if (recheiosExistentes1 > 0 || recheiosExistentes2 > 0) {
+            throw new EntidadeJaExisteException("Recheio exclusivo já existente");
+        }
+
+        RecheioExclusivo recheioSalvo = recheioExclusivoRepository.save(recheioExclusivo);
+        return recheioExclusivoRepository.buscarRecheioExclusivoPorId(recheioSalvo.getId());
+    }
+
+    public RecheioExclusivoProjection buscarRecheioExclusivoPorId(Integer id) {
+        return recheioExclusivoRepository.buscarRecheioExclusivoPorId(id);
+    }
+
+    public List<RecheioExclusivoProjection> listarRecheiosExclusivos() {
+        return recheioExclusivoRepository.listarRecheiosExclusivos().stream().filter(
+                recheioExclusivo -> recheioExclusivo.getIsAtivo() != 0
+        ).toList();
+    }
+
+    public RecheioExclusivoProjection editarRecheioExclusivo(RecheioExclusivo recheioExclusivo, Integer id) {
+        RecheioExclusivo recheioExistente = recheioExclusivoRepository.findById(id)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Recheio com o id %d não encontrado".formatted(id)));
+
+        Integer id1 = recheioExclusivo.getRecheioUnitarioId1();
+        Integer id2 = recheioExclusivo.getRecheioUnitarioId2();
+        Integer recheiosExistentes1 = recheioExclusivoRepository.countByRecheioUnitarioIds(id1, id2);
+        Integer recheiosExistentes2 = recheioExclusivoRepository.countByRecheioUnitarioIds(id2, id1);
+
+        if (recheiosExistentes1 > 0 || recheiosExistentes2 > 0) {
+            throw new EntidadeJaExisteException("Recheio exclusivo já existente");
+        }
+
+        recheioExistente = verificarCampos(recheioExclusivo, recheioExistente);
+        recheioExistente.setId(id);
+        recheioExclusivoRepository.save(recheioExistente);
+
+        return buscarRecheioExclusivoPorId(id);
+    }
+
+    public void excluirRecheioExclusivo(Integer id) {
+        Optional<RecheioExclusivo> possivelRecheio = recheioExclusivoRepository.findById(id);
+        if (possivelRecheio.isPresent()) {
+            RecheioExclusivo recheio = possivelRecheio.get();
+            recheio.setAtivo(false);
+            recheioExclusivoRepository.save(recheio);
+            return;
+        }
+
+        throw new EntidadeNaoEncontradaException("Recheio exclusivo com id %s não encontrado".formatted(id));
+    }
+
+    public RecheioPedidoProjection cadastrarRecheioPedido(RecheioPedido recheioPedido) {
+        verificarCampos(recheioPedido);
+
+        if (recheioPedido.getRecheioExclusivo() != null) {
+            RecheioPedido recheioSalvo = recheioPedidoRepository.save(recheioPedido);
+            return recheioPedidoRepository.buscarRecheioPedidoExclusivoPorId(recheioSalvo.getId());
+        }
+        RecheioPedido recheioSalvo = recheioPedidoRepository.save(recheioPedido);
+        return recheioPedidoRepository.buscarRecheioPedidoUnitariosPorId(recheioSalvo.getId());
+    }
+
+    public RecheioPedidoProjection atualizarRecheioPedido(RecheioPedido recheioPedido, Integer id) {
+        verificarCampos(recheioPedido);
+
+        if (recheioPedido.getRecheioExclusivo() != null) {
+            RecheioPedido recheioSalvo = recheioPedidoRepository.save(recheioPedido);
+            return recheioPedidoRepository.buscarRecheioPedidoExclusivoPorId(recheioSalvo.getId());
+        }
+        recheioPedido.setId(id);
+        RecheioPedido recheioSalvo = recheioPedidoRepository.save(recheioPedido);
+        return recheioPedidoRepository.buscarRecheioPedidoUnitariosPorId(recheioSalvo.getId());
+    }
+
+    public RecheioPedidoProjection buscarRecheioPedidoPorId(Integer id) {
+        if (!recheioPedidoRepository.existsById(id)) {
+            throw new EntidadeNaoEncontradaException("Recheio do pedido com id %d não encontrado".formatted(id));
+        }
+        Optional<RecheioPedido> possivelRecheio = recheioPedidoRepository.findById(id);
+
+        if (possivelRecheio.isPresent()) {
+            RecheioPedido recheioPedido = possivelRecheio.get();
+            verificarCampos(recheioPedido);
+            if (recheioPedido.getRecheioExclusivo() != null) {
+                return recheioPedidoRepository.buscarRecheioPedidoExclusivoPorId(recheioPedido.getId());
+            }
+            return recheioPedidoRepository.buscarRecheioPedidoUnitariosPorId(recheioPedido.getId());
+        }
+        throw new EntidadeImprocessavelException("Falha ao buscar recheio do pedido");
+    }
+
+    public List<RecheioPedidoProjection> listarRecheiosPedido() {
+        return recheioPedidoRepository.listarRecheiosPedido().stream().filter(
+                recheioPedido -> recheioPedido.getIsAtivo() != 0
+        ).toList();
+    }
+
+    public void deletarRecheioPedido(Integer id) {
+        Optional<RecheioPedido> possivelRecheioPedido = recheioPedidoRepository.findById(id);
+
+        if (possivelRecheioPedido.isPresent()) {
+            RecheioPedido recheioPedido = possivelRecheioPedido.get();
+            recheioPedido.setAtivo(false);
+            recheioPedidoRepository.save(recheioPedido);
+            return;
+        }
+
+        throw new EntidadeNaoEncontradaException("Recheio exclusivo com id %s não encontrado".formatted(id));
+    }
+
+    public Cobertura cadastrarCobertura(Cobertura cobertura) {
+        String cor = cobertura.getCor();
+        String descricao = cobertura.getDescricao();
+        Integer coberturasExistentes = coberturaRepository.countByCorAndDescricaoIgnoreCase(cor, descricao);
+
+        if (coberturasExistentes > 0) {
+            throw new EntidadeJaExisteException("Cobertura com a cor %s e descricao %s ja existente".formatted(cor, descricao));
+        }
+
+        return coberturaRepository.save(cobertura);
+    }
+
+    public Cobertura atualizarCobertura(Cobertura novaCobertura, Integer id) {
+        Optional<Cobertura> possivelCobertura = coberturaRepository.findById(id);
+        if (possivelCobertura.isPresent()) {
+            String cor = novaCobertura.getCor();
+            String descricao = novaCobertura.getDescricao();
+
+            Integer coberturasExistentes = coberturaRepository.countByCorAndDescricaoAndIdNot(
+                    cor,
+                    descricao,
+                    id
+            );
+
+            if(coberturasExistentes > 0) {
+                throw new EntidadeJaExisteException("Cobertura com cor %s e descricao %s ja existe".formatted(cor, descricao));
+            }
+
+            Cobertura cobertura = possivelCobertura.get();
+            return coberturaRepository.save(
+                    verificarCampos(cobertura, novaCobertura)
+            );
+        }
+
+        throw new EntidadeNaoEncontradaException("Copbertura com id %d não encontrada".formatted(id));
+    }
+
+    public List<Cobertura> listarCoberturas() {
+        return coberturaRepository.findAll().stream().filter(Cobertura::getAtivo).toList();
+    }
+
+    public Cobertura buscarCoberturaPorId(Integer id) {
+        Optional<Cobertura> possivelCobertura = coberturaRepository.findById(id);
+
+        if (possivelCobertura.isEmpty()) {
+            throw new EntidadeJaExisteException("Cobertura com id %d não encontrar".formatted(id));
+        }
+
+        return possivelCobertura.get();
+    }
+
+    public void deletarCobertura(Integer id) {
+        Optional<Cobertura> possivelCobertura = coberturaRepository.findById(id);
+        if (possivelCobertura.isEmpty()) {
+            throw new EntidadeNaoEncontradaException("Cobertura com o id %d não encontrada".formatted(id));
+        }
+
+        Cobertura cobertura = possivelCobertura.get();
+        cobertura.setAtivo(false);
+        coberturaRepository.save(cobertura);
+    }
+
+    public Massa cadastrarMassa(Massa massa) {
+        if(massaRepository.countBySabor(massa.getSabor()) > 0) {
+            throw new EntidadeJaExisteException("Massa com sabor %s já existente".formatted(massa.getSabor()));
+        }
+        return massaRepository.save(massa);
+    }
+
+    public Massa atualizarMassa(Massa massa, Integer id) {
+        if(!massaRepository.existsById(id)) {
+            throw new EntidadeNaoEncontradaException("Massa com id %d não existente".formatted(id));
+        }
+        if (massaRepository.countBySaborAndIdNot(massa.getSabor(), id) > 0) {
+            throw new EntidadeJaExisteException("Massa com saber %s ja existente".formatted(massa.getSabor()));
+        }
+        massa.setId(id);
+        return massaRepository.save(massa);
+    }
+
+    public List<Massa> listarMassas() {
+        return massaRepository.findAll().stream().filter(Massa::getAtivo).toList();
+    }
+
+    public Massa buscarMassaPorId(Integer id) {
+        Optional<Massa> possivelMassa = massaRepository.findById(id);
+        if(possivelMassa.isEmpty()) {
+            throw new EntidadeNaoEncontradaException("Massa com id %d não encontrada".formatted(id));
+        }
+
+        return possivelMassa.get();
+    }
+
+    public void deletarMassa(Integer id) {
+        Optional<Massa> possivelMassa = massaRepository.findById(id);
+        if (possivelMassa.isEmpty()) {
+            throw new EntidadeNaoEncontradaException("Massa com id %d não encontrada".formatted(id));
+        }
+        Massa massa = possivelMassa.get();
+        massa.setAtivo(false);
+        massaRepository.save(massa);
+    }
+
+    private RecheioExclusivo verificarCampos(RecheioExclusivo recheioExclusivo, RecheioExclusivo recheioExistente) {
+        if (recheioExclusivo.getNome() != null) {
+            recheioExistente.setNome(recheioExclusivo.getNome());
+        }
+        if (recheioExclusivo.getRecheioUnitarioId1() != null) {
+            recheioExistente.setRecheioUnitarioId1(recheioExclusivo.getRecheioUnitarioId1());
+        }
+        if (recheioExclusivo.getRecheioUnitarioId2() != null) {
+            recheioExistente.setRecheioUnitarioId2(recheioExclusivo.getRecheioUnitarioId2());
+        }
+        return recheioExistente;
+    }
+
+    private void verificarCampos(RecheioPedido recheioPedido) {
+        if (recheioPedido.getRecheioUnitarioId1() != null && recheioPedido.getRecheioUnitarioId2() != null && recheioPedido.getRecheioExclusivo() != null) {
+            throw new EntidadeImprocessavelException("Requisição apenas pode ter o recheio exclusivo nulo ou recheios unitarios nulos");
+        } else if (
+                recheioPedido.getRecheioUnitarioId1() == null && recheioPedido.getRecheioUnitarioId2() != null ||
+                        recheioPedido.getRecheioUnitarioId1() != null && recheioPedido.getRecheioUnitarioId2() == null
+        ) {
+            throw new EntidadeImprocessavelException("Requisição apenas pode ter o recheio exclusivo nulo ou recheios unitarios nulos");
+        }
+    }
+
+    private Cobertura verificarCampos(Cobertura cobertura, Cobertura novaCobertura) {
+        if (novaCobertura.getCor() == null) {
+            novaCobertura.setCor(cobertura.getCor());
+        }
+
+        if (novaCobertura.getDescricao() == null) {
+            novaCobertura.setDescricao(cobertura.getDescricao());
+        }
+        novaCobertura.setId(cobertura.getId());
+        return novaCobertura;
+    }
+}
