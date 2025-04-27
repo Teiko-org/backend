@@ -1,4 +1,4 @@
-package com.carambolos.carambolosapi.controller.request;
+package com.carambolos.carambolosapi.controller.dto;
 
 import com.carambolos.carambolosapi.model.Cobertura;
 

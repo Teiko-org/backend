@@ -1,5 +1,5 @@
 package com.carambolos.carambolosapi.service;
-import com.carambolos.carambolosapi.controller.request.ProdutoFornadaRequestDTO;
+import com.carambolos.carambolosapi.controller.dto.ProdutoFornadaRequestDTO;
 import com.carambolos.carambolosapi.exception.EntidadeJaExisteException;
 import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.model.ProdutoFornada;
