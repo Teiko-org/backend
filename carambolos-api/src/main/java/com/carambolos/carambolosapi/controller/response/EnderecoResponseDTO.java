@@ -1,22 +1,48 @@
-package com.carambolos.carambolosapi.controller.dto;
+package com.carambolos.carambolosapi.controller.response;
 
 import com.carambolos.carambolosapi.model.Endereco;
+import io.swagger.v3.oas.annotations.media.Schema;
 
+@Schema(description = "DTO de resposta contendo informações do endereço de um usuário")
 public class EnderecoResponseDTO {
+
+    @Schema(description = "ID do endereço", example = "1")
     private int id;
+
+    @Schema(description = "CEP do endereço (8 dígitos numéricos)", example = "12345678")
     private String cep;
+
+    @Schema(description = "Estado do endereço", example = "SP")
     private String estado;
+
+    @Schema(description = "Cidade do endereço", example = "São Paulo")
     private String cidade;
+
+    @Schema(description = "Bairro do endereço", example = "Centro")
     private String bairro;
+
+    @Schema(description = "Logradouro do endereço", example = "Rua das Flores")
     private String logradouro;
+
+    @Schema(description = "Número do endereço", example = "123")
     private String numero;
+
+    @Schema(description = "Complemento do endereço", example = "Apartamento 202")
     private String complemento;
+
+    @Schema(description = "Referência do endereço", example = "Próximo à praça central")
     private String referencia;
+    private boolean isAtivo;
+
+    @Schema(description = "ID do usuário associado ao endereço", example = "5")
     private Integer usuario;
 
     public static EnderecoResponseDTO toResponseDTO(Endereco endereco) {
-        EnderecoResponseDTO responseDto = new EnderecoResponseDTO();
+        if (endereco == null) {
+            return null;
+        }
 
+        EnderecoResponseDTO responseDto = new EnderecoResponseDTO();
         responseDto.setId(endereco.getId());
         responseDto.setCep(endereco.getCep());
         responseDto.setEstado(endereco.getEstado());
@@ -26,10 +52,10 @@ public class EnderecoResponseDTO {
         responseDto.setNumero(endereco.getNumero());
         responseDto.setComplemento(endereco.getComplemento());
         responseDto.setReferencia(endereco.getReferencia());
+        responseDto.setAtivo(endereco.isAtivo());
         responseDto.setUsuario(endereco.getUsuario());
 
         return responseDto;
-
     }
 
     public int getId() {
@@ -102,6 +128,14 @@ public class EnderecoResponseDTO {
 
     public void setReferencia(String referencia) {
         this.referencia = referencia;
+    }
+
+    public boolean isAtivo() {
+        return isAtivo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        isAtivo = ativo;
     }
 
     public Integer getUsuario() {
