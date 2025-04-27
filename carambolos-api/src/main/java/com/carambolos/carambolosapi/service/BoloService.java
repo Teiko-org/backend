@@ -17,8 +17,8 @@ import java.util.Optional;
 @Service
 public class BoloService {
 
-    @Autowired
-    private BoloRepository boloRepository;
+//    @Autowired
+//    private BoloRepository boloRepository;
 
     @Autowired
     private RecheioUnitarioRepository recheioUnitarioRepository;
@@ -35,9 +35,9 @@ public class BoloService {
     @Autowired
     MassaRepository massaRepository;
 
-    public List<Bolo> listarBolos() {
-        return boloRepository.findAll();
-    }
+//    public List<Bolo> listarBolos() {
+//        return boloRepository.findAll();
+//    }
 
     public RecheioUnitario cadastrarRecheioUnitario(RecheioUnitario recheioUnitario) {
         if (recheioUnitarioRepository.countBySaborIgnoreCase(recheioUnitario.getSabor()) > 0) {
