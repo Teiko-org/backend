@@ -1,6 +1,6 @@
 package com.carambolos.carambolosapi.service;
 
-import com.carambolos.carambolosapi.controller.request.FornadaRequestDTO;
+import com.carambolos.carambolosapi.controller.dto.FornadaRequestDTO;
 import com.carambolos.carambolosapi.exception.EntidadeJaExisteException;
 import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.model.Fornada;

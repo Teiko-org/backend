@@ -1,19 +1,29 @@
 package com.carambolos.carambolosapi.controller.dto;
 
 import com.carambolos.carambolosapi.model.Usuario;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+@Schema(description = "DTO para requisição de cadastro de usuário.")
 public class UsuarioRequestDTO {
+
+    @Schema(description = "Nome completo do usuário.", example = "Ana Souza")
     @NotBlank
     private String nome;
+
+    @Schema(description = "E-mail do usuário, utilizado para login.", example = "ana.souza@email.com")
     @Email
     @NotBlank
     private String email;
+
+    @Schema(description = "Senha de acesso do usuário. Mínimo de 6 caracteres.", example = "senhaSegura123")
     @NotBlank
-    @Size(min = 6)
+    @Size(min = 6, message = "A senha deve ter no mínimo 6 caracteres.")
     private String senha;
+
+    @Schema(description = "Número de telefone para contato (WhatsApp ou ligação).", example = "5511987654321")
     @NotBlank
     @Size(max = 14)
     private String contato;

@@ -1,30 +1,43 @@
 package com.carambolos.carambolosapi.model;
 
 import jakarta.persistence.*;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Entity
+@Schema(description = "Entidade que representa um endereço de um usuário.")
 public class Endereco {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "Identificador único do endereço", example = "1")
     private int id;
 
+    @Schema(description = "CEP do endereço (apenas números)", example = "12345678")
     private String cep;
 
+    @Schema(description = "Estado do endereço", example = "SP")
     private String estado;
 
+    @Schema(description = "Cidade do endereço", example = "São Paulo")
     private String cidade;
 
+    @Schema(description = "Bairro do endereço", example = "Centro")
     private String bairro;
 
+    @Schema(description = "Logradouro do endereço (rua, avenida, etc.)", example = "Rua das Flores")
     private String logradouro;
 
+    @Schema(description = "Número do endereço", example = "123")
     private String numero;
 
+    @Schema(description = "Complemento do endereço", example = "Apartamento 202")
     private String complemento;
 
+    @Schema(description = "Referência para localização", example = "Próximo à praça central")
     private String referencia;
 
     @Column(name = "usuario_id")
+    @Schema(description = "ID do usuário associado ao endereço", example = "5")
     private Integer usuario;
 
     public int getId() {

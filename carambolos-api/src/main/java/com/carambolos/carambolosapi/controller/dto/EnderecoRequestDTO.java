@@ -1,52 +1,63 @@
 package com.carambolos.carambolosapi.controller.dto;
 
 import com.carambolos.carambolosapi.model.Endereco;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
+@Schema(description = "DTO para criação de endereço de um usuário")
 public class EnderecoRequestDTO {
+
     @NotBlank
     @Pattern(regexp = "\\d{8}", message = "O CEP deve ter exatamente 8 dígitos numéricos.")
+    @Schema(description = "CEP do endereço (8 dígitos numéricos)", example = "12345678")
     private String cep;
 
     @NotBlank
     @Size(max = 20)
+    @Schema(description = "Estado do endereço", example = "SP")
     private String estado;
 
     @NotBlank
     @Size(max = 100)
+    @Schema(description = "Cidade do endereço", example = "São Paulo")
     private String cidade;
 
     @NotBlank
     @Size(max = 100)
+    @Schema(description = "Bairro do endereço", example = "Centro")
     private String bairro;
 
     @NotBlank
     @Size(max = 100)
+    @Schema(description = "Logradouro do endereço", example = "Rua das Flores")
     private String logradouro;
 
     @NotBlank
     @Size(max = 6)
+    @Schema(description = "Número do endereço", example = "123")
     private String numero;
 
     @Size(max = 20)
+    @Schema(description = "Complemento do endereço", example = "Apartamento 202")
     private String complemento;
 
     @Size(max = 70)
+    @Schema(description = "Referência do endereço", example = "Próximo à praça central")
     private String referencia;
 
     @Column(name = "usuario_id")
+    @Schema(description = "ID do usuário associado ao endereço", example = "1")
     private Integer usuario;
 
     public static Endereco toEntity(EnderecoRequestDTO requestDto) {
-        Endereco endereco = new Endereco();
-
-        if(requestDto == null) {
+        if (requestDto == null) {
             return null;
         }
 
+        Endereco endereco = new Endereco();
         endereco.setCep(requestDto.getCep());
         endereco.setEstado(requestDto.getEstado());
         endereco.setCidade(requestDto.getCidade());
@@ -60,67 +71,67 @@ public class EnderecoRequestDTO {
         return endereco;
     }
 
-    public @NotBlank @Pattern(regexp = "\\d{8}", message = "O CEP deve ter exatamente 8 dígitos numéricos.") String getCep() {
+    public String getCep() {
         return cep;
     }
 
-    public void setCep(@NotBlank @Pattern(regexp = "\\d{8}", message = "O CEP deve ter exatamente 8 dígitos numéricos.") String cep) {
+    public void setCep(String cep) {
         this.cep = cep;
     }
 
-    public @NotBlank @Size(max = 20) String getEstado() {
+    public String getEstado() {
         return estado;
     }
 
-    public void setEstado(@NotBlank @Size(max = 20) String estado) {
+    public void setEstado(String estado) {
         this.estado = estado;
     }
 
-    public @NotBlank @Size(max = 100) String getCidade() {
+    public String getCidade() {
         return cidade;
     }
 
-    public void setCidade(@NotBlank @Size(max = 100) String cidade) {
+    public void setCidade(String cidade) {
         this.cidade = cidade;
     }
 
-    public @NotBlank @Size(max = 100) String getBairro() {
+    public String getBairro() {
         return bairro;
     }
 
-    public void setBairro(@NotBlank @Size(max = 100) String bairro) {
+    public void setBairro(String bairro) {
         this.bairro = bairro;
     }
 
-    public @NotBlank @Size(max = 100) String getLogradouro() {
+    public String getLogradouro() {
         return logradouro;
     }
 
-    public void setLogradouro(@NotBlank @Size(max = 100) String logradouro) {
+    public void setLogradouro(String logradouro) {
         this.logradouro = logradouro;
     }
 
-    public @NotBlank @Size(max = 6) String getNumero() {
+    public String getNumero() {
         return numero;
     }
 
-    public void setNumero(@NotBlank @Size(max = 6) String numero) {
+    public void setNumero(String numero) {
         this.numero = numero;
     }
 
-    public @Size(max = 20) String getComplemento() {
+    public String getComplemento() {
         return complemento;
     }
 
-    public void setComplemento(@Size(max = 20) String complemento) {
+    public void setComplemento(String complemento) {
         this.complemento = complemento;
     }
 
-    public @Size(max = 70) String getReferencia() {
+    public String getReferencia() {
         return referencia;
     }
 
-    public void setReferencia(@Size(max = 70) String referencia) {
+    public void setReferencia(String referencia) {
         this.referencia = referencia;
     }
 

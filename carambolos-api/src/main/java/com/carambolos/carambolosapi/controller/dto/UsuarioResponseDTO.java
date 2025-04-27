@@ -1,11 +1,20 @@
 package com.carambolos.carambolosapi.controller.dto;
 
 import com.carambolos.carambolosapi.model.Usuario;
+import io.swagger.v3.oas.annotations.media.Schema;
 
+@Schema(description = "DTO de resposta contendo informações do usuário")
 public class UsuarioResponseDTO {
+    @Schema(description = "ID do usuário", example = "1")
     private Integer id;
+
+    @Schema(description = "Nome do usuário", example = "Luciana Bernardes")
     private String nome;
+
+    @Schema(description = "Email do usuário", example = "luciana-bernardes@gmail.com")
     private String email;
+
+    @Schema(description = "Celular do usuário", example = "556826852415")
     private String contato;
 
     public static UsuarioResponseDTO toResponseDTO(Usuario usuario) {
