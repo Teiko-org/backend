@@ -1,10 +1,9 @@
 package com.carambolos.carambolosapi.controller;
 
-import com.carambolos.carambolosapi.controller.dto.FornadaDaVezRequestDTO;
-import com.carambolos.carambolosapi.controller.dto.FornadaRequestDTO;
-import com.carambolos.carambolosapi.controller.dto.ProdutoFornadaRequestDTO;
+import com.carambolos.carambolosapi.controller.dto.*;
 import com.carambolos.carambolosapi.model.Fornada;
 import com.carambolos.carambolosapi.model.FornadaDaVez;
+import com.carambolos.carambolosapi.model.PedidoFornada;
 import com.carambolos.carambolosapi.model.ProdutoFornada;
 import com.carambolos.carambolosapi.service.FornadaDaVezService;
 import com.carambolos.carambolosapi.service.FornadaService;
@@ -175,26 +174,72 @@ public class FornadaController {
     // ----------------- FORNADA DA VEZ -----------------
 
     @Operation(summary = "Cria uma nova fornada da vez")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Fornada da vez criada com sucesso",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = FornadaDaVez.class))),
-            @ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content())
-    })
     @PostMapping("/da-vez")
     public ResponseEntity<FornadaDaVez> criarFornadaDaVez(@RequestBody @Valid FornadaDaVezRequestDTO request) {
         return ResponseEntity.status(201).body(fornadaDaVezService.criarFornadaDaVez(request));
     }
 
     @Operation(summary = "Lista todas as fornadas da vez")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Listagem das fornadas da vez realizada com sucesso",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = FornadaDaVez.class))),
-            @ApiResponse(responseCode = "404", description = "Nenhuma fornada da vez encontrada", content = @Content())
-    })
     @GetMapping("/da-vez")
     public ResponseEntity<List<FornadaDaVez>> listarFornadasDaVez() {
         return ResponseEntity.status(200).body(fornadaDaVezService.listarFornadasDaVez());
+    }
+
+    @Operation(summary = "Busca uma fornada da vez por ID")
+    @GetMapping("/da-vez/{id}")
+    public ResponseEntity<FornadaDaVez> buscarFornadaDaVez(@PathVariable Integer id) {
+        return ResponseEntity.status(200).body(fornadaDaVezService.buscarFornadaDaVez(id));
+    }
+
+    @Operation(summary = "Atualiza a quantidade da fornada da vez")
+    @PutMapping("/da-vez/{id}")
+    public ResponseEntity<FornadaDaVez> atualizarFornadaDaVez(
+            @PathVariable Integer id,
+            @RequestBody @Valid FornadaDaVezUpdateRequestDTO request) {
+        return ResponseEntity.status(200).body(fornadaDaVezService.atualizarQuantidade(id, request));
+    }
+
+    @Operation(summary = "Exclui uma fornada da vez por ID")
+    @DeleteMapping("/da-vez/{id}")
+    public ResponseEntity<Void> excluirFornadaDaVez(@PathVariable Integer id) {
+        fornadaDaVezService.excluirFornadaDaVez(id);
+        return ResponseEntity.status(204).build();
+    }
+
+    // ----------------- PEDIDO FORNADA -----------------
+
+    @Operation(summary = "Cria um novo pedido de fornada")
+    @PostMapping("/pedidos")
+    public ResponseEntity<PedidoFornada> criarPedidoFornada(
+            @RequestBody @Valid PedidoFornadaRequestDTO request
+    ){
+        return ResponseEntity.status(201).body(pedidoFornadaService.criarPedidoFornada(request));
+    }
+
+    @Operation(summary = "Lista todos os pedidos de fornada")
+    @GetMapping("/pedidos")
+    public ResponseEntity<List<PedidoFornada>> listarPedidos() {
+        return ResponseEntity.status(200).body(pedidoFornadaService.listarPedidosFornada());
+    }
+
+    @Operation(summary = "Busca um pedido de fornada por ID")
+    @GetMapping("/pedidos/{id}")
+    public ResponseEntity<PedidoFornada> buscarPedido(@PathVariable Integer id) {
+        return ResponseEntity.status(200).body(pedidoFornadaService.buscarPedidoFornada(id));
+    }
+
+    @Operation(summary = "Atualiza um pedido de fornada existente")
+    @PutMapping("/pedidos/{id}")
+    public ResponseEntity<PedidoFornada> atualizarPedidoFornada(
+            @PathVariable Integer id,
+            @RequestBody @Valid PedidoFornadaUpdateRequestDTO request) {
+        return ResponseEntity.status(200).body(pedidoFornadaService.atualizarPedidoFornada(id, request));
+    }
+
+    @Operation(summary = "Exclui um pedido de fornada por ID")
+    @DeleteMapping("/pedidos/{id}")
+    public ResponseEntity<Void> excluirPedidoFornada(@PathVariable Integer id) {
+        pedidoFornadaService.excluirPedidoFornada(id);
+        return ResponseEntity.status(204).build();
     }
 }
