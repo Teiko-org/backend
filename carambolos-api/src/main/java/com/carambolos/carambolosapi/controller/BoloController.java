@@ -25,10 +25,40 @@ public class BoloController {
     @Autowired
     private BoloService boloService;
 
-//    @GetMapping
-//    public ResponseEntity<List<Bolo>> listarBolos() {
-//        return ResponseEntity.status(200).body(boloService.listarBolos());
-//    }
+    @Operation(summary = "Listar bolos", description = "Retorna todos os bolos cadastrados no sistema.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de bolos retornada com sucesso."),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor.")
+    })
+    @GetMapping
+    public ResponseEntity<List<Bolo>> listarBolos() {
+        List<Bolo> bolos = boloService.listarBolos();
+        if (bolos.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.status(200).body(boloService.listarBolos());
+    }
+
+    @Operation(summary = "Buscar bolo por ID", description = "Busca um bolo pelo seu ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Bolo encontrado"),
+            @ApiResponse(responseCode = "404", description = "Bolo não encontrado"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<BoloResponseDTO> buscarPorId(@PathVariable Integer id) {
+        Bolo bolo = boloService.buscarBoloPorId(id);
+        BoloResponseDTO response = BoloResponseDTO.toBoloResponse(bolo);
+        return ResponseEntity.status(200).body(response);
+    }
+
+    @PostMapping
+    public ResponseEntity<BoloResponseDTO> cadastrarBolo(@Valid @RequestBody BoloRequestDTO request) {
+        Bolo bolo = BoloRequestDTO.toBolo(request);
+        Bolo boloSalvo = boloService.cadastrarBolo(bolo);
+        BoloResponseDTO response = BoloResponseDTO.toBoloResponse(boloSalvo);
+        return ResponseEntity.status(201).body(response);
+    }
 
     @Operation(summary = "Cadastrar recheio unitário", description = "Cadastra um novo recheio unitário")
     @ApiResponses(value = {
@@ -342,7 +372,7 @@ public class BoloController {
             @PathVariable Integer id
     ) {
         boloService.deletarCobertura(id);
-        return ResponseEntity.status(200).build();
+        return ResponseEntity.status(204).build();
     }
 
     @Operation(summary = "Cadastrar massa", description = "Cadastra uma nova massa para bolo")
@@ -425,7 +455,21 @@ public class BoloController {
             @PathVariable Integer id
     ) {
         boloService.deletarMassa(id);
-        return ResponseEntity.status(200).build();
+        return ResponseEntity.status(204).build();
     }
+
+//    @Operation(summary = "Cadastrar decoração", description = "Cadastra uma nova decoração de bolo")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "201", description = "Decoração cadastrada com sucesso"),
+//            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+//            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+//    })
+//    @PostMapping("/decoracao")
+//    public ResponseEntity<DecoracaoResponseDTO> cadastrarDecoracao(@Valid @RequestBody DecoracaoRequestDTO request) {
+//        Decoracao decoracao = DecoracaoRequestDTO.toDecoracao(request);
+//        Decoracao decoracaoSalva = boloService.cadastrarDecoracao(decoracao);
+//        DecoracaoResponseDTO response = DecoracaoResponseDTO.toDecoracaoResponse(decoracaoSalva);
+//        return ResponseEntity.status(201).body(response);
+//    }
 }
 

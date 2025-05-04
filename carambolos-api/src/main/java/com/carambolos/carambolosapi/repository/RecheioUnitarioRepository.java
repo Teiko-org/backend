@@ -4,6 +4,7 @@ import com.carambolos.carambolosapi.model.RecheioUnitario;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RecheioUnitarioRepository extends JpaRepository<RecheioUnitario, Integer> {
-    Integer countBySaborIgnoreCaseAndIdNot(String sabor, Integer id);
-    Integer countBySaborIgnoreCase(String sabor);
+    Integer countBySaborIgnoreCaseAndIdNotAndIsAtivo(String sabor, Integer id, boolean isAtivo);
+    Integer countBySaborIgnoreCaseAndIsAtivo(String sabor, Boolean isAtivo);
+    Boolean existsByIdAndIsAtivoTrue(Integer id);
 }

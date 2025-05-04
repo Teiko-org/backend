@@ -139,6 +139,7 @@ CREATE TABLE IF NOT EXISTS teiko.cobertura (
 CREATE TABLE IF NOT EXISTS teiko.decoracao (
   id INT NOT NULL AUTO_INCREMENT,
   imagem_referencia BLOB NULL,
+  estilo_decoracao VARCHAR(70) NULL,
   is_ativo TINYINT NULL,
   PRIMARY KEY (id)
 );
