@@ -6,6 +6,7 @@ import com.carambolos.carambolosapi.model.*;
 import com.carambolos.carambolosapi.model.projection.RecheioExclusivoProjection;
 import com.carambolos.carambolosapi.model.projection.RecheioPedidoProjection;
 import com.carambolos.carambolosapi.service.BoloService;
+import com.carambolos.carambolosapi.service.PedidoBoloService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -24,6 +25,9 @@ public class BoloController {
 
     @Autowired
     private BoloService boloService;
+
+    @Autowired
+    private PedidoBoloService pedidoBoloService;
 
     @Operation(summary = "Listar bolos", description = "Retorna todos os bolos cadastrados no sistema.")
     @ApiResponses(value = {
@@ -516,7 +520,7 @@ public class BoloController {
     })
     @GetMapping("/pedido")
     public ResponseEntity<List<PedidoBoloResponseDTO>> listarPedidos() {
-        List<PedidoBolo> pedidos = boloService.listarPedidos();
+        List<PedidoBolo> pedidos = pedidoBoloService.listarPedidos();
         if (pedidos.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
@@ -535,10 +539,60 @@ public class BoloController {
     public ResponseEntity<PedidoBoloResponseDTO> buscarPedidoPorId(
             @PathVariable Integer id
     ) {
-        PedidoBolo pedido = boloService.buscarPedidoPorId(id);
+        PedidoBolo pedido = pedidoBoloService.buscarPedidoPorId(id);
         return ResponseEntity.status(200).body(
                 PedidoBoloResponseDTO.toPedidoBoloResponse(pedido)
         );
+    }
+
+    @Operation(summary = "Cadastrar pedido", description = "Cadastra um novo pedido de bolo")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Pedido cadastrado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos para cadastro"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @PostMapping("/pedido")
+    public ResponseEntity<PedidoBoloResponseDTO> cadastrarPedido(
+            @Valid @RequestBody PedidoBoloRequestDTO request
+    ) {
+        PedidoBolo pedido = PedidoBoloRequestDTO.toPedidoBolo(request);
+        PedidoBolo pedidoSalvo = pedidoBoloService.cadastrarPedido(pedido);
+        return ResponseEntity.status(201).body(
+                PedidoBoloResponseDTO.toPedidoBoloResponse(pedidoSalvo)
+        );
+    }
+
+    @Operation(summary = "Atualizar pedido", description = "Atualiza os dados de um pedido existente")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pedido atualizado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos para atualização"),
+            @ApiResponse(responseCode = "404", description = "Pedido não encontrado"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @PutMapping("/pedido/{id}")
+    public ResponseEntity<PedidoBoloResponseDTO> atualizarPedido(
+            @PathVariable Integer id,
+            @RequestBody PedidoBoloRequestDTO request
+    ) {
+        PedidoBolo pedido = PedidoBoloRequestDTO.toPedidoBolo(request);
+        PedidoBolo pedidoAtualizado = pedidoBoloService.atualizarPedido(pedido, id);
+        return ResponseEntity.status(200).body(
+                PedidoBoloResponseDTO.toPedidoBoloResponse(pedidoAtualizado)
+        );
+    }
+
+    @Operation(summary = "Deletar pedido", description = "Remove um pedido pelo ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Pedido removido com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Pedido não encontrado"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @DeleteMapping("/pedido/{id}")
+    public ResponseEntity<Void> deletarPedido(
+            @PathVariable Integer id
+    ) {
+        pedidoBoloService.deletarPedido(id);
+        return ResponseEntity.status(204).build();
     }
 }
 

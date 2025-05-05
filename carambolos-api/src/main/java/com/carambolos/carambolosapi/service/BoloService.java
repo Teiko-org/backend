@@ -8,7 +8,6 @@ import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.model.projection.RecheioPedidoProjection;
 import com.carambolos.carambolosapi.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,9 +33,6 @@ public class BoloService {
 
     @Autowired
     MassaRepository massaRepository;
-
-    @Autowired
-    PedidoBoloRepository pedidoBoloRepository;
 
 //    @Autowired
 //    DecoracaoRepository decoracaoRepository;
@@ -391,17 +387,6 @@ public class BoloService {
 //    public Decoracao cadastrarDecoracao(Decoracao decoracao) {
 //        return decoracaoRepository.save(decoracao);
 //    }
-
-    public List<PedidoBolo> listarPedidos() {
-        return pedidoBoloRepository.findAll().stream().filter(PedidoBolo::getAtivo).toList();
-    }
-
-    public PedidoBolo buscarPedidoPorId(Integer id) {
-        return pedidoBoloRepository.findById(id)
-                .filter(PedidoBolo::getAtivo)
-                .orElseThrow(() -> new EntidadeNaoEncontradaException("Pedido com o id %d não encontrado".formatted(id)));
-    }
-
 
     private RecheioExclusivo verificarCampos(RecheioExclusivo recheioExclusivo, RecheioExclusivo recheioExistente) {
         if (recheioExclusivo.getNome() != null) {
