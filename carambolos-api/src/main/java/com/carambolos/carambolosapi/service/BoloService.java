@@ -8,6 +8,7 @@ import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.model.projection.RecheioPedidoProjection;
 import com.carambolos.carambolosapi.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,11 +35,14 @@ public class BoloService {
     @Autowired
     MassaRepository massaRepository;
 
+    @Autowired
+    PedidoBoloRepository pedidoBoloRepository;
+
 //    @Autowired
 //    DecoracaoRepository decoracaoRepository;
 
     public List<Bolo> listarBolos() {
-        return boloRepository.findAll();
+        return boloRepository.findAll().stream().filter(Bolo::getAtivo).toList();
     }
 
     public Bolo buscarBoloPorId(Integer id) {
@@ -64,6 +68,41 @@ public class BoloService {
         }
 
         return boloRepository.save(bolo);
+    }
+
+    public Bolo atualizarBolo(Bolo bolo, Integer id) {
+        boloRepository.findById(id)
+                .filter(Bolo::getAtivo)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Bolo com o id %d não encontrado".formatted(id)));
+
+        if(boloRepository.existsByIdAndIdNotAndIsAtivoTrue(id, bolo.getId())) {
+            throw new EntidadeJaExisteException("Esse bolo já existe no banco de dados.");
+        }
+
+        if(!massaRepository.existsByIdAndIsAtivo(bolo.getMassa(), true)) {
+            throw new EntidadeNaoEncontradaException("Essa massa não existe");
+        }
+        if(!recheioPedidoRepository.existsByIdAndIsAtivoTrue(bolo.getRecheioPedido())) {
+            throw new EntidadeNaoEncontradaException("Esse recheio não existe");
+        }
+        if(!coberturaRepository.existsByIdAndIsAtivoTrue(bolo.getCobertura())) {
+            throw new EntidadeNaoEncontradaException("Essa cobertura não existe");
+        }
+
+        bolo.setId(id);
+        return boloRepository.save(bolo);
+    }
+
+    public void deletarBolo(Integer id) {
+        Optional<Bolo> possivelBolo = boloRepository.findById(id)
+                .filter(Bolo::getAtivo);
+        if (possivelBolo.isPresent()) {
+            Bolo bolo = possivelBolo.get();
+            bolo.setAtivo(false);
+            boloRepository.save(bolo);
+            return;
+        }
+        throw new EntidadeNaoEncontradaException("Bolo com id %d não encontrado".formatted(id));
     }
 
     public RecheioUnitario cadastrarRecheioUnitario(RecheioUnitario recheioUnitario) {
@@ -352,6 +391,16 @@ public class BoloService {
 //    public Decoracao cadastrarDecoracao(Decoracao decoracao) {
 //        return decoracaoRepository.save(decoracao);
 //    }
+
+    public List<PedidoBolo> listarPedidos() {
+        return pedidoBoloRepository.findAll().stream().filter(PedidoBolo::getAtivo).toList();
+    }
+
+    public PedidoBolo buscarPedidoPorId(Integer id) {
+        return pedidoBoloRepository.findById(id)
+                .filter(PedidoBolo::getAtivo)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Pedido com o id %d não encontrado".formatted(id)));
+    }
 
 
     private RecheioExclusivo verificarCampos(RecheioExclusivo recheioExclusivo, RecheioExclusivo recheioExistente) {
