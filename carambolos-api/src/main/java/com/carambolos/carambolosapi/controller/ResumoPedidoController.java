@@ -1,0 +1,219 @@
+package com.carambolos.carambolosapi.controller;
+
+import com.carambolos.carambolosapi.controller.request.ResumoPedidoRequestDTO;
+import com.carambolos.carambolosapi.controller.response.ResumoPedidoResponseDTO;
+import com.carambolos.carambolosapi.model.ResumoPedido;
+import com.carambolos.carambolosapi.model.enums.StatusEnum;
+import com.carambolos.carambolosapi.service.ResumoPedidoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@RestController
+@RequestMapping("/resumo-pedido")
+@Tag(name = "Resumo Pedido Controller", description = "Gerencia resumos de pedidos (bolos e fornadas)")
+public class ResumoPedidoController {
+
+    @Autowired
+    private ResumoPedidoService resumoPedidoService;
+
+    @Operation(summary = "Listar resumos de pedidos", description = "Retorna todos os resumos de pedidos ativos")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de resumos retornada com sucesso"),
+            @ApiResponse(responseCode = "204", description = "Nenhum resumo encontrado"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @GetMapping
+    public ResponseEntity<List<ResumoPedidoResponseDTO>> listarResumosPedidos() {
+        List<ResumoPedido> resumosPedidos = resumoPedidoService.listarResumosPedidos();
+        if (resumosPedidos.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumosPedidos));
+    }
+
+    @Operation(summary = "Buscar resumo de pedido por ID", description = "Retorna um resumo de pedido específico com base no ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Resumo de pedido encontrado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Resumo de pedido não encontrado"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<ResumoPedidoResponseDTO> buscarResumoPedidoPorId(@PathVariable Integer id) {
+        ResumoPedido resumoPedido = resumoPedidoService.buscarResumoPedidoPorId(id);
+        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumoPedido));
+    }
+
+    @Operation(summary = "Buscar resumos por data de pedido", description = "Retorna resumos de pedidos para uma data de pedido específica")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de resumos retornada com sucesso"),
+            @ApiResponse(responseCode = "204", description = "Nenhum resumo encontrado para a data especificada"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @GetMapping("/data-pedido/{dataPedido}")
+    public ResponseEntity<List<ResumoPedidoResponseDTO>> buscarResumosPedidosPorDataPedido(
+            @PathVariable LocalDate dataPedido
+    ) {
+        List<ResumoPedido> resumosPedidos = resumoPedidoService.buscarResumosPedidosPorDataPedido(dataPedido);
+        if (resumosPedidos.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumosPedidos));
+    }
+
+    @Operation(summary = "Buscar resumos por status", description = "Retorna resumos de pedidos com um status específico")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de resumos retornada com sucesso"),
+            @ApiResponse(responseCode = "204", description = "Nenhum resumo encontrado para o status especificado"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @GetMapping("/status/{status}")
+    public ResponseEntity<List<ResumoPedidoResponseDTO>> buscarResumosPorStatus(
+            @PathVariable StatusEnum status
+    ) {
+        List<ResumoPedido> resumosPedidos = resumoPedidoService.buscarResumosPedidosPorStatus(status);
+        if (resumosPedidos.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumosPedidos));
+    }
+
+    @Operation(summary = "Cadastrar resumo de pedido", description = "Cadastra um novo resumo de pedido")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Resumo de pedido cadastrado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos para cadastro"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @PostMapping
+    public ResponseEntity<ResumoPedidoResponseDTO> cadastrarResumoPedido(
+            @Valid @RequestBody ResumoPedidoRequestDTO request
+    ) {
+        ResumoPedido resumoPedido = ResumoPedidoRequestDTO.toResumoPedido(request);
+        ResumoPedido resumoSalvo = resumoPedidoService.cadastrarResumoPedido(resumoPedido);
+        return ResponseEntity.status(201).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumoSalvo));
+    }
+
+    @Operation(summary = "Atualizar resumo de pedido", description = "Atualiza um resumo de pedido existente")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Resumo de pedido atualizado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos para atualização"),
+            @ApiResponse(responseCode = "404", description = "Resumo de pedido não encontrado"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @PutMapping("/{id}")
+    public ResponseEntity<ResumoPedidoResponseDTO> atualizarResumoPedido(
+            @PathVariable Integer id,
+            @Valid @RequestBody ResumoPedidoRequestDTO request
+    ) {
+        ResumoPedido resumoPedido = ResumoPedidoRequestDTO.toResumoPedido(request);
+        ResumoPedido resumoAtualizado = resumoPedidoService.atualizarResumoPedido(id, resumoPedido);
+        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumoAtualizado));
+    }
+
+    @Operation(summary = "Deletar resumo de pedido", description = "Remove um resumo de pedido pelo ID (desativa)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Resumo de pedido removido com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Resumo de pedido não encontrado"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarResumoPedido(@PathVariable Integer id) {
+        resumoPedidoService.deletarResumoPedido(id);
+        return ResponseEntity.status(204).build();
+    }
+
+    @Operation(summary = "Marcar resumo de pedido como pago", description = "Atualiza o status do resumo de pedido para 'PAGO'")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Resumo de pedido atualizado para 'PAGO' com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Resumo de pedido não encontrado"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @PatchMapping("/{id}/pago")
+    public ResponseEntity<ResumoPedidoResponseDTO> marcarPedidoComoPago(
+            @PathVariable Integer id
+    ) {
+        ResumoPedido resumoPedido = resumoPedidoService.alterarStatus(id, StatusEnum.PAGO);
+        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumoPedido));
+    }
+
+    @Operation(summary = "Marcar resumo de pedido como concluído", description = "Atualiza o status do resumo de pedido para 'CONCLUIDO'")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Resumo de pedido atualizado para 'CONCLUIDO' com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Resumo de pedido não encontrado"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @PatchMapping("/{id}/concluido")
+    public ResponseEntity<ResumoPedidoResponseDTO> marcarPedidoComoConcluido(
+            @PathVariable Integer id
+    ) {
+        ResumoPedido resumoPedido = resumoPedidoService.alterarStatus(id, StatusEnum.CONCLUIDO);
+        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumoPedido));
+    }
+
+    @Operation(summary = "Marcar resumo de pedido como cancelado", description = "Atualiza o status do resumo de pedido para 'PENDENTE'")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Resumo de pedido atualizado para 'PENDENTE' com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Resumo de pedido não encontrado"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @PatchMapping("/{id}/pendente")
+    public ResponseEntity<ResumoPedidoResponseDTO> marcarPedidoComoPendente(
+            @PathVariable Integer id
+    ) {
+        ResumoPedido resumoPedido = resumoPedidoService.alterarStatus(id, StatusEnum.PENDENTE);
+        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumoPedido));
+    }
+
+    @Operation(summary = "Marcar resumo de pedido como cancelado", description = "Atualiza o status do resumo de pedido para 'CANCELADO'")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Resumo de pedido atualizado para 'CANCELADO' com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Resumo de pedido não encontrado"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @PatchMapping("/{id}/cancelado")
+    public ResponseEntity<ResumoPedidoResponseDTO> marcarPedidoComoCancelado(
+            @PathVariable Integer id
+    ) {
+        ResumoPedido resumoPedido = resumoPedidoService.alterarStatus(id, StatusEnum.CANCELADO);
+        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumoPedido));
+    }
+
+    @Operation(summary = "Buscar resumos de pedidos de bolo", description = "Retorna todos os resumos de pedidos que possuem pedido de bolo associado")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de resumos retornada com sucesso"),
+            @ApiResponse(responseCode = "204", description = "Nenhum resumo de pedido de bolo encontrado"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @GetMapping("/pedido-bolo")
+    public ResponseEntity<List<ResumoPedidoResponseDTO>> listarResumosPedidosBolo() {
+        List<ResumoPedido> resumosPedidos = resumoPedidoService.listarResumosPedidosBolo();
+        if (resumosPedidos.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumosPedidos));
+    }
+
+    @Operation(summary = "Buscar resumos de pedidos de fornada", description = "Retorna todos os resumos de pedidos que possuem pedido de fornada associado")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de resumos retornada com sucesso"),
+            @ApiResponse(responseCode = "204", description = "Nenhum resumo de pedido de fornada encontrado"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @GetMapping("/pedido-fornada")
+    public ResponseEntity<List<ResumoPedidoResponseDTO>> listarResumosPedidosFornada() {
+        List<ResumoPedido> resumosPedidos = resumoPedidoService.listarResumosPedidosFornada();
+        if (resumosPedidos.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumosPedidos));
+    }
+
+}
