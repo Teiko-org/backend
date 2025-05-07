@@ -1,14 +1,23 @@
 package com.carambolos.carambolosapi.controller.response;
 
 import com.carambolos.carambolosapi.model.RecheioUnitario;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
 
+@Schema(description = "DTO de resposta para dados do Recheio Unitário")
 public record RecheioUnitarioResponseDTO(
-    Integer id,
-    String sabor,
-    String descricao,
-    Double valor
+        @Schema(description = "Identificador único do recheio unitário", example = "1")
+        Integer id,
+
+        @Schema(description = "Sabor do recheio unitário", example = "Chocolate")
+        String sabor,
+
+        @Schema(description = "Descrição adicional do recheio unitário", example = "Chocolate meio amargo")
+        String descricao,
+
+        @Schema(description = "Valor do recheio unitário", example = "5.75")
+        Double valor
 ) {
     public static RecheioUnitarioResponseDTO toRecheioUnitarioResponse(RecheioUnitario recheioUnitario) {
         return new RecheioUnitarioResponseDTO(
