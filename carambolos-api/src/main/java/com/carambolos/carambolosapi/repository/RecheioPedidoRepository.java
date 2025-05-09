@@ -65,4 +65,6 @@ public interface RecheioPedidoRepository extends JpaRepository<RecheioPedido, In
             group by rp.id, ru1.sabor, ru2.sabor;
             """, nativeQuery = true)
     List<RecheioPedidoProjection> listarRecheiosPedido();
+
+    Boolean existsByIdAndIsAtivoTrue(Integer id);
 }

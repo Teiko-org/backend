@@ -6,6 +6,7 @@ import com.carambolos.carambolosapi.model.*;
 import com.carambolos.carambolosapi.model.projection.RecheioExclusivoProjection;
 import com.carambolos.carambolosapi.model.projection.RecheioPedidoProjection;
 import com.carambolos.carambolosapi.service.BoloService;
+import com.carambolos.carambolosapi.service.PedidoBoloService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -27,10 +28,80 @@ public class BoloController {
     @Autowired
     private BoloService boloService;
 
-//    @GetMapping
-//    public ResponseEntity<List<Bolo>> listarBolos() {
-//        return ResponseEntity.status(200).body(boloService.listarBolos());
-//    }
+    @Autowired
+    private PedidoBoloService pedidoBoloService;
+
+    @Operation(summary = "Listar bolos", description = "Retorna todos os bolos cadastrados no sistema.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de bolos retornada com sucesso."),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor.")
+    })
+    @GetMapping
+    public ResponseEntity<List<Bolo>> listarBolos() {
+        List<Bolo> bolos = boloService.listarBolos();
+        if (bolos.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.status(200).body(boloService.listarBolos());
+    }
+
+    @Operation(summary = "Buscar bolo por ID", description = "Busca um bolo pelo seu ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Bolo encontrado"),
+            @ApiResponse(responseCode = "404", description = "Bolo não encontrado"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<BoloResponseDTO> buscarPorId(@PathVariable Integer id) {
+        Bolo bolo = boloService.buscarBoloPorId(id);
+        BoloResponseDTO response = BoloResponseDTO.toBoloResponse(bolo);
+        return ResponseEntity.status(200).body(response);
+    }
+
+    @Operation(summary = "Cadastrar bolo", description = "Cadastra um novo bolo")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Bolo criado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Requisição inválida"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @PostMapping
+    public ResponseEntity<BoloResponseDTO> cadastrarBolo(@Valid @RequestBody BoloRequestDTO request) {
+        Bolo bolo = BoloRequestDTO.toBolo(request);
+        Bolo boloSalvo = boloService.cadastrarBolo(bolo);
+        BoloResponseDTO response = BoloResponseDTO.toBoloResponse(boloSalvo);
+        return ResponseEntity.status(201).body(response);
+    }
+
+    @Operation(summary = "Atualizar bolo", description = "Atualiza os dados de um bolo existente")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Bolo atualizado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "404", description = "Bolo não encontrado"),
+            @ApiResponse(responseCode = "409", description = "Bolo já existe")
+    })
+    @PutMapping("/{id}")
+    public ResponseEntity<BoloResponseDTO> atualizarBolo(
+            @PathVariable Integer id,
+            @Valid @RequestBody BoloRequestDTO request
+    ) {
+        Bolo bolo = BoloRequestDTO.toBolo(request);
+        Bolo boloAtualizado = boloService.atualizarBolo(bolo, id);
+        BoloResponseDTO response = BoloResponseDTO.toBoloResponse(boloAtualizado);
+        return ResponseEntity.status(200).body(response);
+    }
+
+    @Operation(summary = "Deletar bolo", description = "Remove um bolo pelo ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Bolo removido com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Bolo não encontrado"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarBolo(@PathVariable Integer id) {
+        boloService.deletarBolo(id);
+        return ResponseEntity.status(204).build();
+    }
+
 
     @Operation(summary = "Cadastrar recheio unitário", description = "Cadastra um novo recheio unitário")
     @ApiResponses(value = {
@@ -344,7 +415,7 @@ public class BoloController {
             @PathVariable Integer id
     ) {
         boloService.deletarCobertura(id);
-        return ResponseEntity.status(200).build();
+        return ResponseEntity.status(204).build();
     }
 
     @Operation(summary = "Cadastrar massa", description = "Cadastra uma nova massa para bolo")
@@ -427,7 +498,103 @@ public class BoloController {
             @PathVariable Integer id
     ) {
         boloService.deletarMassa(id);
-        return ResponseEntity.status(200).build();
+        return ResponseEntity.status(204).build();
+    }
+
+//    @Operation(summary = "Cadastrar decoração", description = "Cadastra uma nova decoração de bolo")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "201", description = "Decoração cadastrada com sucesso"),
+//            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+//            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+//    })
+//    @PostMapping("/decoracao")
+//    public ResponseEntity<DecoracaoResponseDTO> cadastrarDecoracao(@Valid @RequestBody DecoracaoRequestDTO request) {
+//        Decoracao decoracao = DecoracaoRequestDTO.toDecoracao(request);
+//        Decoracao decoracaoSalva = boloService.cadastrarDecoracao(decoracao);
+//        DecoracaoResponseDTO response = DecoracaoResponseDTO.toDecoracaoResponse(decoracaoSalva);
+//        return ResponseEntity.status(201).body(response);
+//    }
+    @Operation(summary = "Listar pedidos", description = "Retorna uma lista com todos os pedidos ativos")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de pedidos retornada com sucesso"),
+            @ApiResponse(responseCode = "204", description = "Nenhum pedido encontrado"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @GetMapping("/pedido")
+    public ResponseEntity<List<PedidoBoloResponseDTO>> listarPedidos() {
+        List<PedidoBolo> pedidos = pedidoBoloService.listarPedidos();
+        if (pedidos.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.status(200).body(
+                PedidoBoloResponseDTO.toPedidoBoloResponse(pedidos)
+        );
+    }
+
+    @Operation(summary = "Buscar pedido por ID", description = "Retorna um pedido específico com base no ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pedido encontrado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Pedido não encontrado"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @GetMapping("/pedido/{id}")
+    public ResponseEntity<PedidoBoloResponseDTO> buscarPedidoPorId(
+            @PathVariable Integer id
+    ) {
+        PedidoBolo pedido = pedidoBoloService.buscarPedidoPorId(id);
+        return ResponseEntity.status(200).body(
+                PedidoBoloResponseDTO.toPedidoBoloResponse(pedido)
+        );
+    }
+
+    @Operation(summary = "Cadastrar pedido", description = "Cadastra um novo pedido de bolo")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Pedido cadastrado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos para cadastro"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @PostMapping("/pedido")
+    public ResponseEntity<PedidoBoloResponseDTO> cadastrarPedido(
+            @Valid @RequestBody PedidoBoloRequestDTO request
+    ) {
+        PedidoBolo pedido = PedidoBoloRequestDTO.toPedidoBolo(request);
+        PedidoBolo pedidoSalvo = pedidoBoloService.cadastrarPedido(pedido);
+        return ResponseEntity.status(201).body(
+                PedidoBoloResponseDTO.toPedidoBoloResponse(pedidoSalvo)
+        );
+    }
+
+    @Operation(summary = "Atualizar pedido", description = "Atualiza os dados de um pedido existente")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pedido atualizado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos para atualização"),
+            @ApiResponse(responseCode = "404", description = "Pedido não encontrado"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @PutMapping("/pedido/{id}")
+    public ResponseEntity<PedidoBoloResponseDTO> atualizarPedido(
+            @PathVariable Integer id,
+            @RequestBody PedidoBoloRequestDTO request
+    ) {
+        PedidoBolo pedido = PedidoBoloRequestDTO.toPedidoBolo(request);
+        PedidoBolo pedidoAtualizado = pedidoBoloService.atualizarPedido(pedido, id);
+        return ResponseEntity.status(200).body(
+                PedidoBoloResponseDTO.toPedidoBoloResponse(pedidoAtualizado)
+        );
+    }
+
+    @Operation(summary = "Deletar pedido", description = "Remove um pedido pelo ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Pedido removido com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Pedido não encontrado"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @DeleteMapping("/pedido/{id}")
+    public ResponseEntity<Void> deletarPedido(
+            @PathVariable Integer id
+    ) {
+        pedidoBoloService.deletarPedido(id);
+        return ResponseEntity.status(204).build();
     }
 }
 
