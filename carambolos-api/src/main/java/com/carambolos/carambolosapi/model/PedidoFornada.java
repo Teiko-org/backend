@@ -44,7 +44,7 @@ public class PedidoFornada {
 
     @Column(name = "is_ativo")
     @Schema(description = "Indica se o pedido está ativo ou não", example = "true")
-    private boolean isAtivo = true;
+    private Boolean isAtivo = true;
 
     public Integer getId() {
         return id;
@@ -94,11 +94,11 @@ public class PedidoFornada {
         this.dataPrevisaoEntrega = dataPrevisaoEntrega;
     }
 
-    public boolean isAtivo() {
+    public Boolean isAtivo() {
         return isAtivo;
     }
 
-    public void setAtivo(boolean ativo) {
+    public void setAtivo(Boolean ativo) {
         isAtivo = ativo;
     }
 }

@@ -27,7 +27,7 @@ public class Fornada {
 
     @Column(name = "is_ativo")
     @Schema(description = "Indica se a fornada está ativa ou não", example = "true")
-    private boolean isAtivo = true;
+    private Boolean isAtivo = true;
 
     public Integer getId() {
         return id;
@@ -53,11 +53,11 @@ public class Fornada {
         this.dataFim = dataFim;
     }
 
-    public boolean isAtivo() {
+    public Boolean isAtivo() {
         return isAtivo;
     }
 
-    public void setAtivo(boolean ativo) {
+    public void setAtivo(Boolean ativo) {
         isAtivo = ativo;
     }
 }

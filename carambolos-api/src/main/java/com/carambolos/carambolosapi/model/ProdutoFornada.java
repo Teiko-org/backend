@@ -31,7 +31,7 @@ public class ProdutoFornada {
 
     @Column(name = "is_ativo")
     @Schema(description = "Indica se o produto está ativo ou não", example = "true")
-    private boolean isAtivo = true;
+    private Boolean isAtivo = true;
 
     public Integer getId() {
         return id;
@@ -65,11 +65,11 @@ public class ProdutoFornada {
         this.valor = valor;
     }
 
-    public boolean isAtivo() {
+    public Boolean isAtivo() {
         return isAtivo;
     }
 
-    public void setAtivo(boolean ativo) {
+    public void setAtivo(Boolean ativo) {
         isAtivo = ativo;
     }
 }
