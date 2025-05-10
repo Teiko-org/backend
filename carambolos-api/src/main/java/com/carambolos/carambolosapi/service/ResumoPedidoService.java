@@ -107,9 +107,9 @@ public class ResumoPedidoService {
     }
 
     private void validarPedidoFornada(Integer pedidoFornadaId) {
-//        if (!pedidoFornadaRepository.existsByIdAndIsAtivoTrue(pedidoFornadaId)) {
-//            throw new EntidadeNaoEncontradaException("Pedido de fornada com ID %d não encontrado".formatted(pedidoFornadaId));
-//        }
+        if (!pedidoFornadaRepository.existsByIdAndIsAtivoTrue(pedidoFornadaId)) {
+            throw new EntidadeNaoEncontradaException("Pedido de fornada com ID %d não encontrado".formatted(pedidoFornadaId));
+        }
     }
 
     private boolean isTransicaoStatusValida(StatusEnum statusAtual, StatusEnum novoStatus) {

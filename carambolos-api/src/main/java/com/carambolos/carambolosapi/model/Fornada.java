@@ -25,6 +25,10 @@ public class Fornada {
     @Schema(description = "Data de fim da fornada", example = "2025-05-07")
     private LocalDate dataFim;
 
+    @Column(name = "is_ativo")
+    @Schema(description = "Indica se a fornada está ativa ou não", example = "true")
+    private boolean isAtivo = true;
+
     public Integer getId() {
         return id;
     }
@@ -47,5 +51,13 @@ public class Fornada {
 
     public void setDataFim(LocalDate dataFim) {
         this.dataFim = dataFim;
+    }
+
+    public boolean isAtivo() {
+        return isAtivo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        isAtivo = ativo;
     }
 }

@@ -22,11 +22,11 @@ public record BoloRequestDTO(
 
 //        Integer decoracaoId,
 
-        @Schema(description = "Formato do bolo", example = "CIRCULO", implementation = FormatoEnum.class)
+        @Schema(description = "Formato do bolo", example = "CIRCULO")
         @NotNull
         FormatoEnum formato,
 
-        @Schema(description = "Tamanho do bolo em cm", example = "TAMANHO_12", implementation = TamanhoEnum.class)
+        @Schema(description = "Tamanho do bolo em cm", example = "TAMANHO_12")
         @NotNull
         TamanhoEnum tamanho
 ) {

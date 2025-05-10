@@ -30,7 +30,6 @@ public class PedidoFornada {
 
     @OneToOne(optional = true)
     @JoinColumn(name = "usuario_id")
-    @NotNull
     @Schema(description = "Usuário que realizou o pedido", implementation = Usuario.class)
     private Usuario usuario;
 
@@ -42,6 +41,10 @@ public class PedidoFornada {
     @NotNull
     @Schema(description = "Data prevista para entrega do pedido", example = "2025-05-10")
     private LocalDate dataPrevisaoEntrega;
+
+    @Column(name = "is_ativo")
+    @Schema(description = "Indica se o pedido está ativo ou não", example = "true")
+    private boolean isAtivo = true;
 
     public Integer getId() {
         return id;
@@ -89,5 +92,13 @@ public class PedidoFornada {
 
     public void setDataPrevisaoEntrega(LocalDate dataPrevisaoEntrega) {
         this.dataPrevisaoEntrega = dataPrevisaoEntrega;
+    }
+
+    public boolean isAtivo() {
+        return isAtivo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        isAtivo = ativo;
     }
 }

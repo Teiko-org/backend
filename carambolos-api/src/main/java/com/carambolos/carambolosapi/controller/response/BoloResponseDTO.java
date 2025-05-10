@@ -22,10 +22,10 @@ public record BoloResponseDTO(
 
 //        Integer decoracaoId,
 
-        @Schema(description = "Formato do bolo", example = "Circulo", implementation = FormatoEnum.class)
+        @Schema(description = "Formato do bolo", example = "Circulo")
         FormatoEnum formato,
 
-        @Schema(description = "Tamanho do bolo em cm", example = "12", implementation = TamanhoEnum.class)
+        @Schema(description = "Tamanho do bolo em cm", example = "12")
         TamanhoEnum tamanho
 ) {
     @Schema(description = "Método para converter a entidade Bolo em um DTO de resposta")
