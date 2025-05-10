@@ -5,6 +5,7 @@ import com.carambolos.carambolosapi.model.enums.FormatoEnum;
 import com.carambolos.carambolosapi.model.enums.TamanhoEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+@Schema(description = "DTO de resposta contendo informações do bolo")
 public record BoloResponseDTO(
 
         @Schema(description = "Identificador único do bolo", example = "1")
@@ -21,12 +22,13 @@ public record BoloResponseDTO(
 
 //        Integer decoracaoId,
 
-        @Schema(description = "Formato do bolo", example = "Circulo")
+        @Schema(description = "Formato do bolo", example = "Circulo", implementation = FormatoEnum.class)
         FormatoEnum formato,
 
-        @Schema(description = "Tamanho do bolo em cm", example = "12")
+        @Schema(description = "Tamanho do bolo em cm", example = "12", implementation = TamanhoEnum.class)
         TamanhoEnum tamanho
 ) {
+    @Schema(description = "Método para converter a entidade Bolo em um DTO de resposta")
     public static BoloResponseDTO toBoloResponse(Bolo bolo) {
         return new BoloResponseDTO(
                 bolo.getId(),

@@ -8,8 +8,11 @@ import com.carambolos.carambolosapi.model.projection.RecheioPedidoProjection;
 import com.carambolos.carambolosapi.service.BoloService;
 import com.carambolos.carambolosapi.service.PedidoBoloService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +23,7 @@ import static com.carambolos.carambolosapi.controller.request.RecheioUnitarioReq
 
 @RestController
 @RequestMapping("/bolos")
+@SecurityRequirement(name = "Bearer")
 @Tag(name = "Bolo Controller", description = "Gerencia bolos, recheios, coberturas e massas")
 public class BoloController {
 
@@ -31,7 +35,11 @@ public class BoloController {
 
     @Operation(summary = "Listar bolos", description = "Retorna todos os bolos cadastrados no sistema.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de bolos retornada com sucesso."),
+            @ApiResponse(responseCode = "200", description = "Lista de bolos retornada com sucesso.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = BoloResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "204", description = "Nenhum bolo encontrado.", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno no servidor.")
     })
     @GetMapping
@@ -45,8 +53,11 @@ public class BoloController {
 
     @Operation(summary = "Buscar bolo por ID", description = "Busca um bolo pelo seu ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Bolo encontrado"),
-            @ApiResponse(responseCode = "404", description = "Bolo não encontrado"),
+            @ApiResponse(responseCode = "200", description = "Bolo encontrado", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = BoloResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "404", description = "Bolo não encontrado", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @GetMapping("/{id}")
@@ -58,8 +69,10 @@ public class BoloController {
 
     @Operation(summary = "Cadastrar bolo", description = "Cadastra um novo bolo")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Bolo criado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Requisição inválida"),
+            @ApiResponse(responseCode = "201", description = "Bolo criado com sucesso",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BoloResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @PostMapping
@@ -72,10 +85,13 @@ public class BoloController {
 
     @Operation(summary = "Atualizar bolo", description = "Atualiza os dados de um bolo existente")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Bolo atualizado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-            @ApiResponse(responseCode = "404", description = "Bolo não encontrado"),
-            @ApiResponse(responseCode = "409", description = "Bolo já existe")
+            @ApiResponse(responseCode = "200", description = "Bolo atualizado com sucesso", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = BoloResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "Bolo não encontrado", content = @Content()),
+            @ApiResponse(responseCode = "409", description = "Bolo já existe"),
     })
     @PutMapping("/{id}")
     public ResponseEntity<BoloResponseDTO> atualizarBolo(
@@ -90,8 +106,8 @@ public class BoloController {
 
     @Operation(summary = "Deletar bolo", description = "Remove um bolo pelo ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Bolo removido com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Bolo não encontrado"),
+            @ApiResponse(responseCode = "204", description = "Bolo removido com sucesso", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "Bolo não encontrado", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @DeleteMapping("/{id}")
@@ -103,8 +119,11 @@ public class BoloController {
 
     @Operation(summary = "Cadastrar recheio unitário", description = "Cadastra um novo recheio unitário")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Recheio criado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Requisição inválida"),
+            @ApiResponse(responseCode = "201", description = "Recheio criado com sucesso", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = RecheioUnitarioResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @PostMapping("/recheio-unitario")
@@ -120,7 +139,11 @@ public class BoloController {
 
     @Operation(summary = "Listar recheios unitários", description = "Lista todos os recheios unitários cadastrados")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso"),
+            @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = RecheioUnitarioResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "204", description = "Nenhum recheio unitário encontrado", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @GetMapping("/recheio-unitario")
@@ -133,8 +156,11 @@ public class BoloController {
 
     @Operation(summary = "Buscar recheio unitário por ID", description = "Busca um recheio unitário pelo seu ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Recheio encontrado"),
-            @ApiResponse(responseCode = "404", description = "Recheio não encontrado"),
+            @ApiResponse(responseCode = "200", description = "Recheio encontrado", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = RecheioUnitarioResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "404", description = "Recheio não encontrado", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @GetMapping("/recheio-unitario/{id}")
@@ -149,9 +175,12 @@ public class BoloController {
 
     @Operation(summary = "Atualizar recheio unitário", description = "Atualiza os dados de um recheio unitário existente")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Recheio atualizado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-            @ApiResponse(responseCode = "404", description = "Recheio não encontrado"),
+            @ApiResponse(responseCode = "200", description = "Recheio atualizado com sucesso", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = RecheioUnitarioResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "Recheio não encontrado", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @PutMapping("/recheio-unitario/{id}")
@@ -168,8 +197,8 @@ public class BoloController {
 
     @Operation(summary = "Deletar recheio unitário", description = "Remove um recheio unitário pelo ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Recheio removido com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Recheio não encontrado"),
+            @ApiResponse(responseCode = "204", description = "Recheio removido com sucesso", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "Recheio não encontrado", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @DeleteMapping("/recheio-unitario/{id}")
@@ -182,8 +211,11 @@ public class BoloController {
 
     @Operation(summary = "Cadastrar recheio exclusivo", description = "Cadastra um novo recheio exclusivo")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Recheio exclusivo cadastrado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos para cadastro"),
+            @ApiResponse(responseCode = "200", description = "Recheio exclusivo cadastrado com sucesso", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = RecheioExclusivoResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos para cadastro", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @PostMapping("/recheio-exclusivo")
@@ -199,8 +231,11 @@ public class BoloController {
 
     @Operation(summary = "Buscar recheio exclusivo por ID", description = "Busca um recheio exclusivo pelo seu ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Recheio exclusivo encontrado"),
-            @ApiResponse(responseCode = "404", description = "Recheio exclusivo não encontrado"),
+            @ApiResponse(responseCode = "200", description = "Recheio exclusivo encontrado", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = RecheioExclusivoResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "404", description = "Recheio exclusivo não encontrado", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @GetMapping("/recheio-exclusivo/{id}")
@@ -215,7 +250,11 @@ public class BoloController {
 
     @Operation(summary = "Listar recheios exclusivos", description = "Retorna uma lista de todos os recheios exclusivos cadastrados")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso"),
+            @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = RecheioExclusivoResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "204", description = "Nenhum recheio exclusivo encontrado", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @GetMapping("/recheio-exclusivo")
@@ -228,9 +267,12 @@ public class BoloController {
 
     @Operation(summary = "Atualizar recheio exclusivo", description = "Atualiza um recheio exclusivo com base no ID informado")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Recheio exclusivo atualizado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos para atualização"),
-            @ApiResponse(responseCode = "404", description = "Recheio exclusivo não encontrado"),
+            @ApiResponse(responseCode = "200", description = "Recheio exclusivo atualizado com sucesso", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = RecheioExclusivoResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos para atualização", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "Recheio exclusivo não encontrado", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @PutMapping("/recheio-exclusivo/{id}")
@@ -247,8 +289,8 @@ public class BoloController {
 
     @Operation(summary = "Excluir recheio exclusivo", description = "Exclui um recheio exclusivo pelo ID informado")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Recheio exclusivo removido com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Recheio exclusivo não encontrado"),
+            @ApiResponse(responseCode = "204", description = "Recheio exclusivo removido com sucesso", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "Recheio exclusivo não encontrado", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @DeleteMapping("/recheio-exclusivo/{id}")
@@ -261,8 +303,11 @@ public class BoloController {
 
     @Operation(summary = "Cadastrar recheio do pedido", description = "Cadastra um novo recheio para um pedido de bolo")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Recheio do pedido cadastrado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos para cadastro"),
+            @ApiResponse(responseCode = "201", description = "Recheio do pedido cadastrado com sucesso", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = RecheioPedidoResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos para cadastro", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @PostMapping("/recheio-pedido")
@@ -277,9 +322,12 @@ public class BoloController {
 
     @Operation(summary = "Atualizar recheio do pedido", description = "Atualiza um recheio de pedido com base no ID informado")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Recheio do pedido atualizado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos para atualização"),
-            @ApiResponse(responseCode = "404", description = "Recheio do pedido não encontrado"),
+            @ApiResponse(responseCode = "200", description = "Recheio do pedido atualizado com sucesso", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = RecheioPedidoResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos para atualização", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "Recheio do pedido não encontrado", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @PutMapping("/recheio-pedido/{id}")
@@ -294,8 +342,11 @@ public class BoloController {
 
     @Operation(summary = "Buscar recheio do pedido por ID", description = "Busca um recheio de pedido pelo ID informado")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Recheio do pedido encontrado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Recheio do pedido não encontrado"),
+            @ApiResponse(responseCode = "200", description = "Recheio do pedido encontrado com sucesso", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = RecheioPedidoResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "404", description = "Recheio do pedido não encontrado", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @GetMapping("/recheio-pedido/{id}")
@@ -308,8 +359,11 @@ public class BoloController {
 
     @Operation(summary = "Listar todos os recheios de pedido", description = "Lista todos os recheios de pedido cadastrados")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso"),
-            @ApiResponse(responseCode = "204", description = "Nenhum recheio de pedido encontrado"),
+            @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = RecheioPedidoResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "204", description = "Nenhum recheio de pedido encontrado", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @GetMapping("/recheio-pedido")
@@ -327,8 +381,8 @@ public class BoloController {
 
     @Operation(summary = "Deletar recheio do pedido", description = "Remove um recheio de pedido com base no ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Recheio do pedido deletado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Recheio do pedido não encontrado"),
+            @ApiResponse(responseCode = "204", description = "Recheio do pedido deletado com sucesso", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "Recheio do pedido não encontrado", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @DeleteMapping("/recheio-pedido/{id}")
@@ -341,8 +395,11 @@ public class BoloController {
 
     @Operation(summary = "Cadastrar cobertura", description = "Cadastra uma nova cobertura para bolo")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Cobertura cadastrada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos para cadastro"),
+            @ApiResponse(responseCode = "201", description = "Cobertura cadastrada com sucesso", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = CoberturaResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos para cadastro", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @PostMapping("/cobertura")
@@ -356,9 +413,12 @@ public class BoloController {
 
     @Operation(summary = "Atualizar cobertura", description = "Atualiza uma cobertura existente pelo ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cobertura atualizada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos para atualização"),
-            @ApiResponse(responseCode = "404", description = "Cobertura não encontrada"),
+            @ApiResponse(responseCode = "200", description = "Cobertura atualizada com sucesso", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = CoberturaResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos para atualização", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "Cobertura não encontrada", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @PutMapping("/cobertura/{id}")
@@ -375,8 +435,11 @@ public class BoloController {
 
     @Operation(summary = "Listar coberturas", description = "Retorna uma lista com todas as coberturas cadastradas")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de coberturas retornada com sucesso"),
-            @ApiResponse(responseCode = "204", description = "Nenhuma cobertura encontrada"),
+            @ApiResponse(responseCode = "200", description = "Lista de coberturas retornada com sucesso", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = CoberturaResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "204", description = "Nenhuma cobertura encontrada", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @GetMapping("/cobertura")
@@ -390,8 +453,11 @@ public class BoloController {
 
     @Operation(summary = "Buscar cobertura por ID", description = "Retorna uma cobertura específica com base no ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cobertura encontrada com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Cobertura não encontrada"),
+            @ApiResponse(responseCode = "200", description = "Cobertura encontrada com sucesso", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = CoberturaResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "404", description = "Cobertura não encontrada", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @GetMapping("/cobertura/{id}")
@@ -404,8 +470,11 @@ public class BoloController {
 
     @Operation(summary = "Deletar cobertura", description = "Remove uma cobertura pelo ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cobertura deletada com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Cobertura não encontrada"),
+            @ApiResponse(responseCode = "200", description = "Cobertura deletada com sucesso", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = CoberturaResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "404", description = "Cobertura não encontrada", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @DeleteMapping("/cobertura/{id}")
@@ -418,8 +487,11 @@ public class BoloController {
 
     @Operation(summary = "Cadastrar massa", description = "Cadastra uma nova massa para bolo")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Massa cadastrada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos para cadastro"),
+            @ApiResponse(responseCode = "201", description = "Massa cadastrada com sucesso", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = MassaResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos para cadastro", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @PostMapping("/massa")
@@ -435,9 +507,12 @@ public class BoloController {
 
     @Operation(summary = "Atualizar massa", description = "Atualiza uma massa existente pelo ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Massa atualizada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos para atualização"),
-            @ApiResponse(responseCode = "404", description = "Massa não encontrada"),
+            @ApiResponse(responseCode = "200", description = "Massa atualizada com sucesso", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = MassaResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos para atualização", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "Massa não encontrada", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @PutMapping("/massa/{id}")
@@ -454,8 +529,11 @@ public class BoloController {
 
     @Operation(summary = "Listar massas", description = "Retorna uma lista com todas as massas cadastradas")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de massas retornada com sucesso"),
-            @ApiResponse(responseCode = "204", description = "Nenhuma massa encontrada"),
+            @ApiResponse(responseCode = "200", description = "Lista de massas retornada com sucesso", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = MassaResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "204", description = "Nenhuma massa encontrada", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @GetMapping("/massa")
@@ -471,8 +549,11 @@ public class BoloController {
 
     @Operation(summary = "Buscar massa por ID", description = "Retorna uma massa específica com base no ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Massa encontrada com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Massa não encontrada"),
+            @ApiResponse(responseCode = "200", description = "Massa encontrada com sucesso", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = MassaResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "404", description = "Massa não encontrada", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @GetMapping("/massa/{id}")
@@ -487,8 +568,11 @@ public class BoloController {
 
     @Operation(summary = "Deletar massa", description = "Remove uma massa pelo ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Massa deletada com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Massa não encontrada"),
+            @ApiResponse(responseCode = "200", description = "Massa deletada com sucesso", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = MassaResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "404", description = "Massa não encontrada", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @DeleteMapping("/massa/{id}")
@@ -514,8 +598,11 @@ public class BoloController {
 //    }
     @Operation(summary = "Listar pedidos", description = "Retorna uma lista com todos os pedidos ativos")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de pedidos retornada com sucesso"),
-            @ApiResponse(responseCode = "204", description = "Nenhum pedido encontrado"),
+            @ApiResponse(responseCode = "200", description = "Lista de pedidos retornada com sucesso", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = PedidoBoloResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "204", description = "Nenhum pedido encontrado", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @GetMapping("/pedido")
@@ -531,8 +618,11 @@ public class BoloController {
 
     @Operation(summary = "Buscar pedido por ID", description = "Retorna um pedido específico com base no ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Pedido encontrado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Pedido não encontrado"),
+            @ApiResponse(responseCode = "200", description = "Pedido encontrado com sucesso", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = PedidoBoloResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @GetMapping("/pedido/{id}")
@@ -564,9 +654,12 @@ public class BoloController {
 
     @Operation(summary = "Atualizar pedido", description = "Atualiza os dados de um pedido existente")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Pedido atualizado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos para atualização"),
-            @ApiResponse(responseCode = "404", description = "Pedido não encontrado"),
+            @ApiResponse(responseCode = "200", description = "Pedido atualizado com sucesso", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = PedidoBoloResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos para atualização", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @PutMapping("/pedido/{id}")
@@ -583,8 +676,8 @@ public class BoloController {
 
     @Operation(summary = "Deletar pedido", description = "Remove um pedido pelo ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Pedido removido com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Pedido não encontrado"),
+            @ApiResponse(responseCode = "204", description = "Pedido removido com sucesso", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @DeleteMapping("/pedido/{id}")

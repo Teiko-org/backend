@@ -6,6 +6,7 @@ import com.carambolos.carambolosapi.model.enums.TamanhoEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
+@Schema(description = "DTO para requisição de cadastro de bolo.")
 public record BoloRequestDTO(
         @Schema(description = "ID do recheio", example = "1")
         @NotNull
@@ -21,14 +22,15 @@ public record BoloRequestDTO(
 
 //        Integer decoracaoId,
 
-        @Schema(description = "Formato do bolo", example = "CIRCULO")
+        @Schema(description = "Formato do bolo", example = "CIRCULO", implementation = FormatoEnum.class)
         @NotNull
         FormatoEnum formato,
 
-        @Schema(description = "Tamanho do bolo em cm", example = "TAMANHO_12")
+        @Schema(description = "Tamanho do bolo em cm", example = "TAMANHO_12", implementation = TamanhoEnum.class)
         @NotNull
         TamanhoEnum tamanho
 ) {
+    @Schema(description = "Método para converter o DTO em uma entidade FornadaDaVez")
     public static Bolo toBolo(BoloRequestDTO request) {
         if (request == null) {
             return null;

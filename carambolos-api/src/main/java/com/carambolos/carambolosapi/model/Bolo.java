@@ -2,9 +2,11 @@ package com.carambolos.carambolosapi.model;
 
 import com.carambolos.carambolosapi.model.enums.FormatoEnum;
 import com.carambolos.carambolosapi.model.enums.TamanhoEnum;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 
 @Entity
+@Schema(description = "Representa um bolo")
 public class Bolo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,9 +19,9 @@ public class Bolo {
     private Integer cobertura;
 //    @Column(name = "decoracao_id")
 //    private Integer decoracao;
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private FormatoEnum formato;
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private TamanhoEnum tamanho;
     @Column(name = "is_ativo")
     private Boolean isAtivo = true;
