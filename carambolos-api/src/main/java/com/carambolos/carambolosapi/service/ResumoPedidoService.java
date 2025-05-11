@@ -37,7 +37,9 @@ public class ResumoPedidoService {
 
     //LocalDateTime?
     public List<ResumoPedido> buscarResumosPedidosPorDataPedido(LocalDate dataPedido) {
-        return resumoPedidoRepository.findByDataEntregaAndIsAtivoTrue(dataPedido);
+        LocalDateTime comecoData = dataPedido.atStartOfDay();
+        LocalDateTime fimData = dataPedido.atTime(23, 59, 59);
+        return resumoPedidoRepository.findByDataPedidoBetweenAndIsAtivoTrue(comecoData, fimData);
     }
 
     public List<ResumoPedido> buscarResumosPedidosPorStatus(StatusEnum status) {
