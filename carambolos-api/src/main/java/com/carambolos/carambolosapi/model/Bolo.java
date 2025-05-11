@@ -17,10 +17,11 @@ public class Bolo {
     private Integer cobertura;
 //    @Column(name = "decoracao_id")
 //    private Integer decoracao;
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private FormatoEnum formato;
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private TamanhoEnum tamanho;
+    private String categoria;
     @Column(name = "is_ativo")
     private Boolean isAtivo = true;
 
@@ -70,6 +71,14 @@ public class Bolo {
 
     public void setTamanho(TamanhoEnum tamanho) {
         this.tamanho = tamanho;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
     }
 
     public Boolean getAtivo() {

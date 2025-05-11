@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,12 +38,14 @@ public class BoloController {
             @ApiResponse(responseCode = "500", description = "Erro interno no servidor.")
     })
     @GetMapping
-    public ResponseEntity<List<Bolo>> listarBolos() {
-        List<Bolo> bolos = boloService.listarBolos();
+    public ResponseEntity<List<Bolo>> listarBolos(
+            @RequestParam(defaultValue = "") List<String> categorias
+    ) {
+        List<Bolo> bolos = boloService.listarBolos(categorias);
         if (bolos.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
-        return ResponseEntity.status(200).body(boloService.listarBolos());
+        return ResponseEntity.status(200).body(bolos);
     }
 
     @Operation(summary = "Buscar bolo por ID", description = "Busca um bolo pelo seu ID")

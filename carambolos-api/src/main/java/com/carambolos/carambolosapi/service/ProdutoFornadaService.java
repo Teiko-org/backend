@@ -26,8 +26,14 @@ public class ProdutoFornadaService {
         return produtoFornadaRepository.save(produtoFornada);
     }
 
-    public List<ProdutoFornada> listarProdutosFornada() {
-        return produtoFornadaRepository.findAll();
+    public List<ProdutoFornada> listarProdutosFornada(List<String> categorias) {
+        List<ProdutoFornada> produtos;
+        if (!categorias.isEmpty()) {
+            produtos = produtoFornadaRepository.findByCategoriaIn(categorias);
+        } else {
+            produtos = produtoFornadaRepository.findAll();
+        }
+        return produtos;
     }
 
     public ProdutoFornada buscarProdutoFornada(Integer id) {

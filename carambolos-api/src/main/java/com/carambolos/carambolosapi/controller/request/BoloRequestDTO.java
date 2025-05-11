@@ -27,7 +27,10 @@ public record BoloRequestDTO(
 
         @Schema(description = "Tamanho do bolo em cm", example = "TAMANHO_12")
         @NotNull
-        TamanhoEnum tamanho
+        TamanhoEnum tamanho,
+
+        @Schema(description = "Categoria do bolo", example = "bolo de páscoa")
+        String categoria
 ) {
     public static Bolo toBolo(BoloRequestDTO request) {
         if (request == null) {
@@ -39,6 +42,7 @@ public record BoloRequestDTO(
         bolo.setCobertura(request.coberturaId);
         bolo.setFormato(request.formato);
         bolo.setTamanho(request.tamanho);
+        bolo.setCategoria(request.categoria);
         return bolo;
     }
 }
