@@ -1,8 +1,6 @@
 package com.carambolos.carambolosapi.controller;
 
-import com.carambolos.carambolosapi.controller.request.FornadaDaVezRequestDTO;
-import com.carambolos.carambolosapi.controller.request.FornadaRequestDTO;
-import com.carambolos.carambolosapi.controller.request.ProdutoFornadaRequestDTO;
+import com.carambolos.carambolosapi.controller.request.*;
 import com.carambolos.carambolosapi.model.Fornada;
 import com.carambolos.carambolosapi.model.FornadaDaVez;
 import com.carambolos.carambolosapi.model.PedidoFornada;
@@ -14,6 +12,7 @@ import com.carambolos.carambolosapi.service.ProdutoFornadaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -27,6 +26,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/fornadas")
 @Tag(name = "Fornada Controller", description = "Gerencia Fornadas, Produtos da Fornada, Fornadas da Vez e Pedidos de Fornada")
+@SecurityRequirement(name = "Bearer")
 public class FornadaController {
 
     @Autowired
@@ -130,8 +130,10 @@ public class FornadaController {
             @ApiResponse(responseCode = "404", description = "Nenhum produto encontrado", content = @Content())
     })
     @GetMapping("/produto-fornada")
-    public ResponseEntity<List<ProdutoFornada>> listarProdutoFornada() {
-        return ResponseEntity.status(200).body(produtoFornadaService.listarProdutosFornada());
+    public ResponseEntity<List<ProdutoFornada>> listarProdutoFornada(
+            @RequestParam(defaultValue = "") List<String> categorias
+    ) {
+        return ResponseEntity.status(200).body(produtoFornadaService.listarProdutosFornada(categorias));
     }
 
     @Operation(summary = "Busca um produto da fornada por ID")

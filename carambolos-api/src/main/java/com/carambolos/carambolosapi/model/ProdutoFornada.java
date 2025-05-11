@@ -29,6 +29,9 @@ public class ProdutoFornada {
     @Schema(description = "Valor do produto", example = "7.50")
     private Double valor;
 
+    @Schema(description = "categoria da fornada", example = "Fornada natalina")
+    private String categoria;
+
     public Integer getId() {
         return id;
     }
@@ -59,5 +62,13 @@ public class ProdutoFornada {
 
     public void setValor(Double valor) {
         this.valor = valor;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
     }
 }

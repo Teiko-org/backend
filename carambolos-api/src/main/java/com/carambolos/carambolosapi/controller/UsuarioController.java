@@ -64,6 +64,7 @@ public class UsuarioController {
                     content = @Content())
     })
     @GetMapping("/{id}")
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<UsuarioResponseDTO> buscarPorId(
             @PathVariable Integer id) {
         Usuario usuario = usuarioService.buscarPorId(id);
@@ -122,6 +123,7 @@ public class UsuarioController {
                     content = @Content())
     })
     @PutMapping("/{id}")
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<UsuarioResponseDTO> atualizar(@PathVariable Integer id, @Valid @RequestBody UsuarioRequestDTO usuarioRequest) {
         Usuario usuario = UsuarioRequestDTO.toEntity(usuarioRequest);
         Usuario usuarioAtualizado = usuarioService.atualizar(id, usuario);
@@ -140,6 +142,7 @@ public class UsuarioController {
                     content = @Content())
     })
     @DeleteMapping("/{id}")
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<Void> deletar(@PathVariable Integer id) {
         usuarioService.deletar(id);
         return ResponseEntity.status(204).build();

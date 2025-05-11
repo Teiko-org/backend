@@ -16,7 +16,10 @@ public record ProdutoFornadaRequestDTO(
         String descricao,
 
         @Schema(description = "Preço unitário do produto", example = "7.50")
-        Double valor
+        Double valor,
+
+        @Schema(description = "Categoria da fornada", example = "Fornada de natal")
+        String categoria
 
 ) {
 
@@ -25,6 +28,7 @@ public record ProdutoFornadaRequestDTO(
         produtoFornada.setProduto(produto);
         produtoFornada.setDescricao(descricao);
         produtoFornada.setValor(valor);
+        produtoFornada.setCategoria(categoria);
         return produtoFornada;
     }
 }

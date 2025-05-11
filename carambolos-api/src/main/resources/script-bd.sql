@@ -1,5 +1,6 @@
 CREATE DATABASE IF NOT EXISTS teiko;
 USE teiko ;
+
 -- -----------------------------------------------------
 -- Table teiko.usuario
 -- -----------------------------------------------------
@@ -46,11 +47,11 @@ CREATE TABLE IF NOT EXISTS teiko.produto_fornada (
   produto VARCHAR(50) NULL,
   descricao VARCHAR(70) NULL,
   valor DOUBLE NULL,
+  categoria VARCHAR(70),
   is_ativo TINYINT NULL,
   PRIMARY KEY (id),
   INDEX produto_fornada_idx (produto ASC) VISIBLE
 );
-
 
 -- -----------------------------------------------------
 -- Table teiko.fornada
@@ -139,6 +140,7 @@ CREATE TABLE IF NOT EXISTS teiko.cobertura (
 CREATE TABLE IF NOT EXISTS teiko.decoracao (
   id INT NOT NULL AUTO_INCREMENT,
   imagem_referencia BLOB NULL,
+  observacao VARCHAR(70),
   is_ativo TINYINT NULL,
   PRIMARY KEY (id)
 );
@@ -209,6 +211,7 @@ CREATE TABLE IF NOT EXISTS teiko.bolo (
   decoracao_id INT NULL,
   formato VARCHAR(45) NULL,
   tamanho INT NULL,
+  categoria VARCHAR(60),
   is_ativo TINYINT NULL,
   PRIMARY KEY (id, recheio_pedido_id, massa_id, cobertura_id),
   INDEX fk_Bolo_massa1_idx (massa_id ASC) VISIBLE,
