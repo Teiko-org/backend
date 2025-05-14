@@ -32,6 +32,10 @@ public class FornadaDaVez {
     @Schema(description = "Quantidade de produtos produzidos na fornada", example = "100")
     private Integer quantidade;
 
+    @Column(name = "is_ativo")
+    @Schema(description = "Indica se a fornada da vez está ativa ou não", example = "true")
+    private Boolean isAtivo = true;
+
     public Integer getId() {
         return id;
     }
@@ -62,5 +66,13 @@ public class FornadaDaVez {
 
     public void setQuantidade(Integer quantidade) {
         this.quantidade = quantidade;
+    }
+
+    public Boolean isAtivo() {
+        return isAtivo;
+    }
+
+    public void setAtivo(Boolean ativo) {
+        isAtivo = ativo;
     }
 }

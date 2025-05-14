@@ -32,6 +32,10 @@ public class ProdutoFornada {
     @Schema(description = "categoria da fornada", example = "Fornada natalina")
     private String categoria;
 
+    @Column(name = "is_ativo")
+    @Schema(description = "Indica se o produto está ativo ou não", example = "true")
+    private Boolean isAtivo = true;
+
     public Integer getId() {
         return id;
     }
@@ -70,5 +74,12 @@ public class ProdutoFornada {
 
     public void setCategoria(String categoria) {
         this.categoria = categoria;
+      
+    public Boolean isAtivo() {
+        return isAtivo;
+    }
+
+    public void setAtivo(Boolean ativo) {
+        isAtivo = ativo;
     }
 }

@@ -37,7 +37,9 @@ public class ResumoPedidoService {
 
     //LocalDateTime?
     public List<ResumoPedido> buscarResumosPedidosPorDataPedido(LocalDate dataPedido) {
-        return resumoPedidoRepository.findByDataEntregaAndIsAtivoTrue(dataPedido);
+        LocalDateTime comecoData = dataPedido.atStartOfDay();
+        LocalDateTime fimData = dataPedido.atTime(23, 59, 59);
+        return resumoPedidoRepository.findByDataPedidoBetweenAndIsAtivoTrue(comecoData, fimData);
     }
 
     public List<ResumoPedido> buscarResumosPedidosPorStatus(StatusEnum status) {
@@ -107,9 +109,9 @@ public class ResumoPedidoService {
     }
 
     private void validarPedidoFornada(Integer pedidoFornadaId) {
-//        if (!pedidoFornadaRepository.existsByIdAndIsAtivoTrue(pedidoFornadaId)) {
-//            throw new EntidadeNaoEncontradaException("Pedido de fornada com ID %d não encontrado".formatted(pedidoFornadaId));
-//        }
+        if (!pedidoFornadaRepository.existsByIdAndIsAtivoTrue(pedidoFornadaId)) {
+            throw new EntidadeNaoEncontradaException("Pedido de fornada com ID %d não encontrado".formatted(pedidoFornadaId));
+        }
     }
 
     private boolean isTransicaoStatusValida(StatusEnum statusAtual, StatusEnum novoStatus) {
