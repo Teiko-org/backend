@@ -26,10 +26,14 @@ public class ProdutoFornadaService {
         return produtoFornadaRepository.save(produtoFornada);
     }
 
-    public List<ProdutoFornada> listarProdutosFornada() {
-        return produtoFornadaRepository.findAll().stream()
-                .filter(ProdutoFornada::isAtivo)
-                .toList();
+    public List<ProdutoFornada> listarProdutosFornada(List<String> categorias) {
+        List<ProdutoFornada> produtos;
+        if (!categorias.isEmpty()) {
+            produtos = produtoFornadaRepository.findByCategoriaIn(categorias).stream().filter(ProdutoFornada::isAtivo).toList();
+        } else {
+            produtos = produtoFornadaRepository.findAll().stream().filter(ProdutoFornada::isAtivo).toList();
+        }
+        return produtos;
     }
 
     public ProdutoFornada buscarProdutoFornada(Integer id) {

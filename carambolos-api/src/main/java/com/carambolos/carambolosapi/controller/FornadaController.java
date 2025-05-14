@@ -130,8 +130,10 @@ public class FornadaController {
             @ApiResponse(responseCode = "404", description = "Nenhum produto encontrado", content = @Content())
     })
     @GetMapping("/produto-fornada")
-    public ResponseEntity<List<ProdutoFornada>> listarProdutoFornada() {
-        return ResponseEntity.status(200).body(produtoFornadaService.listarProdutosFornada());
+    public ResponseEntity<List<ProdutoFornada>> listarProdutoFornada(
+            @RequestParam(defaultValue = "") List<String> categorias
+    ) {
+        return ResponseEntity.status(200).body(produtoFornadaService.listarProdutosFornada(categorias));
     }
 
     @Operation(summary = "Busca um produto da fornada por ID")

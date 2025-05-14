@@ -23,6 +23,7 @@ public class Bolo {
     private FormatoEnum formato;
     @Enumerated(EnumType.STRING)
     private TamanhoEnum tamanho;
+    private String categoria;
     @Column(name = "is_ativo")
     private Boolean isAtivo = true;
 
@@ -72,6 +73,14 @@ public class Bolo {
 
     public void setTamanho(TamanhoEnum tamanho) {
         this.tamanho = tamanho;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
     }
 
     public Boolean getAtivo() {
