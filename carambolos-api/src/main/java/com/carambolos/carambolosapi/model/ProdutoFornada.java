@@ -74,7 +74,8 @@ public class ProdutoFornada {
 
     public void setCategoria(String categoria) {
         this.categoria = categoria;
-      
+    }
+
     public Boolean isAtivo() {
         return isAtivo;
     }

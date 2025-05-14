@@ -29,9 +29,9 @@ public class ProdutoFornadaService {
     public List<ProdutoFornada> listarProdutosFornada(List<String> categorias) {
         List<ProdutoFornada> produtos;
         if (!categorias.isEmpty()) {
-            produtos = produtoFornadaRepository.findByCategoriaIn(categorias).filter(ProdutoFornada::isAtivo);
+            produtos = produtoFornadaRepository.findByCategoriaIn(categorias).stream().filter(ProdutoFornada::isAtivo).toList();
         } else {
-            produtos = produtoFornadaRepository.findAll().filter(ProdutoFornada::isAtivo);
+            produtos = produtoFornadaRepository.findAll().stream().filter(ProdutoFornada::isAtivo).toList();
         }
         return produtos;
     }
