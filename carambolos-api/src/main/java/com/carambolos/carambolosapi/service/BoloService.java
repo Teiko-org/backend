@@ -7,7 +7,6 @@ import com.carambolos.carambolosapi.exception.EntidadeJaExisteException;
 import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.model.projection.RecheioPedidoProjection;
 import com.carambolos.carambolosapi.repository.*;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +16,8 @@ import java.util.Optional;
 @Service
 public class BoloService {
 
-//    @Autowired
-//    private BoloRepository boloRepository;
+    @Autowired
+    private BoloRepository boloRepository;
 
     @Autowired
     private RecheioUnitarioRepository recheioUnitarioRepository;
@@ -35,12 +34,75 @@ public class BoloService {
     @Autowired
     MassaRepository massaRepository;
 
-//    public List<Bolo> listarBolos() {
-//        return boloRepository.findAll();
-//    }
+//    @Autowired
+//    DecoracaoRepository decoracaoRepository;
+
+    public List<Bolo> listarBolos() {
+        return boloRepository.findAll().stream().filter(Bolo::getAtivo).toList();
+    }
+
+    public Bolo buscarBoloPorId(Integer id) {
+        return boloRepository.findById(id)
+                .filter(Bolo::getAtivo)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Bolo com o id %d não encontrado".formatted(id)));
+    }
+
+    public Bolo cadastrarBolo(Bolo bolo) {
+        boolean existeBoloAtivo = boloRepository.existsByIdAndIsAtivoTrue(bolo.getId());
+        if (existeBoloAtivo) {
+            throw new EntidadeJaExisteException("Esse bolo já existe no banco de dados.");
+        }
+
+        if(!massaRepository.existsByIdAndIsAtivo(bolo.getMassa(), true)) {
+            throw new EntidadeNaoEncontradaException("Essa massa não existe");
+        }
+        if(!recheioPedidoRepository.existsByIdAndIsAtivoTrue(bolo.getRecheioPedido())) {
+            throw new EntidadeNaoEncontradaException("Esse recheio não existe");
+        }
+        if(!coberturaRepository.existsByIdAndIsAtivoTrue(bolo.getCobertura())) {
+            throw new EntidadeNaoEncontradaException("Essa cobertura não existe");
+        }
+
+        return boloRepository.save(bolo);
+    }
+
+    public Bolo atualizarBolo(Bolo bolo, Integer id) {
+        boloRepository.findById(id)
+                .filter(Bolo::getAtivo)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Bolo com o id %d não encontrado".formatted(id)));
+
+        if(boloRepository.existsByIdAndIdNotAndIsAtivoTrue(id, bolo.getId())) {
+            throw new EntidadeJaExisteException("Esse bolo já existe no banco de dados.");
+        }
+
+        if(!massaRepository.existsByIdAndIsAtivo(bolo.getMassa(), true)) {
+            throw new EntidadeNaoEncontradaException("Essa massa não existe");
+        }
+        if(!recheioPedidoRepository.existsByIdAndIsAtivoTrue(bolo.getRecheioPedido())) {
+            throw new EntidadeNaoEncontradaException("Esse recheio não existe");
+        }
+        if(!coberturaRepository.existsByIdAndIsAtivoTrue(bolo.getCobertura())) {
+            throw new EntidadeNaoEncontradaException("Essa cobertura não existe");
+        }
+
+        bolo.setId(id);
+        return boloRepository.save(bolo);
+    }
+
+    public void deletarBolo(Integer id) {
+        Optional<Bolo> possivelBolo = boloRepository.findById(id)
+                .filter(Bolo::getAtivo);
+        if (possivelBolo.isPresent()) {
+            Bolo bolo = possivelBolo.get();
+            bolo.setAtivo(false);
+            boloRepository.save(bolo);
+            return;
+        }
+        throw new EntidadeNaoEncontradaException("Bolo com id %d não encontrado".formatted(id));
+    }
 
     public RecheioUnitario cadastrarRecheioUnitario(RecheioUnitario recheioUnitario) {
-        if (recheioUnitarioRepository.countBySaborIgnoreCase(recheioUnitario.getSabor()) > 0) {
+        if (recheioUnitarioRepository.countBySaborIgnoreCaseAndIsAtivo(recheioUnitario.getSabor(), true)  > 0) {
             throw new EntidadeJaExisteException("Recheio com o sabor %s já existe".formatted(recheioUnitario.getSabor()));
         }
         return recheioUnitarioRepository.save(recheioUnitario);
@@ -52,6 +114,7 @@ public class BoloService {
 
     public RecheioUnitario buscarPorId(Integer id) {
         return recheioUnitarioRepository.findById(id)
+                .filter(RecheioUnitario::getAtivo)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Recheio com o id %d não encontrado".formatted(id)));
     }
 
@@ -59,7 +122,7 @@ public class BoloService {
         RecheioUnitario recheioExistente = recheioUnitarioRepository.findById(id)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Recheio com o id %d não encontrado".formatted(id)));
 
-        if (recheioUnitarioRepository.countBySaborIgnoreCaseAndIdNot(recheioUnitario.getSabor(), id) > 0) {
+        if (recheioUnitarioRepository.countBySaborIgnoreCaseAndIdNotAndIsAtivo(recheioUnitario.getSabor(), id, true) > 0) {
             throw new EntidadeJaExisteException("Recheio com o sabor %s já existe".formatted(recheioUnitario.getSabor()));
         }
 
@@ -79,7 +142,8 @@ public class BoloService {
     }
 
     public void deletarRecheioUnitario(Integer id) {
-        Optional<RecheioUnitario> possivelRecheio = recheioUnitarioRepository.findById(id);
+        Optional<RecheioUnitario> possivelRecheio = recheioUnitarioRepository.findById(id)
+                .filter(RecheioUnitario::getAtivo);
         if (possivelRecheio.isEmpty()) {
             throw new EntidadeNaoEncontradaException("Recheio com id %d não existe".formatted(id));
         }
@@ -92,7 +156,7 @@ public class BoloService {
         int id1 = recheioExclusivo.getRecheioUnitarioId1();
         int id2 = recheioExclusivo.getRecheioUnitarioId2();
 
-        boolean recheiosExistem = recheioUnitarioRepository.existsById(id1) && recheioUnitarioRepository.existsById(id2);
+        boolean recheiosExistem = recheioUnitarioRepository.existsByIdAndIsAtivoTrue(id1) && recheioUnitarioRepository.existsByIdAndIsAtivoTrue(id2);
         if (!recheiosExistem) {
             throw new EntidadeNaoEncontradaException("Um ou mais recheios cadastrados não existem");
         }
@@ -120,6 +184,7 @@ public class BoloService {
 
     public RecheioExclusivoProjection editarRecheioExclusivo(RecheioExclusivo recheioExclusivo, Integer id) {
         RecheioExclusivo recheioExistente = recheioExclusivoRepository.findById(id)
+                .filter(RecheioExclusivo::getAtivo)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Recheio com o id %d não encontrado".formatted(id)));
 
         Integer id1 = recheioExclusivo.getRecheioUnitarioId1();
@@ -139,7 +204,8 @@ public class BoloService {
     }
 
     public void excluirRecheioExclusivo(Integer id) {
-        Optional<RecheioExclusivo> possivelRecheio = recheioExclusivoRepository.findById(id);
+        Optional<RecheioExclusivo> possivelRecheio = recheioExclusivoRepository.findById(id)
+                .filter(RecheioExclusivo::getAtivo);
         if (possivelRecheio.isPresent()) {
             RecheioExclusivo recheio = possivelRecheio.get();
             recheio.setAtivo(false);
@@ -197,7 +263,8 @@ public class BoloService {
     }
 
     public void deletarRecheioPedido(Integer id) {
-        Optional<RecheioPedido> possivelRecheioPedido = recheioPedidoRepository.findById(id);
+        Optional<RecheioPedido> possivelRecheioPedido = recheioPedidoRepository.findById(id)
+                .filter(RecheioPedido::getAtivo);
 
         if (possivelRecheioPedido.isPresent()) {
             RecheioPedido recheioPedido = possivelRecheioPedido.get();
@@ -212,7 +279,7 @@ public class BoloService {
     public Cobertura cadastrarCobertura(Cobertura cobertura) {
         String cor = cobertura.getCor();
         String descricao = cobertura.getDescricao();
-        Integer coberturasExistentes = coberturaRepository.countByCorAndDescricaoIgnoreCase(cor, descricao);
+        Integer coberturasExistentes = coberturaRepository.countByCorAndDescricaoIgnoreCaseAndIsAtivoTrue(cor, descricao);
 
         if (coberturasExistentes > 0) {
             throw new EntidadeJaExisteException("Cobertura com a cor %s e descricao %s ja existente".formatted(cor, descricao));
@@ -222,12 +289,13 @@ public class BoloService {
     }
 
     public Cobertura atualizarCobertura(Cobertura novaCobertura, Integer id) {
-        Optional<Cobertura> possivelCobertura = coberturaRepository.findById(id);
+        Optional<Cobertura> possivelCobertura = coberturaRepository.findById(id)
+                .filter(Cobertura::getAtivo);
         if (possivelCobertura.isPresent()) {
             String cor = novaCobertura.getCor();
             String descricao = novaCobertura.getDescricao();
 
-            Integer coberturasExistentes = coberturaRepository.countByCorAndDescricaoAndIdNot(
+            Integer coberturasExistentes = coberturaRepository.countByCorAndDescricaoAndIdNotAndIsAtivoTrue(
                     cor,
                     descricao,
                     id
@@ -243,7 +311,7 @@ public class BoloService {
             );
         }
 
-        throw new EntidadeNaoEncontradaException("Copbertura com id %d não encontrada".formatted(id));
+        throw new EntidadeNaoEncontradaException("Cobertura com id %d não encontrada".formatted(id));
     }
 
     public List<Cobertura> listarCoberturas() {
@@ -251,7 +319,8 @@ public class BoloService {
     }
 
     public Cobertura buscarCoberturaPorId(Integer id) {
-        Optional<Cobertura> possivelCobertura = coberturaRepository.findById(id);
+        Optional<Cobertura> possivelCobertura = coberturaRepository.findById(id)
+                .filter(Cobertura::getAtivo);
 
         if (possivelCobertura.isEmpty()) {
             throw new EntidadeJaExisteException("Cobertura com id %d não encontrar".formatted(id));
@@ -261,7 +330,8 @@ public class BoloService {
     }
 
     public void deletarCobertura(Integer id) {
-        Optional<Cobertura> possivelCobertura = coberturaRepository.findById(id);
+        Optional<Cobertura> possivelCobertura = coberturaRepository.findById(id)
+                .filter(Cobertura::getAtivo);
         if (possivelCobertura.isEmpty()) {
             throw new EntidadeNaoEncontradaException("Cobertura com o id %d não encontrada".formatted(id));
         }
@@ -272,17 +342,17 @@ public class BoloService {
     }
 
     public Massa cadastrarMassa(Massa massa) {
-        if(massaRepository.countBySabor(massa.getSabor()) > 0) {
+        if(massaRepository.countBySaborAndIsAtivo(massa.getSabor(), true) > 0) {
             throw new EntidadeJaExisteException("Massa com sabor %s já existente".formatted(massa.getSabor()));
         }
         return massaRepository.save(massa);
     }
 
     public Massa atualizarMassa(Massa massa, Integer id) {
-        if(!massaRepository.existsById(id)) {
+        if(!massaRepository.existsByIdAndIsAtivo(id, true)) {
             throw new EntidadeNaoEncontradaException("Massa com id %d não existente".formatted(id));
         }
-        if (massaRepository.countBySaborAndIdNot(massa.getSabor(), id) > 0) {
+        if (massaRepository.countBySaborAndIdNotAndIsAtivo(massa.getSabor(), id, true) > 0) {
             throw new EntidadeJaExisteException("Massa com saber %s ja existente".formatted(massa.getSabor()));
         }
         massa.setId(id);
@@ -294,7 +364,8 @@ public class BoloService {
     }
 
     public Massa buscarMassaPorId(Integer id) {
-        Optional<Massa> possivelMassa = massaRepository.findById(id);
+        Optional<Massa> possivelMassa = massaRepository.findById(id)
+                .filter(Massa::getAtivo);
         if(possivelMassa.isEmpty()) {
             throw new EntidadeNaoEncontradaException("Massa com id %d não encontrada".formatted(id));
         }
@@ -303,7 +374,8 @@ public class BoloService {
     }
 
     public void deletarMassa(Integer id) {
-        Optional<Massa> possivelMassa = massaRepository.findById(id);
+        Optional<Massa> possivelMassa = massaRepository.findById(id)
+                .filter(Massa::getAtivo);
         if (possivelMassa.isEmpty()) {
             throw new EntidadeNaoEncontradaException("Massa com id %d não encontrada".formatted(id));
         }
@@ -311,6 +383,10 @@ public class BoloService {
         massa.setAtivo(false);
         massaRepository.save(massa);
     }
+
+//    public Decoracao cadastrarDecoracao(Decoracao decoracao) {
+//        return decoracaoRepository.save(decoracao);
+//    }
 
     private RecheioExclusivo verificarCampos(RecheioExclusivo recheioExclusivo, RecheioExclusivo recheioExistente) {
         if (recheioExclusivo.getNome() != null) {
