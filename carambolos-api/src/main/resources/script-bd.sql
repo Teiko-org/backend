@@ -204,13 +204,13 @@ CREATE TABLE IF NOT EXISTS teiko.recheio_pedido (
 -- -----------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS teiko.bolo (
-  id INT NOT NULL,
+  id INT NOT NULL AUTO_INCREMENT,
   recheio_pedido_id INT NOT NULL,
   massa_id INT NOT NULL,
   cobertura_id INT NOT NULL,
   decoracao_id INT NULL,
   formato VARCHAR(45) NULL,
-  tamanho INT NULL,
+  tamanho VARCHAR(45) NULL,
   categoria VARCHAR(60),
   is_ativo TINYINT NULL,
   PRIMARY KEY (id, recheio_pedido_id, massa_id, cobertura_id),
@@ -236,7 +236,7 @@ CREATE TABLE IF NOT EXISTS teiko.bolo (
 -- -----------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS teiko.pedido_bolo (
-  id INT NOT NULL,
+  id INT NOT NULL AUTO_INCREMENT,
   endereco_id INT NOT NULL,
   bolo_id INT NOT NULL,
   usuario_id INT NULL,
