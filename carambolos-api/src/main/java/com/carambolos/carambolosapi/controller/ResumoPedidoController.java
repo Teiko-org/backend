@@ -17,6 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -267,4 +270,21 @@ public class ResumoPedidoController {
         return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumosPedidos));
     }
 
+    @Operation(summary = "Enviar resumo de pedido por WhatsApp", description = "Encaminha o resumo do pedido para um número de WhatsApp")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "302", description = "Resumo de pedido encaminhado com sucesso",
+                    content = @Content()),
+            @ApiResponse(responseCode = "404", description = "Resumo de pedido não encontrado",
+                    content = @Content()),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @GetMapping("/{id}/whatsapp")
+    public ResponseEntity<Void> enviarResumoPedidoWhatsapp(@PathVariable Integer id) {
+        ResumoPedido resumoPedido = resumoPedidoService.buscarResumoPedidoPorId(id);
+        String numero = "5511992723105";
+//        String mensagem = "Resumo do pedido: %s".formatted(resumoPedido.toString());
+        String mensagem = "alo";
+        String url = "https://wa.me/" + numero + "?text=" + URLEncoder.encode(mensagem, StandardCharsets.UTF_8);
+        return ResponseEntity.status(302).location(URI.create(url)).build();
+    }
 }
