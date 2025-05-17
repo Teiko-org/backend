@@ -57,6 +57,11 @@ public class UsuarioService {
            throw new EntidadeJaExisteException("Esse contato já existe no sistema.");
        }
 
+       if (!usuario.getSenha().equals(usuarioExistente.getSenha())) {
+           String senhaCriptografada = passwordEncoder.encode(usuario.getSenha());
+           usuario.setSenha(senhaCriptografada);
+       }
+
        usuario.setId(id);
        return usuarioRepository.save(usuario);
     }
