@@ -3,6 +3,9 @@ package com.carambolos.carambolosapi.model;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Schema(description = "Entidade que representa a decoração de um bolo")
 public class Decoracao {
@@ -12,9 +15,8 @@ public class Decoracao {
     @Schema(description = "Identificador único da decoração", example = "1")
     private Integer id;
 
-    @Column(name = "imagem_referencia", length = 500)
-    @Schema(description = "URL da imagem de referência da decoração", example = "https://storage.azure.com/decoracoes/bolo123.jpg")
-    private String imagemReferencia;
+    @OneToMany(mappedBy = "decoracao", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ImagemDecoracao> imagens = new ArrayList<>();
 
     @Schema(description = "Observação adicional sobre a decoração", example = "Tema do Homem-Aranha com cores azul e vermelha")
     private String observacao;
@@ -31,12 +33,12 @@ public class Decoracao {
         this.id = id;
     }
 
-    public String getImagemReferencia() {
-        return imagemReferencia;
+    public List<ImagemDecoracao> getImagens() {
+        return imagens;
     }
 
-    public void setImagemReferencia(String imagemReferencia) {
-        this.imagemReferencia = imagemReferencia;
+    public void setImagens(List<ImagemDecoracao> imagens) {
+        this.imagens = imagens;
     }
 
     public String getObservacao() {

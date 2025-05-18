@@ -4,10 +4,13 @@ import com.carambolos.carambolosapi.controller.request.DecoracaoRequestDTO;
 import com.carambolos.carambolosapi.controller.response.DecoracaoResponseDTO;
 import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.model.Decoracao;
+import com.carambolos.carambolosapi.model.ImagemDecoracao;
 import com.carambolos.carambolosapi.repository.DecoracaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,13 +20,27 @@ public class DecoracaoService {
     @Autowired
     private DecoracaoRepository decoracaoRepository;
 
-    public DecoracaoResponseDTO cadastrar(DecoracaoRequestDTO request) {
+    @Autowired
+    private AzureStorageService azureStorageService;
+
+    public DecoracaoResponseDTO cadastrar(String observacao, MultipartFile[] arquivos) {
         Decoracao decoracao = new Decoracao();
-        decoracao.setImagemReferencia(request.imagemReferencia());
-        decoracao.setObservacao(request.observacao());
+        decoracao.setObservacao(observacao);
         decoracao.setIsAtivo(true);
 
+        List<ImagemDecoracao> imagens = new ArrayList<>();
+
+        for (MultipartFile arquivo : arquivos) {
+            String url = azureStorageService.upload(arquivo);
+            ImagemDecoracao imagem = new ImagemDecoracao();
+            imagem.setUrl(url);
+            imagem.setDecoracao(decoracao);
+            imagens.add(imagem);
+        }
+
+        decoracao.setImagens(imagens);
         Decoracao salva = decoracaoRepository.save(decoracao);
+
         return DecoracaoResponseDTO.fromEntity(salva);
     }
 
@@ -58,7 +75,6 @@ public class DecoracaoService {
         Decoracao decoracao = decoracaoRepository.findById(id)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Decoração não encontrada"));
 
-        decoracao.setImagemReferencia(request.imagemReferencia());
         decoracao.setObservacao(request.observacao());
 
         return DecoracaoResponseDTO.fromEntity(decoracaoRepository.save(decoracao));

@@ -146,6 +146,19 @@ CREATE TABLE IF NOT EXISTS teiko.decoracao (
 );
 
 -- -----------------------------------------------------
+-- Table teiko.imagem_decoracao
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS teiko.imagem_decoracao (
+    id INT NOT NULL AUTO_INCREMENT,
+    decoracao_id INT NOT NULL,
+    url VARCHAR(500) NOT NULL,
+    PRIMARY KEY (id),
+    INDEX decoracao_idx (decoracao_id ASC),
+    CONSTRAINT fk_imagem_decoracao_decoracao FOREIGN KEY (decoracao_id)
+    REFERENCES teiko.decoracao (id)
+);
+
+-- -----------------------------------------------------
 -- Table teiko.recheio_unitario
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS teiko.recheio_unitario (

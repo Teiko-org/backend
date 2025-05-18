@@ -11,8 +11,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -34,9 +36,12 @@ public class DecoracaoController {
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor", content = @Content)
     })
-    @PostMapping
-    public ResponseEntity<DecoracaoResponseDTO> criar(@RequestBody DecoracaoRequestDTO request) {
-        DecoracaoResponseDTO decoracao = decoracaoService.cadastrar(request);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<DecoracaoResponseDTO> criar(
+            @RequestPart("observacao") String observacao,
+            @RequestPart("imagens") MultipartFile[] imagens) {
+
+        DecoracaoResponseDTO decoracao = decoracaoService.cadastrar(observacao, imagens);
         return ResponseEntity.ok(decoracao);
     }
 
