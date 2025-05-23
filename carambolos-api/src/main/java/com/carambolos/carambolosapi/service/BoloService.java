@@ -34,8 +34,6 @@ public class BoloService {
     @Autowired
     MassaRepository massaRepository;
 
-//    @Autowired
-//    DecoracaoRepository decoracaoRepository;
 
     public List<Bolo> listarBolos(List<String> categorias) {
         List<Bolo> bolos;
@@ -391,10 +389,6 @@ public class BoloService {
         massa.setAtivo(false);
         massaRepository.save(massa);
     }
-
-//    public Decoracao cadastrarDecoracao(Decoracao decoracao) {
-//        return decoracaoRepository.save(decoracao);
-//    }
 
     private RecheioExclusivo verificarCampos(RecheioExclusivo recheioExclusivo, RecheioExclusivo recheioExistente) {
         if (recheioExclusivo.getNome() != null) {

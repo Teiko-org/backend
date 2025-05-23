@@ -139,10 +139,22 @@ CREATE TABLE IF NOT EXISTS teiko.cobertura (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS teiko.decoracao (
   id INT NOT NULL AUTO_INCREMENT,
-  imagem_referencia BLOB NULL,
   observacao VARCHAR(70),
   is_ativo TINYINT NULL,
   PRIMARY KEY (id)
+);
+
+-- -----------------------------------------------------
+-- Table teiko.imagem_decoracao
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS teiko.imagem_decoracao (
+    id INT NOT NULL AUTO_INCREMENT,
+    decoracao_id INT NOT NULL,
+    url VARCHAR(500) NOT NULL,
+    PRIMARY KEY (id),
+    INDEX decoracao_idx (decoracao_id ASC),
+    CONSTRAINT fk_imagem_decoracao_decoracao FOREIGN KEY (decoracao_id)
+    REFERENCES teiko.decoracao (id)
 );
 
 -- -----------------------------------------------------

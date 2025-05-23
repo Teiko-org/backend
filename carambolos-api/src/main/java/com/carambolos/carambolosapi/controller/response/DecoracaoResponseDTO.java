@@ -1,25 +1,32 @@
-//package com.carambolos.carambolosapi.controller.response;
-//
-//import com.carambolos.carambolosapi.model.Decoracao;
-//import io.swagger.v3.oas.annotations.media.Schema;
-//
-//@Schema(description = "DTO de resposta para dados da Decoração")
-//public record DecoracaoResponseDTO (
-//
-//        @Schema(description = "Identificador único da decoração", example = "1")
-//        Integer id,
-//
-//        @Schema(description = "Imagem da decoração", example = "imagem.png")
-//        byte[] imagemReferencia,
-//
-//        @Schema(description = "Observação da decoração", example = "Estilo cyberpunk")
-//        String estiloDecoracao
-//) {
-//    public static DecoracaoResponseDTO toDecoracaoResponse(Decoracao decoracao) {
-//        return new DecoracaoResponseDTO(
-//                decoracao.getId(),
-//                decoracao.getImagemReferencia(),
-//                decoracao.getEstiloDecoracao()
-//        );
-//    }
-//}
+package com.carambolos.carambolosapi.controller.response;
+
+import com.carambolos.carambolosapi.model.Decoracao;
+import com.carambolos.carambolosapi.model.ImagemDecoracao;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.List;
+
+@Schema(description = "DTO de resposta com dados da decoração")
+public record DecoracaoResponseDTO(
+        @Schema(description = "ID da decoração", example = "1")
+        Integer id,
+
+        @Schema(description = "Lista de URLs das imagens da decoração")
+        List<String> imagens,
+
+        @Schema(description = "Observações", example = "Tema Naruto, tons de laranja e preto")
+        String observacao
+) {
+    public static DecoracaoResponseDTO fromEntity(Decoracao decoracao) {
+        List<String> urls = decoracao.getImagens()
+                .stream()
+                .map(ImagemDecoracao::getUrl)
+                .toList();
+
+        return new DecoracaoResponseDTO(
+                decoracao.getId(),
+                urls,
+                decoracao.getObservacao()
+        );
+    }
+}
