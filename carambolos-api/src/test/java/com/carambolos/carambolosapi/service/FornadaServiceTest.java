@@ -73,7 +73,7 @@ public class FornadaServiceTest {
         List<Fornada> result = fornadaService.listarFornada();
 
         assertEquals(1, result.size());
-        assertTrue(result.get(0).isAtivo());
+        assertTrue(result.getFirst().isAtivo());
     }
 
     @Test
