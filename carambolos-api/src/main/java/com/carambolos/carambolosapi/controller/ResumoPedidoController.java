@@ -1,6 +1,7 @@
 package com.carambolos.carambolosapi.controller;
 
 import com.carambolos.carambolosapi.controller.request.ResumoPedidoRequestDTO;
+import com.carambolos.carambolosapi.controller.response.ResumoPedidoMensagemResponseDTO;
 import com.carambolos.carambolosapi.controller.response.ResumoPedidoResponseDTO;
 import com.carambolos.carambolosapi.model.ResumoPedido;
 import com.carambolos.carambolosapi.model.enums.StatusEnum;
@@ -115,12 +116,12 @@ public class ResumoPedidoController {
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @PostMapping
-    public ResponseEntity<ResumoPedidoResponseDTO> cadastrarResumoPedido(
+    public ResponseEntity<ResumoPedidoMensagemResponseDTO> cadastrarResumoPedido(
             @Valid @RequestBody ResumoPedidoRequestDTO request
     ) {
         ResumoPedido resumoPedido = ResumoPedidoRequestDTO.toResumoPedido(request);
         ResumoPedido resumoSalvo = resumoPedidoService.cadastrarResumoPedido(resumoPedido);
-        return ResponseEntity.status(201).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumoSalvo));
+        return ResponseEntity.status(201).body(ResumoPedidoMensagemResponseDTO.toResumoPedidoMensagemResponse(resumoSalvo));
     }
 
     @Operation(summary = "Atualizar resumo de pedido", description = "Atualiza um resumo de pedido existente")
@@ -268,23 +269,5 @@ public class ResumoPedidoController {
             return ResponseEntity.status(204).build();
         }
         return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumosPedidos));
-    }
-
-    @Operation(summary = "Enviar resumo de pedido por WhatsApp", description = "Encaminha o resumo do pedido para um número de WhatsApp")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "302", description = "Resumo de pedido encaminhado com sucesso",
-                    content = @Content()),
-            @ApiResponse(responseCode = "404", description = "Resumo de pedido não encontrado",
-                    content = @Content()),
-            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
-    })
-    @GetMapping("/{id}/whatsapp")
-    public ResponseEntity<Void> enviarResumoPedidoWhatsapp(@PathVariable Integer id) {
-        ResumoPedido resumoPedido = resumoPedidoService.buscarResumoPedidoPorId(id);
-        String numero = "5511992723105";
-//        String mensagem = "Resumo do pedido: %s".formatted(resumoPedido.toString());
-        String mensagem = "alo";
-        String url = "https://wa.me/" + numero + "?text=" + URLEncoder.encode(mensagem, StandardCharsets.UTF_8);
-        return ResponseEntity.status(302).location(URI.create(url)).build();
     }
 }
