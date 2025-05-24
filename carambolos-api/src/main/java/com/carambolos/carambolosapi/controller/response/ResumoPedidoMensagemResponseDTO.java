@@ -58,12 +58,14 @@ public record ResumoPedidoMensagemResponseDTO (
         private final RecheioPedidoRepository recheioPedidoRepository;
         private final RecheioExclusivoRepository recheioExclusivoRepository;
         private final RecheioUnitarioRepository recheioUnitarioRepository;
+        private final PedidoFornadaRepository pedidoFornadaRepository;
+        private final FornadaDaVezRepository fornadaDaVezRepository;
 
         @Autowired
         public MensagemHelper(
                 PedidoBoloRepository pedidoBoloRepository,
                 BoloRepository boloRepository,
-                MassaRepository massaRepository, CoberturaRepository coberturaRepository, RecheioPedidoRepository recheioPedidoRepository, RecheioExclusivoRepository recheioExclusivoRepository, RecheioUnitarioRepository recheioUnitarioRepository) {
+                MassaRepository massaRepository, CoberturaRepository coberturaRepository, RecheioPedidoRepository recheioPedidoRepository, RecheioExclusivoRepository recheioExclusivoRepository, RecheioUnitarioRepository recheioUnitarioRepository, PedidoFornadaRepository pedidoFornadaRepository, FornadaDaVezRepository fornadaDaVezRepository) {
             this.pedidoBoloRepository = pedidoBoloRepository;
             this.boloRepository = boloRepository;
             ResumoPedidoMensagemResponseDTO.setMensagemHelper(this);
@@ -72,6 +74,8 @@ public record ResumoPedidoMensagemResponseDTO (
             this.recheioPedidoRepository = recheioPedidoRepository;
             this.recheioExclusivoRepository = recheioExclusivoRepository;
             this.recheioUnitarioRepository = recheioUnitarioRepository;
+            this.pedidoFornadaRepository = pedidoFornadaRepository;
+            this.fornadaDaVezRepository = fornadaDaVezRepository;
         }
 
         public String gerarMensagemWhatsapp(ResumoPedido pedido) {
@@ -92,11 +96,11 @@ public record ResumoPedidoMensagemResponseDTO (
             mensagem.append("Pedido Carambolos Delivery - Carambolo Doces\n");
             mensagem.append("---------------------------------------\n");
 
-            // Adiciona detalhes do pedido com base no tipo (Bolo ou Fornada)
+
             if (pedido.getPedidoBoloId() != null) {
                 adicionarDetalhesPedidoBolo(mensagem, pedido.getPedidoBoloId(), valorFormatado);
             } else if (pedido.getPedidoFornadaId() != null) {
-//                adicionarDetalhesPedidoFornada(mensagem, pedido.getPedidoFornadaId(), valorFormatado);
+                adicionarDetalhesPedidoFornada(mensagem, pedido.getPedidoFornadaId(), valorFormatado);
             }
 
             mensagem.append("---------------------------------------\n");
@@ -191,6 +195,40 @@ public record ResumoPedidoMensagemResponseDTO (
                     }
                 }
             }
+            return descricao.toString();
+        }
+
+        private void adicionarDetalhesPedidoFornada(StringBuilder mensagem, Integer pedidoFornadaId, String valorTotal) {
+            PedidoFornada pedidoFornada = pedidoFornadaRepository.findById(pedidoFornadaId)
+                    .orElseThrow(() -> new RuntimeException("Pedido de fornada não encontrado"));
+
+            FornadaDaVez fornadaDaVez = pedidoFornada.getFornadaDaVez();
+            String descricaoFornada = gerarDescricaoFornada(fornadaDaVez);
+
+            mensagem.append(pedidoFornada.getQuantidade())
+                    .append("x ").append(descricaoFornada)
+                    .append(" ").append(valorTotal).append("\n");
+            mensagem.append("Total: ").append(valorTotal).append("\n");
+
+            if (pedidoFornada.getDataPrevisaoEntrega() != null) {
+                mensagem.append("Previsão de entrega: ")
+                        .append(pedidoFornada.getDataPrevisaoEntrega().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
+                        .append("\n");
+            }
+        }
+
+        private String gerarDescricaoFornada(FornadaDaVez fornadaDaVez) {
+            if (fornadaDaVez == null) return "Fornada Especial";
+            Integer fornadaId = fornadaDaVez.getFornada().getId();
+            List<FornadaDaVez> produtosDaFornada = fornadaDaVezRepository.findByFornadaId(fornadaId);
+
+            StringBuilder descricao = new StringBuilder("Fornada: ");
+            for (FornadaDaVez fdv : produtosDaFornada) {
+                descricao.append(fdv.getProdutoFornada().getDescricao()).append(", ");
+            }
+//            if (descricao.length() > 9) {
+//                descricao.setLength(descricao.length() - 2); // Remove a última vírgula e espaço
+//            }
             return descricao.toString();
         }
     }
