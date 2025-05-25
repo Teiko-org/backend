@@ -31,15 +31,15 @@ public class FornadaDaVezService {
     }
 
     public FornadaDaVez criarFornadaDaVez(FornadaDaVezRequestDTO request) {
-        ProdutoFornada produto = produtoFornadaRepository.findById(request.produtoFornadaId())
+        produtoFornadaRepository.findById(request.produtoFornadaId())
                 .filter(ProdutoFornada::isAtivo)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("ProdutoFornada com ID " + request.produtoFornadaId() + " não encontrado."));
 
-        Fornada fornada = fornadaRepository.findById(request.fornadaId())
+        fornadaRepository.findById(request.fornadaId())
                 .filter(Fornada::isAtivo)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Fornada com ID " + request.fornadaId() + " não encontrada."));
 
-        FornadaDaVez fornadaDaVez = request.toEntity(fornada, produto);
+        FornadaDaVez fornadaDaVez = request.toEntity(request);
 
         return fornadaDaVezRepository.save(fornadaDaVez);
     }

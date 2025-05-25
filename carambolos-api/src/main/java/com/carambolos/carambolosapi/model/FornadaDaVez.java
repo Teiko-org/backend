@@ -12,28 +12,17 @@ public class FornadaDaVez {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Schema(description = "Identificador único da FornadaDaVez", example = "1")
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "produto_fornada_id", referencedColumnName = "id", nullable = false)
-    @NotNull
-    @Schema(description = "Produto relacionado à fornada da vez", implementation = ProdutoFornada.class)
-    private ProdutoFornada produtoFornada;
+    @Column(name = "produto_fornada_id")
+    private Integer produtoFornada;
 
-    @ManyToOne
-    @JoinColumn(name = "fornada_id", referencedColumnName = "id", nullable = false)
-    @NotNull
-    @Schema(description = "Fornada à qual o produto pertence", implementation = Fornada.class)
-    private Fornada fornada;
+    @Column(name = "fornada_id")
+    private Integer fornada;
 
-    @NotNull
-    @Min(1)
-    @Schema(description = "Quantidade de produtos produzidos na fornada", example = "100")
     private Integer quantidade;
 
     @Column(name = "is_ativo")
-    @Schema(description = "Indica se a fornada da vez está ativa ou não", example = "true")
     private Boolean isAtivo = true;
 
     public Integer getId() {
@@ -44,19 +33,19 @@ public class FornadaDaVez {
         this.id = id;
     }
 
-    public ProdutoFornada getProdutoFornada() {
+    public Integer getProdutoFornada() {
         return produtoFornada;
     }
 
-    public void setProdutoFornada(ProdutoFornada produtoFornada) {
+    public void setProdutoFornada(Integer produtoFornada) {
         this.produtoFornada = produtoFornada;
     }
 
-    public Fornada getFornada() {
+    public Integer getFornada() {
         return fornada;
     }
 
-    public void setFornada(Fornada fornada) {
+    public void setFornada(Integer fornada) {
         this.fornada = fornada;
     }
 

@@ -60,12 +60,13 @@ public record ResumoPedidoMensagemResponseDTO (
         private final RecheioUnitarioRepository recheioUnitarioRepository;
         private final PedidoFornadaRepository pedidoFornadaRepository;
         private final FornadaDaVezRepository fornadaDaVezRepository;
+        private final ProdutoFornadaRepository produtoFornadaRepository;
 
         @Autowired
         public MensagemHelper(
                 PedidoBoloRepository pedidoBoloRepository,
                 BoloRepository boloRepository,
-                MassaRepository massaRepository, CoberturaRepository coberturaRepository, RecheioPedidoRepository recheioPedidoRepository, RecheioExclusivoRepository recheioExclusivoRepository, RecheioUnitarioRepository recheioUnitarioRepository, PedidoFornadaRepository pedidoFornadaRepository, FornadaDaVezRepository fornadaDaVezRepository) {
+                MassaRepository massaRepository, CoberturaRepository coberturaRepository, RecheioPedidoRepository recheioPedidoRepository, RecheioExclusivoRepository recheioExclusivoRepository, RecheioUnitarioRepository recheioUnitarioRepository, PedidoFornadaRepository pedidoFornadaRepository, FornadaDaVezRepository fornadaDaVezRepository, ProdutoFornadaRepository produtoFornadaRepository) {
             this.pedidoBoloRepository = pedidoBoloRepository;
             this.boloRepository = boloRepository;
             ResumoPedidoMensagemResponseDTO.setMensagemHelper(this);
@@ -76,6 +77,7 @@ public record ResumoPedidoMensagemResponseDTO (
             this.recheioUnitarioRepository = recheioUnitarioRepository;
             this.pedidoFornadaRepository = pedidoFornadaRepository;
             this.fornadaDaVezRepository = fornadaDaVezRepository;
+            this.produtoFornadaRepository = produtoFornadaRepository;
         }
 
         public String gerarMensagemWhatsapp(ResumoPedido pedido) {
@@ -202,13 +204,21 @@ public record ResumoPedidoMensagemResponseDTO (
             PedidoFornada pedidoFornada = pedidoFornadaRepository.findById(pedidoFornadaId)
                     .orElseThrow(() -> new RuntimeException("Pedido de fornada não encontrado"));
 
-            FornadaDaVez fornadaDaVez = pedidoFornada.getFornadaDaVez();
+            Integer fornadaDaVezId = pedidoFornada.getFornadaDaVez();
+            FornadaDaVez fornadaDaVez = fornadaDaVezRepository.findById(fornadaDaVezId)
+                    .orElse(null);
+
             String descricaoFornada = gerarDescricaoFornada(fornadaDaVez);
 
             mensagem.append(pedidoFornada.getQuantidade())
-                    .append("x ").append(descricaoFornada)
-                    .append(" ").append(valorTotal).append("\n");
-            mensagem.append("Total: ").append(valorTotal).append("\n");
+                    .append("x ")
+                    .append(descricaoFornada)
+                    .append(" ")
+                    .append(valorTotal)
+                    .append("\n")
+                    .append("Total: ")
+                    .append(valorTotal)
+                    .append("\n");
 
             if (pedidoFornada.getDataPrevisaoEntrega() != null) {
                 mensagem.append("Previsão de entrega: ")
@@ -218,13 +228,19 @@ public record ResumoPedidoMensagemResponseDTO (
         }
 
         private String gerarDescricaoFornada(FornadaDaVez fornadaDaVez) {
-            if (fornadaDaVez == null) return "Fornada Especial";
-            Integer fornadaId = fornadaDaVez.getFornada().getId();
-            List<FornadaDaVez> produtosDaFornada = fornadaDaVezRepository.findByFornadaId(fornadaId);
+            if (fornadaDaVez == null || fornadaDaVez.getFornada() == null) return "Fornada Especial";
+            Integer fornadaId = fornadaDaVez.getFornada();
+            List<FornadaDaVez> produtosDaFornada = fornadaDaVezRepository.findByFornada(fornadaId);
 
             StringBuilder descricao = new StringBuilder("Fornada: ");
             for (FornadaDaVez fdv : produtosDaFornada) {
-                descricao.append(fdv.getProdutoFornada().getDescricao()).append(", ");
+                Integer produtoFornadaId = fdv.getProdutoFornada();
+                if (produtoFornadaId != null) {
+                    ProdutoFornada produto = produtoFornadaRepository.findById(produtoFornadaId).orElse(null);
+                    if (produto != null && produto.getDescricao() != null) {
+                        descricao.append(produto.getDescricao()).append(", ");
+                    }
+                }
             }
 //            if (descricao.length() > 9) {
 //                descricao.setLength(descricao.length() - 2); // Remove a última vírgula e espaço
