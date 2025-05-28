@@ -229,23 +229,15 @@ public record ResumoPedidoMensagemResponseDTO (
 
         private String gerarDescricaoFornada(FornadaDaVez fornadaDaVez) {
             if (fornadaDaVez == null || fornadaDaVez.getFornada() == null) return "Fornada Especial";
-            Integer fornadaId = fornadaDaVez.getFornada();
-            List<FornadaDaVez> produtosDaFornada = fornadaDaVezRepository.findByFornada(fornadaId);
 
-            StringBuilder descricao = new StringBuilder("Fornada: ");
-            for (FornadaDaVez fdv : produtosDaFornada) {
-                Integer produtoFornadaId = fdv.getProdutoFornada();
-                if (produtoFornadaId != null) {
-                    ProdutoFornada produto = produtoFornadaRepository.findById(produtoFornadaId).orElse(null);
-                    if (produto != null && produto.getDescricao() != null) {
-                        descricao.append(produto.getDescricao()).append(", ");
-                    }
-                }
+            Integer produtoFornadaId = fornadaDaVez.getProdutoFornada();
+            ProdutoFornada produto = produtoFornadaRepository.findById(produtoFornadaId).orElse(null);
+
+            if (produto != null && produto.getProduto() != null) {
+                return "Produto da Fornada: " + produto.getProduto() + " - " + produto.getDescricao();
+            } else {
+                return "Fornada Especial";
             }
-//            if (descricao.length() > 9) {
-//                descricao.setLength(descricao.length() - 2); // Remove a última vírgula e espaço
-//            }
-            return descricao.toString();
         }
     }
 }
