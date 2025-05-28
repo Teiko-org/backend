@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -142,5 +143,25 @@ class UsuarioServiceTest {
         assertThrows(EntidadeNaoEncontradaException.class, () -> service.deletar(id));
     }
 
+    @Test
+    @DisplayName("Deve cadastrar usuário com sucesso")
+    void deveCadastrarUsuarioComSucesso() {
+        String contato = "123456789";
+        String senha = "senha123";
+        String senhaCriptografada = "senhaCriptografada";
 
+        Usuario usuario = new Usuario();
+        usuario.setContato(contato);
+        usuario.setSenha(senha);
+
+        when(repository.findByContatoAndIsAtivoTrue(contato)).thenReturn(Optional.empty());
+        when(passwordEncoder.encode(senha)).thenReturn(senhaCriptografada);
+        when(repository.save(usuario)).thenReturn(usuario);
+
+        Usuario resultado = service.cadastrar(usuario);
+
+        assertEquals(contato, resultado.getContato());
+        assertEquals(senhaCriptografada, resultado.getSenha());
+        verify(repository).save(usuario);
+    }
 }
