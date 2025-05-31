@@ -25,8 +25,6 @@ public class RelatorioService {
     private final ProdutoFornadaRepository produtoFornadaRepository;
     private final FornadaDaVezRepository fornadaDaVezRepository;
 
-
-    // Atualize o construtor
     public RelatorioService(PedidoBoloRepository pedidoBoloRepository,
                             UsuarioRepository usuarioRepository,
                             BoloRepository boloRepository,
