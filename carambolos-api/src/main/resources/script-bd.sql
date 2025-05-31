@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS teiko.fornada_da_vez (
   fornada_id INT NOT NULL,
   quantidade INT NULL,
   is_ativo TINYINT NULL,
-  PRIMARY KEY (id, produto_fornada_id, fornada_id), -- quando implementar carrinho de compras, mudar aqui para chave composta com id, produto_fornada_id, fornada_id
+  PRIMARY KEY (id, produto_fornada_id, fornada_id),
   INDEX fornada_idx (fornada_id ASC) VISIBLE,
   INDEX produto_fornada_idx (produto_fornada_id ASC) VISIBLE,
   CONSTRAINT fk_produto_fornada
