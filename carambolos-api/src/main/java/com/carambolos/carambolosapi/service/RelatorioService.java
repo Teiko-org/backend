@@ -172,7 +172,8 @@ public class RelatorioService {
 
         List<Map.Entry<Integer, Long>> top3UsuariosFornada = pedidosFornada.stream()
                 .filter(p -> p.getUsuario() != null)
-                .collect(Collectors.groupingBy(PedidoFornada::getUsuario, Collectors.counting()))                .entrySet().stream()
+                .collect(Collectors.groupingBy(PedidoFornada::getUsuario, Collectors.counting()))
+                .entrySet().stream()
                 .sorted(Map.Entry.<Integer, Long>comparingByValue().reversed())
                 .limit(3)
                 .toList();
