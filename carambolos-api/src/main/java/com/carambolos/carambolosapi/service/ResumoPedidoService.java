@@ -2,14 +2,15 @@ package com.carambolos.carambolosapi.service;
 
 import com.carambolos.carambolosapi.exception.EntidadeImprocessavelException;
 import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
+import com.carambolos.carambolosapi.model.ProdutoFornada;
 import com.carambolos.carambolosapi.model.ResumoPedido;
 import com.carambolos.carambolosapi.model.enums.StatusEnum;
-import com.carambolos.carambolosapi.repository.PedidoBoloRepository;
-import com.carambolos.carambolosapi.repository.PedidoFornadaRepository;
-import com.carambolos.carambolosapi.repository.ResumoPedidoRepository;
+import com.carambolos.carambolosapi.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,6 +26,27 @@ public class ResumoPedidoService {
 
     @Autowired
     private PedidoFornadaRepository pedidoFornadaRepository;
+
+    @Autowired
+    private FornadaDaVezRepository fornadaDaVezRepository;
+
+    @Autowired
+    private ProdutoFornadaRepository produtoFornadaRepository;
+
+    @Autowired
+    private BoloRepository boloRepository;
+
+    @Autowired
+    private RecheioPedidoRepository recheioPedidoRepository;
+
+    @Autowired
+    private RecheioExclusivoRepository recheioExclusivoRepository;
+
+    @Autowired
+    private RecheioUnitarioRepository recheioUnitarioRepository;
+
+    @Autowired
+    private MassaRepository massaRepository;
 
     public List<ResumoPedido> listarResumosPedidos() {
         return resumoPedidoRepository.findAllByIsAtivoTrue();
@@ -51,6 +73,12 @@ public class ResumoPedidoService {
 
         resumoPedido.setDataPedido(LocalDateTime.now());
         resumoPedido.setStatus(StatusEnum.PENDENTE);
+
+        if (resumoPedido.getPedidoFornadaId() != null) {
+            resumoPedido.setValor(calcularValorPedidoFornada(resumoPedido.getPedidoFornadaId()));
+        } else if (resumoPedido.getPedidoBoloId() != null) {
+            resumoPedido.setValor(calcularValorPedidoBolo(resumoPedido.getPedidoBoloId()));
+        }
 
         return resumoPedidoRepository.save(resumoPedido);
     }
@@ -122,5 +150,91 @@ public class ResumoPedidoService {
         return true;
     }
 
+    private Double calcularValorPedidoFornada(Integer pedidoFornadaId) {
+        var pedidoFornada = pedidoFornadaRepository.findById(pedidoFornadaId)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Pedido fornada não encontrado"));
 
+        var fornadaDaVez = fornadaDaVezRepository.findById(pedidoFornada.getFornadaDaVez())
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Fornada da vez não encontrada"));
+
+        var produtoFornada = produtoFornadaRepository.findById(fornadaDaVez.getProdutoFornada())
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Produto da fornada não encontrado"));
+
+        Double valorProduto = produtoFornada.getValor();
+        return valorProduto * pedidoFornada.getQuantidade();
+    }
+
+    private Double calcularValorPedidoBolo(Integer pedidoBoloId) {
+        var pedidoBolo = pedidoBoloRepository.findById(pedidoBoloId)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Pedido bolo não encontrado"));
+
+        var bolo = boloRepository.findById(pedidoBolo.getBoloId())
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Bolo não encontrado"));
+
+        Double valorTamanho = 0.0;
+        if (bolo.getTamanho() != null) {
+            switch (bolo.getTamanho()) {
+                case TAMANHO_5 -> valorTamanho = 50.0;
+                case TAMANHO_7 -> valorTamanho = 100.0;
+                case TAMANHO_12 -> valorTamanho = 150.0;
+                case TAMANHO_15 -> valorTamanho = 200.0;
+                case TAMANHO_17 -> valorTamanho = 250.0;
+            }
+        }
+
+        Double valorRecheio = 0.0;
+        if (bolo.getRecheioPedido() != null) {
+            var recheioPedido = recheioPedidoRepository.findById(bolo.getRecheioPedido())
+                    .orElseThrow(() -> new EntidadeNaoEncontradaException("Recheio do bolo não encontrado"));
+
+            if (recheioPedido.getRecheioExclusivo() != null) {
+                var recheioExclusivo = recheioExclusivoRepository.findById(recheioPedido.getRecheioExclusivo())
+                        .orElseThrow(() -> new EntidadeNaoEncontradaException("Recheio exclusivo não encontrado"));
+
+                if (recheioExclusivo.getRecheioUnitarioId1() != null) {
+                    var recheioUnitario1 = recheioUnitarioRepository.findById(recheioExclusivo.getRecheioUnitarioId1())
+                            .orElse(null);
+                    if (recheioUnitario1 != null && recheioUnitario1.getValor() != null) {
+                        valorRecheio += recheioUnitario1.getValor();
+                    }
+                }
+
+                if (recheioExclusivo.getRecheioUnitarioId2() != null) {
+                    var recheioUnitario2 = recheioUnitarioRepository.findById(recheioExclusivo.getRecheioUnitarioId2())
+                            .orElse(null);
+                    if (recheioUnitario2 != null && recheioUnitario2.getValor() != null) {
+                        valorRecheio += recheioUnitario2.getValor();
+                    }
+                }
+            } else {
+                if (recheioPedido.getRecheioUnitarioId1() != null) {
+                    var recheioUnitario1 = recheioUnitarioRepository.findById(recheioPedido.getRecheioUnitarioId1())
+                            .orElse(null);
+                    if (recheioUnitario1 != null && recheioUnitario1.getValor() != null) {
+                        valorRecheio += recheioUnitario1.getValor();
+                    }
+                }
+
+                if (recheioPedido.getRecheioUnitarioId2() != null) {
+                    var recheioUnitario2 = recheioUnitarioRepository.findById(recheioPedido.getRecheioUnitarioId2())
+                            .orElse(null);
+                    if (recheioUnitario2 != null && recheioUnitario2.getValor() != null) {
+                        valorRecheio += recheioUnitario2.getValor();
+                    }
+                }
+            }
+        }
+
+        Double valorMassa = 0.0;
+        if (bolo.getMassa() != null) {
+            var massa = massaRepository.findById(bolo.getMassa())
+                    .orElse(null);
+            if (massa != null && massa.getValor() != null) {
+                valorMassa = massa.getValor();
+            }
+        }
+
+        Double valorTotal = valorTamanho + valorRecheio + valorMassa;
+        return valorTotal;
+    }
 }

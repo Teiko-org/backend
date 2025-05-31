@@ -1,6 +1,7 @@
 package com.carambolos.carambolosapi.controller;
 
 import com.carambolos.carambolosapi.controller.request.ResumoPedidoRequestDTO;
+import com.carambolos.carambolosapi.controller.response.ResumoPedidoMensagemResponseDTO;
 import com.carambolos.carambolosapi.controller.response.ResumoPedidoResponseDTO;
 import com.carambolos.carambolosapi.model.ResumoPedido;
 import com.carambolos.carambolosapi.model.enums.StatusEnum;
@@ -17,6 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -112,12 +116,12 @@ public class ResumoPedidoController {
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @PostMapping
-    public ResponseEntity<ResumoPedidoResponseDTO> cadastrarResumoPedido(
+    public ResponseEntity<ResumoPedidoMensagemResponseDTO> cadastrarResumoPedido(
             @Valid @RequestBody ResumoPedidoRequestDTO request
     ) {
         ResumoPedido resumoPedido = ResumoPedidoRequestDTO.toResumoPedido(request);
         ResumoPedido resumoSalvo = resumoPedidoService.cadastrarResumoPedido(resumoPedido);
-        return ResponseEntity.status(201).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumoSalvo));
+        return ResponseEntity.status(201).body(ResumoPedidoMensagemResponseDTO.toResumoPedidoMensagemResponse(resumoSalvo));
     }
 
     @Operation(summary = "Atualizar resumo de pedido", description = "Atualiza um resumo de pedido existente")
@@ -266,5 +270,4 @@ public class ResumoPedidoController {
         }
         return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumosPedidos));
     }
-
 }

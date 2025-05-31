@@ -34,22 +34,21 @@ public class PedidoFornadaService {
     }
 
     public PedidoFornada criarPedidoFornada(PedidoFornadaRequestDTO request) {
-        FornadaDaVez fornadaDaVez = fornadaDaVezRepository.findById(request.fornadaDaVezId())
+        fornadaDaVezRepository.findById(request.fornadaDaVezId())
                 .filter(FornadaDaVez::isAtivo)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("FornadaDaVez com ID " + request.fornadaDaVezId() + " não encontrada."));
 
-        Endereco endereco = enderecoRepository.findById(request.enderecoId())
+        enderecoRepository.findById(request.enderecoId())
                 .filter(Endereco::isAtivo)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Endereço com ID " + request.enderecoId() + " não encontrado."));
 
-        Usuario usuario = null;
         if (request.usuarioId() != null) {
-            usuario = usuarioRepository.findById(request.usuarioId())
+            usuarioRepository.findById(request.usuarioId())
                     .filter(Usuario::isAtivo)
                     .orElseThrow(() -> new EntidadeNaoEncontradaException("Usuário com ID " + request.usuarioId() + " não encontrado."));
         }
 
-        PedidoFornada pedidoFornada = request.toEntity(fornadaDaVez, endereco, usuario);
+        PedidoFornada pedidoFornada = request.toEntity(request);
         return pedidoFornadaRepository.save(pedidoFornada);
     }
 
