@@ -147,10 +147,10 @@ public class RelatorioService {
         String recheioMaisPedido = top3Recheios.isEmpty()
                 ? "Desconhecido"
                 : recheios.stream()
-                .filter(r -> r.getId().equals(top3Recheios.get(0).getKey()))
+                .filter(r -> r.getId().equals(top3Recheios.getFirst().getKey()))
                 .map(RecheioUnitario::getSabor)
                 .findFirst()
-                .orElse("Recheio ID " + top3Recheios.get(0).getKey());
+                .orElse("Recheio ID " + top3Recheios.getFirst().getKey());
 
         List<Map.Entry<Integer, Long>> top3UsuariosBolo = pedidosBolo.stream()
                 .collect(Collectors.groupingBy(PedidoBolo::getUsuarioId, Collectors.counting()))
