@@ -22,14 +22,20 @@ public class RelatorioService {
     private final MassaRepository massaRepository;
     private final RecheioPedidoRepository recheioPedidoRepository;
     private final RecheioUnitarioRepository recheioUnitarioRepository;
+    private final ProdutoFornadaRepository produtoFornadaRepository;
+    private final FornadaDaVezRepository fornadaDaVezRepository;
 
+
+    // Atualize o construtor
     public RelatorioService(PedidoBoloRepository pedidoBoloRepository,
                             UsuarioRepository usuarioRepository,
                             BoloRepository boloRepository,
                             PedidoFornadaRepository pedidoFornadaRepository,
                             MassaRepository massaRepository,
                             RecheioPedidoRepository recheioPedidoRepository,
-                            RecheioUnitarioRepository recheioUnitarioRepository) {
+                            RecheioUnitarioRepository recheioUnitarioRepository,
+                            ProdutoFornadaRepository produtoFornadaRepository,
+                            FornadaDaVezRepository fornadaDaVezRepository) {
         this.pedidoBoloRepository = pedidoBoloRepository;
         this.usuarioRepository = usuarioRepository;
         this.boloRepository = boloRepository;
@@ -37,6 +43,8 @@ public class RelatorioService {
         this.massaRepository = massaRepository;
         this.recheioPedidoRepository = recheioPedidoRepository;
         this.recheioUnitarioRepository = recheioUnitarioRepository;
+        this.produtoFornadaRepository = produtoFornadaRepository;
+        this.fornadaDaVezRepository = fornadaDaVezRepository;
     }
 
     public byte[] gerarRelatorioInsights() {
@@ -56,7 +64,10 @@ public class RelatorioService {
                 .toList();
 
         Map<Integer, Long> contagemFornadas = pedidosFornada.stream()
-                .map(p -> p.getFornadaDaVez().getProdutoFornada().getId())
+                .map(p -> fornadaDaVezRepository.findById(p.getFornadaDaVez())
+                        .map(FornadaDaVez::getProdutoFornada)
+                        .orElse(null))
+                .filter(Objects::nonNull)
                 .collect(Collectors.groupingBy(id -> id, Collectors.counting()));
 
         List<Map.Entry<Integer, Long>> top3Fornadas = contagemFornadas.entrySet().stream()
@@ -161,8 +172,7 @@ public class RelatorioService {
 
         List<Map.Entry<Integer, Long>> top3UsuariosFornada = pedidosFornada.stream()
                 .filter(p -> p.getUsuario() != null)
-                .collect(Collectors.groupingBy(p -> p.getUsuario().getId(), Collectors.counting()))
-                .entrySet().stream()
+                .collect(Collectors.groupingBy(PedidoFornada::getUsuario, Collectors.counting()))                .entrySet().stream()
                 .sorted(Map.Entry.<Integer, Long>comparingByValue().reversed())
                 .limit(3)
                 .toList();
@@ -200,11 +210,8 @@ public class RelatorioService {
                     Integer produtoId = entry.getKey();
                     Long count = entry.getValue();
 
-                    String produtoNome = pedidosFornada.stream()
-                            .map(p -> p.getFornadaDaVez().getProdutoFornada())
-                            .filter(p -> p.getId().equals(produtoId))
+                    String produtoNome = produtoFornadaRepository.findById(produtoId)
                             .map(ProdutoFornada::getProduto)
-                            .findFirst()
                             .orElse("Produto ID " + produtoId);
 
                     doc.add(new Paragraph(i + ". " + produtoNome + " (" + count + " pedidos)"));
