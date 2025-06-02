@@ -124,6 +124,10 @@ public record ResumoPedidoMensagemResponseDTO (
             mensagem.append("1x ").append(descricaoBolo).append(" ").append(valorTotal).append("\n");
             mensagem.append("Total: ").append(valorTotal).append("\n");
 
+            mensagem.append("Tipo: ")
+                    .append(pedidoBolo.getTipoEntrega() != null ? pedidoBolo.getTipoEntrega().name() : "ENTREGA")
+                    .append("\n");
+
             if (pedidoBolo.getDataPrevisaoEntrega() != null) {
                 mensagem.append("Previsão de entrega: ")
                         .append(pedidoBolo.getDataPrevisaoEntrega().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
@@ -218,6 +222,10 @@ public record ResumoPedidoMensagemResponseDTO (
                     .append("\n")
                     .append("Total: ")
                     .append(valorTotal)
+                    .append("\n");
+
+            mensagem.append("Tipo: ")
+                    .append(pedidoFornada.getTipoEntrega() != null ? pedidoFornada.getTipoEntrega().name() : "ENTREGA")
                     .append("\n");
 
             if (pedidoFornada.getDataPrevisaoEntrega() != null) {
