@@ -1,5 +1,6 @@
 package com.carambolos.carambolosapi.model;
 
+import com.carambolos.carambolosapi.model.enums.TipoEntregaEnum;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -27,6 +28,10 @@ public class PedidoBolo {
 
     @Column(name = "data_ultima_atualizacao")
     private LocalDateTime dataUltimaAtualizacao;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_entrega")
+    private TipoEntregaEnum tipoEntrega;
 
     @Column(name = "is_ativo")
     private Boolean isAtivo = true;
@@ -85,6 +90,14 @@ public class PedidoBolo {
 
     public void setDataUltimaAtualizacao(LocalDateTime dataUltimaAtualizacao) {
         this.dataUltimaAtualizacao = dataUltimaAtualizacao;
+    }
+
+    public TipoEntregaEnum getTipoEntrega() {
+        return tipoEntrega;
+    }
+
+    public void setTipoEntrega(TipoEntregaEnum tipoEntrega) {
+        this.tipoEntrega = tipoEntrega;
     }
 
     public Boolean getAtivo() {

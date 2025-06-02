@@ -1,5 +1,6 @@
 package com.carambolos.carambolosapi.model;
 
+import com.carambolos.carambolosapi.model.enums.TipoEntregaEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -28,6 +29,10 @@ public class PedidoFornada {
 
     @Column(name = "data_previsao_entrega")
     private LocalDate dataPrevisaoEntrega;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_entrega")
+    private TipoEntregaEnum tipoEntrega;
 
     @Column(name = "is_ativo")
     private Boolean isAtivo = true;
@@ -78,6 +83,14 @@ public class PedidoFornada {
 
     public void setDataPrevisaoEntrega(LocalDate dataPrevisaoEntrega) {
         this.dataPrevisaoEntrega = dataPrevisaoEntrega;
+    }
+
+    public TipoEntregaEnum getTipoEntrega() {
+        return tipoEntrega;
+    }
+
+    public void setTipoEntrega(TipoEntregaEnum tipoEntrega) {
+        this.tipoEntrega = tipoEntrega;
     }
 
     public Boolean isAtivo() {

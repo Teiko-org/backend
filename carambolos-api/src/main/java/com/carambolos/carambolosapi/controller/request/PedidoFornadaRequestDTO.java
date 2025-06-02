@@ -4,6 +4,7 @@ import com.carambolos.carambolosapi.model.Endereco;
 import com.carambolos.carambolosapi.model.FornadaDaVez;
 import com.carambolos.carambolosapi.model.PedidoFornada;
 import com.carambolos.carambolosapi.model.Usuario;
+import com.carambolos.carambolosapi.model.enums.TipoEntregaEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
@@ -29,7 +30,10 @@ public record PedidoFornadaRequestDTO(
 
         @Schema(description = "Data prevista para entrega do pedido", example = "2025-05-10")
         @NotNull
-        LocalDate dataPrevisaoEntrega
+        LocalDate dataPrevisaoEntrega,
+
+        @Schema(description = "Tipo de entrega", example = "RETIRADA", allowableValues = "RETIRADA, ENTREGA")
+        TipoEntregaEnum tipoEntrega
 
 ) {
 
@@ -40,6 +44,7 @@ public record PedidoFornadaRequestDTO(
         pedidoFornada.setUsuario(request.usuarioId);
         pedidoFornada.setQuantidade(request.quantidade);
         pedidoFornada.setDataPrevisaoEntrega(request.dataPrevisaoEntrega);
+        pedidoFornada.setTipoEntrega(request.tipoEntrega);
         return pedidoFornada;
     }
 }
