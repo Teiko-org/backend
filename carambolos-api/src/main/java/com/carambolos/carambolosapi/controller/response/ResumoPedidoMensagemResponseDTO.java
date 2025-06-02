@@ -124,6 +124,9 @@ public record ResumoPedidoMensagemResponseDTO (
             mensagem.append("1x ").append(descricaoBolo).append(" ").append(valorTotal).append("\n");
             mensagem.append("Total: ").append(valorTotal).append("\n");
 
+            mensagem.append("Cliente: ").append(pedidoBolo.getNomeCliente()).append("\n")
+                    .append("Telefone: ").append(pedidoBolo.getTelefoneCliente()).append("\n");
+
             mensagem.append("Tipo: ")
                     .append(pedidoBolo.getTipoEntrega() != null ? pedidoBolo.getTipoEntrega().name() : "ENTREGA")
                     .append("\n");
@@ -222,6 +225,13 @@ public record ResumoPedidoMensagemResponseDTO (
                     .append("\n")
                     .append("Total: ")
                     .append(valorTotal)
+                    .append("\n");
+
+            mensagem.append("Cliente: ")
+                    .append(pedidoFornada.getNomeCliente())
+                    .append("\n")
+                    .append("Telefone: ")
+                    .append(pedidoFornada.getTelefoneCliente())
                     .append("\n");
 
             mensagem.append("Tipo: ")

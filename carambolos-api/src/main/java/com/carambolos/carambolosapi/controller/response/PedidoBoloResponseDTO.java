@@ -15,7 +15,9 @@ public record PedidoBoloResponseDTO(
         String observacao,
         LocalDate dataPrevisaoEntrega,
         LocalDateTime dataUltimaAtualizacao,
-        TipoEntregaEnum tipoEntrega
+        TipoEntregaEnum tipoEntrega,
+        String nomeCliente,
+        String telefoneCliente
 ) {
     public static PedidoBoloResponseDTO toPedidoBoloResponse(PedidoBolo pedido) {
         return new PedidoBoloResponseDTO(
@@ -26,7 +28,9 @@ public record PedidoBoloResponseDTO(
                 pedido.getObservacao(),
                 pedido.getDataPrevisaoEntrega(),
                 pedido.getDataUltimaAtualizacao(),
-                pedido.getTipoEntrega()
+                pedido.getTipoEntrega(),
+                pedido.getNomeCliente(),
+                pedido.getTelefoneCliente()
         );
     }
 

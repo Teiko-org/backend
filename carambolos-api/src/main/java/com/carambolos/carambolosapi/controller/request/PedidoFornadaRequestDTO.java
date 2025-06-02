@@ -6,6 +6,7 @@ import com.carambolos.carambolosapi.model.PedidoFornada;
 import com.carambolos.carambolosapi.model.Usuario;
 import com.carambolos.carambolosapi.model.enums.TipoEntregaEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
@@ -33,7 +34,15 @@ public record PedidoFornadaRequestDTO(
         LocalDate dataPrevisaoEntrega,
 
         @Schema(description = "Tipo de entrega", example = "RETIRADA", allowableValues = "RETIRADA, ENTREGA")
-        TipoEntregaEnum tipoEntrega
+        TipoEntregaEnum tipoEntrega,
+
+        @Schema(description = "Nome do cliente", example = "João da Silva")
+        @NotBlank
+        String nomeCliente,
+
+        @Schema(description = "Telefone do cliente", example = "(11) 91234-5678")
+        @NotBlank
+        String telefoneCliente
 
 ) {
 
@@ -45,6 +54,8 @@ public record PedidoFornadaRequestDTO(
         pedidoFornada.setQuantidade(request.quantidade);
         pedidoFornada.setDataPrevisaoEntrega(request.dataPrevisaoEntrega);
         pedidoFornada.setTipoEntrega(request.tipoEntrega);
+        pedidoFornada.setNomeCliente(request.nomeCliente);
+        pedidoFornada.setTelefoneCliente(request.telefoneCliente);
         return pedidoFornada;
     }
 }

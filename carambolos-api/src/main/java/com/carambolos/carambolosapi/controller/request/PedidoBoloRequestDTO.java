@@ -3,6 +3,7 @@ package com.carambolos.carambolosapi.controller.request;
 import com.carambolos.carambolosapi.model.PedidoBolo;
 import com.carambolos.carambolosapi.model.enums.TipoEntregaEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
@@ -32,7 +33,15 @@ public record PedidoBoloRequestDTO(
         LocalDateTime dataUltimaAtualizacao,
 
         @Schema(description = "Tipo de entrega", example = "RETIRADA", allowableValues = "RETIRADA, ENTREGA")
-        TipoEntregaEnum tipoEntrega
+        TipoEntregaEnum tipoEntrega,
+
+        @Schema(description = "Nome do cliente", example = "João da Silva")
+        @NotBlank
+        String nomeCliente,
+
+        @Schema(description = "Telefone do cliente", example = "(11) 91234-5678")
+        @NotBlank
+        String telefoneCliente
 ) {
     public static PedidoBolo toPedidoBolo(PedidoBoloRequestDTO request) {
         if (request == null) {
@@ -46,6 +55,8 @@ public record PedidoBoloRequestDTO(
         pedidoBolo.setDataPrevisaoEntrega(request.dataPrevisaoEntrega);
         pedidoBolo.setDataUltimaAtualizacao(request.dataUltimaAtualizacao);
         pedidoBolo.setTipoEntrega(request.tipoEntrega);
+        pedidoBolo.setNomeCliente(request.nomeCliente);
+        pedidoBolo.setTelefoneCliente(request.telefoneCliente);
         return pedidoBolo;
     }
 }
