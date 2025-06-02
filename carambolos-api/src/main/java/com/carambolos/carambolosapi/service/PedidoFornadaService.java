@@ -34,41 +34,48 @@ public class PedidoFornadaService {
     }
 
     public PedidoFornada criarPedidoFornada(PedidoFornadaRequestDTO request) {
-        FornadaDaVez fornadaDaVez = fornadaDaVezRepository.findById(request.fornadaDaVezId())
+        fornadaDaVezRepository.findById(request.fornadaDaVezId())
+                .filter(FornadaDaVez::isAtivo)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("FornadaDaVez com ID " + request.fornadaDaVezId() + " não encontrada."));
 
-        Endereco endereco = enderecoRepository.findById(request.enderecoId())
+        enderecoRepository.findById(request.enderecoId())
+                .filter(Endereco::isAtivo)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Endereço com ID " + request.enderecoId() + " não encontrado."));
 
-        Usuario usuario = null;
         if (request.usuarioId() != null) {
-            usuario = usuarioRepository.findById(request.usuarioId())
+            usuarioRepository.findById(request.usuarioId())
+                    .filter(Usuario::isAtivo)
                     .orElseThrow(() -> new EntidadeNaoEncontradaException("Usuário com ID " + request.usuarioId() + " não encontrado."));
         }
 
-        PedidoFornada pedidoFornada = request.toEntity(fornadaDaVez, endereco, usuario);
+        PedidoFornada pedidoFornada = request.toEntity(request);
         return pedidoFornadaRepository.save(pedidoFornada);
     }
 
     public PedidoFornada buscarPedidoFornada(Integer id) {
         return pedidoFornadaRepository.findById(id)
+                .filter(PedidoFornada::isAtivo)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("PedidoFornada com ID " + id + " não encontrado."));
     }
 
     public List<PedidoFornada> listarPedidosFornada() {
-        return pedidoFornadaRepository.findAll();
+        return pedidoFornadaRepository.findAll().stream()
+                .filter(PedidoFornada::isAtivo)
+                .toList();
     }
 
     public void excluirPedidoFornada(Integer id) {
-        if (!pedidoFornadaRepository.existsById(id)) {
-            throw new EntidadeNaoEncontradaException("PedidoFornada com ID " + id + " não existe.");
-        }
-        pedidoFornadaRepository.deleteById(id);
+        PedidoFornada pedidoFornada = buscarPedidoFornada(id);
+        pedidoFornada.setAtivo(false);
+        pedidoFornadaRepository.save(pedidoFornada);
     }
 
     public PedidoFornada atualizarPedidoFornada(Integer id, PedidoFornadaUpdateRequestDTO request) {
-        PedidoFornada pedidoFornada = pedidoFornadaRepository.findById(id)
-                .orElseThrow(() -> new EntidadeNaoEncontradaException("PedidoFornada com ID " + id + " não encontrado para atualização."));
+        PedidoFornada pedidoFornada = buscarPedidoFornada(id);
+
+        if (request.quantidade() == null || request.quantidade() <= 0) {
+            throw new IllegalArgumentException("A quantidade deve ser maior que zero.");
+        }
 
         pedidoFornada.setQuantidade(request.quantidade());
         pedidoFornada.setDataPrevisaoEntrega(request.dataPrevisaoEntrega());

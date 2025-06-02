@@ -18,7 +18,7 @@ public class ProdutoFornadaService {
     }
 
     public ProdutoFornada criarProdutoFornada(ProdutoFornadaRequestDTO request) {
-        if (produtoFornadaRepository.existsByProduto(request.produto())) {
+        if (produtoFornadaRepository.existsByProdutoAndIsAtivoTrue(request.produto())) {
             throw new EntidadeJaExisteException("Já existe um ProdutoFornada com o nome informado: " + request.produto());
         }
 
@@ -26,25 +26,34 @@ public class ProdutoFornadaService {
         return produtoFornadaRepository.save(produtoFornada);
     }
 
-    public List<ProdutoFornada> listarProdutosFornada() {
-        return produtoFornadaRepository.findAll();
+    public List<ProdutoFornada> listarProdutosFornada(List<String> categorias) {
+        List<ProdutoFornada> produtos;
+        if (!categorias.isEmpty()) {
+            produtos = produtoFornadaRepository.findByCategoriaIn(categorias).stream().filter(ProdutoFornada::isAtivo).toList();
+        } else {
+            produtos = produtoFornadaRepository.findAll().stream().filter(ProdutoFornada::isAtivo).toList();
+        }
+        return produtos;
     }
 
     public ProdutoFornada buscarProdutoFornada(Integer id) {
         return produtoFornadaRepository.findById(id)
+                .filter(ProdutoFornada::isAtivo)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("ProdutoFornada com ID " + id + " não encontrado."));
     }
 
     public void excluirProdutoFornada(Integer id) {
-        if (!produtoFornadaRepository.existsById(id)) {
-            throw new EntidadeNaoEncontradaException("Não é possível excluir. ProdutoFornada com ID " + id + " não existe.");
-        }
-        produtoFornadaRepository.deleteById(id);
+        ProdutoFornada produtoFornada = buscarProdutoFornada(id);
+        produtoFornada.setAtivo(false);
+        produtoFornadaRepository.save(produtoFornada);
     }
 
     public ProdutoFornada atualizarProdutoFornada(Integer id, ProdutoFornadaRequestDTO request) {
-        ProdutoFornada produtoFornada = produtoFornadaRepository.findById(id)
-                .orElseThrow(() -> new EntidadeNaoEncontradaException("ProdutoFornada com ID " + id + " não encontrado para atualização."));
+        if (produtoFornadaRepository.existsByProdutoAndIsAtivoTrueAndIdNot(request.produto(), id)) {
+            throw new EntidadeJaExisteException("Já existe um ProdutoFornada ativo com o nome informado: " + request.produto());
+        }
+
+        ProdutoFornada produtoFornada = buscarProdutoFornada(id);
 
         produtoFornada.setProduto(request.produto());
         produtoFornada.setDescricao(request.descricao());

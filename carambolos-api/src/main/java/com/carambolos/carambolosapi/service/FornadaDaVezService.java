@@ -2,6 +2,7 @@ package com.carambolos.carambolosapi.service;
 
 import com.carambolos.carambolosapi.controller.request.FornadaDaVezRequestDTO;
 import com.carambolos.carambolosapi.controller.request.FornadaDaVezUpdateRequestDTO;
+import com.carambolos.carambolosapi.exception.EntidadeImprocessavelException;
 import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.model.Fornada;
 import com.carambolos.carambolosapi.model.FornadaDaVez;
@@ -30,36 +31,41 @@ public class FornadaDaVezService {
     }
 
     public FornadaDaVez criarFornadaDaVez(FornadaDaVezRequestDTO request) {
-        ProdutoFornada produto = produtoFornadaRepository.findById(request.produtoFornadaId())
+        produtoFornadaRepository.findById(request.produtoFornadaId())
+                .filter(ProdutoFornada::isAtivo)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("ProdutoFornada com ID " + request.produtoFornadaId() + " não encontrado."));
 
-        Fornada fornada = fornadaRepository.findById(request.fornadaId())
+        fornadaRepository.findById(request.fornadaId())
+                .filter(Fornada::isAtivo)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Fornada com ID " + request.fornadaId() + " não encontrada."));
 
-        FornadaDaVez fornadaDaVez = request.toEntity(fornada, produto);
+        FornadaDaVez fornadaDaVez = request.toEntity(request);
 
         return fornadaDaVezRepository.save(fornadaDaVez);
     }
 
     public List<FornadaDaVez> listarFornadasDaVez() {
-        return fornadaDaVezRepository.findAll();
+        return fornadaDaVezRepository.findAll().stream().filter(FornadaDaVez::isAtivo).toList();
     }
 
     public FornadaDaVez buscarFornadaDaVez(Integer id) {
         return fornadaDaVezRepository.findById(id)
+                .filter(FornadaDaVez::isAtivo)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("FornadaDaVez com ID " + id + " não encontrada."));
     }
 
     public void excluirFornadaDaVez(Integer id) {
-        if (!fornadaDaVezRepository.existsById(id)) {
-            throw new EntidadeNaoEncontradaException("FornadaDaVez com ID " + id + " não existe para exclusão.");
-        }
-        fornadaDaVezRepository.deleteById(id);
+        FornadaDaVez fornadaDaVez = buscarFornadaDaVez(id);
+        fornadaDaVez.setAtivo(false);
+        fornadaDaVezRepository.save(fornadaDaVez);
     }
 
     public FornadaDaVez atualizarQuantidade(Integer id, FornadaDaVezUpdateRequestDTO request) {
-        FornadaDaVez fornadaDaVez = fornadaDaVezRepository.findById(id)
-                .orElseThrow(() -> new EntidadeNaoEncontradaException("FornadaDaVez com ID " + id + " não encontrada para atualização."));
+        FornadaDaVez fornadaDaVez = buscarFornadaDaVez(id);
+
+        if (request.quantidade() <= 0) {
+            throw new EntidadeImprocessavelException("Quantidade deve ser maior que zero.");
+        }
 
         fornadaDaVez.setQuantidade(request.quantidade());
 

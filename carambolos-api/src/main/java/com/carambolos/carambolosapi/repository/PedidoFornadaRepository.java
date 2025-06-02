@@ -4,4 +4,5 @@ import com.carambolos.carambolosapi.model.PedidoFornada;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PedidoFornadaRepository extends JpaRepository<PedidoFornada, Integer> {
+    boolean existsByIdAndIsAtivoTrue(Integer id);
 }

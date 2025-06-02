@@ -13,35 +13,24 @@ public class PedidoFornada {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Schema(description = "Identificador único do pedido da fornada", example = "1", accessMode = Schema.AccessMode.READ_ONLY)
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "fornada_da_vez_id")
-    @NotNull
-    @Schema(description = "Fornada da vez relacionada ao pedido", implementation = FornadaDaVez.class)
-    private FornadaDaVez fornadaDaVez;
+    @Column(name = "fornada_da_vez_id")
+    private Integer fornadaDaVez;
 
-    @OneToOne
-    @JoinColumn(name = "endereco_id")
-    @NotNull
-    @Schema(description = "Endereço de entrega do pedido", implementation = Endereco.class)
-    private Endereco endereco;
+    @Column(name = "endereco_id")
+    private Integer endereco;
 
-    @OneToOne(optional = true)
-    @JoinColumn(name = "usuario_id")
-    @NotNull
-    @Schema(description = "Usuário que realizou o pedido", implementation = Usuario.class)
-    private Usuario usuario;
+    @Column(name = "usuario_id")
+    private Integer usuario;
 
-    @NotNull
-    @Schema(description = "Quantidade de itens no pedido", example = "10")
     private Integer quantidade;
 
     @Column(name = "data_previsao_entrega")
-    @NotNull
-    @Schema(description = "Data prevista para entrega do pedido", example = "2025-05-10")
     private LocalDate dataPrevisaoEntrega;
+
+    @Column(name = "is_ativo")
+    private Boolean isAtivo = true;
 
     public Integer getId() {
         return id;
@@ -51,27 +40,27 @@ public class PedidoFornada {
         this.id = id;
     }
 
-    public FornadaDaVez getFornadaDaVez() {
+    public Integer getFornadaDaVez() {
         return fornadaDaVez;
     }
 
-    public void setFornadaDaVez(FornadaDaVez fornadaDaVez) {
+    public void setFornadaDaVez(Integer fornadaDaVez) {
         this.fornadaDaVez = fornadaDaVez;
     }
 
-    public Endereco getEndereco() {
+    public Integer getEndereco() {
         return endereco;
     }
 
-    public void setEndereco(Endereco endereco) {
+    public void setEndereco(Integer endereco) {
         this.endereco = endereco;
     }
 
-    public Usuario getUsuario() {
+    public Integer getUsuario() {
         return usuario;
     }
 
-    public void setUsuario(Usuario usuario) {
+    public void setUsuario(Integer usuario) {
         this.usuario = usuario;
     }
 
@@ -89,5 +78,13 @@ public class PedidoFornada {
 
     public void setDataPrevisaoEntrega(LocalDate dataPrevisaoEntrega) {
         this.dataPrevisaoEntrega = dataPrevisaoEntrega;
+    }
+
+    public Boolean isAtivo() {
+        return isAtivo;
+    }
+
+    public void setAtivo(Boolean ativo) {
+        isAtivo = ativo;
     }
 }

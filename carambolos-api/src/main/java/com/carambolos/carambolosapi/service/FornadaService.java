@@ -21,7 +21,7 @@ public class FornadaService {
     public Fornada criarFornada(FornadaRequestDTO request) {
         Fornada fornada = request.toEntity();
 
-        if (fornada.getId() != null && fornadaRepository.existsById(fornada.getId())) {
+        if (fornada.getId() != null && fornadaRepository.existsByIdAndIsAtivoTrue(fornada.getId())) {
             throw new EntidadeJaExisteException("Fornada com cadastro " + fornada.getId() + " já existe.");
         }
 
@@ -29,25 +29,25 @@ public class FornadaService {
     }
 
     public List<Fornada> listarFornada() {
-        return fornadaRepository.findAll();
+        return fornadaRepository.findAll().stream().filter(Fornada::isAtivo).toList();
     }
 
     public Fornada buscarFornada(Integer id) {
         return fornadaRepository.findById(id)
+                .filter(Fornada::isAtivo)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Fornada com cadastro " + id + " não encontrada."));
     }
 
     public void excluirFornada(Integer id) {
-        if (!fornadaRepository.existsById(id)) {
-            throw new EntidadeNaoEncontradaException("Não é possível excluir. Fornada com cadastro " + id + " não existe.");
-        }
-        fornadaRepository.deleteById(id);
+        Fornada fornada = buscarFornada(id);
+        fornada.setAtivo(false);
+        fornadaRepository.save(fornada);
     }
 
     public Fornada atualizarFornada(Integer id, FornadaRequestDTO request) {
-        Fornada fornada = fornadaRepository.findById(id).orElseThrow(()
-                -> new EntidadeNaoEncontradaException("Fornada com cadastro " + id + " não encontrada para atualização."));
+        Fornada fornada = buscarFornada(id);
 
+        fornada.setId(id);
         fornada.setDataInicio(request.dataInicio());
         fornada.setDataFim(request.dataFim());
 
