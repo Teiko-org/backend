@@ -19,7 +19,6 @@ public record PedidoFornadaRequestDTO(
         Integer fornadaDaVezId,
 
         @Schema(description = "ID do endereço de entrega", example = "2")
-        @NotNull
         Integer enderecoId,
 
         @Schema(description = "ID do usuário responsável pelo pedido", example = "3")

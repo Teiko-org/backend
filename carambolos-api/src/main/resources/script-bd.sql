@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS teiko.fornada_da_vez (
 CREATE TABLE IF NOT EXISTS teiko.pedido_fornada (
   id INT NOT NULL AUTO_INCREMENT,
   fornada_da_vez_id INT NOT NULL,
-  endereco_id INT NOT NULL,
+  endereco_id INT NULL,
   usuario_id INT NULL,
   quantidade INT NOT NULL,
   data_previsao_entrega DATE NOT NULL,
@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS teiko.pedido_fornada (
   tipo_entrega VARCHAR(15) NOT NULL DEFAULT 'ENTREGA',
   nome_cliente VARCHAR(100) NOT NULL,
   telefone_cliente VARCHAR(20) NOT NULL,
-  PRIMARY KEY (id, fornada_da_vez_id, endereco_id),
+  PRIMARY KEY (id),
   INDEX endereco1_idx (endereco_id ASC) VISIBLE,
   INDEX usuario1_idx (usuario_id ASC) VISIBLE,
   INDEX fornada_da_vez1_idx (fornada_da_vez_id ASC) VISIBLE,
