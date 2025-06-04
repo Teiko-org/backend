@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 
 public record PedidoBoloRequestDTO(
         @Schema(description = "ID do endereço", example = "1")
-        @NotNull
         Integer enderecoId,
 
         @Schema(description = "ID do bolo", example = "1")
