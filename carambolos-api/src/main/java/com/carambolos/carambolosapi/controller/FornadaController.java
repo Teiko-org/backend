@@ -1,10 +1,12 @@
 package com.carambolos.carambolosapi.controller;
 
 import com.carambolos.carambolosapi.controller.request.*;
+import com.carambolos.carambolosapi.controller.response.ProdutoFornadaDaVezResponse;
 import com.carambolos.carambolosapi.model.Fornada;
 import com.carambolos.carambolosapi.model.FornadaDaVez;
 import com.carambolos.carambolosapi.model.PedidoFornada;
 import com.carambolos.carambolosapi.model.ProdutoFornada;
+import com.carambolos.carambolosapi.model.projection.ProdutoFornadaDaVezProjection;
 import com.carambolos.carambolosapi.service.FornadaDaVezService;
 import com.carambolos.carambolosapi.service.FornadaService;
 import com.carambolos.carambolosapi.service.PedidoFornadaService;
@@ -21,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -208,6 +211,17 @@ public class FornadaController {
     public ResponseEntity<Void> excluirFornadaDaVez(@PathVariable Integer id) {
         fornadaDaVezService.excluirFornadaDaVez(id);
         return ResponseEntity.status(204).build();
+    }
+
+    @Operation(summary = "Lista produtos de uma fornada")
+    @GetMapping("/da-vez/produtos")
+    public ResponseEntity<List<ProdutoFornadaDaVezResponse>> buscarProdutosFornadaDaVez(
+            @RequestParam("data_inicio") LocalDate dataInicio,
+            @RequestParam("data_fim") LocalDate dataFim
+            ) {
+        List<ProdutoFornadaDaVezProjection> projections = fornadaDaVezService.buscarProdutosFornadaDaVez(dataInicio, dataFim);
+        List<ProdutoFornadaDaVezResponse> response = ProdutoFornadaDaVezResponse.toProdutoFornadaDaVezResonse(projections);
+        return ResponseEntity.ok(response);
     }
 
     // ----------------- PEDIDO FORNADA -----------------
