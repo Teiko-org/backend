@@ -1,11 +1,13 @@
 package com.carambolos.carambolosapi.controller;
 
 import com.carambolos.carambolosapi.controller.request.*;
+import com.carambolos.carambolosapi.controller.response.ProdutoFornadaDaVezResponse;
 import com.carambolos.carambolosapi.controller.response.ProdutoFornadaResponseDTO;
 import com.carambolos.carambolosapi.model.Fornada;
 import com.carambolos.carambolosapi.model.FornadaDaVez;
 import com.carambolos.carambolosapi.model.PedidoFornada;
 import com.carambolos.carambolosapi.model.ProdutoFornada;
+import com.carambolos.carambolosapi.model.projection.ProdutoFornadaDaVezProjection;
 import com.carambolos.carambolosapi.service.FornadaDaVezService;
 import com.carambolos.carambolosapi.service.FornadaService;
 import com.carambolos.carambolosapi.service.PedidoFornadaService;
@@ -222,13 +224,24 @@ public class FornadaController {
         return ResponseEntity.status(204).build();
     }
 
+    @Operation(summary = "Lista produtos de uma fornada")
+    @GetMapping("/da-vez/produtos")
+    public ResponseEntity<List<ProdutoFornadaDaVezResponse>> buscarProdutosFornadaDaVez(
+            @RequestParam("data_inicio") LocalDate dataInicio,
+            @RequestParam("data_fim") LocalDate dataFim
+    ) {
+        List<ProdutoFornadaDaVezProjection> projections = fornadaDaVezService.buscarProdutosFornadaDaVez(dataInicio, dataFim);
+        List<ProdutoFornadaDaVezResponse> response = ProdutoFornadaDaVezResponse.toProdutoFornadaDaVezResonse(projections);
+        return ResponseEntity.ok(response);
+    }
+
     // ----------------- PEDIDO FORNADA -----------------
 
     @Operation(summary = "Cria um novo pedido de fornada")
     @PostMapping("/pedidos")
     public ResponseEntity<PedidoFornada> criarPedidoFornada(
             @RequestBody @Valid PedidoFornadaRequestDTO request
-    ){
+    ) {
         return ResponseEntity.status(201).body(pedidoFornadaService.criarPedidoFornada(request));
     }
 
