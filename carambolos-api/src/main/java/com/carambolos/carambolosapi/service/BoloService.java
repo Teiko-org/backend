@@ -2,6 +2,7 @@ package com.carambolos.carambolosapi.service;
 
 import com.carambolos.carambolosapi.exception.EntidadeImprocessavelException;
 import com.carambolos.carambolosapi.model.*;
+import com.carambolos.carambolosapi.model.projection.DetalheBoloProjection;
 import com.carambolos.carambolosapi.model.projection.RecheioExclusivoProjection;
 import com.carambolos.carambolosapi.exception.EntidadeJaExisteException;
 import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
@@ -45,6 +46,10 @@ public class BoloService {
             bolos =   boloRepository.findAll().stream().filter(Bolo::getAtivo).toList();
         }
         return bolos;
+    }
+
+    public List<DetalheBoloProjection> listarDetalhesBolos() {
+        return boloRepository.listarDetalheBolo();
     }
 
     public Bolo buscarBoloPorId(Integer id) {

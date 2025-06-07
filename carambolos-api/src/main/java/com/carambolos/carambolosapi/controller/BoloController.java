@@ -3,6 +3,7 @@ package com.carambolos.carambolosapi.controller;
 import com.carambolos.carambolosapi.controller.request.*;
 import com.carambolos.carambolosapi.controller.response.*;
 import com.carambolos.carambolosapi.model.*;
+import com.carambolos.carambolosapi.model.projection.DetalheBoloProjection;
 import com.carambolos.carambolosapi.model.projection.RecheioExclusivoProjection;
 import com.carambolos.carambolosapi.model.projection.RecheioPedidoProjection;
 import com.carambolos.carambolosapi.service.BoloService;
@@ -55,6 +56,11 @@ public class BoloController {
             return ResponseEntity.status(204).build();
         }
         return ResponseEntity.status(200).body(bolos);
+    }
+
+    @GetMapping("/detalhe")
+    public ResponseEntity<List<DetalheBoloProjection>> listarDetalheBolos() {
+        return ResponseEntity.ok().body(boloService.listarDetalhesBolos());
     }
 
     @Operation(summary = "Buscar bolo por ID", description = "Busca um bolo pelo seu ID")

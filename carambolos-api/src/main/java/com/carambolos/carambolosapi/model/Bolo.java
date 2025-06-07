@@ -17,8 +17,8 @@ public class Bolo {
     private Integer massa;
     @Column(name = "cobertura_id")
     private Integer cobertura;
-//    @Column(name = "decoracao_id")
-//    private Integer decoracao;
+    @Column(name = "decoracao_id")
+    private Integer decoracao;
     @Enumerated(EnumType.STRING)
     private FormatoEnum formato;
     @Enumerated(EnumType.STRING)
@@ -89,5 +89,13 @@ public class Bolo {
 
     public void setAtivo(Boolean ativo) {
         isAtivo = ativo;
+    }
+
+    public Integer getDecoracao() {
+        return decoracao;
+    }
+
+    public void setDecoracao(Integer decoracao) {
+        this.decoracao = decoracao;
     }
 }
