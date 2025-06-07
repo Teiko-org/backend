@@ -102,7 +102,7 @@ public class ProdutoFornada {
         return isAtivo;
     }
 
-    public void setIsAtivo(boolean b) {
-
+    public void setIsAtivo(boolean isAtivo) {
+        this.isAtivo = isAtivo;
     }
 }
