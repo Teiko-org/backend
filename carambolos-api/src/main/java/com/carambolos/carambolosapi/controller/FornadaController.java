@@ -1,6 +1,7 @@
 package com.carambolos.carambolosapi.controller;
 
 import com.carambolos.carambolosapi.controller.request.*;
+import com.carambolos.carambolosapi.controller.response.ProdutoFornadaResponseDTO;
 import com.carambolos.carambolosapi.model.Fornada;
 import com.carambolos.carambolosapi.model.FornadaDaVez;
 import com.carambolos.carambolosapi.model.PedidoFornada;
@@ -10,6 +11,7 @@ import com.carambolos.carambolosapi.service.FornadaService;
 import com.carambolos.carambolosapi.service.PedidoFornadaService;
 import com.carambolos.carambolosapi.service.ProdutoFornadaService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -18,8 +20,10 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -108,18 +112,26 @@ public class FornadaController {
 
     // ---------------- PRODUTO DA FORNADA -------------
 
-    @Operation(summary = "Cria um novo produto da fornada")
+    @PostMapping(value = "/produto-fornada", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(
+            summary = "Cria um novo produto da fornada com imagens",
+            description = "Cadastra um novo produto da fornada e faz upload de imagens associadas."
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Produto da fornada criado com sucesso",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ProdutoFornada.class))),
-            @ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content())
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProdutoFornadaResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content)
     })
-    @PostMapping("/produto-fornada")
-    public ResponseEntity<ProdutoFornada> criarProdutoFornada(
-            @RequestBody @Valid ProdutoFornadaRequestDTO request
-    ){
-        return ResponseEntity.status(201).body(produtoFornadaService.criarProdutoFornada(request));
+    public ResponseEntity<ProdutoFornadaResponseDTO> criarProdutoFornada(
+            @RequestPart("produto") String produto,
+            @RequestPart("descricao") String descricao,
+            @RequestPart("valor") String valor,
+            @RequestPart("categoria") String categoria,
+            @RequestPart("imagens") MultipartFile[] imagens
+    ) {
+        Double valorDouble = Double.valueOf(valor);
+        ProdutoFornada produtoFornada = produtoFornadaService.criarProdutoFornada(produto, descricao, valorDouble, categoria, imagens);
+        return ResponseEntity.status(201).body(ProdutoFornadaResponseDTO.fromEntity(produtoFornada));
     }
 
     @Operation(summary = "Lista todos os produtos da fornada")

@@ -54,6 +54,19 @@ CREATE TABLE IF NOT EXISTS teiko.produto_fornada (
 );
 
 -- -----------------------------------------------------
+-- Table teiko.imagem_produto_fornada
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS imagem_produto_fornada (
+    id INT NOT NULL AUTO_INCREMENT,
+    produto_fornada_id INT NOT NULL,
+    url VARCHAR(500) NOT NULL,
+    PRIMARY KEY (id),
+    INDEX produto_fornada_idx (produto_fornada_id ASC),
+    CONSTRAINT fk_imagem_produto_fornada FOREIGN KEY (produto_fornada_id)
+    REFERENCES produto_fornada (id)
+    );
+
+-- -----------------------------------------------------
 -- Table teiko.fornada
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS teiko.fornada (

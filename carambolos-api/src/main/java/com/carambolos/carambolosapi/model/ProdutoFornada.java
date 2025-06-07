@@ -5,6 +5,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "produto_fornada")
 @Schema(description = "Entidade que representa um produto feito em uma fornada.")
@@ -23,6 +26,9 @@ public class ProdutoFornada {
     @Column(name = "descricao")
     @Schema(description = "Descrição do produto", example = "Cupcake artesanal de chocolate belga")
     private String descricao;
+
+    @OneToMany(mappedBy = "produtoFornada", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ImagemProdutoFornada> imagens = new ArrayList<>();
 
     @Column(name = "valor")
     @NotNull
@@ -82,5 +88,21 @@ public class ProdutoFornada {
 
     public void setAtivo(Boolean ativo) {
         isAtivo = ativo;
+    }
+
+    public List<ImagemProdutoFornada> getImagens() {
+        return imagens;
+    }
+
+    public void setImagens(List<ImagemProdutoFornada> imagens) {
+        this.imagens = imagens;
+    }
+
+    public Boolean getAtivo() {
+        return isAtivo;
+    }
+
+    public void setIsAtivo(boolean b) {
+
     }
 }
