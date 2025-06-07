@@ -7,7 +7,7 @@ public class RecheioExclusivoProjection {
     private String sabor2;
     private int isAtivo;
 
-    public RecheioExclusivoProjection(Integer id, String nome, String sabor1, String sabor2) {
+    public RecheioExclusivoProjection(Integer id, String nome, String sabor1, String sabor2, int isAtivo) {
         this.id = id;
         this.nome = nome;
         this.sabor1 = sabor1;

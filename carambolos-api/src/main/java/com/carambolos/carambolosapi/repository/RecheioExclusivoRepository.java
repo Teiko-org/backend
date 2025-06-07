@@ -15,12 +15,12 @@ public interface RecheioExclusivoRepository extends JpaRepository<RecheioExclusi
     Integer countByRecheioUnitarioIds(Integer id1, Integer id2);
 
     @Query(value = """
-            select re.id, re.nome, ru1.sabor, ru2.sabor
-            from recheio_exclusivo re
-            join recheio_unitario ru1 on re.recheio_unitario_id1 = ru1.id
-            join recheio_unitario ru2 on re.recheio_unitario_id2 = ru2.id
-            where re.id = ?1
-            """, nativeQuery = true)
+        select re.id, re.nome, ru1.sabor, ru2.sabor, re.is_ativo
+        from recheio_exclusivo re
+        join recheio_unitario ru1 on re.recheio_unitario_id1 = ru1.id
+        join recheio_unitario ru2 on re.recheio_unitario_id2 = ru2.id
+        where re.id = ?1
+        """, nativeQuery = true)
     RecheioExclusivoProjection buscarRecheioExclusivoPorId(Integer id);
 
     @Query(value = """
