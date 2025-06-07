@@ -2,11 +2,13 @@ package com.carambolos.carambolosapi.service;
 
 import com.carambolos.carambolosapi.controller.request.PedidoFornadaRequestDTO;
 import com.carambolos.carambolosapi.controller.request.PedidoFornadaUpdateRequestDTO;
+import com.carambolos.carambolosapi.exception.EntidadeImprocessavelException;
 import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.model.Endereco;
 import com.carambolos.carambolosapi.model.FornadaDaVez;
 import com.carambolos.carambolosapi.model.PedidoFornada;
 import com.carambolos.carambolosapi.model.Usuario;
+import com.carambolos.carambolosapi.model.enums.TipoEntregaEnum;
 import com.carambolos.carambolosapi.repository.EnderecoRepository;
 import com.carambolos.carambolosapi.repository.FornadaDaVezRepository;
 import com.carambolos.carambolosapi.repository.PedidoFornadaRepository;
@@ -38,9 +40,15 @@ public class PedidoFornadaService {
                 .filter(FornadaDaVez::isAtivo)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("FornadaDaVez com ID " + request.fornadaDaVezId() + " não encontrada."));
 
-        enderecoRepository.findById(request.enderecoId())
-                .filter(Endereco::isAtivo)
-                .orElseThrow(() -> new EntidadeNaoEncontradaException("Endereço com ID " + request.enderecoId() + " não encontrado."));
+        if (request.tipoEntrega() == TipoEntregaEnum.ENTREGA && request.enderecoId() == null) {
+            throw new EntidadeImprocessavelException("Tipo de entrega 'ENTREGA' requer um endereço válido.");
+        }
+
+        if (request.enderecoId() != null) {
+            enderecoRepository.findById(request.enderecoId())
+                    .filter(Endereco::isAtivo)
+                    .orElseThrow(() -> new EntidadeNaoEncontradaException("Endereço com ID " + request.enderecoId() + " não encontrado."));
+        }
 
         if (request.usuarioId() != null) {
             usuarioRepository.findById(request.usuarioId())
