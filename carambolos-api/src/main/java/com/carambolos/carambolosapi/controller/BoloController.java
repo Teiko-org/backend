@@ -690,17 +690,5 @@ public class BoloController {
         pedidoBoloService.deletarPedido(id);
         return ResponseEntity.status(204).build();
     }
-
-    @Operation(summary = "Detalhe de um pedido específico", description = "Busca detalhe de um pedido específico")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Detalhe do pedido retornado com sucesso", content = @Content()),
-            @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content()),
-            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
-    })
-    @GetMapping("/pedido/{id}/detalhe")
-    public ResponseEntity<DetalhePedidoBoloDTO> obterDetalhePedido(@PathVariable Integer id) {
-        DetalhePedidoBoloDTO detalhe = pedidoBoloService.obterDetalhePedido(id);
-        return ResponseEntity.ok(detalhe);
-    }
 }
 
