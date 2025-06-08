@@ -124,6 +124,10 @@ public class ResumoPedidoService {
     public DetalhePedidoBoloDTO obterDetalhePedidoBolo(Integer pedidoResumoId) {
         ResumoPedido resumoPedido = buscarResumoPedidoPorId(pedidoResumoId);
 
+        if (resumoPedido.getPedidoBoloId() == null) {
+            throw new EntidadeImprocessavelException("O resumo de pedido #" + pedidoResumoId + " não está vinculado a um pedido de bolo");
+        }
+
         PedidoBolo pedido = pedidoBoloRepository.findById(resumoPedido.getPedidoBoloId())
                 .filter(PedidoBolo::getAtivo)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Pedido com o id %d não encontrado".formatted(resumoPedido.getPedidoBoloId())));
@@ -199,6 +203,10 @@ public class ResumoPedidoService {
 
     public DetalhePedidoFornadaDTO obterDetalhePedidoFornada(Integer pedidoResumoId) {
         ResumoPedido resumoPedido = buscarResumoPedidoPorId(pedidoResumoId);
+
+        if (resumoPedido.getPedidoFornadaId() == null) {
+            throw new EntidadeImprocessavelException("O resumo de pedido #" + pedidoResumoId + " não está vinculado a um pedido de fornada");
+        }
 
         PedidoFornada pedidoFornada = pedidoFornadaRepository.findById(resumoPedido.getPedidoFornadaId())
                 .filter(PedidoFornada::isAtivo)
