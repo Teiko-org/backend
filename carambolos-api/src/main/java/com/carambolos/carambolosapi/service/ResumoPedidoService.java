@@ -228,6 +228,7 @@ public class ResumoPedidoService {
                 pedidoFornada.getTipoEntrega(),
                 pedidoFornada.getNomeCliente(),
                 pedidoFornada.getTelefoneCliente(),
+                pedidoFornada.getObservacoes(),
                 resumoPedido.getDataPedido(),
                 enderecoDTO
         );

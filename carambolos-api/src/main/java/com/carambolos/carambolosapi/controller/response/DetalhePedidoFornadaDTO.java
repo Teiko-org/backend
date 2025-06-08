@@ -11,7 +11,7 @@ public record DetalhePedidoFornadaDTO(
         TipoEntregaEnum tipoEntrega,
         String nomeCliente,
         String telefoneCliente,
-//        String observacao,
+        String observacao,
         LocalDateTime dataPedido,
         EnderecoResponseDTO endereco
 ) {
@@ -21,12 +21,12 @@ public record DetalhePedidoFornadaDTO(
             TipoEntregaEnum tipoEntrega,
             String nomeCliente,
             String telefoneCliente,
-//            String observacao,
+            String observacao,
             LocalDateTime dataPedido,
             EnderecoResponseDTO endereco
     ) {
         return new DetalhePedidoFornadaDTO(
-                quantidade, produtoFornada, tipoEntrega, nomeCliente, telefoneCliente, dataPedido, endereco
+                quantidade, produtoFornada, tipoEntrega, nomeCliente, telefoneCliente, observacao, dataPedido, endereco
         );
     }
 
