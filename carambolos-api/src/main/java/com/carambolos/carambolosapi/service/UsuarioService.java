@@ -57,13 +57,37 @@ public class UsuarioService {
            throw new EntidadeJaExisteException("Esse contato já existe no sistema.");
        }
 
-       if (!usuario.getSenha().equals(usuarioExistente.getSenha())) {
-           String senhaCriptografada = passwordEncoder.encode(usuario.getSenha());
-           usuario.setSenha(senhaCriptografada);
-       }
+        if (usuario.getSenha() == null || usuario.getSenha().trim().isEmpty()) {
+            usuario.setSenha(usuarioExistente.getSenha());
+        } else if (!usuario.getSenha().equals(usuarioExistente.getSenha())) {
+            String senhaCriptografada = passwordEncoder.encode(usuario.getSenha());
+            usuario.setSenha(senhaCriptografada);
+        }
 
        usuario.setId(id);
        return usuarioRepository.save(usuario);
+    }
+
+    public Usuario atualizarDadosPessoais(Integer id, Usuario usuario) {
+        Usuario usuarioExistente = usuarioRepository.findByIdAndIsAtivoTrue(id);
+
+        if (usuarioExistente == null) {
+            throw new EntidadeNaoEncontradaException("Usuario com Id %d não encontrado.".formatted(id));
+        }
+
+        boolean existePorContato = usuarioRepository.existsByContatoAndIdNotAndIsAtivoTrue(usuario.getContato(), id);
+
+        if (existePorContato) {
+            throw new EntidadeJaExisteException("Esse contato já existe no sistema.");
+        }
+
+        // Atualizar apenas dados pessoais, mantendo senha e outros campos
+        usuarioExistente.setNome(usuario.getNome());
+        usuarioExistente.setContato(usuario.getContato());
+        usuarioExistente.setDataNascimento(usuario.getDataNascimento());
+        usuarioExistente.setGenero(usuario.getGenero());
+
+        return usuarioRepository.save(usuarioExistente);
     }
 
     public Usuario cadastrar(Usuario usuario)  {
@@ -95,6 +119,18 @@ public class UsuarioService {
         final String token = gerenciadorTokenJwt.generateToken(authentication);
 
         return UsuarioTokenDTO.toTokenDTO(usuarioAutenticado, token);
+    }
+
+    public void alterarSenha(Integer id, String senhaAtual, String novaSenha) {
+        Usuario usuario = usuarioRepository.findByIdAndIsAtivoTrue(id);
+        if (usuario == null) {
+            throw new EntidadeNaoEncontradaException("Usuário não encontrado.");
+        }
+        if (!passwordEncoder.matches(senhaAtual, usuario.getSenha())) {
+            throw new CredenciaisInvalidasException("Senha atual incorreta.");
+        }
+        usuario.setSenha(passwordEncoder.encode(novaSenha));
+        usuarioRepository.save(usuario);
     }
 
     public void deletar(Integer id) {

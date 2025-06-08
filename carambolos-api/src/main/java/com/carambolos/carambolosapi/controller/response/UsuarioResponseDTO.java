@@ -3,6 +3,8 @@ package com.carambolos.carambolosapi.controller.response;
 import com.carambolos.carambolosapi.model.Usuario;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.time.LocalDate;
+
 @Schema(description = "DTO de resposta contendo informações do usuário")
 public class UsuarioResponseDTO {
     @Schema(description = "ID do usuário", example = "1")
@@ -14,6 +16,12 @@ public class UsuarioResponseDTO {
     @Schema(description = "Celular do usuário", example = "556826852415")
     private String contato;
 
+    @Schema(description = "Data de nascimento do usuário", example = "2000-05-20")
+    private LocalDate dataNascimento;
+
+    @Schema(description = "Gênero do usuário", example = "Feminino")
+    private String genero;
+
     private boolean isAtivo;
 
     public static UsuarioResponseDTO toResponseDTO(Usuario usuario) {
@@ -22,6 +30,8 @@ public class UsuarioResponseDTO {
         responseDto.setId(usuario.getId());
         responseDto.setNome(usuario.getNome());
         responseDto.setContato(usuario.getContato());
+        responseDto.setDataNascimento(usuario.getDataNascimento());
+        responseDto.setGenero(usuario.getGenero());
         responseDto.setAtivo(usuario.isAtivo());
 
         return responseDto;
@@ -50,6 +60,22 @@ public class UsuarioResponseDTO {
 
     public void setContato(String contato) {
         this.contato = contato;
+    }
+
+    public LocalDate getDataNascimento() {
+        return dataNascimento;
+    }
+
+    public void setDataNascimento(LocalDate dataNascimento) {
+        this.dataNascimento = dataNascimento;
+    }
+
+    public String getGenero() {
+        return genero;
+    }
+
+    public void setGenero(String genero) {
+        this.genero = genero;
     }
 
     public boolean isAtivo() {

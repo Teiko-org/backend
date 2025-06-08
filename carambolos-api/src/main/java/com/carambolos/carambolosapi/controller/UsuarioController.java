@@ -1,5 +1,7 @@
 package com.carambolos.carambolosapi.controller;
 
+import com.carambolos.carambolosapi.controller.request.AlterarSenhaRequestDTO;
+import com.carambolos.carambolosapi.controller.request.AtualizarUsuarioRequestDTO;
 import com.carambolos.carambolosapi.controller.request.LoginRequestDTO;
 import com.carambolos.carambolosapi.controller.request.UsuarioRequestDTO;
 import com.carambolos.carambolosapi.controller.response.UsuarioResponseDTO;
@@ -129,6 +131,47 @@ public class UsuarioController {
         Usuario usuarioAtualizado = usuarioService.atualizar(id, usuario);
         UsuarioResponseDTO usuarioResponse = UsuarioResponseDTO.toResponseDTO(usuarioAtualizado);
         return ResponseEntity.status(200).body(usuarioResponse);
+    }
+
+    @Operation(
+            summary = "Atualizar dados pessoais do usuário",
+            description = "Atualiza apenas os dados pessoais (nome, telefone, data de nascimento, gênero) do usuário."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Dados atualizados com sucesso",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UsuarioResponseDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado"),
+            @ApiResponse(responseCode = "409", description = "Telefone já em uso")
+    })
+    @PatchMapping("/{id}/dados-pessoais")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<UsuarioResponseDTO> atualizarDadosPessoais(
+            @PathVariable Integer id,
+            @Valid @RequestBody AtualizarUsuarioRequestDTO atualizarUsuarioRequest) {
+        Usuario usuario = AtualizarUsuarioRequestDTO.toEntity(atualizarUsuarioRequest);
+        Usuario usuarioAtualizado = usuarioService.atualizarDadosPessoais(id, usuario);
+        UsuarioResponseDTO usuarioResponse = UsuarioResponseDTO.toResponseDTO(usuarioAtualizado);
+        return ResponseEntity.status(200).body(usuarioResponse);
+    }
+
+
+    @Operation(
+            summary = "Alterar senha do usuário",
+            description = "Permite que o usuário altere sua senha informando a senha atual e a nova senha."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Senha alterada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Senha atual incorreta"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+    })
+    @PatchMapping("/{id}/alterar-senha")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<Void> alterarSenha(
+            @PathVariable Integer id,
+            @Valid @RequestBody AlterarSenhaRequestDTO alterarSenhaRequest) {
+        usuarioService.alterarSenha(id, alterarSenhaRequest.getSenhaAtual(), alterarSenhaRequest.getNovaSenha());
+        return ResponseEntity.ok().build();
     }
 
     @Operation(

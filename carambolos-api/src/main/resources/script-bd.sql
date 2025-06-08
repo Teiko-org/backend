@@ -9,6 +9,8 @@ CREATE TABLE IF NOT EXISTS teiko.usuario (
   nome VARCHAR(60) NOT NULL,
   senha VARCHAR(60) NOT NULL,
   contato VARCHAR(14) NOT NULL,
+  data_nascimento DATE NULL,
+  genero VARCHAR(20) NULL,
   sys_admin TINYINT NULL,
   is_ativo TINYINT NULL,
   PRIMARY KEY (id),
