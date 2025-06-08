@@ -1,6 +1,8 @@
 package com.carambolos.carambolosapi.controller;
 
 import com.carambolos.carambolosapi.controller.request.*;
+import com.carambolos.carambolosapi.controller.response.DetalhePedidoBoloDTO;
+import com.carambolos.carambolosapi.controller.response.DetalhePedidoFornadaDTO;
 import com.carambolos.carambolosapi.controller.response.ProdutoFornadaResponseDTO;
 import com.carambolos.carambolosapi.model.Fornada;
 import com.carambolos.carambolosapi.model.FornadaDaVez;
