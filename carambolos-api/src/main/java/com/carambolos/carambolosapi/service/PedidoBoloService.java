@@ -1,10 +1,8 @@
 package com.carambolos.carambolosapi.service;
 
-import com.carambolos.carambolosapi.controller.response.DetalhePedidoBoloDTO;
-import com.carambolos.carambolosapi.controller.response.EnderecoResponseDTO;
 import com.carambolos.carambolosapi.exception.EntidadeImprocessavelException;
 import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
-import com.carambolos.carambolosapi.model.*;
+import com.carambolos.carambolosapi.model.PedidoBolo;
 import com.carambolos.carambolosapi.model.enums.TipoEntregaEnum;
 import com.carambolos.carambolosapi.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
