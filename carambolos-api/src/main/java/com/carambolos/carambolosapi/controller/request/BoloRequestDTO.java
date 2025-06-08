@@ -20,7 +20,7 @@ public record BoloRequestDTO(
         @NotNull
         Integer coberturaId,
 
-//        Integer decoracaoId,
+        Integer decoracaoId,
 
         @Schema(description = "Formato do bolo", example = "CIRCULO")
         @NotNull
