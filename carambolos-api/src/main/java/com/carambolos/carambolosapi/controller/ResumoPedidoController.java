@@ -273,25 +273,25 @@ public class ResumoPedidoController {
         return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumosPedidos));
     }
 
-    @Operation(summary = "Detalhe de um pedido específico", description = "Busca detalhe de um pedido específico")
+    @Operation(summary = "Detalhe de um pedido fornada específico", description = "Busca detalhe de um pedido fornada específico")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Detalhe do pedido retornado com sucesso", content = @Content()),
             @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
-    @GetMapping("/detalhe-bolo/{id}")
+    @GetMapping("/pedido-bolo/detalhe/{id}")
     public ResponseEntity<DetalhePedidoBoloDTO> obterDetalhePedidoBolo(@PathVariable Integer id) {
         DetalhePedidoBoloDTO detalhe = resumoPedidoService.obterDetalhePedidoBolo(id);
         return ResponseEntity.ok(detalhe);
     }
 
-    @Operation(summary = "Detalhe de um pedido específico", description = "Busca detalhe de um pedido específico")
+    @Operation(summary = "Detalhe de um pedido bolo específico", description = "Busca detalhe de um pedido de bolo específico")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Detalhe do pedido retornado com sucesso", content = @Content()),
             @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
-    @GetMapping("/detalhe-fornada/{id}")
+    @GetMapping("/pedido-fornada/detalhe/{id}")
     public ResponseEntity<DetalhePedidoFornadaDTO> obterDetalhePedidoFornada(@PathVariable Integer id) {
         DetalhePedidoFornadaDTO detalhe = resumoPedidoService.obterDetalhePedidoFornada(id);
         return ResponseEntity.ok(detalhe);
