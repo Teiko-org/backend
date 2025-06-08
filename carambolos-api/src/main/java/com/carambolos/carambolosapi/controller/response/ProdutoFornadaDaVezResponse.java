@@ -7,14 +7,13 @@ import java.util.List;
 
 public record ProdutoFornadaDaVezResponse(
         Integer fornadaDaVezId,
-        Integer produtoFornadaId,
+        Integer id,
         String produto,
         String descricao,
         Double valor,
         String categoria,
         Integer quantidade,
         Boolean isAtivoPf,
-        Boolean isAtivoFdv,
         LocalDate dataInicio,
         LocalDate dataFim
 ) {
@@ -31,7 +30,6 @@ public record ProdutoFornadaDaVezResponse(
                 projection.getCategoria(),
                 projection.getQuantidade(),
                 projection.getAtivoPf(),
-                projection.getAtivoFdv(),
                 projection.getDataInicio(),
                 projection.getDataFim()
         );
