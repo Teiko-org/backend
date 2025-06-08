@@ -40,6 +40,12 @@ public class PedidoFornada {
     @Column(name = "telefone_cliente")
     private String telefoneCliente;
 
+    @Column(name = "horario_retirada")
+    private String horarioRetirada;
+
+    @Column(name = "observacoes")
+    private String observacoes;
+
     @Column(name = "is_ativo")
     private Boolean isAtivo = true;
 
@@ -113,6 +119,34 @@ public class PedidoFornada {
 
     public void setTelefoneCliente(String telefoneCliente) {
         this.telefoneCliente = telefoneCliente;
+    }
+
+    public String getHorario() {
+        return horarioRetirada;
+    }
+
+    public void setHorario(String horario) {
+        this.horarioRetirada = horario;
+    }
+
+    public String getHorarioRetirada() {
+        return horarioRetirada;
+    }
+
+    public void setHorarioRetirada(String horarioRetirada) {
+        this.horarioRetirada = horarioRetirada;
+    }
+
+    public String getObservacoes() {
+        return observacoes;
+    }
+
+    public void setObservacoes(String observacoes) {
+        this.observacoes = observacoes;
+    }
+
+    public Boolean getAtivo() {
+        return isAtivo;
     }
 
     public Boolean isAtivo() {

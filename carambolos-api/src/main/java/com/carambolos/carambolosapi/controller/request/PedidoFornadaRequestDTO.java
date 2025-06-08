@@ -5,6 +5,7 @@ import com.carambolos.carambolosapi.model.FornadaDaVez;
 import com.carambolos.carambolosapi.model.PedidoFornada;
 import com.carambolos.carambolosapi.model.Usuario;
 import com.carambolos.carambolosapi.model.enums.TipoEntregaEnum;
+import io.micrometer.common.lang.Nullable;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -36,12 +37,16 @@ public record PedidoFornadaRequestDTO(
         TipoEntregaEnum tipoEntrega,
 
         @Schema(description = "Nome do cliente", example = "João da Silva")
-        @NotBlank
         String nomeCliente,
 
         @Schema(description = "Telefone do cliente", example = "(11) 91234-5678")
-        @NotBlank
-        String telefoneCliente
+        String telefoneCliente,
+
+        @Schema(description = "Horário da retirada/entrega", example = "17:00")
+        String horarioRetirada,
+
+        @Schema(description = "Observações adicionais sobre o pedido", example = "Favor entregar com cuidado")
+        @Nullable String observacoes
 
 ) {
 
@@ -55,6 +60,9 @@ public record PedidoFornadaRequestDTO(
         pedidoFornada.setTipoEntrega(request.tipoEntrega);
         pedidoFornada.setNomeCliente(request.nomeCliente);
         pedidoFornada.setTelefoneCliente(request.telefoneCliente);
+        pedidoFornada.setHorario(request.horarioRetirada);
+        pedidoFornada.setObservacoes(request.observacoes);
+        pedidoFornada.setAtivo(true);
         return pedidoFornada;
     }
 }
