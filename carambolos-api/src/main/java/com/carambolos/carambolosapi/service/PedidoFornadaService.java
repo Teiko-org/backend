@@ -89,37 +89,5 @@ public class PedidoFornadaService {
 
         return pedidoFornadaRepository.save(pedidoFornada);
     }
-
-    public DetalhePedidoFornadaDTO obterDetalhePedido(Integer pedidoId) {
-        PedidoFornada pedidoFornada = buscarPedidoFornada(pedidoId);
-
-        FornadaDaVez fornadaDaVez = fornadaDaVezRepository.findById(pedidoFornada.getFornadaDaVez())
-                .orElseThrow(() -> new EntidadeNaoEncontradaException("FornadaDaVez com ID " + pedidoFornada.getFornadaDaVez() + " não encontrada."));
-
-        String produtoFornada = "Produto não especificado";
-        if (fornadaDaVez.getProdutoFornada() != null) {
-            produtoFornada = produtoFornadaRepository.findById(fornadaDaVez.getProdutoFornada())
-                    .map(ProdutoFornada::getProduto)
-                    .orElse("Produto não especificado");
-        }
-
-        EnderecoResponseDTO enderecoDTO = null;
-        if (pedidoFornada.getTipoEntrega() == TipoEntregaEnum.ENTREGA && pedidoFornada.getEndereco() != null) {
-            enderecoDTO = enderecoRepository.findById(pedidoFornada.getEndereco())
-                    .filter(Endereco::isAtivo)
-                    .map(EnderecoResponseDTO::toResponseDTO)
-                    .orElse(null);
-        }
-
-        return DetalhePedidoFornadaDTO.toDetalhePedidoResponse(
-                pedidoFornada.getQuantidade(),
-                produtoFornada,
-                pedidoFornada.getTipoEntrega(),
-                pedidoFornada.getNomeCliente(),
-                pedidoFornada.getTelefoneCliente(),
-                pedidoFornada.getDataPrevisaoEntrega(),
-                enderecoDTO
-        );
-    }
 }
 

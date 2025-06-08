@@ -2,6 +2,7 @@ package com.carambolos.carambolosapi.controller;
 
 import com.carambolos.carambolosapi.controller.request.ResumoPedidoRequestDTO;
 import com.carambolos.carambolosapi.controller.response.DetalhePedidoBoloDTO;
+import com.carambolos.carambolosapi.controller.response.DetalhePedidoFornadaDTO;
 import com.carambolos.carambolosapi.controller.response.ResumoPedidoMensagemResponseDTO;
 import com.carambolos.carambolosapi.controller.response.ResumoPedidoResponseDTO;
 import com.carambolos.carambolosapi.model.ResumoPedido;
@@ -281,6 +282,18 @@ public class ResumoPedidoController {
     @GetMapping("/detalhe-bolo/{id}")
     public ResponseEntity<DetalhePedidoBoloDTO> obterDetalhePedidoBolo(@PathVariable Integer id) {
         DetalhePedidoBoloDTO detalhe = resumoPedidoService.obterDetalhePedidoBolo(id);
+        return ResponseEntity.ok(detalhe);
+    }
+
+    @Operation(summary = "Detalhe de um pedido específico", description = "Busca detalhe de um pedido específico")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Detalhe do pedido retornado com sucesso", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content()),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @GetMapping("/detalhe-fornada/{id}")
+    public ResponseEntity<DetalhePedidoFornadaDTO> obterDetalhePedidoFornada(@PathVariable Integer id) {
+        DetalhePedidoFornadaDTO detalhe = resumoPedidoService.obterDetalhePedidoFornada(id);
         return ResponseEntity.ok(detalhe);
     }
 }

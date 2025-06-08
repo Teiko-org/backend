@@ -1,6 +1,7 @@
 package com.carambolos.carambolosapi.service;
 
 import com.carambolos.carambolosapi.controller.response.DetalhePedidoBoloDTO;
+import com.carambolos.carambolosapi.controller.response.DetalhePedidoFornadaDTO;
 import com.carambolos.carambolosapi.controller.response.EnderecoResponseDTO;
 import com.carambolos.carambolosapi.exception.EntidadeImprocessavelException;
 import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
@@ -194,6 +195,42 @@ public class ResumoPedidoService {
                 resumoPedido.getDataPedido(),
                 pedido.getNomeCliente(),
                 pedido.getTelefoneCliente(),
+                enderecoDTO
+        );
+    }
+
+    public DetalhePedidoFornadaDTO obterDetalhePedidoFornada(Integer pedidoResumoId) {
+        ResumoPedido resumoPedido = buscarResumoPedidoPorId(pedidoResumoId);
+
+        PedidoFornada pedidoFornada = pedidoFornadaRepository.findById(resumoPedido.getPedidoFornadaId())
+                .filter(PedidoFornada::isAtivo)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Pedido de fornada com ID " + resumoPedido.getPedidoFornadaId() + " não encontrado."));
+
+        FornadaDaVez fornadaDaVez = fornadaDaVezRepository.findById(pedidoFornada.getFornadaDaVez())
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("FornadaDaVez com ID " + pedidoFornada.getFornadaDaVez() + " não encontrada."));
+
+        String produtoFornada = "Produto não especificado";
+        if (fornadaDaVez.getProdutoFornada() != null) {
+            produtoFornada = produtoFornadaRepository.findById(fornadaDaVez.getProdutoFornada())
+                    .map(ProdutoFornada::getProduto)
+                    .orElse("Produto não especificado");
+        }
+
+        EnderecoResponseDTO enderecoDTO = null;
+        if (pedidoFornada.getTipoEntrega() == TipoEntregaEnum.ENTREGA && pedidoFornada.getEndereco() != null) {
+            enderecoDTO = enderecoRepository.findById(pedidoFornada.getEndereco())
+                    .filter(Endereco::isAtivo)
+                    .map(EnderecoResponseDTO::toResponseDTO)
+                    .orElse(null);
+        }
+
+        return DetalhePedidoFornadaDTO.toDetalhePedidoResponse(
+                pedidoFornada.getQuantidade(),
+                produtoFornada,
+                pedidoFornada.getTipoEntrega(),
+                pedidoFornada.getNomeCliente(),
+                pedidoFornada.getTelefoneCliente(),
+                pedidoFornada.getDataPrevisaoEntrega(),
                 enderecoDTO
         );
     }
