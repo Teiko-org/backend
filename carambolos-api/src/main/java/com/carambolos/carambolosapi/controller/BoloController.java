@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -699,8 +698,8 @@ public class BoloController {
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @GetMapping("/pedido/{id}/detalhe")
-    public ResponseEntity<DetalhePedidoDTO> obterDetalhePedido(@PathVariable Integer id) {
-        DetalhePedidoDTO detalhe = pedidoBoloService.obterDetalhePedido(id);
+    public ResponseEntity<DetalhePedidoBoloDTO> obterDetalhePedido(@PathVariable Integer id) {
+        DetalhePedidoBoloDTO detalhe = pedidoBoloService.obterDetalhePedido(id);
         return ResponseEntity.ok(detalhe);
     }
 }

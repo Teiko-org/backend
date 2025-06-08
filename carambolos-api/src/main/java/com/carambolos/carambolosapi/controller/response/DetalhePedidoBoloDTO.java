@@ -1,14 +1,12 @@
 package com.carambolos.carambolosapi.controller.response;
 
-import com.carambolos.carambolosapi.model.ImagemDecoracao;
 import com.carambolos.carambolosapi.model.enums.FormatoEnum;
 import com.carambolos.carambolosapi.model.enums.TamanhoEnum;
 import com.carambolos.carambolosapi.model.enums.TipoEntregaEnum;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-public record DetalhePedidoDTO (
+public record DetalhePedidoBoloDTO(
     Integer numeroPedido,
     TamanhoEnum tamanho,
     FormatoEnum formato,
@@ -24,7 +22,7 @@ public record DetalhePedidoDTO (
     EnderecoResponseDTO endereco
 ) {
 
-    public static DetalhePedidoDTO toDetalhePedidoResponse(
+    public static DetalhePedidoBoloDTO toDetalhePedidoResponse(
             Integer numeroPedido,
             TamanhoEnum tamanho,
             FormatoEnum formato,
@@ -39,7 +37,7 @@ public record DetalhePedidoDTO (
             String telefone,
             EnderecoResponseDTO endereco
     ) {
-        return new DetalhePedidoDTO(
+        return new DetalhePedidoBoloDTO(
                 numeroPedido, tamanho, formato, massa, recheio, cobertura, decoracao, observacoes, tipoEntrega, data, nomeCliente, telefone, endereco
         );
     }

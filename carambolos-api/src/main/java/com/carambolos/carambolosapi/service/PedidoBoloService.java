@@ -1,6 +1,6 @@
 package com.carambolos.carambolosapi.service;
 
-import com.carambolos.carambolosapi.controller.response.DetalhePedidoDTO;
+import com.carambolos.carambolosapi.controller.response.DetalhePedidoBoloDTO;
 import com.carambolos.carambolosapi.controller.response.EnderecoResponseDTO;
 import com.carambolos.carambolosapi.exception.EntidadeImprocessavelException;
 import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
@@ -85,7 +85,7 @@ public class PedidoBoloService {
         pedidoBoloRepository.save(pedido);
     }
 
-    public DetalhePedidoDTO obterDetalhePedido(Integer pedidoId) {
+    public DetalhePedidoBoloDTO obterDetalhePedido(Integer pedidoId) {
         PedidoBolo pedido = pedidoBoloRepository.findById(pedidoId)
                 .filter(PedidoBolo::getAtivo)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Pedido com o id %d não encontrado".formatted(pedidoId)));
@@ -142,7 +142,7 @@ public class PedidoBoloService {
                     .orElse(null);
         }
 
-        return DetalhePedidoDTO.toDetalhePedidoResponse(
+        return DetalhePedidoBoloDTO.toDetalhePedidoResponse(
                 pedido.getId(),
                 bolo.getTamanho(),
                 bolo.getFormato(),
