@@ -2,17 +2,13 @@ package com.carambolos.carambolosapi.service;
 
 import com.carambolos.carambolosapi.controller.request.PedidoFornadaRequestDTO;
 import com.carambolos.carambolosapi.controller.request.PedidoFornadaUpdateRequestDTO;
+import com.carambolos.carambolosapi.controller.response.DetalhePedidoFornadaDTO;
+import com.carambolos.carambolosapi.controller.response.EnderecoResponseDTO;
 import com.carambolos.carambolosapi.exception.EntidadeImprocessavelException;
 import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
-import com.carambolos.carambolosapi.model.Endereco;
-import com.carambolos.carambolosapi.model.FornadaDaVez;
-import com.carambolos.carambolosapi.model.PedidoFornada;
-import com.carambolos.carambolosapi.model.Usuario;
+import com.carambolos.carambolosapi.model.*;
 import com.carambolos.carambolosapi.model.enums.TipoEntregaEnum;
-import com.carambolos.carambolosapi.repository.EnderecoRepository;
-import com.carambolos.carambolosapi.repository.FornadaDaVezRepository;
-import com.carambolos.carambolosapi.repository.PedidoFornadaRepository;
-import com.carambolos.carambolosapi.repository.UsuarioRepository;
+import com.carambolos.carambolosapi.repository.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,16 +19,19 @@ public class PedidoFornadaService {
     private final FornadaDaVezRepository fornadaDaVezRepository;
     private final EnderecoRepository enderecoRepository;
     private final UsuarioRepository usuarioRepository;
+    private final ProdutoFornadaRepository produtoFornadaRepository;
 
     public PedidoFornadaService(
             PedidoFornadaRepository pedidoFornadaRepository,
             FornadaDaVezRepository fornadaDaVezRepository,
             EnderecoRepository enderecoRepository,
-            UsuarioRepository usuarioRepository) {
+            UsuarioRepository usuarioRepository,
+            ProdutoFornadaRepository produtoFornadaRepository) {
         this.pedidoFornadaRepository = pedidoFornadaRepository;
         this.fornadaDaVezRepository = fornadaDaVezRepository;
         this.enderecoRepository = enderecoRepository;
         this.usuarioRepository = usuarioRepository;
+        this.produtoFornadaRepository = produtoFornadaRepository;
     }
 
     public PedidoFornada criarPedidoFornada(PedidoFornadaRequestDTO request) {
@@ -89,6 +88,38 @@ public class PedidoFornadaService {
         pedidoFornada.setDataPrevisaoEntrega(request.dataPrevisaoEntrega());
 
         return pedidoFornadaRepository.save(pedidoFornada);
+    }
+
+    public DetalhePedidoFornadaDTO obterDetalhePedido(Integer pedidoId) {
+        PedidoFornada pedidoFornada = buscarPedidoFornada(pedidoId);
+
+        FornadaDaVez fornadaDaVez = fornadaDaVezRepository.findById(pedidoFornada.getFornadaDaVez())
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("FornadaDaVez com ID " + pedidoFornada.getFornadaDaVez() + " não encontrada."));
+
+        String produtoFornada = "Produto não especificado";
+        if (fornadaDaVez.getProdutoFornada() != null) {
+            produtoFornada = produtoFornadaRepository.findById(fornadaDaVez.getProdutoFornada())
+                    .map(ProdutoFornada::getProduto)
+                    .orElse("Produto não especificado");
+        }
+
+        EnderecoResponseDTO enderecoDTO = null;
+        if (pedidoFornada.getTipoEntrega() == TipoEntregaEnum.ENTREGA && pedidoFornada.getEndereco() != null) {
+            enderecoDTO = enderecoRepository.findById(pedidoFornada.getEndereco())
+                    .filter(Endereco::isAtivo)
+                    .map(EnderecoResponseDTO::toResponseDTO)
+                    .orElse(null);
+        }
+
+        return DetalhePedidoFornadaDTO.toDetalhePedidoResponse(
+                pedidoFornada.getQuantidade(),
+                produtoFornada,
+                pedidoFornada.getTipoEntrega(),
+                pedidoFornada.getNomeCliente(),
+                pedidoFornada.getTelefoneCliente(),
+                pedidoFornada.getDataPrevisaoEntrega(),
+                enderecoDTO
+        );
     }
 }
 
