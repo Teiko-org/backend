@@ -3,6 +3,7 @@ package com.carambolos.carambolosapi.controller.response;
 import com.carambolos.carambolosapi.model.enums.TipoEntregaEnum;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record DetalhePedidoFornadaDTO(
         Integer quantidade,
@@ -11,7 +12,7 @@ public record DetalhePedidoFornadaDTO(
         String nomeCliente,
         String telefoneCliente,
 //        String observacao,
-        LocalDate dataPedido,
+        LocalDateTime dataPedido,
         EnderecoResponseDTO endereco
 ) {
     public static DetalhePedidoFornadaDTO toDetalhePedidoResponse(
@@ -21,7 +22,7 @@ public record DetalhePedidoFornadaDTO(
             String nomeCliente,
             String telefoneCliente,
 //            String observacao,
-            LocalDate dataPedido,
+            LocalDateTime dataPedido,
             EnderecoResponseDTO endereco
     ) {
         return new DetalhePedidoFornadaDTO(
