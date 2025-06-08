@@ -20,19 +20,16 @@ public class PedidoFornadaService {
     private final FornadaDaVezRepository fornadaDaVezRepository;
     private final EnderecoRepository enderecoRepository;
     private final UsuarioRepository usuarioRepository;
-    private final ProdutoFornadaRepository produtoFornadaRepository;
 
     public PedidoFornadaService(
             PedidoFornadaRepository pedidoFornadaRepository,
             FornadaDaVezRepository fornadaDaVezRepository,
             EnderecoRepository enderecoRepository,
-            UsuarioRepository usuarioRepository,
-            ProdutoFornadaRepository produtoFornadaRepository) {
+            UsuarioRepository usuarioRepository) {
         this.pedidoFornadaRepository = pedidoFornadaRepository;
         this.fornadaDaVezRepository = fornadaDaVezRepository;
         this.enderecoRepository = enderecoRepository;
         this.usuarioRepository = usuarioRepository;
-        this.produtoFornadaRepository = produtoFornadaRepository;
     }
 
     public PedidoFornada criarPedidoFornada(PedidoFornadaRequestDTO request) {

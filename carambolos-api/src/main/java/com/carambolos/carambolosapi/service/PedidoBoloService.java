@@ -20,16 +20,6 @@ public class PedidoBoloService {
     PedidoBoloRepository pedidoBoloRepository;
     @Autowired
     private EnderecoRepository enderecoRepository;
-    @Autowired
-    private MassaRepository massaRepository;
-    @Autowired
-    private RecheioPedidoRepository recheioPedidoRepository;
-    @Autowired
-    private RecheioUnitarioRepository recheioUnitarioRepository;
-    @Autowired
-    private CoberturaRepository coberturaRepository;
-    @Autowired
-    private RecheioExclusivoRepository recheioExclusivoRepository;
 
     public List<PedidoBolo> listarPedidos() {
         return pedidoBoloRepository.findAll().stream().filter(PedidoBolo::getAtivo).toList();
