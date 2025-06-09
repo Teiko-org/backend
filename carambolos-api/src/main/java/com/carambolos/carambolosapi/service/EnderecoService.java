@@ -38,7 +38,6 @@ public class EnderecoService {
 
             Usuario usuarioFk = usuarioService.buscarPorId(endereco.getUsuario());
 
-            //mudar a exception para UNPROCESSABLE(422)
             if (endereco.getUsuario() != usuarioFk.getId()) {
                 throw new EntidadeNaoEncontradaException("Usuariofk não existe no banco");
             }
@@ -50,7 +49,7 @@ public class EnderecoService {
         if (!enderecoRepository.existsByIdAndIsAtivoTrue(id)) {
             throw new EntidadeNaoEncontradaException(("Endereço com Id %d não encontrado.".formatted(id)));
         }
-        if (existeEnderecoDuplicado(endereco)) {
+        if (existeEnderecoDuplicadoParaAtualizacao(endereco, id)) {
             throw new EntidadeJaExisteException("Endereço já cadastrado");
         }
         endereco.setId(id);
@@ -68,7 +67,20 @@ public class EnderecoService {
     }
 
     public Boolean existeEnderecoDuplicado(Endereco endereco) {
+        if (endereco.getUsuario() == null) {
+            return false;
+        }
         return enderecoRepository.countByUsuarioAndCepAndNumeroAndIsAtivoEquals(
                 endereco.getUsuario(), endereco.getCep(), endereco.getNumero(), true) > 0;
     }
+
+    public Boolean existeEnderecoDuplicadoParaAtualizacao(Endereco endereco, Integer id) {
+        if (endereco.getUsuario() == null) {
+            return false;
+        }
+        return enderecoRepository.countByUsuarioAndCepAndNumeroAndIsAtivoEqualsAndIdNot(
+                endereco.getUsuario(), endereco.getCep(), endereco.getNumero(), true, id) > 0;
+    }
+
+
 }

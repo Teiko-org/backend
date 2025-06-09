@@ -17,6 +17,11 @@ public class EnderecoRequestDTO {
 
     @NotBlank
     @Size(max = 20)
+    @Schema(description = "Nome do endereço (ex: Casa, Trabalho)", example = "Casa")
+    private String nome;
+
+    @NotBlank
+    @Size(max = 20)
     @Schema(description = "Estado do endereço", example = "SP")
     private String estado;
 
@@ -59,6 +64,7 @@ public class EnderecoRequestDTO {
 
         Endereco endereco = new Endereco();
         endereco.setCep(requestDto.getCep());
+        endereco.setNome(requestDto.getNome());
         endereco.setEstado(requestDto.getEstado());
         endereco.setCidade(requestDto.getCidade());
         endereco.setBairro(requestDto.getBairro());
@@ -77,6 +83,14 @@ public class EnderecoRequestDTO {
 
     public void setCep(String cep) {
         this.cep = cep;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     public String getEstado() {
