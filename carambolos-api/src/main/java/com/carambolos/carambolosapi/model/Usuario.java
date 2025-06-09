@@ -23,6 +23,10 @@ public class Usuario {
     @Column(name = "genero")
     private String genero;
 
+    @Column(name = "imagem_url")
+    private String imagemUrl;
+
+
     @Column(name = "is_ativo")
     private boolean isAtivo = true;
 
@@ -72,6 +76,14 @@ public class Usuario {
 
     public void setGenero(String genero) {
         this.genero = genero;
+    }
+
+    public String getImagemUrl() {
+        return imagemUrl;
+    }
+
+    public void setImagemUrl(String imagemUrl) {
+        this.imagemUrl = imagemUrl;
     }
 
     public boolean isAtivo() {
