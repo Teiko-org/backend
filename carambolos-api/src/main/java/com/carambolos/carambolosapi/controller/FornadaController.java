@@ -3,11 +3,13 @@ package com.carambolos.carambolosapi.controller;
 import com.carambolos.carambolosapi.controller.request.*;
 import com.carambolos.carambolosapi.controller.response.DetalhePedidoBoloDTO;
 import com.carambolos.carambolosapi.controller.response.DetalhePedidoFornadaDTO;
+import com.carambolos.carambolosapi.controller.response.ProdutoFornadaDaVezResponse;
 import com.carambolos.carambolosapi.controller.response.ProdutoFornadaResponseDTO;
 import com.carambolos.carambolosapi.model.Fornada;
 import com.carambolos.carambolosapi.model.FornadaDaVez;
 import com.carambolos.carambolosapi.model.PedidoFornada;
 import com.carambolos.carambolosapi.model.ProdutoFornada;
+import com.carambolos.carambolosapi.model.projection.ProdutoFornadaDaVezProjection;
 import com.carambolos.carambolosapi.service.FornadaDaVezService;
 import com.carambolos.carambolosapi.service.FornadaService;
 import com.carambolos.carambolosapi.service.PedidoFornadaService;
@@ -26,6 +28,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -188,6 +191,16 @@ public class FornadaController {
         return ResponseEntity.status(204).build();
     }
 
+    @Operation(summary = "Atualiza o status de um produto fornada", description = "Atualiza o status de um produto fornada")
+    @PatchMapping("/produto-fornada/status/{id}")
+    public ResponseEntity<Void> atualizarStatusProdutoFornada(
+            @RequestBody StatusRequestDTO status,
+            @PathVariable Integer id
+    ) {
+        produtoFornadaService.atualizarStatusProdutoFornada(status.isAtivo(), id);
+        return ResponseEntity.ok().build();
+    }
+
     // ----------------- FORNADA DA VEZ -----------------
 
     @Operation(summary = "Cria uma nova fornada da vez")
@@ -223,13 +236,24 @@ public class FornadaController {
         return ResponseEntity.status(204).build();
     }
 
+    @Operation(summary = "Lista produtos de uma fornada")
+    @GetMapping("/da-vez/produtos")
+    public ResponseEntity<List<ProdutoFornadaDaVezResponse>> buscarProdutosFornadaDaVez(
+            @RequestParam("data_inicio") LocalDate dataInicio,
+            @RequestParam("data_fim") LocalDate dataFim
+    ) {
+        List<ProdutoFornadaDaVezProjection> projections = fornadaDaVezService.buscarProdutosFornadaDaVez(dataInicio, dataFim);
+        List<ProdutoFornadaDaVezResponse> response = ProdutoFornadaDaVezResponse.toProdutoFornadaDaVezResonse(projections);
+        return ResponseEntity.ok(response);
+    }
+
     // ----------------- PEDIDO FORNADA -----------------
 
     @Operation(summary = "Cria um novo pedido de fornada")
     @PostMapping("/pedidos")
     public ResponseEntity<PedidoFornada> criarPedidoFornada(
             @RequestBody @Valid PedidoFornadaRequestDTO request
-    ){
+    ) {
         return ResponseEntity.status(201).body(pedidoFornadaService.criarPedidoFornada(request));
     }
 

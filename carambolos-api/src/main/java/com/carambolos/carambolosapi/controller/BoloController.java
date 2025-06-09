@@ -3,6 +3,7 @@ package com.carambolos.carambolosapi.controller;
 import com.carambolos.carambolosapi.controller.request.*;
 import com.carambolos.carambolosapi.controller.response.*;
 import com.carambolos.carambolosapi.model.*;
+import com.carambolos.carambolosapi.model.projection.DetalheBoloProjection;
 import com.carambolos.carambolosapi.model.projection.RecheioExclusivoProjection;
 import com.carambolos.carambolosapi.model.projection.RecheioPedidoProjection;
 import com.carambolos.carambolosapi.service.BoloService;
@@ -18,7 +19,9 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
+
 import static com.carambolos.carambolosapi.controller.request.RecheioUnitarioRequestDTO.toRecheioUnitario;
 
 @RestController
@@ -52,6 +55,11 @@ public class BoloController {
             return ResponseEntity.status(204).build();
         }
         return ResponseEntity.status(200).body(bolos);
+    }
+
+    @GetMapping("/detalhe")
+    public ResponseEntity<List<DetalheBoloProjection>> listarDetalheBolos() {
+        return ResponseEntity.ok().body(boloService.listarDetalhesBolos());
     }
 
     @Operation(summary = "Buscar bolo por ID", description = "Busca um bolo pelo seu ID")
@@ -119,6 +127,15 @@ public class BoloController {
         return ResponseEntity.status(204).build();
     }
 
+    @Operation(summary = "Atualiza o status de um bolo", description = "Atualizar status de um bolo")
+    @PatchMapping("/atualizar-status/{id}")
+    public ResponseEntity<Void> atualizarStatusBolo(
+            @RequestBody StatusRequestDTO status,
+            @PathVariable Integer id
+    ) {
+        boloService.atualizarStatusBolo(status.isAtivo(), id);
+        return ResponseEntity.ok().build();
+    }
 
     @Operation(summary = "Cadastrar recheio unitário", description = "Cadastra um novo recheio unitário")
     @ApiResponses(value = {
@@ -586,7 +603,7 @@ public class BoloController {
         return ResponseEntity.status(204).build();
     }
 
-//    @Operation(summary = "Cadastrar decoração", description = "Cadastra uma nova decoração de bolo")
+    //    @Operation(summary = "Cadastrar decoração", description = "Cadastra uma nova decoração de bolo")
 //    @ApiResponses(value = {
 //            @ApiResponse(responseCode = "201", description = "Decoração cadastrada com sucesso"),
 //            @ApiResponse(responseCode = "400", description = "Dados inválidos"),

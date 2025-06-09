@@ -98,4 +98,12 @@ public class Bolo {
     public void setAtivo(Boolean ativo) {
         isAtivo = ativo;
     }
+
+    public Integer getDecoracao() {
+        return decoracao;
+    }
+
+    public void setDecoracao(Integer decoracao) {
+        this.decoracao = decoracao;
+    }
 }

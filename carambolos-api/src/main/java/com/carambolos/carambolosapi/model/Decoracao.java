@@ -21,6 +21,9 @@ public class Decoracao {
     @Schema(description = "Observação adicional sobre a decoração", example = "Tema do Homem-Aranha com cores azul e vermelha")
     private String observacao;
 
+    @Schema(description = "Nome do tipo da decoração", example = "Bolo de natal")
+    private String nome;
+
     @Column(name = "is_ativo")
     @Schema(description = "Indica se a decoração está ativa", example = "true")
     private Boolean isAtivo = true;
@@ -47,6 +50,22 @@ public class Decoracao {
 
     public void setObservacao(String observacao) {
         this.observacao = observacao;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public Boolean getAtivo() {
+        return isAtivo;
+    }
+
+    public void setAtivo(Boolean ativo) {
+        isAtivo = ativo;
     }
 
     public Boolean getIsAtivo() {
