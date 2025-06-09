@@ -3,13 +3,17 @@ package com.carambolos.carambolosapi.repository;
 import com.carambolos.carambolosapi.model.Bolo;
 import com.carambolos.carambolosapi.model.projection.DetalheBoloProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-public interface BoloRepository extends JpaRepository<Bolo,Integer> {
+public interface BoloRepository extends JpaRepository<Bolo, Integer> {
     Boolean existsByIdAndIsAtivoTrue(Integer id);
+
     Boolean existsByIdAndIdNotAndIsAtivoTrue(Integer id, Integer id2);
+
     List<Bolo> findByCategoriaIn(List<String> categoria);
 
     @Query(value = """
@@ -40,4 +44,11 @@ public interface BoloRepository extends JpaRepository<Bolo,Integer> {
             LEFT JOIN recheio_unitario reu2 ON re.recheio_unitario_id2 = reu2.id
             """, nativeQuery = true)
     List<DetalheBoloProjection> listarDetalheBolo();
+
+    @Transactional
+    @Modifying
+    @Query(value = """
+            UPDATE bolo SET is_ativo = ?1 where id = ?2
+            """, nativeQuery = true)
+    void atualizarStatusBolo(Integer status, Integer id);
 }

@@ -100,6 +100,16 @@ public class BoloService {
         return boloRepository.save(bolo);
     }
 
+    public void atualizarStatusBolo(Boolean status, Integer id) {
+        Integer statusInt = status ? 1 : 0;
+
+        if (boloRepository.existsById(id)) {
+            boloRepository.atualizarStatusBolo(statusInt, id);
+        } else {
+            throw new EntidadeNaoEncontradaException("Bolo com id %d não encontrado".formatted(id));
+        }
+    }
+
     public void deletarBolo(Integer id) {
         Optional<Bolo> possivelBolo = boloRepository.findById(id)
                 .filter(Bolo::getAtivo);

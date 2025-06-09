@@ -128,6 +128,15 @@ public class BoloController {
         return ResponseEntity.status(204).build();
     }
 
+    @Operation(summary = "Atualiza o status de um bolo", description = "Atualizar status de um bolo")
+    @PatchMapping("/atualizar-status/{id}")
+    public ResponseEntity<Void> atualizarStatusBolo(
+            @RequestBody StatusRequestDTO status,
+            @PathVariable Integer id
+    ) {
+        boloService.atualizarStatusBolo(status.isAtivo(), id);
+        return ResponseEntity.ok().build();
+    }
 
     @Operation(summary = "Cadastrar recheio unitário", description = "Cadastra um novo recheio unitário")
     @ApiResponses(value = {

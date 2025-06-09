@@ -13,7 +13,7 @@ public record ProdutoFornadaDaVezResponse(
         Double valor,
         String categoria,
         Integer quantidade,
-        Boolean isAtivoPf,
+        Boolean isAtivo,
         LocalDate dataInicio,
         LocalDate dataFim
 ) {

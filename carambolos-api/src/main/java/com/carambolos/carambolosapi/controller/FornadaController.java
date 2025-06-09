@@ -189,6 +189,16 @@ public class FornadaController {
         return ResponseEntity.status(204).build();
     }
 
+    @Operation(summary = "Atualiza o status de um produto fornada", description = "Atualiza o status de um produto fornada")
+    @PatchMapping("/produto-fornada/status/{id}")
+    public ResponseEntity<Void> atualizarStatusProdutoFornada(
+            @RequestBody StatusRequestDTO status,
+            @PathVariable Integer id
+    ) {
+        produtoFornadaService.atualizarStatusProdutoFornada(status.isAtivo(), id);
+        return ResponseEntity.ok().build();
+    }
+
     // ----------------- FORNADA DA VEZ -----------------
 
     @Operation(summary = "Cria uma nova fornada da vez")
