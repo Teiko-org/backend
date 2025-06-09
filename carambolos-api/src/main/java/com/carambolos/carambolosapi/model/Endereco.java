@@ -12,6 +12,9 @@ public class Endereco {
     @Schema(description = "Identificador único do endereço", example = "1")
     private int id;
 
+    @Schema(description = "Nome do endereço (ex: Casa, Trabalho)", example = "Casa")
+    private String nome;
+
     @Schema(description = "CEP do endereço (apenas números)", example = "12345678")
     private String cep;
 
@@ -49,6 +52,14 @@ public class Endereco {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     public String getCep() {

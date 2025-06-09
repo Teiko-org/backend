@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS teiko.usuario (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS teiko.endereco (
   id INT NOT NULL AUTO_INCREMENT,
+  nome VARCHAR(20) NOT NULL,
   cep CHAR(8) NOT NULL,
   estado VARCHAR(20) NOT NULL,
   cidade VARCHAR(100) NOT NULL,
