@@ -114,6 +114,8 @@ CREATE TABLE IF NOT EXISTS teiko.pedido_fornada (
   tipo_entrega VARCHAR(15) NOT NULL DEFAULT 'ENTREGA',
   nome_cliente VARCHAR(100) NOT NULL,
   telefone_cliente VARCHAR(20) NOT NULL,
+  horario_retirada VARCHAR(10) NULL,
+  observacoes VARCHAR(500) NULL,
   PRIMARY KEY (id),
   INDEX endereco1_idx (endereco_id ASC) VISIBLE,
   INDEX usuario1_idx (usuario_id ASC) VISIBLE,

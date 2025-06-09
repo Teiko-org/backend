@@ -243,6 +243,18 @@ public record ResumoPedidoMensagemResponseDTO (
                         .append(pedidoFornada.getDataPrevisaoEntrega().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
                         .append("\n");
             }
+
+            if (pedidoFornada.getHorario() != null && !pedidoFornada.getHorario().isEmpty()) {
+                mensagem.append("Horário: ")
+                        .append(pedidoFornada.getHorario())
+                        .append("\n");
+            }
+
+            if (pedidoFornada.getObservacoes() != null && !pedidoFornada.getObservacoes().isEmpty()) {
+                mensagem.append("Observações: ")
+                        .append(pedidoFornada.getObservacoes())
+                        .append("\n");
+            }
         }
 
         private String gerarDescricaoFornada(FornadaDaVez fornadaDaVez) {

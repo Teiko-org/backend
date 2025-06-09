@@ -59,6 +59,14 @@ public class Bolo {
         this.cobertura = cobertura;
     }
 
+    public Integer getDecoracao() {
+        return decoracao;
+    }
+
+    public void setDecoracao(Integer decoracao) {
+        this.decoracao = decoracao;
+    }
+
     public FormatoEnum getFormato() {
         return formato;
     }
