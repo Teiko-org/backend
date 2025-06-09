@@ -21,7 +21,7 @@ public class CarambolosApiApplication {
 
 	public static void main(String[] args) {
 		Dotenv dotenv = Dotenv.configure()
-				.filename("teiko-envs.env")
+				.filename("dev.env")
 				.load();
 
 		System.setProperty("spring.datasource.username", dotenv.get("DB_USERNAME"));
