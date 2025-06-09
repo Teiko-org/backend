@@ -15,7 +15,6 @@ public class EnderecoRequestDTO {
     @Schema(description = "CEP do endereço (8 dígitos numéricos)", example = "12345678")
     private String cep;
 
-    @NotBlank
     @Size(max = 20)
     @Schema(description = "Nome do endereço (ex: Casa, Trabalho)", example = "Casa")
     private String nome;

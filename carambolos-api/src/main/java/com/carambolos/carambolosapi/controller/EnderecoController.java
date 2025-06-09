@@ -96,6 +96,23 @@ public class EnderecoController {
         return ResponseEntity.status(200).body(enderecoResponse);
     }
 
+    @Operation(summary = "Lista endereços de um usuário específico")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de endereços do usuário retornada com sucesso",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = EnderecoResponseDTO.class))),
+            @ApiResponse(responseCode = "204", description = "Nenhum endereço encontrado para o usuário", content = @Content())
+    })
+    @GetMapping("/usuario/{usuarioId}")
+    public ResponseEntity<List<EnderecoResponseDTO>> listarPorUsuario(@PathVariable Integer usuarioId) {
+        List<Endereco> enderecos = enderecoService.listarPorUsuario(usuarioId);
+        if (enderecos.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        List<EnderecoResponseDTO> enderecosResponse = enderecos.stream().map(EnderecoResponseDTO::toResponseDTO).toList();
+        return ResponseEntity.status(200).body(enderecosResponse);
+    }
+
     @Operation(summary = "Deleta um endereço")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Endereço deletado com sucesso", content = @Content()),
