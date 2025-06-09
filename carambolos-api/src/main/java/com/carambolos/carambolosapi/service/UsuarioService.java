@@ -143,4 +143,19 @@ public class UsuarioService {
         throw new EntidadeNaoEncontradaException("Usuario com Id %d não encontrado.".formatted(id));
     }
 
+    public Usuario atualizarImagemPerfil(Integer id, String imagemUrl) {
+        Usuario usuarioExistente = usuarioRepository.findByIdAndIsAtivoTrue(id);
+
+        if (id == null || imagemUrl == null || imagemUrl.trim().isEmpty()) {
+            throw new IllegalArgumentException("ID do usuário e URL da imagem são obrigatórios");
+        }
+
+        if (usuarioExistente == null) {
+            throw new EntidadeNaoEncontradaException("Usuario com Id %d não encontrado.".formatted(id));
+        }
+
+        usuarioExistente.setImagemUrl(imagemUrl);
+        return usuarioRepository.save(usuarioExistente);
+    }
+
 }

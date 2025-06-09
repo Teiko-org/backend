@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS teiko.usuario (
   contato VARCHAR(14) NOT NULL,
   data_nascimento DATE NULL,
   genero VARCHAR(20) NULL,
+  imagem_url VARCHAR(500) NULL,
   sys_admin TINYINT NULL,
   is_ativo TINYINT NULL,
   PRIMARY KEY (id),

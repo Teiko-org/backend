@@ -22,6 +22,9 @@ public class UsuarioResponseDTO {
     @Schema(description = "Gênero do usuário", example = "Feminino")
     private String genero;
 
+    @Schema(description = "URL da imagem de perfil do usuário")
+    private String imagemUrl;
+
     private boolean isAtivo;
 
     public static UsuarioResponseDTO toResponseDTO(Usuario usuario) {
@@ -32,6 +35,7 @@ public class UsuarioResponseDTO {
         responseDto.setContato(usuario.getContato());
         responseDto.setDataNascimento(usuario.getDataNascimento());
         responseDto.setGenero(usuario.getGenero());
+        responseDto.setImagemUrl(usuario.getImagemUrl());
         responseDto.setAtivo(usuario.isAtivo());
 
         return responseDto;
@@ -76,6 +80,14 @@ public class UsuarioResponseDTO {
 
     public void setGenero(String genero) {
         this.genero = genero;
+    }
+
+    public String getImagemUrl() {
+        return imagemUrl;
+    }
+
+    public void setImagemUrl(String imagemUrl) {
+        this.imagemUrl = imagemUrl;
     }
 
     public boolean isAtivo() {
