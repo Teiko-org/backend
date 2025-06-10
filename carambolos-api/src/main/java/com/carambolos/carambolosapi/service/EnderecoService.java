@@ -22,6 +22,10 @@ public class EnderecoService {
         return enderecoRepository.findAllByIsAtivoTrue();
     }
 
+    public List<Endereco> listarPorUsuario(Integer usuarioId) {
+        return enderecoRepository.findByUsuarioAndIsAtivoTrue(usuarioId);
+    }
+
     public Endereco buscarPorId(Integer id) {
         Endereco enderecoExistente = enderecoRepository.findByIdAndIsAtivoTrue(id);
         if (enderecoExistente != null) {
