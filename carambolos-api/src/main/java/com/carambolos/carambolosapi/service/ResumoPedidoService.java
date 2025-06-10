@@ -174,7 +174,18 @@ public class ResumoPedidoService {
                 .orElse("Não especificada");
 
         //TODO: Implementar lógica para buscar imagens de decoração
-        String decoracao = "Nenhuma imagem de referência adicionada";
+        ImagemDecoracao imagem = boloRepository.findImagemByBolo(bolo.getDecoracao());
+
+        String imagemUrl;
+
+        if (imagem != null) {
+            imagemUrl = imagem.getUrl() == null ? "" : imagem.getUrl();
+        } else {
+
+            imagemUrl = "";
+
+        }
+
 
         EnderecoResponseDTO enderecoDTO = null;
         if (pedido.getTipoEntrega() == TipoEntregaEnum.ENTREGA && pedido.getEnderecoId() != null) {
@@ -191,7 +202,7 @@ public class ResumoPedidoService {
                 massaNome,
                 recheioNome,
                 coberturaNome,
-                decoracao,
+                imagemUrl,
                 pedido.getObservacao(),
                 pedido.getTipoEntrega(),
                 resumoPedido.getDataPedido(),

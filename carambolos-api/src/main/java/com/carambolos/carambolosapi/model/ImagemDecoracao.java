@@ -26,7 +26,14 @@ public class ImagemDecoracao {
     }
 
     public String getUrl() {
+        if (url == null) {
+
+            return "";
+
+        }
+
         return url;
+
     }
 
     public void setUrl(String url) {

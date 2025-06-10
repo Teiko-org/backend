@@ -1,6 +1,7 @@
 package com.carambolos.carambolosapi.repository;
 
 import com.carambolos.carambolosapi.model.Bolo;
+import com.carambolos.carambolosapi.model.ImagemDecoracao;
 import com.carambolos.carambolosapi.model.projection.DetalheBoloProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -51,4 +52,8 @@ public interface BoloRepository extends JpaRepository<Bolo, Integer> {
             UPDATE bolo SET is_ativo = ?1 where id = ?2
             """, nativeQuery = true)
     void atualizarStatusBolo(Integer status, Integer id);
+
+    @Query(value = "SELECT * FROM imagem_decoracao WHERE decoracao_id = ?1", nativeQuery = true)
+    ImagemDecoracao findImagemByBolo(Integer idDecoracao);
+
 }
