@@ -3,6 +3,8 @@ package com.carambolos.carambolosapi.controller;
 import com.carambolos.carambolosapi.controller.request.*;
 import com.carambolos.carambolosapi.controller.response.*;
 import com.carambolos.carambolosapi.model.*;
+import com.carambolos.carambolosapi.model.enums.FormatoEnum;
+import com.carambolos.carambolosapi.model.enums.TamanhoEnum;
 import com.carambolos.carambolosapi.model.projection.DetalheBoloProjection;
 import com.carambolos.carambolosapi.model.projection.RecheioExclusivoProjection;
 import com.carambolos.carambolosapi.model.projection.RecheioPedidoProjection;
@@ -706,6 +708,16 @@ public class BoloController {
     ) {
         pedidoBoloService.deletarPedido(id);
         return ResponseEntity.status(204).build();
+    }
+
+    @GetMapping("/formatos")
+    public ResponseEntity<FormatoEnum[]> listarFormatos() {
+        return ResponseEntity.ok(FormatoEnum.values());
+    }
+
+    @GetMapping("/tamanhos")
+    public ResponseEntity<TamanhoEnum[]> listarTamanhos() {
+        return ResponseEntity.ok(TamanhoEnum.values());
     }
 }
 
