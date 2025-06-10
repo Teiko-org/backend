@@ -2,6 +2,7 @@ package com.carambolos.carambolosapi.service;
 
 import com.carambolos.carambolosapi.exception.EntidadeImprocessavelException;
 import com.carambolos.carambolosapi.model.*;
+import com.carambolos.carambolosapi.model.projection.DetalheBoloProjection;
 import com.carambolos.carambolosapi.model.projection.RecheioExclusivoProjection;
 import com.carambolos.carambolosapi.exception.EntidadeJaExisteException;
 import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
@@ -45,6 +46,10 @@ public class BoloService {
             bolos =   boloRepository.findAll().stream().filter(Bolo::getAtivo).toList();
         }
         return bolos;
+    }
+
+    public List<DetalheBoloProjection> listarDetalhesBolos() {
+        return boloRepository.listarDetalheBolo();
     }
 
     public Bolo buscarBoloPorId(Integer id) {
@@ -93,6 +98,16 @@ public class BoloService {
 
         bolo.setId(id);
         return boloRepository.save(bolo);
+    }
+
+    public void atualizarStatusBolo(Boolean status, Integer id) {
+        Integer statusInt = status ? 1 : 0;
+
+        if (boloRepository.existsById(id)) {
+            boloRepository.atualizarStatusBolo(statusInt, id);
+        } else {
+            throw new EntidadeNaoEncontradaException("Bolo com id %d não encontrado".formatted(id));
+        }
     }
 
     public void deletarBolo(Integer id) {

@@ -79,4 +79,13 @@ public class ProdutoFornadaService {
         produtoFornada.setValor(request.valor());
         return produtoFornadaRepository.save(produtoFornada);
     }
+
+    public void atualizarStatusProdutoFornada(Boolean status, Integer id) {
+        Integer statusInt = status ? 1 : 0;
+        if (produtoFornadaRepository.existsById(id)) {
+            produtoFornadaRepository.updateStatus(statusInt, id);
+        } else {
+            throw new EntidadeNaoEncontradaException("Produto fornada com id %d não encontrado".formatted(id));
+        }
+    }
 }

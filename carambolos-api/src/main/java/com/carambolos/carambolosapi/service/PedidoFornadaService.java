@@ -9,10 +9,7 @@ import com.carambolos.carambolosapi.model.FornadaDaVez;
 import com.carambolos.carambolosapi.model.PedidoFornada;
 import com.carambolos.carambolosapi.model.Usuario;
 import com.carambolos.carambolosapi.model.enums.TipoEntregaEnum;
-import com.carambolos.carambolosapi.repository.EnderecoRepository;
-import com.carambolos.carambolosapi.repository.FornadaDaVezRepository;
-import com.carambolos.carambolosapi.repository.PedidoFornadaRepository;
-import com.carambolos.carambolosapi.repository.UsuarioRepository;
+import com.carambolos.carambolosapi.repository.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

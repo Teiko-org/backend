@@ -1,16 +1,17 @@
 package com.carambolos.carambolosapi.service;
 
+import com.carambolos.carambolosapi.controller.response.DetalhePedidoBoloDTO;
+import com.carambolos.carambolosapi.controller.response.DetalhePedidoFornadaDTO;
+import com.carambolos.carambolosapi.controller.response.EnderecoResponseDTO;
 import com.carambolos.carambolosapi.exception.EntidadeImprocessavelException;
 import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
-import com.carambolos.carambolosapi.model.ProdutoFornada;
-import com.carambolos.carambolosapi.model.ResumoPedido;
+import com.carambolos.carambolosapi.model.*;
 import com.carambolos.carambolosapi.model.enums.StatusEnum;
+import com.carambolos.carambolosapi.model.enums.TipoEntregaEnum;
 import com.carambolos.carambolosapi.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -47,6 +48,10 @@ public class ResumoPedidoService {
 
     @Autowired
     private MassaRepository massaRepository;
+    @Autowired
+    private CoberturaRepository coberturaRepository;
+    @Autowired
+    private EnderecoRepository enderecoRepository;
 
     public List<ResumoPedido> listarResumosPedidos() {
         return resumoPedidoRepository.findAllByIsAtivoTrue();
@@ -114,6 +119,127 @@ public class ResumoPedidoService {
         }
         resumoPedido.setStatus(novoStatus);
         return resumoPedidoRepository.save(resumoPedido);
+    }
+
+    public DetalhePedidoBoloDTO obterDetalhePedidoBolo(Integer pedidoResumoId) {
+        ResumoPedido resumoPedido = resumoPedidoRepository.findByPedidoBoloId(pedidoResumoId);
+
+        if (resumoPedido.getPedidoBoloId() == null) {
+            throw new EntidadeImprocessavelException("O resumo de pedido #" + pedidoResumoId + " não está vinculado a um pedido de bolo");
+        }
+
+        PedidoBolo pedido = pedidoBoloRepository.findById(resumoPedido.getPedidoBoloId())
+                .filter(PedidoBolo::getAtivo)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Pedido com o id %d não encontrado".formatted(resumoPedido.getPedidoBoloId())));
+
+        Bolo bolo = boloRepository.findById(pedido.getBoloId())
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Bolo com id %d não encontrado".formatted(pedido.getBoloId())));
+
+        String massaNome = massaRepository.findById(bolo.getMassa())
+                .map(Massa::getSabor)
+                .orElse("Não especificada");
+
+        String recheioNome = recheioPedidoRepository.findById(bolo.getRecheioPedido())
+                .map(recheioPedido -> {
+                    StringBuilder nomes = new StringBuilder();
+
+                    if (recheioPedido.getRecheioExclusivo() != null) {
+                        return recheioExclusivoRepository.buscarRecheioExclusivoPorId(recheioPedido.getRecheioExclusivo())
+                                .getNome() + " (" +
+                                recheioExclusivoRepository.buscarRecheioExclusivoPorId(recheioPedido.getRecheioExclusivo()).getSabor1() +
+                                " + " +
+                                recheioExclusivoRepository.buscarRecheioExclusivoPorId(recheioPedido.getRecheioExclusivo()).getSabor2() +
+                                ")";
+                    } else {
+                        if (recheioPedido.getRecheioUnitarioId1() != null) {
+                            recheioUnitarioRepository.findById(recheioPedido.getRecheioUnitarioId1())
+                                    .ifPresent(recheio -> nomes.append(recheio.getSabor()));
+                        }
+
+                        if (recheioPedido.getRecheioUnitarioId2() != null) {
+                            if (!nomes.isEmpty()) {
+                                nomes.append(" + ");
+                            }
+                            recheioUnitarioRepository.findById(recheioPedido.getRecheioUnitarioId2())
+                                    .ifPresent(recheio -> nomes.append(recheio.getSabor()));
+                        }
+                        return nomes.toString();
+                    }
+                })
+                .orElse("Não especificado");
+
+
+        String coberturaNome = coberturaRepository.findById(bolo.getCobertura())
+                .map(Cobertura::getDescricao)
+                .orElse("Não especificada");
+
+        //TODO: Implementar lógica para buscar imagens de decoração
+        String decoracao = "Nenhuma imagem de referência adicionada";
+
+        EnderecoResponseDTO enderecoDTO = null;
+        if (pedido.getTipoEntrega() == TipoEntregaEnum.ENTREGA && pedido.getEnderecoId() != null) {
+            enderecoDTO = enderecoRepository.findById(pedido.getEnderecoId())
+                    .filter(Endereco::isAtivo)
+                    .map(EnderecoResponseDTO::toResponseDTO)
+                    .orElse(null);
+        }
+
+        return DetalhePedidoBoloDTO.toDetalhePedidoResponse(
+                pedido.getId(),
+                bolo.getTamanho(),
+                bolo.getFormato(),
+                massaNome,
+                recheioNome,
+                coberturaNome,
+                decoracao,
+                pedido.getObservacao(),
+                pedido.getTipoEntrega(),
+                resumoPedido.getDataPedido(),
+                pedido.getNomeCliente(),
+                pedido.getTelefoneCliente(),
+                enderecoDTO
+        );
+    }
+
+    public DetalhePedidoFornadaDTO obterDetalhePedidoFornada(Integer pedidoResumoId) {
+        ResumoPedido resumoPedido = resumoPedidoRepository.findByPedidoFornadaId(pedidoResumoId);
+
+        if (resumoPedido.getPedidoFornadaId() == null) {
+            throw new EntidadeImprocessavelException("O resumo de pedido #" + pedidoResumoId + " não está vinculado a um pedido de fornada");
+        }
+
+        PedidoFornada pedidoFornada = pedidoFornadaRepository.findById(resumoPedido.getPedidoFornadaId())
+                .filter(PedidoFornada::isAtivo)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Pedido de fornada com ID " + resumoPedido.getPedidoFornadaId() + " não encontrado."));
+
+        FornadaDaVez fornadaDaVez = fornadaDaVezRepository.findById(pedidoFornada.getFornadaDaVez())
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("FornadaDaVez com ID " + pedidoFornada.getFornadaDaVez() + " não encontrada."));
+
+        String produtoFornada = "Produto não especificado";
+        if (fornadaDaVez.getProdutoFornada() != null) {
+            produtoFornada = produtoFornadaRepository.findById(fornadaDaVez.getProdutoFornada())
+                    .map(ProdutoFornada::getProduto)
+                    .orElse("Produto não especificado");
+        }
+
+        EnderecoResponseDTO enderecoDTO = null;
+        if (pedidoFornada.getTipoEntrega() == TipoEntregaEnum.ENTREGA && pedidoFornada.getEndereco() != null) {
+            enderecoDTO = enderecoRepository.findById(pedidoFornada.getEndereco())
+                    .filter(Endereco::isAtivo)
+                    .map(EnderecoResponseDTO::toResponseDTO)
+                    .orElse(null);
+        }
+
+        return DetalhePedidoFornadaDTO.toDetalhePedidoResponse(
+                pedidoFornada.getQuantidade(),
+                produtoFornada,
+                pedidoFornada.getTipoEntrega(),
+                pedidoFornada.getNomeCliente(),
+                pedidoFornada.getTelefoneCliente(),
+                pedidoFornada.getObservacoes(),
+                resumoPedido.getDataPedido(),
+                enderecoDTO
+        );
     }
 
     private void validarReferencias(ResumoPedido resumoPedido) {

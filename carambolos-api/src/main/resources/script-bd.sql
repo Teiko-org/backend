@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS teiko.endereco (
     REFERENCES teiko.usuario (id)
 );
 
+
 -- -----------------------------------------------------
 -- Table teiko.produto_fornada
 -- -----------------------------------------------------
@@ -162,6 +163,7 @@ CREATE TABLE IF NOT EXISTS teiko.cobertura (
 CREATE TABLE IF NOT EXISTS teiko.decoracao (
   id INT NOT NULL AUTO_INCREMENT,
   observacao VARCHAR(70),
+  nome varchar(70),
   is_ativo TINYINT NULL,
   PRIMARY KEY (id)
 );
