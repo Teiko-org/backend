@@ -247,6 +247,16 @@ public class FornadaController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Lista produtos de uma fornada por ID")
+    @GetMapping("/da-vez/produtos/{fornadaId}")
+    public ResponseEntity<List<ProdutoFornadaDaVezResponse>> buscarProdutosPorFornadaId(
+            @PathVariable Integer fornadaId
+    ) {
+        List<ProdutoFornadaDaVezProjection> projections = fornadaDaVezService.buscarProdutosPorFornadaId(fornadaId);
+        List<ProdutoFornadaDaVezResponse> response = ProdutoFornadaDaVezResponse.toProdutoFornadaDaVezResonse(projections);
+        return ResponseEntity.ok(response);
+    }
+
     // ----------------- PEDIDO FORNADA -----------------
 
     @Operation(summary = "Cria um novo pedido de fornada")
