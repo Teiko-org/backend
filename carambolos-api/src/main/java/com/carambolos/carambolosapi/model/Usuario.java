@@ -26,9 +26,11 @@ public class Usuario {
     @Column(name = "imagem_url")
     private String imagemUrl;
 
-
     @Column(name = "is_ativo")
     private boolean isAtivo = true;
+
+    @Column(name = "sys_admin")
+    public Boolean sysAdmin;
 
     public Integer getId() {
         return id;
