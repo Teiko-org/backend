@@ -695,7 +695,6 @@ public class BoloController {
                 PedidoBoloResponseDTO.toPedidoBoloResponse(pedidoAtualizado)
         );
     }
-
     @Operation(summary = "Deletar pedido", description = "Remove um pedido pelo ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Pedido removido com sucesso", content = @Content()),

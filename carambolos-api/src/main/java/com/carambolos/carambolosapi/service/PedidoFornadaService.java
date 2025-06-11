@@ -33,9 +33,16 @@ public class PedidoFornadaService {
     }
 
     public PedidoFornada criarPedidoFornada(PedidoFornadaRequestDTO request) {
-        fornadaDaVezRepository.findById(request.fornadaDaVezId())
+        FornadaDaVez fornadaDaVez = fornadaDaVezRepository.findById(request.fornadaDaVezId())
                 .filter(FornadaDaVez::isAtivo)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("FornadaDaVez com ID " + request.fornadaDaVezId() + " não encontrada."));
+
+        if (fornadaDaVez.getQuantidade() < request.quantidade()) {
+            throw new EntidadeImprocessavelException(
+                    String.format("Estoque insuficiente. Disponível: %d, Solicitado: %d",
+                            fornadaDaVez.getQuantidade(), request.quantidade())
+            );
+        }
 
         if (request.tipoEntrega() == TipoEntregaEnum.ENTREGA && request.enderecoId() == null) {
             throw new EntidadeImprocessavelException("Tipo de entrega 'ENTREGA' requer um endereço válido.");
@@ -52,6 +59,16 @@ public class PedidoFornadaService {
                     .filter(Usuario::isAtivo)
                     .orElseThrow(() -> new EntidadeNaoEncontradaException("Usuário com ID " + request.usuarioId() + " não encontrado."));
         }
+
+        int novaQuantidade = fornadaDaVez.getQuantidade() - request.quantidade();
+        fornadaDaVez.setQuantidade(novaQuantidade);
+
+        fornadaDaVezRepository.save(fornadaDaVez);
+
+        System.out.println("✅ ESTOQUE ATUALIZADO: Produto " + fornadaDaVez.getProdutoFornada() +
+                " | Quantidade anterior: " + (fornadaDaVez.getQuantidade() + request.quantidade()) +
+                " | Vendido: " + request.quantidade() +
+                " | Nova quantidade: " + novaQuantidade);
 
         PedidoFornada pedidoFornada = request.toEntity(request);
         return pedidoFornadaRepository.save(pedidoFornada);

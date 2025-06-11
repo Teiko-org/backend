@@ -77,4 +77,8 @@ public class FornadaDaVezService {
     public List<ProdutoFornadaDaVezProjection> buscarProdutosFornadaDaVez(LocalDate dataInicio, LocalDate dataFim) {
         return fornadaDaVezRepository.findProductsByFornada(dataInicio, dataFim);
     }
+
+    public List<ProdutoFornadaDaVezProjection> buscarProdutosPorFornadaId(Integer fornadaId) {
+        return fornadaDaVezRepository.findProductsByFornadaId(fornadaId);
+    }
 }

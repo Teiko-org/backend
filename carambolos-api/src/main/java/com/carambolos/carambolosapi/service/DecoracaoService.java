@@ -23,10 +23,11 @@ public class DecoracaoService {
     @Autowired
     private AzureStorageService azureStorageService;
 
-    public DecoracaoResponseDTO cadastrar(String observacao, MultipartFile[] arquivos) {
+    public DecoracaoResponseDTO cadastrar(String observacao, MultipartFile[] arquivos, String nome) {
         Decoracao decoracao = new Decoracao();
         decoracao.setObservacao(observacao);
         decoracao.setIsAtivo(true);
+        decoracao.setNome(nome);
 
         List<ImagemDecoracao> imagens = new ArrayList<>();
 

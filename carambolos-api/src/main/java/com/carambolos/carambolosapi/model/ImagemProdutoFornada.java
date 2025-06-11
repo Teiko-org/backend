@@ -1,5 +1,6 @@
 package com.carambolos.carambolosapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -15,6 +16,7 @@ public class ImagemProdutoFornada {
 
     @ManyToOne
     @JoinColumn(name = "produto_fornada_id", nullable = false)
+    @JsonIgnore
     private ProdutoFornada produtoFornada;
 
     public Integer getId() {
