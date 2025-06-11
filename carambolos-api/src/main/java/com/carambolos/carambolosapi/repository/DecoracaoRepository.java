@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface DecoracaoRepository extends JpaRepository<Decoracao, Integer> {
     List<Decoracao> findByIsAtivoTrue();
+
+    boolean existsByIdAndIsAtivoTrue(Integer id);
 }

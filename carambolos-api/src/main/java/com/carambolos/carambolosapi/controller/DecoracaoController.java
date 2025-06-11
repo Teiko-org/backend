@@ -38,10 +38,11 @@ public class DecoracaoController {
     })
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DecoracaoResponseDTO> criar(
+            @RequestPart("nome") String nome,
             @RequestPart("observacao") String observacao,
             @RequestPart("imagens") MultipartFile[] imagens) {
 
-        DecoracaoResponseDTO decoracao = decoracaoService.cadastrar(observacao, imagens);
+        DecoracaoResponseDTO decoracao = decoracaoService.cadastrar(nome, observacao, imagens);
         return ResponseEntity.ok(decoracao);
     }
 

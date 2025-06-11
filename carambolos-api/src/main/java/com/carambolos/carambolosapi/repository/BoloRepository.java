@@ -28,6 +28,7 @@ public interface BoloRepository extends JpaRepository<Bolo, Integer> {
               b.formato,
               b.tamanho,
               (m.valor + COALESCE(ru1.valor + ru2.valor, reu1.valor + reu2.valor)) AS preco_total,
+              b.decoracao_id AS decoracao_id,   
               b.is_ativo AS status
             FROM bolo b
             JOIN massa m ON b.massa_id = m.id
