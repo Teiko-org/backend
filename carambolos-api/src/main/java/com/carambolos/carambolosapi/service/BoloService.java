@@ -35,6 +35,9 @@ public class BoloService {
     @Autowired
     MassaRepository massaRepository;
 
+    @Autowired
+    DecoracaoRepository decoracaoRepository;
+
 
     public List<Bolo> listarBolos(List<String> categorias) {
         List<Bolo> bolos;
@@ -73,6 +76,9 @@ public class BoloService {
         if (!coberturaRepository.existsByIdAndIsAtivoTrue(bolo.getCobertura())) {
             throw new EntidadeNaoEncontradaException("Essa cobertura não existe");
         }
+        if (bolo.getDecoracao() != null && !decoracaoRepository.existsByIdAndIsAtivoTrue(bolo.getDecoracao())) {
+            throw new EntidadeNaoEncontradaException("Essa decoração não existe");
+        }
 
         return boloRepository.save(bolo);
     }
@@ -94,6 +100,9 @@ public class BoloService {
         }
         if (!coberturaRepository.existsByIdAndIsAtivoTrue(bolo.getCobertura())) {
             throw new EntidadeNaoEncontradaException("Essa cobertura não existe");
+        }
+        if (bolo.getDecoracao() != null && !decoracaoRepository.existsByIdAndIsAtivoTrue(bolo.getDecoracao())) {
+            throw new EntidadeNaoEncontradaException("Essa decoração não existe");
         }
 
         bolo.setId(id);
