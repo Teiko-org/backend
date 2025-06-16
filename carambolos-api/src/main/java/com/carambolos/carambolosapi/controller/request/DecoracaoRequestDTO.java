@@ -7,5 +7,6 @@ import jakarta.validation.constraints.Size;
 public record DecoracaoRequestDTO(
         @Schema(description = "Observações da decoração", example = "Tema Frozen, tons de azul")
         @Size(max = 70)
-        String observacao
+        String observacao,
+        String nome
 ) {}

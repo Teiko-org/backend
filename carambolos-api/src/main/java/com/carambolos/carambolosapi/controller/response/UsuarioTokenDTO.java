@@ -8,6 +8,7 @@ public class UsuarioTokenDTO {
     private String nome;
     private String contato;
     private String token;
+    private Boolean isAdmin;
 
     public static UsuarioTokenDTO toTokenDTO(Usuario usuario, String token) {
         UsuarioTokenDTO tokenDto = new UsuarioTokenDTO();
@@ -16,7 +17,7 @@ public class UsuarioTokenDTO {
         tokenDto.setContato(usuario.getContato());
         tokenDto.setNome(usuario.getNome());
         tokenDto.setToken(token);
-
+        tokenDto.setAdmin(usuario.sysAdmin);
         return tokenDto;
     }
 
@@ -50,5 +51,13 @@ public class UsuarioTokenDTO {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public Boolean getAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(Boolean admin) {
+        isAdmin = admin;
     }
 }

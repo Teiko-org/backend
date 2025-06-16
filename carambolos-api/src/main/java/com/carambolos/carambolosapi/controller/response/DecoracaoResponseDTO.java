@@ -15,7 +15,10 @@ public record DecoracaoResponseDTO(
         List<String> imagens,
 
         @Schema(description = "Observações", example = "Tema Naruto, tons de laranja e preto")
-        String observacao
+        String observacao,
+
+        @Schema(description = "Nome do tipo da decoração", example = "Bolo de natal")
+        String nome
 ) {
     public static DecoracaoResponseDTO fromEntity(Decoracao decoracao) {
         List<String> urls = decoracao.getImagens()
@@ -26,7 +29,8 @@ public record DecoracaoResponseDTO(
         return new DecoracaoResponseDTO(
                 decoracao.getId(),
                 urls,
-                decoracao.getObservacao()
+                decoracao.getObservacao(),
+                decoracao.getNome()
         );
     }
 }

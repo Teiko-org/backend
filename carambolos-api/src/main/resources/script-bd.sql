@@ -9,6 +9,9 @@ CREATE TABLE IF NOT EXISTS teiko.usuario (
   nome VARCHAR(60) NOT NULL,
   senha VARCHAR(60) NOT NULL,
   contato VARCHAR(14) NOT NULL,
+  data_nascimento DATE NULL,
+  genero VARCHAR(20) NULL,
+  imagem_url VARCHAR(500) NULL,
   sys_admin TINYINT NULL,
   is_ativo TINYINT NULL,
   PRIMARY KEY (id),
@@ -21,6 +24,7 @@ CREATE TABLE IF NOT EXISTS teiko.usuario (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS teiko.endereco (
   id INT NOT NULL AUTO_INCREMENT,
+  nome VARCHAR(20) NULL,
   cep CHAR(8) NOT NULL,
   estado VARCHAR(20) NOT NULL,
   cidade VARCHAR(100) NOT NULL,
@@ -39,6 +43,7 @@ CREATE TABLE IF NOT EXISTS teiko.endereco (
     REFERENCES teiko.usuario (id)
 );
 
+
 -- -----------------------------------------------------
 -- Table teiko.produto_fornada
 -- -----------------------------------------------------
@@ -52,6 +57,19 @@ CREATE TABLE IF NOT EXISTS teiko.produto_fornada (
   PRIMARY KEY (id),
   INDEX produto_fornada_idx (produto ASC) VISIBLE
 );
+
+-- -----------------------------------------------------
+-- Table teiko.imagem_produto_fornada
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS imagem_produto_fornada (
+    id INT NOT NULL AUTO_INCREMENT,
+    produto_fornada_id INT NOT NULL,
+    url VARCHAR(500) NOT NULL,
+    PRIMARY KEY (id),
+    INDEX produto_fornada_idx (produto_fornada_id ASC),
+    CONSTRAINT fk_imagem_produto_fornada FOREIGN KEY (produto_fornada_id)
+    REFERENCES produto_fornada (id)
+    );
 
 -- -----------------------------------------------------
 -- Table teiko.fornada
@@ -92,12 +110,17 @@ CREATE TABLE IF NOT EXISTS teiko.fornada_da_vez (
 CREATE TABLE IF NOT EXISTS teiko.pedido_fornada (
   id INT NOT NULL AUTO_INCREMENT,
   fornada_da_vez_id INT NOT NULL,
-  endereco_id INT NOT NULL,
+  endereco_id INT NULL,
   usuario_id INT NULL,
   quantidade INT NOT NULL,
   data_previsao_entrega DATE NOT NULL,
   is_ativo TINYINT NULL,
-  PRIMARY KEY (id, fornada_da_vez_id, endereco_id),
+  tipo_entrega VARCHAR(15) NOT NULL DEFAULT 'ENTREGA',
+  nome_cliente VARCHAR(100) NOT NULL,
+  telefone_cliente VARCHAR(20) NOT NULL,
+  horario_retirada VARCHAR(10) NULL,
+  observacoes VARCHAR(500) NULL,
+  PRIMARY KEY (id),
   INDEX endereco1_idx (endereco_id ASC) VISIBLE,
   INDEX usuario1_idx (usuario_id ASC) VISIBLE,
   INDEX fornada_da_vez1_idx (fornada_da_vez_id ASC) VISIBLE,
@@ -140,6 +163,7 @@ CREATE TABLE IF NOT EXISTS teiko.cobertura (
 CREATE TABLE IF NOT EXISTS teiko.decoracao (
   id INT NOT NULL AUTO_INCREMENT,
   observacao VARCHAR(70),
+  nome varchar(70),
   is_ativo TINYINT NULL,
   PRIMARY KEY (id)
 );
@@ -249,17 +273,20 @@ CREATE TABLE IF NOT EXISTS teiko.bolo (
 
 CREATE TABLE IF NOT EXISTS teiko.pedido_bolo (
   id INT NOT NULL AUTO_INCREMENT,
-  endereco_id INT NOT NULL,
+  endereco_id INT NULL,
   bolo_id INT NOT NULL,
   usuario_id INT NULL,
   observacao VARCHAR(70) NULL,
   data_previsao_entrega DATE NOT NULL,
   data_ultima_atualizacao DATETIME NOT NULL,
+  tipo_entrega VARCHAR(15) NOT NULL DEFAULT 'ENTREGA',
+  nome_cliente VARCHAR(100) NOT NULL,
+  telefone_cliente VARCHAR(20) NOT NULL,
   is_ativo TINYINT NULL,
-  PRIMARY KEY (id, endereco_id, Bolo_id),
+  PRIMARY KEY (id),
   INDEX fk_pedido_bolo_usuario1_idx (usuario_id ASC) VISIBLE,
   INDEX fk_pedido_bolo_endereco1_idx (endereco_id ASC) VISIBLE,
-  INDEX fk_pedido_bolo_Bolo1_idx (Bolo_id ASC) VISIBLE,
+  INDEX fk_pedido_bolo_Bolo1_idx (bolo_id ASC) VISIBLE,
   CONSTRAINT fk_pedido_bolo_usuario1
     FOREIGN KEY (usuario_id)
     REFERENCES teiko.usuario (id),

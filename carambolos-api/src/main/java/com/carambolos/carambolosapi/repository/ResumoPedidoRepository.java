@@ -18,5 +18,7 @@ public interface ResumoPedidoRepository extends JpaRepository<ResumoPedido, Inte
    List<ResumoPedido> findByPedidoFornadaIdIsNotNullAndIsAtivoTrue();
    List<ResumoPedido> findByStatusAndIsAtivoTrue(StatusEnum status);
    boolean existsByIdAndIsAtivoTrue(Integer id);
+   ResumoPedido findByPedidoBoloId(Integer id);
+   ResumoPedido findByPedidoFornadaId(Integer id);
 
 }

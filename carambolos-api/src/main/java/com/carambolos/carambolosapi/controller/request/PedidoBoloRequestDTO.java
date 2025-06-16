@@ -1,7 +1,9 @@
 package com.carambolos.carambolosapi.controller.request;
 
 import com.carambolos.carambolosapi.model.PedidoBolo;
+import com.carambolos.carambolosapi.model.enums.TipoEntregaEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
@@ -9,7 +11,6 @@ import java.time.LocalDateTime;
 
 public record PedidoBoloRequestDTO(
         @Schema(description = "ID do endereço", example = "1")
-        @NotNull
         Integer enderecoId,
 
         @Schema(description = "ID do bolo", example = "1")
@@ -28,7 +29,18 @@ public record PedidoBoloRequestDTO(
 
         @Schema(description = "Data da última atualização", example = "2023-12-01T15:00:00")
         @NotNull
-        LocalDateTime dataUltimaAtualizacao
+        LocalDateTime dataUltimaAtualizacao,
+
+        @Schema(description = "Tipo de entrega", example = "RETIRADA", allowableValues = "RETIRADA, ENTREGA")
+        TipoEntregaEnum tipoEntrega,
+
+        @Schema(description = "Nome do cliente", example = "João da Silva")
+        @NotBlank
+        String nomeCliente,
+
+        @Schema(description = "Telefone do cliente", example = "(11) 91234-5678")
+        @NotBlank
+        String telefoneCliente
 ) {
     public static PedidoBolo toPedidoBolo(PedidoBoloRequestDTO request) {
         if (request == null) {
@@ -41,6 +53,9 @@ public record PedidoBoloRequestDTO(
         pedidoBolo.setObservacao(request.observacao);
         pedidoBolo.setDataPrevisaoEntrega(request.dataPrevisaoEntrega);
         pedidoBolo.setDataUltimaAtualizacao(request.dataUltimaAtualizacao);
+        pedidoBolo.setTipoEntrega(request.tipoEntrega);
+        pedidoBolo.setNomeCliente(request.nomeCliente);
+        pedidoBolo.setTelefoneCliente(request.telefoneCliente);
         return pedidoBolo;
     }
 }

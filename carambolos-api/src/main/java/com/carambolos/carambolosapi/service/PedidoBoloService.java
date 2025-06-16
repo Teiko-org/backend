@@ -1,7 +1,9 @@
 package com.carambolos.carambolosapi.service;
 
+import com.carambolos.carambolosapi.exception.EntidadeImprocessavelException;
 import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.model.PedidoBolo;
+import com.carambolos.carambolosapi.model.enums.TipoEntregaEnum;
 import com.carambolos.carambolosapi.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,7 +35,10 @@ public class PedidoBoloService {
         if (!boloRepository.existsByIdAndIsAtivoTrue(pedidoBolo.getBoloId())) {
             throw new EntidadeNaoEncontradaException("Bolo com id %d não encontrado".formatted(pedidoBolo.getBoloId()));
         }
-        if (!enderecoRepository.existsByIdAndIsAtivoTrue(pedidoBolo.getEnderecoId())) {
+        if (pedidoBolo.getTipoEntrega() == TipoEntregaEnum.ENTREGA && pedidoBolo.getEnderecoId() == null) {
+            throw new EntidadeImprocessavelException("Tipo de entrega 'ENTREGA' requer um endereço válido.");
+        }
+        if (pedidoBolo.getEnderecoId() != null && !enderecoRepository.existsByIdAndIsAtivoTrue(pedidoBolo.getEnderecoId())) {
             throw new EntidadeNaoEncontradaException("Endereço com id %d não encontrado".formatted(pedidoBolo.getEnderecoId()));
         }
 
@@ -46,10 +51,13 @@ public class PedidoBoloService {
         if (!pedidoBoloRepository.existsByIdAndIsAtivoTrue(id)) {
             throw new EntidadeNaoEncontradaException("Pedido com id %d não encontrado".formatted(id));
         }
+        if (pedidoBolo.getTipoEntrega() == TipoEntregaEnum.ENTREGA && pedidoBolo.getEnderecoId() == null) {
+            throw new EntidadeImprocessavelException("Tipo de entrega 'ENTREGA' requer um endereço válido.");
+        }
         if (!boloRepository.existsByIdAndIsAtivoTrue(pedidoBolo.getBoloId())) {
             throw new EntidadeNaoEncontradaException("Bolo com id %d não encontrado".formatted(pedidoBolo.getBoloId()));
         }
-        if (!enderecoRepository.existsByIdAndIsAtivoTrue(pedidoBolo.getEnderecoId())) {
+        if (pedidoBolo.getEnderecoId() != null && !enderecoRepository.existsByIdAndIsAtivoTrue(pedidoBolo.getEnderecoId())) {
             throw new EntidadeNaoEncontradaException("Endereço com id %d não encontrado".formatted(pedidoBolo.getEnderecoId()));
         }
 

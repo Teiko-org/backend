@@ -20,7 +20,7 @@ public record BoloResponseDTO(
         @Schema(description = "ID da cobertura", example = "1")
         Integer coberturaId,
 
-//        Integer decoracaoId,
+        Integer decoracaoId,
 
         @Schema(description = "Formato do bolo", example = "Circulo")
         FormatoEnum formato,
@@ -35,6 +35,7 @@ public record BoloResponseDTO(
                 bolo.getRecheioPedido(),
                 bolo.getMassa(),
                 bolo.getCobertura(),
+                bolo.getDecoracao(),
                 bolo.getFormato(),
                 bolo.getTamanho()
         );

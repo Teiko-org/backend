@@ -7,8 +7,8 @@ import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 
-@Schema(description = "DTO para requisição de cadastro de usuário.")
-public class UsuarioRequestDTO {
+@Schema(description = "DTO para requisição de atualização de dados do usuário.")
+public class AtualizarUsuarioRequestDTO {
 
     @Schema(description = "Nome completo do usuário.", example = "Ana Souza")
     @NotBlank
@@ -19,24 +19,18 @@ public class UsuarioRequestDTO {
     @Size(max = 14)
     private String contato;
 
-    @Schema(description = "Senha de acesso do usuário. Mínimo de 6 caracteres.", example = "senhaSegura123")
-    @NotBlank
-    @Size(min = 6, message = "A senha deve ter no mínimo 6 caracteres.")
-    private String senha;
-
     @Schema(description = "Data de nascimento do usuário.", example = "2000-05-20")
     private LocalDate dataNascimento;
 
     @Schema(description = "Gênero do usuário.", example = "Feminino")
     private String genero;
 
-    public static Usuario toEntity(UsuarioRequestDTO requestDto) {
+    public static Usuario toEntity(AtualizarUsuarioRequestDTO requestDto) {
         if(requestDto == null) {
             return null;
         }
         Usuario usuario = new Usuario();
         usuario.setNome(requestDto.getNome());
-        usuario.setSenha(requestDto.getSenha());
         usuario.setContato(requestDto.getContato());
         usuario.setDataNascimento(requestDto.getDataNascimento());
         usuario.setGenero(requestDto.getGenero());
@@ -49,14 +43,6 @@ public class UsuarioRequestDTO {
 
     public void setNome(@NotBlank String nome) {
         this.nome = nome;
-    }
-
-    public @NotBlank @Size(min = 6) String getSenha() {
-        return senha;
-    }
-
-    public void setSenha(@NotBlank @Size(min = 6) String senha) {
-        this.senha = senha;
     }
 
     public @NotBlank @Size(max = 14) String getContato() {

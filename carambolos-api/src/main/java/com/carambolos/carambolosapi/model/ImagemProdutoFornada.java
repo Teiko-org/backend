@@ -1,10 +1,11 @@
 package com.carambolos.carambolosapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "imagem_decoracao")
-public class ImagemDecoracao {
+@Table(name = "imagem_produto_fornada")
+public class ImagemProdutoFornada {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -13,9 +14,10 @@ public class ImagemDecoracao {
     @Column(length = 500, nullable = false)
     private String url;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "decoracao_id", nullable = false)
-    private Decoracao decoracao;
+    @ManyToOne
+    @JoinColumn(name = "produto_fornada_id", nullable = false)
+    @JsonIgnore
+    private ProdutoFornada produtoFornada;
 
     public Integer getId() {
         return id;
@@ -26,25 +28,18 @@ public class ImagemDecoracao {
     }
 
     public String getUrl() {
-        if (url == null) {
-
-            return "";
-
-        }
-
         return url;
-
     }
 
     public void setUrl(String url) {
         this.url = url;
     }
 
-    public Decoracao getDecoracao() {
-        return decoracao;
+    public ProdutoFornada getProdutoFornada() {
+        return produtoFornada;
     }
 
-    public void setDecoracao(Decoracao decoracao) {
-        this.decoracao = decoracao;
+    public void setProdutoFornada(ProdutoFornada produtoFornada) {
+        this.produtoFornada = produtoFornada;
     }
 }

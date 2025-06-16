@@ -7,11 +7,13 @@ import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.model.Fornada;
 import com.carambolos.carambolosapi.model.FornadaDaVez;
 import com.carambolos.carambolosapi.model.ProdutoFornada;
+import com.carambolos.carambolosapi.model.projection.ProdutoFornadaDaVezProjection;
 import com.carambolos.carambolosapi.repository.FornadaDaVezRepository;
 import com.carambolos.carambolosapi.repository.FornadaRepository;
 import com.carambolos.carambolosapi.repository.ProdutoFornadaRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -70,5 +72,13 @@ public class FornadaDaVezService {
         fornadaDaVez.setQuantidade(request.quantidade());
 
         return fornadaDaVezRepository.save(fornadaDaVez);
+    }
+
+    public List<ProdutoFornadaDaVezProjection> buscarProdutosFornadaDaVez(LocalDate dataInicio, LocalDate dataFim) {
+        return fornadaDaVezRepository.findProductsByFornada(dataInicio, dataFim);
+    }
+
+    public List<ProdutoFornadaDaVezProjection> buscarProdutosPorFornadaId(Integer fornadaId) {
+        return fornadaDaVezRepository.findProductsByFornadaId(fornadaId);
     }
 }

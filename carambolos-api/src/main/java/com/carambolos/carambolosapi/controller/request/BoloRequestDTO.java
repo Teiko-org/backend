@@ -20,7 +20,8 @@ public record BoloRequestDTO(
         @NotNull
         Integer coberturaId,
 
-//        Integer decoracaoId,
+        @Schema(description = "ID da decoração", example = "1")
+        Integer decoracaoId,
 
         @Schema(description = "Formato do bolo", example = "CIRCULO")
         @NotNull
@@ -42,6 +43,7 @@ public record BoloRequestDTO(
         bolo.setRecheioPedido(request.recheioPedidoId);
         bolo.setMassa(request.massaId);
         bolo.setCobertura(request.coberturaId);
+        bolo.setDecoracao(request.decoracaoId);
         bolo.setFormato(request.formato);
         bolo.setTamanho(request.tamanho);
         bolo.setCategoria(request.categoria);

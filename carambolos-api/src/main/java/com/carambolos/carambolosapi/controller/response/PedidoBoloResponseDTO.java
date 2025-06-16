@@ -1,6 +1,7 @@
 package com.carambolos.carambolosapi.controller.response;
 
 import com.carambolos.carambolosapi.model.PedidoBolo;
+import com.carambolos.carambolosapi.model.enums.TipoEntregaEnum;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,7 +14,10 @@ public record PedidoBoloResponseDTO(
         Integer usuarioId,
         String observacao,
         LocalDate dataPrevisaoEntrega,
-        LocalDateTime dataUltimaAtualizacao
+        LocalDateTime dataUltimaAtualizacao,
+        TipoEntregaEnum tipoEntrega,
+        String nomeCliente,
+        String telefoneCliente
 ) {
     public static PedidoBoloResponseDTO toPedidoBoloResponse(PedidoBolo pedido) {
         return new PedidoBoloResponseDTO(
@@ -23,7 +27,10 @@ public record PedidoBoloResponseDTO(
                 pedido.getUsuarioId(),
                 pedido.getObservacao(),
                 pedido.getDataPrevisaoEntrega(),
-                pedido.getDataUltimaAtualizacao()
+                pedido.getDataUltimaAtualizacao(),
+                pedido.getTipoEntrega(),
+                pedido.getNomeCliente(),
+                pedido.getTelefoneCliente()
         );
     }
 

@@ -12,6 +12,9 @@ public class EnderecoResponseDTO {
     @Schema(description = "CEP do endereço (8 dígitos numéricos)", example = "12345678")
     private String cep;
 
+    @Schema(description = "Nome do endereço (ex: Casa, Trabalho)", example = "Casa")
+    private String nome;
+
     @Schema(description = "Estado do endereço", example = "SP")
     private String estado;
 
@@ -45,6 +48,7 @@ public class EnderecoResponseDTO {
         EnderecoResponseDTO responseDto = new EnderecoResponseDTO();
         responseDto.setId(endereco.getId());
         responseDto.setCep(endereco.getCep());
+        responseDto.setNome(endereco.getNome());
         responseDto.setEstado(endereco.getEstado());
         responseDto.setCidade(endereco.getCidade());
         responseDto.setBairro(endereco.getBairro());
@@ -72,6 +76,14 @@ public class EnderecoResponseDTO {
 
     public void setCep(String cep) {
         this.cep = cep;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     public String getEstado() {
