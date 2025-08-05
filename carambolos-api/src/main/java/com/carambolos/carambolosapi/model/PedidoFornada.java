@@ -1,5 +1,6 @@
 package com.carambolos.carambolosapi.model;
 
+import com.carambolos.carambolosapi.model.enums.TipoEntregaEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -28,6 +29,22 @@ public class PedidoFornada {
 
     @Column(name = "data_previsao_entrega")
     private LocalDate dataPrevisaoEntrega;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_entrega")
+    private TipoEntregaEnum tipoEntrega;
+
+    @Column(name = "nome_cliente")
+    private String nomeCliente;
+
+    @Column(name = "telefone_cliente")
+    private String telefoneCliente;
+
+    @Column(name = "horario_retirada")
+    private String horarioRetirada;
+
+    @Column(name = "observacoes")
+    private String observacoes;
 
     @Column(name = "is_ativo")
     private Boolean isAtivo = true;
@@ -78,6 +95,58 @@ public class PedidoFornada {
 
     public void setDataPrevisaoEntrega(LocalDate dataPrevisaoEntrega) {
         this.dataPrevisaoEntrega = dataPrevisaoEntrega;
+    }
+
+    public TipoEntregaEnum getTipoEntrega() {
+        return tipoEntrega;
+    }
+
+    public void setTipoEntrega(TipoEntregaEnum tipoEntrega) {
+        this.tipoEntrega = tipoEntrega;
+    }
+
+    public String getNomeCliente() {
+        return nomeCliente;
+    }
+
+    public void setNomeCliente(String nomeCliente) {
+        this.nomeCliente = nomeCliente;
+    }
+
+    public String getTelefoneCliente() {
+        return telefoneCliente;
+    }
+
+    public void setTelefoneCliente(String telefoneCliente) {
+        this.telefoneCliente = telefoneCliente;
+    }
+
+    public String getHorario() {
+        return horarioRetirada;
+    }
+
+    public void setHorario(String horario) {
+        this.horarioRetirada = horario;
+    }
+
+    public String getHorarioRetirada() {
+        return horarioRetirada;
+    }
+
+    public void setHorarioRetirada(String horarioRetirada) {
+        this.horarioRetirada = horarioRetirada;
+    }
+
+    public String getObservacoes() {
+        return observacoes;
+    }
+
+    public void setObservacoes(String observacoes) {
+        this.observacoes = observacoes;
+    }
+
+    public Boolean getAtivo() {
+        return isAtivo;
     }
 
     public Boolean isAtivo() {

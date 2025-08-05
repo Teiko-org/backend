@@ -2,6 +2,8 @@ package com.carambolos.carambolosapi.model;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "usuario")
 public class Usuario {
@@ -15,8 +17,20 @@ public class Usuario {
 
     private String senha;
 
+    @Column(name = "data_nascimento")
+    private LocalDate dataNascimento;
+
+    @Column(name = "genero")
+    private String genero;
+
+    @Column(name = "imagem_url")
+    private String imagemUrl;
+
     @Column(name = "is_ativo")
     private boolean isAtivo = true;
+
+    @Column(name = "sys_admin")
+    public Boolean sysAdmin;
 
     public Integer getId() {
         return id;
@@ -48,6 +62,30 @@ public class Usuario {
 
     public void setSenha(String senha) {
         this.senha = senha;
+    }
+
+    public LocalDate getDataNascimento() {
+        return dataNascimento;
+    }
+
+    public void setDataNascimento(LocalDate dataNascimento) {
+        this.dataNascimento = dataNascimento;
+    }
+
+    public String getGenero() {
+        return genero;
+    }
+
+    public void setGenero(String genero) {
+        this.genero = genero;
+    }
+
+    public String getImagemUrl() {
+        return imagemUrl;
+    }
+
+    public void setImagemUrl(String imagemUrl) {
+        this.imagemUrl = imagemUrl;
     }
 
     public boolean isAtivo() {

@@ -1,11 +1,14 @@
 package com.carambolos.carambolosapi.controller;
 
+import com.carambolos.carambolosapi.controller.request.AlterarSenhaRequestDTO;
+import com.carambolos.carambolosapi.controller.request.AtualizarUsuarioRequestDTO;
 import com.carambolos.carambolosapi.controller.request.LoginRequestDTO;
 import com.carambolos.carambolosapi.controller.request.UsuarioRequestDTO;
 import com.carambolos.carambolosapi.controller.response.UsuarioResponseDTO;
 import com.carambolos.carambolosapi.controller.response.UsuarioTokenDTO;
 import com.carambolos.carambolosapi.model.Usuario;
 import com.carambolos.carambolosapi.service.UsuarioService;
+import com.carambolos.carambolosapi.service.AzureStorageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,8 +18,12 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+
 
 import java.util.List;
 
@@ -27,6 +34,9 @@ public class UsuarioController {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    @Autowired
+    private AzureStorageService azureStorageService;
 
     @Operation(
             summary = "Listar todos os usuários",
@@ -132,6 +142,47 @@ public class UsuarioController {
     }
 
     @Operation(
+            summary = "Atualizar dados pessoais do usuário",
+            description = "Atualiza apenas os dados pessoais (nome, telefone, data de nascimento, gênero) do usuário."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Dados atualizados com sucesso",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UsuarioResponseDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado"),
+            @ApiResponse(responseCode = "409", description = "Telefone já em uso")
+    })
+    @PatchMapping("/{id}/dados-pessoais")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<UsuarioResponseDTO> atualizarDadosPessoais(
+            @PathVariable Integer id,
+            @Valid @RequestBody AtualizarUsuarioRequestDTO atualizarUsuarioRequest) {
+        Usuario usuario = AtualizarUsuarioRequestDTO.toEntity(atualizarUsuarioRequest);
+        Usuario usuarioAtualizado = usuarioService.atualizarDadosPessoais(id, usuario);
+        UsuarioResponseDTO usuarioResponse = UsuarioResponseDTO.toResponseDTO(usuarioAtualizado);
+        return ResponseEntity.status(200).body(usuarioResponse);
+    }
+
+
+    @Operation(
+            summary = "Alterar senha do usuário",
+            description = "Permite que o usuário altere sua senha informando a senha atual e a nova senha."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Senha alterada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Senha atual incorreta"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+    })
+    @PatchMapping("/{id}/alterar-senha")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<Void> alterarSenha(
+            @PathVariable Integer id,
+            @Valid @RequestBody AlterarSenhaRequestDTO alterarSenhaRequest) {
+        usuarioService.alterarSenha(id, alterarSenhaRequest.getSenhaAtual(), alterarSenhaRequest.getNovaSenha());
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
             summary = "Deletar usuário",
             description = "Remove um usuário do sistema com base no ID informado."
     )
@@ -146,5 +197,47 @@ public class UsuarioController {
     public ResponseEntity<Void> deletar(@PathVariable Integer id) {
         usuarioService.deletar(id);
         return ResponseEntity.status(204).build();
+    }
+
+    @Operation(
+            summary = "Upload de imagem de perfil do usuário",
+            description = "Faz upload da imagem de perfil do usuário para o Azure Storage e atualiza a URL no banco de dados."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Imagem de perfil atualizada com sucesso",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UsuarioResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Arquivo inválido ou formato não suportado",
+                    content = @Content()),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado",
+                    content = @Content()),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor",
+                    content = @Content())
+    })
+    @PostMapping(value = "/{id}/upload-imagem", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<UsuarioResponseDTO> uploadImagemPerfil(
+            @PathVariable Integer id,
+            @RequestPart("file") MultipartFile file) {
+
+        try {
+            if (file.isEmpty()) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            if (!file.getContentType().startsWith("image/")) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            String imageUrl = azureStorageService.upload(file);
+
+            Usuario usuarioAtualizado = usuarioService.atualizarImagemPerfil(id, imageUrl);
+            UsuarioResponseDTO usuarioResponse = UsuarioResponseDTO.toResponseDTO(usuarioAtualizado);
+
+            return ResponseEntity.ok(usuarioResponse);
+
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }

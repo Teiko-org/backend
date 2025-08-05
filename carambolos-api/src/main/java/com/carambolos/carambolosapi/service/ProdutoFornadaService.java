@@ -2,10 +2,14 @@ package com.carambolos.carambolosapi.service;
 import com.carambolos.carambolosapi.controller.request.ProdutoFornadaRequestDTO;
 import com.carambolos.carambolosapi.exception.EntidadeJaExisteException;
 import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
+import com.carambolos.carambolosapi.model.ImagemProdutoFornada;
 import com.carambolos.carambolosapi.model.ProdutoFornada;
 import com.carambolos.carambolosapi.repository.ProdutoFornadaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -13,16 +17,31 @@ public class ProdutoFornadaService {
 
     private final ProdutoFornadaRepository produtoFornadaRepository;
 
+    @Autowired
+    private AzureStorageService azureStorageService;
+
     public ProdutoFornadaService(ProdutoFornadaRepository produtoFornadaRepository) {
         this.produtoFornadaRepository = produtoFornadaRepository;
     }
 
-    public ProdutoFornada criarProdutoFornada(ProdutoFornadaRequestDTO request) {
-        if (produtoFornadaRepository.existsByProdutoAndIsAtivoTrue(request.produto())) {
-            throw new EntidadeJaExisteException("Já existe um ProdutoFornada com o nome informado: " + request.produto());
-        }
+    public ProdutoFornada criarProdutoFornada(String produto, String descricao, Double valor, String categoria, MultipartFile[] arquivos) {
+        ProdutoFornada produtoFornada = new ProdutoFornada();
+        produtoFornada.setProduto(produto);
+        produtoFornada.setDescricao(descricao);
+        produtoFornada.setValor(valor);
+        produtoFornada.setCategoria(categoria);
+        produtoFornada.setIsAtivo(true);
 
-        ProdutoFornada produtoFornada = request.toEntity();
+        List<ImagemProdutoFornada> imagens = new ArrayList<>();
+        for (MultipartFile arquivo : arquivos) {
+            String url = azureStorageService.upload(arquivo);
+            ImagemProdutoFornada imagem = new ImagemProdutoFornada();
+            imagem.setUrl(url);
+            imagem.setProdutoFornada(produtoFornada);
+            imagens.add(imagem);
+        }
+        produtoFornada.setImagens(imagens);
+
         return produtoFornadaRepository.save(produtoFornada);
     }
 
@@ -59,5 +78,14 @@ public class ProdutoFornadaService {
         produtoFornada.setDescricao(request.descricao());
         produtoFornada.setValor(request.valor());
         return produtoFornadaRepository.save(produtoFornada);
+    }
+
+    public void atualizarStatusProdutoFornada(Boolean status, Integer id) {
+        Integer statusInt = status ? 1 : 0;
+        if (produtoFornadaRepository.existsById(id)) {
+            produtoFornadaRepository.updateStatus(statusInt, id);
+        } else {
+            throw new EntidadeNaoEncontradaException("Produto fornada com id %d não encontrado".formatted(id));
+        }
     }
 }

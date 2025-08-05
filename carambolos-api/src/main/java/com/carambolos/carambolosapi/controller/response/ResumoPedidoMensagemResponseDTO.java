@@ -61,12 +61,13 @@ public record ResumoPedidoMensagemResponseDTO (
         private final PedidoFornadaRepository pedidoFornadaRepository;
         private final FornadaDaVezRepository fornadaDaVezRepository;
         private final ProdutoFornadaRepository produtoFornadaRepository;
+        private final EnderecoRepository enderecoRepository;
 
         @Autowired
         public MensagemHelper(
                 PedidoBoloRepository pedidoBoloRepository,
                 BoloRepository boloRepository,
-                MassaRepository massaRepository, CoberturaRepository coberturaRepository, RecheioPedidoRepository recheioPedidoRepository, RecheioExclusivoRepository recheioExclusivoRepository, RecheioUnitarioRepository recheioUnitarioRepository, PedidoFornadaRepository pedidoFornadaRepository, FornadaDaVezRepository fornadaDaVezRepository, ProdutoFornadaRepository produtoFornadaRepository) {
+                MassaRepository massaRepository, CoberturaRepository coberturaRepository, RecheioPedidoRepository recheioPedidoRepository, RecheioExclusivoRepository recheioExclusivoRepository, RecheioUnitarioRepository recheioUnitarioRepository, PedidoFornadaRepository pedidoFornadaRepository, FornadaDaVezRepository fornadaDaVezRepository, ProdutoFornadaRepository produtoFornadaRepository, EnderecoRepository enderecoRepository) {
             this.pedidoBoloRepository = pedidoBoloRepository;
             this.boloRepository = boloRepository;
             ResumoPedidoMensagemResponseDTO.setMensagemHelper(this);
@@ -78,6 +79,7 @@ public record ResumoPedidoMensagemResponseDTO (
             this.pedidoFornadaRepository = pedidoFornadaRepository;
             this.fornadaDaVezRepository = fornadaDaVezRepository;
             this.produtoFornadaRepository = produtoFornadaRepository;
+            this.enderecoRepository = enderecoRepository;
         }
 
         public String gerarMensagemWhatsapp(ResumoPedido pedido) {
@@ -124,6 +126,13 @@ public record ResumoPedidoMensagemResponseDTO (
             mensagem.append("1x ").append(descricaoBolo).append(" ").append(valorTotal).append("\n");
             mensagem.append("Total: ").append(valorTotal).append("\n");
 
+            mensagem.append("Cliente: ").append(pedidoBolo.getNomeCliente()).append("\n")
+                    .append("Telefone: ").append(pedidoBolo.getTelefoneCliente()).append("\n");
+
+            mensagem.append("Tipo: ")
+                    .append(pedidoBolo.getTipoEntrega() != null ? pedidoBolo.getTipoEntrega().name() : "ENTREGA")
+                    .append("\n");
+
             if (pedidoBolo.getDataPrevisaoEntrega() != null) {
                 mensagem.append("Previsão de entrega: ")
                         .append(pedidoBolo.getDataPrevisaoEntrega().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
@@ -132,6 +141,31 @@ public record ResumoPedidoMensagemResponseDTO (
 
             if (pedidoBolo.getObservacao() != null && !pedidoBolo.getObservacao().isEmpty()) {
                 mensagem.append("Observações: ").append(pedidoBolo.getObservacao()).append("\n");
+            }
+
+            // Adicionar informações do endereço se for entrega
+            if (pedidoBolo.getTipoEntrega() != null &&
+                    pedidoBolo.getTipoEntrega().name().equals("ENTREGA") &&
+                    pedidoBolo.getEnderecoId() != null) {
+
+                Endereco endereco = enderecoRepository.findByIdAndIsAtivoTrue(pedidoBolo.getEnderecoId());
+                if (endereco != null) {
+                    mensagem.append("Endereço de entrega:\n");
+                    mensagem.append(endereco.getLogradouro());
+                    if (endereco.getNumero() != null && !endereco.getNumero().isEmpty()) {
+                        mensagem.append(", ").append(endereco.getNumero());
+                    }
+                    if (endereco.getComplemento() != null && !endereco.getComplemento().isEmpty()) {
+                        mensagem.append(", ").append(endereco.getComplemento());
+                    }
+                    mensagem.append("\n");
+                    mensagem.append(endereco.getBairro()).append(" - ").append(endereco.getCidade());
+                    mensagem.append(" - ").append(endereco.getEstado());
+                    mensagem.append(" - CEP: ").append(endereco.getCep()).append("\n");
+                    if (endereco.getReferencia() != null && !endereco.getReferencia().isEmpty()) {
+                        mensagem.append("Referência: ").append(endereco.getReferencia()).append("\n");
+                    }
+                }
             }
         }
 
@@ -152,7 +186,7 @@ public record ResumoPedidoMensagemResponseDTO (
 
             if (bolo.getCobertura() != null) {
                 Cobertura cobertura = coberturaRepository.findById(bolo.getCobertura())
-                                .orElse(null);
+                        .orElse(null);
                 if (cobertura != null) {
                     descricao.append("\nCobertura: ").append(cobertura.getDescricao());
                 }
@@ -160,7 +194,7 @@ public record ResumoPedidoMensagemResponseDTO (
 
             if (bolo.getMassa() != null) {
                 Massa massa = massaRepository.findById(bolo.getMassa())
-                                .orElse(null);
+                        .orElse(null);
                 if (massa != null) {
                     descricao.append("\nMassa: ").append(massa.getSabor());
                 }
@@ -168,7 +202,7 @@ public record ResumoPedidoMensagemResponseDTO (
 
             if (bolo.getRecheioPedido() != null) {
                 RecheioPedido recheioPedido = recheioPedidoRepository.findById(bolo.getRecheioPedido())
-                                .orElse(null);
+                        .orElse(null);
                 if (recheioPedido != null) {
                     descricao.append("\nRecheio: ");
 
@@ -220,10 +254,58 @@ public record ResumoPedidoMensagemResponseDTO (
                     .append(valorTotal)
                     .append("\n");
 
+            mensagem.append("Cliente: ")
+                    .append(pedidoFornada.getNomeCliente())
+                    .append("\n")
+                    .append("Telefone: ")
+                    .append(pedidoFornada.getTelefoneCliente())
+                    .append("\n");
+
+            mensagem.append("Tipo: ")
+                    .append(pedidoFornada.getTipoEntrega() != null ? pedidoFornada.getTipoEntrega().name() : "ENTREGA")
+                    .append("\n");
+
             if (pedidoFornada.getDataPrevisaoEntrega() != null) {
                 mensagem.append("Previsão de entrega: ")
                         .append(pedidoFornada.getDataPrevisaoEntrega().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
                         .append("\n");
+            }
+
+            if (pedidoFornada.getHorario() != null && !pedidoFornada.getHorario().isEmpty()) {
+                mensagem.append("Horário: ")
+                        .append(pedidoFornada.getHorario())
+                        .append("\n");
+            }
+
+            if (pedidoFornada.getObservacoes() != null && !pedidoFornada.getObservacoes().isEmpty()) {
+                mensagem.append("Observações: ")
+                        .append(pedidoFornada.getObservacoes())
+                        .append("\n");
+            }
+
+            // Adicionar informações do endereço se for entrega
+            if (pedidoFornada.getTipoEntrega() != null &&
+                    pedidoFornada.getTipoEntrega().name().equals("ENTREGA") &&
+                    pedidoFornada.getEndereco() != null) {
+
+                Endereco endereco = enderecoRepository.findByIdAndIsAtivoTrue(pedidoFornada.getEndereco());
+                if (endereco != null) {
+                    mensagem.append("Endereço de entrega:\n");
+                    mensagem.append(endereco.getLogradouro());
+                    if (endereco.getNumero() != null && !endereco.getNumero().isEmpty()) {
+                        mensagem.append(", ").append(endereco.getNumero());
+                    }
+                    if (endereco.getComplemento() != null && !endereco.getComplemento().isEmpty()) {
+                        mensagem.append(", ").append(endereco.getComplemento());
+                    }
+                    mensagem.append("\n");
+                    mensagem.append(endereco.getBairro()).append(" - ").append(endereco.getCidade());
+                    mensagem.append(" - ").append(endereco.getEstado());
+                    mensagem.append(" - CEP: ").append(endereco.getCep()).append("\n");
+                    if (endereco.getReferencia() != null && !endereco.getReferencia().isEmpty()) {
+                        mensagem.append("Referência: ").append(endereco.getReferencia()).append("\n");
+                    }
+                }
             }
         }
 
