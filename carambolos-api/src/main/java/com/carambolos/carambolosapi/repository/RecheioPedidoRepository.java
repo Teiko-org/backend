@@ -14,7 +14,8 @@ public interface RecheioPedidoRepository extends JpaRepository<RecheioPedido, In
             rp.id,
             ru1.sabor,
             ru2.sabor,
-            sum(ru1.valor + ru2.valor) valor
+            sum(ru1.valor + ru2.valor) valor,
+            rp.is_ativo
             from recheio_pedido rp
             join recheio_unitario ru1 on rp.recheio_unitario_id1 = ru1.id
             join recheio_unitario ru2 on rp.recheio_unitario_id2 = ru2.id

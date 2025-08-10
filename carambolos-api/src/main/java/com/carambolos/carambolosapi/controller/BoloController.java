@@ -28,7 +28,6 @@ import static com.carambolos.carambolosapi.controller.request.RecheioUnitarioReq
 
 @RestController
 @RequestMapping("/bolos")
-@SecurityRequirement(name = "Bearer")
 @Tag(name = "Bolo Controller", description = "Gerencia bolos, recheios, coberturas e massas")
 @SecurityRequirement(name = "Bearer")
 public class BoloController {
