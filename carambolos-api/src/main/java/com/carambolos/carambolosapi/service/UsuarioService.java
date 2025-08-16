@@ -7,6 +7,8 @@ import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.model.Usuario;
 import com.carambolos.carambolosapi.repository.UsuarioRepository;
 import com.carambolos.carambolosapi.utils.GerenciadorTokenJwt;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -101,7 +103,7 @@ public class UsuarioService {
         return usuarioRepository.save(usuario);
     }
 
-    public UsuarioTokenDTO autenticar(Usuario usuario) {
+    public UsuarioTokenDTO autenticar(Usuario usuario, HttpServletResponse httpServletResponse) {
 
         final UsernamePasswordAuthenticationToken credentials = new UsernamePasswordAuthenticationToken(
                 usuario.getContato(), usuario.getSenha());
@@ -118,7 +120,23 @@ public class UsuarioService {
 
         final String token = gerenciadorTokenJwt.generateToken(authentication);
 
-        return UsuarioTokenDTO.toTokenDTO(usuarioAutenticado, token);
+        Cookie cookie = new Cookie("authToken", token);
+        cookie.setHttpOnly(true);
+//        cookie.setSecure(true); // Descomentar caso seja usado HTTPS
+        cookie.setPath("/");
+        cookie.setMaxAge(7 * 24 * 60 * 60);
+        httpServletResponse.addCookie(cookie);
+
+        return UsuarioTokenDTO.toTokenDTO(usuarioAutenticado);
+    }
+
+    public void logOut(HttpServletResponse response) {
+        Cookie cookie = new Cookie("authToken", null);
+        cookie.setHttpOnly(true);
+//        cookie.setSecure(true); // Descomentar caso seja usado HTTPS
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
     }
 
     public void alterarSenha(Integer id, String senhaAtual, String novaSenha) {

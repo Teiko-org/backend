@@ -10,13 +10,13 @@ public class UsuarioTokenDTO {
     private String token;
     private Boolean isAdmin;
 
-    public static UsuarioTokenDTO toTokenDTO(Usuario usuario, String token) {
+    public static UsuarioTokenDTO toTokenDTO(Usuario usuario) {
         UsuarioTokenDTO tokenDto = new UsuarioTokenDTO();
 
         tokenDto.setUserId(usuario.getId());
         tokenDto.setContato(usuario.getContato());
         tokenDto.setNome(usuario.getNome());
-        tokenDto.setToken(token);
+//        tokenDto.setToken(token);
         tokenDto.setAdmin(usuario.sysAdmin);
         return tokenDto;
     }
