@@ -2,7 +2,6 @@ package com.carambolos.carambolosapi.model;
 
 import jakarta.persistence.*;
 import com.carambolos.carambolosapi.utils.CryptoAttributeConverter;
-import com.carambolos.carambolosapi.utils.HashUtils;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Entity
