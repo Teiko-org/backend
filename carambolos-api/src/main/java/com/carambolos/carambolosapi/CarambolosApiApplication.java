@@ -40,14 +40,13 @@ public class CarambolosApiApplication {
 	}
 
 	@Bean
+	@SuppressWarnings("unused")
 	CommandLineRunner backfillEnderecoDedupHash(com.carambolos.carambolosapi.repository.EnderecoRepository enderecoRepository) {
-		return args -> {
-			enderecoRepository.findAll().stream()
-					.filter(e -> e.getDedupHash() == null || e.getDedupHash().isBlank())
-					.forEach(e -> {
-						e.setDedupHash(com.carambolos.carambolosapi.utils.EnderecoHasher.computeDedupHash(e));
-						enderecoRepository.save(e);
-					});
-		};
+		return args -> enderecoRepository.findAll().stream()
+				.filter(e -> e.getDedupHash() == null || e.getDedupHash().isBlank())
+				.forEach(e -> {
+					e.setDedupHash(com.carambolos.carambolosapi.utils.EnderecoHasher.computeDedupHash(e));
+					enderecoRepository.save(e);
+				});
 	}
 }

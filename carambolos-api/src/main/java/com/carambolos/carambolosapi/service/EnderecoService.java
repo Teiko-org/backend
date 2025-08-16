@@ -5,7 +5,6 @@ import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.model.Endereco;
 import com.carambolos.carambolosapi.model.Usuario;
 import com.carambolos.carambolosapi.repository.EnderecoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import com.carambolos.carambolosapi.utils.EnderecoHasher;
@@ -13,11 +12,13 @@ import com.carambolos.carambolosapi.utils.EnderecoHasher;
 @Service
 public class EnderecoService {
 
-    @Autowired
-    private EnderecoRepository enderecoRepository;
+    private final EnderecoRepository enderecoRepository;
+    private final UsuarioService usuarioService;
 
-    @Autowired
-    private UsuarioService usuarioService;
+    public EnderecoService(EnderecoRepository enderecoRepository, UsuarioService usuarioService) {
+        this.enderecoRepository = enderecoRepository;
+        this.usuarioService = usuarioService;
+    }
 
     public List<Endereco> listar() {
         return enderecoRepository.findAllByIsAtivoTrue();
@@ -44,7 +45,7 @@ public class EnderecoService {
 
             Usuario usuarioFk = usuarioService.buscarPorId(endereco.getUsuario());
 
-            if (endereco.getUsuario() != usuarioFk.getId()) {
+            if (!endereco.getUsuario().equals(usuarioFk.getId())) {
                 throw new EntidadeNaoEncontradaException("Usuariofk não existe no banco");
             }
         }

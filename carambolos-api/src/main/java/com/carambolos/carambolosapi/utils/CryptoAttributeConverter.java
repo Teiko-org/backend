@@ -12,7 +12,7 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Base64;
 
-@Converter(autoApply = false)
+@Converter
 public class CryptoAttributeConverter implements AttributeConverter<String, String> {
 
     private static final String TRANSFORMATION = "AES/GCM/NoPadding";
