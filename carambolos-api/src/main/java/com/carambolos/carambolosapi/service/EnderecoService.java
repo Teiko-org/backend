@@ -8,6 +8,7 @@ import com.carambolos.carambolosapi.repository.EnderecoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import com.carambolos.carambolosapi.utils.EnderecoHasher;
 
 @Service
 public class EnderecoService {
@@ -35,6 +36,7 @@ public class EnderecoService {
     }
 
     public Endereco cadastrar(Endereco endereco) {
+        preencherDedupHash(endereco);
         if (endereco.getUsuario() != null) {
             if (existeEnderecoDuplicado(endereco) && endereco.isAtivo()) {
                 throw new EntidadeJaExisteException("Endereço já cadastrado");
@@ -53,6 +55,7 @@ public class EnderecoService {
         if (!enderecoRepository.existsByIdAndIsAtivoTrue(id)) {
             throw new EntidadeNaoEncontradaException(("Endereço com Id %d não encontrado.".formatted(id)));
         }
+        preencherDedupHash(endereco);
         if (existeEnderecoDuplicadoParaAtualizacao(endereco, id)) {
             throw new EntidadeJaExisteException("Endereço já cadastrado");
         }
@@ -74,17 +77,19 @@ public class EnderecoService {
         if (endereco.getUsuario() == null) {
             return false;
         }
-        return enderecoRepository.countByUsuarioAndCepAndNumeroAndIsAtivoEquals(
-                endereco.getUsuario(), endereco.getCep(), endereco.getNumero(), true) > 0;
+        return enderecoRepository.countByUsuarioAndDedupHashAndIsAtivoEquals(
+                endereco.getUsuario(), endereco.getDedupHash(), true) > 0;
     }
 
     public Boolean existeEnderecoDuplicadoParaAtualizacao(Endereco endereco, Integer id) {
         if (endereco.getUsuario() == null) {
             return false;
         }
-        return enderecoRepository.countByUsuarioAndCepAndNumeroAndIsAtivoEqualsAndIdNot(
-                endereco.getUsuario(), endereco.getCep(), endereco.getNumero(), true, id) > 0;
+        return enderecoRepository.countByUsuarioAndDedupHashAndIsAtivoEqualsAndIdNot(
+                endereco.getUsuario(), endereco.getDedupHash(), true, id) > 0;
     }
+
+    private void preencherDedupHash(Endereco e) { e.setDedupHash(EnderecoHasher.computeDedupHash(e)); }
 
 
 }

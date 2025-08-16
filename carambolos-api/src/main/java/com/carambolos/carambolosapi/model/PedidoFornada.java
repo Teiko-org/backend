@@ -1,6 +1,7 @@
 package com.carambolos.carambolosapi.model;
 
 import com.carambolos.carambolosapi.model.enums.TipoEntregaEnum;
+import com.carambolos.carambolosapi.utils.CryptoAttributeConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -35,9 +36,11 @@ public class PedidoFornada {
     private TipoEntregaEnum tipoEntrega;
 
     @Column(name = "nome_cliente")
+    @Convert(converter = CryptoAttributeConverter.class)
     private String nomeCliente;
 
     @Column(name = "telefone_cliente")
+    @Convert(converter = CryptoAttributeConverter.class)
     private String telefoneCliente;
 
     @Column(name = "horario_retirada")

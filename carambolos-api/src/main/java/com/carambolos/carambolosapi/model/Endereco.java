@@ -1,6 +1,8 @@
 package com.carambolos.carambolosapi.model;
 
 import jakarta.persistence.*;
+import com.carambolos.carambolosapi.utils.CryptoAttributeConverter;
+import com.carambolos.carambolosapi.utils.HashUtils;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Entity
@@ -16,27 +18,35 @@ public class Endereco {
     private String nome;
 
     @Schema(description = "CEP do endereço (apenas números)", example = "12345678")
+    @Convert(converter = CryptoAttributeConverter.class)
     private String cep;
 
     @Schema(description = "Estado do endereço", example = "SP")
+    @Convert(converter = CryptoAttributeConverter.class)
     private String estado;
 
     @Schema(description = "Cidade do endereço", example = "São Paulo")
+    @Convert(converter = CryptoAttributeConverter.class)
     private String cidade;
 
     @Schema(description = "Bairro do endereço", example = "Centro")
+    @Convert(converter = CryptoAttributeConverter.class)
     private String bairro;
 
     @Schema(description = "Logradouro do endereço (rua, avenida, etc.)", example = "Rua das Flores")
+    @Convert(converter = CryptoAttributeConverter.class)
     private String logradouro;
 
     @Schema(description = "Número do endereço", example = "123")
+    @Convert(converter = CryptoAttributeConverter.class)
     private String numero;
 
     @Schema(description = "Complemento do endereço", example = "Apartamento 202")
+    @Convert(converter = CryptoAttributeConverter.class)
     private String complemento;
 
     @Schema(description = "Referência para localização", example = "Próximo à praça central")
+    @Convert(converter = CryptoAttributeConverter.class)
     private String referencia;
 
     @Column(name = "is_ativo")
@@ -45,6 +55,9 @@ public class Endereco {
     @Column(name = "usuario_id")
     @Schema(description = "ID do usuário associado ao endereço", example = "5")
     private Integer usuario;
+
+    @Column(name = "dedup_hash", length = 64)
+    private String dedupHash;
 
     public int getId() {
         return id;
@@ -132,6 +145,14 @@ public class Endereco {
 
     public void setUsuario(Integer usuario) {
         this.usuario = usuario;
+    }
+
+    public String getDedupHash() {
+        return dedupHash;
+    }
+
+    public void setDedupHash(String dedupHash) {
+        this.dedupHash = dedupHash;
     }
 
     public Boolean isAtivo() {
