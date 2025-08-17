@@ -1,7 +1,6 @@
 package com.carambolos.carambolosapi.controller;
 
 import com.carambolos.carambolosapi.service.DashboardService;
-import com.carambolos.carambolosapi.service.RelatorioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -36,6 +35,24 @@ public class DashboardController {
             return ResponseEntity.status(204).build();
         }
         return ResponseEntity.ok().body(qtdClientes);
+    }
+
+    @GetMapping("/qtdPedidosConcluidos")
+    public ResponseEntity<Long> countPedidosConcluidos() {
+        long qtd = dashboardService.countPedidosByStatusConcluido();
+        return ResponseEntity.ok(qtd);
+    }
+
+    @GetMapping("/qtdPedidosAbertos")
+    public ResponseEntity<Long> countPedidosAbertos() {
+        long qtd = dashboardService.countPedidosAbertos();
+        return ResponseEntity.ok(qtd);
+    }
+
+    @GetMapping("/qtdPedidosTotal")
+    public ResponseEntity<Long> countPedidosTotal() {
+        long qtd = dashboardService.countPedidosTotal();
+        return ResponseEntity.ok(qtd);
     }
 
 

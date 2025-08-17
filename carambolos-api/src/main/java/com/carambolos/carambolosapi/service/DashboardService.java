@@ -2,6 +2,7 @@ package com.carambolos.carambolosapi.service;
 
 import com.carambolos.carambolosapi.model.PedidoBolo;
 import com.carambolos.carambolosapi.model.PedidoFornada;
+import com.carambolos.carambolosapi.model.enums.StatusEnum;
 import com.carambolos.carambolosapi.repository.*;
 import org.springframework.stereotype.Service;
 import java.util.*;
@@ -19,6 +20,7 @@ public class DashboardService {
     private final RecheioUnitarioRepository recheioUnitarioRepository;
     private final ProdutoFornadaRepository produtoFornadaRepository;
     private final FornadaDaVezRepository fornadaDaVezRepository;
+    private final ResumoPedidoRepository resumoPedidoRepository;
 
     public DashboardService(PedidoBoloRepository pedidoBoloRepository,
                             UsuarioRepository usuarioRepository,
@@ -28,7 +30,7 @@ public class DashboardService {
                             RecheioPedidoRepository recheioPedidoRepository,
                             RecheioUnitarioRepository recheioUnitarioRepository,
                             ProdutoFornadaRepository produtoFornadaRepository,
-                            FornadaDaVezRepository fornadaDaVezRepository) {
+                            FornadaDaVezRepository fornadaDaVezRepository, ResumoPedidoRepository resumoPedidoRepository) {
         this.pedidoBoloRepository = pedidoBoloRepository;
         this.usuarioRepository = usuarioRepository;
         this.boloRepository = boloRepository;
@@ -38,6 +40,7 @@ public class DashboardService {
         this.recheioUnitarioRepository = recheioUnitarioRepository;
         this.produtoFornadaRepository = produtoFornadaRepository;
         this.fornadaDaVezRepository = fornadaDaVezRepository;
+        this.resumoPedidoRepository = resumoPedidoRepository;
     }
 
     public long qtdClientesUnicos() {
@@ -64,4 +67,17 @@ public class DashboardService {
 
         return clientesUnicos.size();
     }
+
+    public long countPedidosByStatusConcluido() {
+        return resumoPedidoRepository.countByStatus(StatusEnum.CONCLUIDO);
+    }
+
+    public long countPedidosAbertos() {
+        return resumoPedidoRepository.countByStatusIn(List.of(StatusEnum.PENDENTE, StatusEnum.PAGO));
+    }
+
+    public long countPedidosTotal() {
+        return resumoPedidoRepository.count();
+    }
+
 }
