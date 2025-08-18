@@ -9,7 +9,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/dashboard")
@@ -53,6 +57,21 @@ public class DashboardController {
     public ResponseEntity<Long> countPedidosTotal() {
         long qtd = dashboardService.countPedidosTotal();
         return ResponseEntity.ok(qtd);
+    }
+
+    @Operation(summary = "Lista os bolos mais pedidos")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Listagem dos bolos mais pedidos realizada com sucesso"),
+            @ApiResponse(responseCode = "204", description = "Nenhum bolo encontrado")
+    })
+    @GetMapping("/bolosMaisPedidos")
+    public ResponseEntity<List<Map<String, Object>>> getBolosMaisPedidos(
+            @RequestParam(defaultValue = "5") int limit) {
+        List<Map<String, Object>> bolosMaisPedidos = dashboardService.getBolosMaisPedidos(limit);
+        if (bolosMaisPedidos.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.ok(bolosMaisPedidos);
     }
 
 
