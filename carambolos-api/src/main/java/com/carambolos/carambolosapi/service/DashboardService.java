@@ -1,15 +1,11 @@
 package com.carambolos.carambolosapi.service;
 
-import com.carambolos.carambolosapi.model.Bolo;
-import com.carambolos.carambolosapi.model.PedidoBolo;
-import com.carambolos.carambolosapi.model.PedidoFornada;
-import com.carambolos.carambolosapi.model.ResumoPedido;
+import com.carambolos.carambolosapi.model.*;
 import com.carambolos.carambolosapi.model.enums.StatusEnum;
 import com.carambolos.carambolosapi.repository.*;
 import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
-
 
 @Service
 public class DashboardService {
@@ -24,6 +20,7 @@ public class DashboardService {
     private final ProdutoFornadaRepository produtoFornadaRepository;
     private final FornadaDaVezRepository fornadaDaVezRepository;
     private final ResumoPedidoRepository resumoPedidoRepository;
+    private final DecoracaoRepository decoracaoRepository;
 
     public DashboardService(PedidoBoloRepository pedidoBoloRepository,
                             UsuarioRepository usuarioRepository,
@@ -33,7 +30,7 @@ public class DashboardService {
                             RecheioPedidoRepository recheioPedidoRepository,
                             RecheioUnitarioRepository recheioUnitarioRepository,
                             ProdutoFornadaRepository produtoFornadaRepository,
-                            FornadaDaVezRepository fornadaDaVezRepository, ResumoPedidoRepository resumoPedidoRepository) {
+                            FornadaDaVezRepository fornadaDaVezRepository, ResumoPedidoRepository resumoPedidoRepository, DecoracaoRepository decoracaoRepository) {
         this.pedidoBoloRepository = pedidoBoloRepository;
         this.usuarioRepository = usuarioRepository;
         this.boloRepository = boloRepository;
@@ -44,6 +41,7 @@ public class DashboardService {
         this.produtoFornadaRepository = produtoFornadaRepository;
         this.fornadaDaVezRepository = fornadaDaVezRepository;
         this.resumoPedidoRepository = resumoPedidoRepository;
+        this.decoracaoRepository = decoracaoRepository;
     }
 
     public long qtdClientesUnicos() {
@@ -98,16 +96,20 @@ public class DashboardService {
                     Double valorTotal = pedidosBolo.stream()
                             .filter(p -> p.getBoloId().equals(entry.getKey()))
                             .mapToDouble(p -> {
-                                Optional<ResumoPedido> resumoPedido = resumoPedidoRepository.findById(p.getId());
-                                return resumoPedido.map(ResumoPedido::getValor).orElse(0.0);
+                                ResumoPedido resumoPedido = resumoPedidoRepository.findByPedidoBoloId(p.getId());
+                                return resumoPedido != null ? resumoPedido.getValor() : 0.0;
                             })
                             .sum();
-                    // TODO: mudar decoracao
+
+                    String nomeDecoracao = bolo
+                            .flatMap(b -> decoracaoRepository.findById(b.getDecoracao()))
+                            .map(Decoracao::getNome)
+                            .orElse("Desconhecido");
 
                     Map<String, Object> resultado = new HashMap<>();
                     resultado.put("boloId", entry.getKey());
                     resultado.put("quantidade", entry.getValue());
-                    resultado.put("nome", bolo.map(b -> b.getDecoracao().getNome()).orElse("Desconhecido"));
+                    resultado.put("nome", nomeDecoracao);
                     resultado.put("valorTotal", valorTotal);
                     return resultado;
                 })
