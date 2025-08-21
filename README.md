@@ -93,6 +93,47 @@ AZURE_STORAGE_CONNECTION_STRING=DefaultEndpointsProtocol=https;AccountName=...
 AZURE_STORAGE_CONTAINER_NAME=carambolo-files
 ```
 
+#### 3.1 Criptografia de dados (PII) — CRYPTO_SECRET_B64
+
+Usamos criptografia AES‑256‑GCM para campos sensíveis (ex.: nome, telefone, endereço). Defina a chave secreta via variável de ambiente `CRYPTO_SECRET_B64` (Base64 de 32 bytes):
+
+- Windows (PowerShell)
+  1. Gerar chave:
+     ```powershell
+     $rng = [System.Security.Cryptography.RandomNumberGenerator]::Create(); $b = New-Object byte[] 32; $rng.GetBytes($b); [Convert]::ToBase64String($b)
+     ```
+  2. Usar na sessão atual:
+     ```powershell
+     $env:CRYPTO_SECRET_B64 = "<COLE_AQUI_O_BASE64>"
+     ```
+  3. Validar (deve imprimir 32):
+     ```powershell
+     [Convert]::FromBase64String($env:CRYPTO_SECRET_B64).Length
+     ```
+
+- macOS/Linux (bash/zsh)
+  1. Gerar chave:
+     ```bash
+     openssl rand -base64 32
+     ```
+  2. Usar na sessão atual:
+     ```bash
+     export CRYPTO_SECRET_B64="<COLE_AQUI_O_BASE64>"
+     ```
+  3. Validar (deve imprimir 32):
+     ```bash
+     echo -n "$CRYPTO_SECRET_B64" | base64 -d | wc -c
+     ```
+
+- Persistência (opcional):
+  - Windows: `setx CRYPTO_SECRET_B64 "<BASE64>"` e reabra o terminal/IDE
+  - Linux: adicione `export CRYPTO_SECRET_B64="<BASE64>"` no `~/.bashrc`/`~/.zshrc`
+
+Alternativa sem variável de ambiente (apenas para desenvolvimento):
+```bash
+./mvnw spring-boot:run -Dspring-boot.run.jvmArguments="-DCRYPTO_SECRET_B64=<BASE64>"
+```
+
 ### 4. Instalação das Dependências
 
 ```bash
@@ -302,6 +343,7 @@ DB_USERNAME=usuario_producao
 DB_PASSWORD=senha_segura_producao
 JWT_SECRET=chave_muito_segura_para_producao_com_mais_de_32_caracteres
 AZURE_STORAGE_CONNECTION_STRING=connection_string_producao
+CRYPTO_SECRET_B64=base64_de_32_bytes_para_aes_256
 ```
 
 ### Build para Produção
@@ -309,6 +351,53 @@ AZURE_STORAGE_CONNECTION_STRING=connection_string_producao
 ```bash
 ./mvnw clean package -Pprod -DskipTests
 ```
+
+### Deploy em VM Ubuntu (systemd)
+
+1. Defina as variáveis de ambiente de produção (incluindo `CRYPTO_SECRET_B64`) no systemd ou `/etc/environment`.
+
+2. Exemplo de unit file `carambolos-api.service`:
+```ini
+[Unit]
+Description=Carambolos API
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/carambolos-api
+ExecStart=/usr/bin/java -jar /opt/carambolos-api/carambolos-api-0.0.1-SNAPSHOT.jar
+User=www-data
+Restart=always
+Environment=DB_URL=jdbc:mysql://10.0.0.5:3306/carambolo_doces
+Environment=DB_USERNAME=usuario_producao
+Environment=DB_PASSWORD=senha_segura_producao
+Environment=JWT_SECRET=chave_muito_segura_para_producao
+Environment=AZURE_STORAGE_CONNECTION_STRING=connection_string_producao
+Environment=CRYPTO_SECRET_B64=<BASE64_DE_32_BYTES>
+
+[Install]
+WantedBy=multi-user.target
+```
+
+3. Copie o JAR para `/opt/carambolos-api`, habilite e inicie:
+```bash
+sudo mkdir -p /opt/carambolos-api
+sudo cp target/carambolos-api-0.0.1-SNAPSHOT.jar /opt/carambolos-api/
+sudo cp carambolos-api.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable carambolos-api
+sudo systemctl start carambolos-api
+sudo systemctl status carambolos-api
+```
+
+Observação: você também pode definir `CRYPTO_SECRET_B64` em `/etc/environment`:
+```bash
+echo 'CRYPTO_SECRET_B64="<BASE64>"' | sudo tee -a /etc/environment
+```
+e depois `sudo systemctl restart carambolos-api`.
+
+### Troubleshooting (CRYPTO_SECRET_B64)
+- Erro: "CRYPTO_SECRET_B64 não definido": variável ausente — defina conforme acima.
+- Erro ao descriptografar: verifique se o Base64 tem 32 bytes após decodificar e se é a mesma chave usada para cifrar dados existentes.
 
 ## 👥 Contribuição
 
