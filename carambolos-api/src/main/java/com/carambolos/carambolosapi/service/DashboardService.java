@@ -92,25 +92,36 @@ public class DashboardService {
         return contagemBolos.entrySet().stream()
                 .sorted(Map.Entry.<Integer, Long>comparingByValue().reversed())
                 .map(entry -> {
-                    Optional<Bolo> bolo = boloRepository.findById(entry.getKey());
+                    Integer boloId = entry.getKey();
+                    Long quantidade = entry.getValue();
+
+                    Optional<Bolo> boloOpt = boloRepository.findById(boloId);
 
                     Double valorTotal = pedidosBolo.stream()
-                            .filter(p -> p.getBoloId().equals(entry.getKey()))
+                            .filter(p -> p.getBoloId().equals(boloId))
                             .mapToDouble(p -> {
                                 ResumoPedido resumoPedido = resumoPedidoRepository.findByPedidoBoloId(p.getId());
                                 return resumoPedido != null ? resumoPedido.getValor() : 0.0;
                             })
                             .sum();
 
-                    String nomeDecoracao = bolo
-                            .flatMap(b -> decoracaoRepository.findById(b.getDecoracao()))
-                            .map(Decoracao::getNome)
-                            .orElse("Desconhecido");
+                    String nomeBolo = "Bolo Desconhecido";
+                    if (boloOpt.isPresent()) {
+                        Bolo bolo = boloOpt.get();
+
+                        String decoracaoNome = bolo.getDecoracao() != null ?
+                                decoracaoRepository.findById(bolo.getDecoracao())
+                                        .map(Decoracao::getNome)
+                                        .orElse("Sem Decoração")
+                                : "Sem Decoração";
+
+                        nomeBolo =  decoracaoNome;
+                    }
 
                     Map<String, Object> resultado = new HashMap<>();
-                    resultado.put("boloId", entry.getKey());
-                    resultado.put("quantidade", entry.getValue());
-                    resultado.put("nome", nomeDecoracao);
+                    resultado.put("boloId", boloId);
+                    resultado.put("quantidade", quantidade);
+                    resultado.put("nome", nomeBolo);
                     resultado.put("valorTotal", valorTotal);
                     return resultado;
                 })
@@ -169,6 +180,41 @@ public class DashboardService {
                 .sorted((m1, m2) -> Integer.compare(
                         (Integer) m2.get("quantidadeTotal"),
                         (Integer) m1.get("quantidadeTotal")
+                ))
+                .collect(Collectors.toList());
+    }
+
+    public List<Map<String, Object>> getProdutosMaisPedidos() {
+
+        List<Map<String, Object>> todasFornadas = getFornadasMaisPedidas();
+        List<Map<String, Object>> todosBolos = getBolosMaisPedidos();
+
+        List<Map<String, Object>> todosProdutos = new ArrayList<>();
+
+        todasFornadas.forEach(produto -> {
+            Map<String, Object> produtoUnificado = new HashMap<>();
+            produtoUnificado.put("id", produto.get("produtoId"));
+            produtoUnificado.put("nome", produto.get("nomeProduto"));
+            produtoUnificado.put("quantidade", produto.get("quantidadeTotal"));
+            produtoUnificado.put("valorTotal", produto.get("valorTotal"));
+            produtoUnificado.put("tipo", "FORNADA");
+            todosProdutos.add(produtoUnificado);
+        });
+
+        todosBolos.forEach(bolo -> {
+            Map<String, Object> boloUnificado = new HashMap<>();
+            boloUnificado.put("id", bolo.get("boloId"));
+            boloUnificado.put("nome", bolo.get("nome"));
+            boloUnificado.put("quantidade", bolo.get("quantidade"));
+            boloUnificado.put("valorTotal", bolo.get("valorTotal"));
+            boloUnificado.put("tipo", "BOLO");
+            todosProdutos.add(boloUnificado);
+        });
+
+        return todosProdutos.stream()
+                .sorted((p1, p2) -> Long.compare(
+                        ((Number) p2.get("quantidade")).longValue(),
+                        ((Number) p1.get("quantidade")).longValue()
                 ))
                 .collect(Collectors.toList());
     }

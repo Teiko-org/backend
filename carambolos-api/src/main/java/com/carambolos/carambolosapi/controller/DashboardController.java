@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -75,7 +74,7 @@ public class DashboardController {
 
     @Operation(summary = "Lista os produtos de fornada mais pedidos")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Listagem dos produtos de fornadas mais pedidosrealizada com sucesso"),
+            @ApiResponse(responseCode = "200", description = "Listagem dos produtos de fornadas mais pedidos realizada com sucesso"),
             @ApiResponse(responseCode = "204", description = "Nenhum produto encontrado")
     })
     @GetMapping("/produtosFornadasMaisPedidos")
@@ -85,5 +84,19 @@ public class DashboardController {
             return ResponseEntity.status(204).build();
         }
         return ResponseEntity.ok(fornadasMaisPedidas);
+    }
+
+    @Operation(summary = "Lista os produtos mais pedidos")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Listagem dos produtos mais pedidos com sucesso"),
+            @ApiResponse(responseCode = "204", description = "Nenhum produto encontrado")
+    })
+    @GetMapping("/produtosMaisPedidos")
+    public ResponseEntity<List<Map<String, Object>>> getProdutosMaisPedidos() {
+        List<Map<String, Object>> produtosMaisPedidos = dashboardService.getProdutosMaisPedidos();
+        if (produtosMaisPedidos.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.ok(produtosMaisPedidos);
     }
 }
