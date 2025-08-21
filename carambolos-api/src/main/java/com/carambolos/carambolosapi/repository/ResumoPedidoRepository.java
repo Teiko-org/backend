@@ -23,5 +23,8 @@ public interface ResumoPedidoRepository extends JpaRepository<ResumoPedido, Inte
    long countByStatus(StatusEnum status);
    long countByStatusIn(List<StatusEnum> status);
    long count();
+   List<ResumoPedido> findAllByOrderByDataPedidoDesc();
+   List<ResumoPedido> findByStatusInOrderByDataPedidoDesc(List<StatusEnum> status);
+
 
 }

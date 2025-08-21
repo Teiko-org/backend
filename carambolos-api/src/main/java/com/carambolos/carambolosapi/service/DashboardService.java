@@ -218,4 +218,41 @@ public class DashboardService {
                 ))
                 .collect(Collectors.toList());
     }
+
+    public List<Map<String, Object>> getUltimosPedidos() {
+        List<ResumoPedido> resumoPedidos = resumoPedidoRepository.findByStatusInOrderByDataPedidoDesc(List.of(StatusEnum.PAGO, StatusEnum.PENDENTE));
+
+        List<Map<String, Object>> ultimosPedidos = new ArrayList<>();
+
+        for (ResumoPedido resumo : resumoPedidos) {
+            Map<String, Object> pedido = new HashMap<>();
+
+            pedido.put("id", resumo.getId());
+            pedido.put("valorPedido", resumo.getValor());
+            pedido.put("dataPedido", resumo.getDataPedido());
+            pedido.put("status", resumo.getStatus());
+
+            if (resumo.getPedidoBoloId() != null) {
+                PedidoBolo pedidoBolo = pedidoBoloRepository.findById(resumo.getPedidoBoloId()).orElse(null);
+
+                if (pedidoBolo != null) {
+                    pedido.put("nomeDoCliente", pedidoBolo.getNomeCliente());
+                    pedido.put("telefoneDoCliente", pedidoBolo.getTelefoneCliente());
+                    pedido.put("tipoDoPedido", pedidoBolo.getTipoEntrega());
+                    pedido.put("tipoProduto", "BOLO");
+                }
+            } else if (resumo.getPedidoFornadaId() != null) {
+                PedidoFornada pedidoFornada = pedidoFornadaRepository.findById(resumo.getPedidoFornadaId()).orElse(null);
+
+                if(pedidoFornada != null) {
+                    pedido.put("nomeDoCliente", pedidoFornada.getNomeCliente());
+                    pedido.put("telefoneDoCliente", pedidoFornada.getTelefoneCliente());
+                    pedido.put("tipoDoPedido", pedidoFornada.getTipoEntrega());
+                    pedido.put("tipoProduto", "FORNADA");
+                }
+            }
+            ultimosPedidos.add(pedido);
+        }
+        return ultimosPedidos;
+    }
 }

@@ -99,4 +99,18 @@ public class DashboardController {
         }
         return ResponseEntity.ok(produtosMaisPedidos);
     }
+
+    @Operation(summary = "Lista os últimos pedidos")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Listagem dos últimos pedidos"),
+            @ApiResponse(responseCode = "204", description = "Nenhum pedido encontrado")
+    })
+    @GetMapping("/ultimosPedidos")
+    public ResponseEntity<List<Map<String, Object>>> getUltimosPedidos() {
+        List<Map<String, Object>> ultimosPedidos = dashboardService.getUltimosPedidos();
+        if (ultimosPedidos.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.ok(ultimosPedidos);
+    }
 }
