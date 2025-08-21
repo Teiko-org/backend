@@ -65,14 +65,25 @@ public class DashboardController {
             @ApiResponse(responseCode = "204", description = "Nenhum bolo encontrado")
     })
     @GetMapping("/bolosMaisPedidos")
-    public ResponseEntity<List<Map<String, Object>>> getBolosMaisPedidos(
-            @RequestParam(defaultValue = "5") int limit) {
-        List<Map<String, Object>> bolosMaisPedidos = dashboardService.getBolosMaisPedidos(limit);
+    public ResponseEntity<List<Map<String, Object>>> getBolosMaisPedidos() {
+        List<Map<String, Object>> bolosMaisPedidos = dashboardService.getBolosMaisPedidos();
         if (bolosMaisPedidos.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
         return ResponseEntity.ok(bolosMaisPedidos);
     }
 
-
+    @Operation(summary = "Lista os produtos de fornada mais pedidos")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Listagem dos produtos de fornadas mais pedidosrealizada com sucesso"),
+            @ApiResponse(responseCode = "204", description = "Nenhum produto encontrado")
+    })
+    @GetMapping("/produtosFornadasMaisPedidos")
+    public ResponseEntity<List<Map<String, Object>>> getFornadasMaisPedidas() {
+        List<Map<String, Object>> fornadasMaisPedidas = dashboardService.getFornadasMaisPedidas();
+        if (fornadasMaisPedidas.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.ok(fornadasMaisPedidas);
+    }
 }

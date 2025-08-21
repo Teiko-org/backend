@@ -21,6 +21,7 @@ public class DashboardService {
     private final FornadaDaVezRepository fornadaDaVezRepository;
     private final ResumoPedidoRepository resumoPedidoRepository;
     private final DecoracaoRepository decoracaoRepository;
+    private final FornadaRepository fornadaRepository;
 
     public DashboardService(PedidoBoloRepository pedidoBoloRepository,
                             UsuarioRepository usuarioRepository,
@@ -30,7 +31,7 @@ public class DashboardService {
                             RecheioPedidoRepository recheioPedidoRepository,
                             RecheioUnitarioRepository recheioUnitarioRepository,
                             ProdutoFornadaRepository produtoFornadaRepository,
-                            FornadaDaVezRepository fornadaDaVezRepository, ResumoPedidoRepository resumoPedidoRepository, DecoracaoRepository decoracaoRepository) {
+                            FornadaDaVezRepository fornadaDaVezRepository, ResumoPedidoRepository resumoPedidoRepository, DecoracaoRepository decoracaoRepository, FornadaRepository fornadaRepository) {
         this.pedidoBoloRepository = pedidoBoloRepository;
         this.usuarioRepository = usuarioRepository;
         this.boloRepository = boloRepository;
@@ -42,6 +43,7 @@ public class DashboardService {
         this.fornadaDaVezRepository = fornadaDaVezRepository;
         this.resumoPedidoRepository = resumoPedidoRepository;
         this.decoracaoRepository = decoracaoRepository;
+        this.fornadaRepository = fornadaRepository;
     }
 
     public long qtdClientesUnicos() {
@@ -81,7 +83,7 @@ public class DashboardService {
         return resumoPedidoRepository.count();
     }
 
-    public List<Map<String, Object>> getBolosMaisPedidos(int limit) {
+    public List<Map<String, Object>> getBolosMaisPedidos() {
         List<PedidoBolo> pedidosBolo = pedidoBoloRepository.findAll();
 
         Map<Integer, Long> contagemBolos = pedidosBolo.stream()
@@ -89,7 +91,6 @@ public class DashboardService {
 
         return contagemBolos.entrySet().stream()
                 .sorted(Map.Entry.<Integer, Long>comparingByValue().reversed())
-                .limit(limit)
                 .map(entry -> {
                     Optional<Bolo> bolo = boloRepository.findById(entry.getKey());
 
@@ -116,4 +117,59 @@ public class DashboardService {
                 .collect(Collectors.toList());
     }
 
+    public List<Map<String, Object>> getFornadasMaisPedidas() {
+        List<PedidoFornada> pedidoFornadas = pedidoFornadaRepository.findAll();
+
+        Map<Integer, Integer> quantidadePorFornadaDaVez = pedidoFornadas.stream()
+                .collect(Collectors.groupingBy(
+                        PedidoFornada::getFornadaDaVez,
+                        Collectors.summingInt(PedidoFornada::getQuantidade)
+                ));
+
+        List<FornadaDaVez> fornadasDaVez = fornadaDaVezRepository.findAll();
+
+        Map<Integer, Integer> quantidadePorProduto = new HashMap<>();
+        Map<Integer, ProdutoFornada> produtoMap = new HashMap<>();
+        Map<Integer, Double> valorTotalPorProduto = new HashMap<>();
+
+        for (FornadaDaVez fdv : fornadasDaVez) {
+            Integer qtdPedida = quantidadePorFornadaDaVez.getOrDefault(fdv.getId(), 0);
+            Integer produtoId = fdv.getProdutoFornada();
+
+            quantidadePorProduto.merge(produtoId, qtdPedida, Integer::sum);
+
+            if (!produtoMap.containsKey(produtoId)) {
+                ProdutoFornada produto = produtoFornadaRepository.findById(produtoId).orElse(null);
+                if (produto != null) {
+                    produtoMap.put(produtoId, produto);
+                    Double valorTotal = qtdPedida * produto.getValor();
+                    valorTotalPorProduto.put(produtoId, valorTotal);
+                }
+            } else {
+                ProdutoFornada produto = produtoMap.get(produtoId);
+                Double valorAtual = valorTotalPorProduto.getOrDefault(produtoId, 0.0);
+                Double novoValor = valorAtual + (qtdPedida * produto.getValor());
+                valorTotalPorProduto.put(produtoId, novoValor);
+            }
+        }
+
+        return quantidadePorProduto.entrySet().stream()
+                .map(entry -> {
+                    Integer produtoId = entry.getKey();
+                    ProdutoFornada produto = produtoMap.get(produtoId);
+
+                    Map<String, Object> result = new HashMap<>();
+                    result.put("produtoId", produtoId);
+                    result.put("nomeProduto", produto != null ? produto.getProduto() : "Produto não encontrado");
+                    result.put("quantidadeTotal", entry.getValue());
+                    result.put("valorTotal", valorTotalPorProduto.getOrDefault(produtoId, 0.0));
+                    return result;
+                })
+                .filter(map -> produtoMap.get(((Integer) map.get("produtoId"))) != null)
+                .sorted((m1, m2) -> Integer.compare(
+                        (Integer) m2.get("quantidadeTotal"),
+                        (Integer) m1.get("quantidadeTotal")
+                ))
+                .collect(Collectors.toList());
+    }
 }
