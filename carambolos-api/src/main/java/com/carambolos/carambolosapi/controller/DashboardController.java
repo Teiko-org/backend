@@ -31,7 +31,7 @@ public class DashboardController {
             @ApiResponse(responseCode = "200", description = "Listagem da quantidade de clientes realizada com sucesso"),
             @ApiResponse(responseCode = "404", description = "Nenhum clientes encontrados")
     })
-    @GetMapping("/qtdClientes")
+    @GetMapping("/qtdClientesUnicos")
     public ResponseEntity<Long> countClientes() {
         long qtdClientes = dashboardService.qtdClientesUnicos();
         if (qtdClientes == 0) {
@@ -40,21 +40,13 @@ public class DashboardController {
         return ResponseEntity.ok().body(qtdClientes);
     }
 
-    @GetMapping("/qtdPedidosConcluidos")
-    public ResponseEntity<Long> countPedidosConcluidos() {
-        long qtd = dashboardService.countPedidosByStatusConcluido();
-        return ResponseEntity.ok(qtd);
-    }
-
-    @GetMapping("/qtdPedidosAbertos")
-    public ResponseEntity<Long> countPedidosAbertos() {
-        long qtd = dashboardService.countPedidosAbertos();
-        return ResponseEntity.ok(qtd);
-    }
-
-    @GetMapping("/qtdPedidosTotal")
-    public ResponseEntity<Long> countPedidosTotal() {
-        long qtd = dashboardService.countPedidosTotal();
+    @Operation(summary = "Conta a quantidade de pedidos")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Contagem da quantidade de pedidos")
+    })
+    @GetMapping("/qtdPedidos")
+    public ResponseEntity<Map<String, Long>> countPedidosTotal() {
+        Map<String, Long> qtd = dashboardService.countPedidos();
         return ResponseEntity.ok(qtd);
     }
 
@@ -112,5 +104,33 @@ public class DashboardController {
             return ResponseEntity.status(204).build();
         }
         return ResponseEntity.ok(ultimosPedidos);
+    }
+
+    @Operation(summary = "Conta as quantidades de pedidos de bolos com os status")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Quantidade dos pedidos de bolos"),
+            @ApiResponse(responseCode = "204", description = "Nenhum pedido encontrado")
+    })
+    @GetMapping("/qtdPedidosBolo")
+    public ResponseEntity<Map<String, Long>> countPedidosBolos() {
+        Map<String, Long> qtdPedidosBolo = dashboardService.countPedidosBolos();
+        if (qtdPedidosBolo.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.ok(qtdPedidosBolo);
+    }
+
+    @Operation(summary = "Conta as quantidades de pedidos de fornadas com os status")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Quantidade dos pedidos de fornadas"),
+            @ApiResponse(responseCode = "204", description = "Nenhum pedido encontrado")
+    })
+    @GetMapping("/qtdPedidosFornada")
+    public ResponseEntity<Map<String, Long>> countPedidosFornada() {
+        Map<String, Long> qtdPedidosFornada = dashboardService.countPedidosFornada();
+        if (qtdPedidosFornada.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.ok(qtdPedidosFornada);
     }
 }

@@ -71,16 +71,58 @@ public class DashboardService {
         return clientesUnicos.size();
     }
 
-    public long countPedidosByStatusConcluido() {
-        return resumoPedidoRepository.countByStatus(StatusEnum.CONCLUIDO);
+    public Map<String, Long> countPedidos() {
+        long pedido = resumoPedidoRepository.count();
+        long pedidoConcluido = resumoPedidoRepository.countByStatus(StatusEnum.CONCLUIDO);
+        long pedidoPago = resumoPedidoRepository.countByStatus(StatusEnum.PAGO);
+        long pedidoPendente = resumoPedidoRepository.countByStatus(StatusEnum.PENDENTE);
+        long pedidoCancelado = resumoPedidoRepository.countByStatus(StatusEnum.CANCELADO);
+
+        Map<String, Long> resultado = new HashMap<>();
+
+        resultado.put("total", pedido);
+        resultado.put("concluídos", pedidoConcluido);
+        resultado.put("pagos", pedidoPago);
+        resultado.put("pendentes", pedidoPendente);
+        resultado.put("cancelados", pedidoCancelado);
+
+        return resultado;
     }
 
-    public long countPedidosAbertos() {
-        return resumoPedidoRepository.countByStatusIn(List.of(StatusEnum.PENDENTE, StatusEnum.PAGO));
+    public Map<String, Long> countPedidosBolos() {
+        long pedidoBolo = resumoPedidoRepository.countByPedidoBoloIdIsNotNull();
+        long pedidoBoloConcluido = resumoPedidoRepository.countByStatusAndPedidoBoloIdIsNotNull(StatusEnum.CONCLUIDO);
+        long pedidoBoloPago = resumoPedidoRepository.countByStatusAndPedidoBoloIdIsNotNull(StatusEnum.PAGO);
+        long pedidoBoloPendente = resumoPedidoRepository.countByStatusAndPedidoBoloIdIsNotNull(StatusEnum.PENDENTE);
+        long pedidoBoloCancelado = resumoPedidoRepository.countByStatusAndPedidoBoloIdIsNotNull(StatusEnum.CANCELADO);
+
+        Map<String, Long> resultado = new HashMap<>();
+
+        resultado.put("total", pedidoBolo);
+        resultado.put("concluídos", pedidoBoloConcluido);
+        resultado.put("pagos", pedidoBoloPago);
+        resultado.put("pendentes", pedidoBoloPendente);
+        resultado.put("cancelados", pedidoBoloCancelado);
+
+        return resultado;
     }
 
-    public long countPedidosTotal() {
-        return resumoPedidoRepository.count();
+    public Map<String, Long> countPedidosFornada() {
+        long pedidoBolo = resumoPedidoRepository.countByPedidoFornadaIdIsNotNull();
+        long pedidoFornadaConcluido = resumoPedidoRepository.countByStatusAndPedidoFornadaIdIsNotNull(StatusEnum.CONCLUIDO);
+        long pedidoFornadaPago = resumoPedidoRepository.countByStatusAndPedidoBoloIdIsNotNull(StatusEnum.PAGO);
+        long pedidoFornadaPendente = resumoPedidoRepository.countByStatusAndPedidoBoloIdIsNotNull(StatusEnum.PENDENTE);
+        long pedidoFornadaCancelado = resumoPedidoRepository.countByStatusAndPedidoFornadaIdIsNotNull(StatusEnum.CANCELADO);
+
+        Map<String, Long> resultado = new HashMap<>();
+
+        resultado.put("total", pedidoBolo);
+        resultado.put("concluídos", pedidoFornadaConcluido);
+        resultado.put("pagos", pedidoFornadaPago);
+        resultado.put("pendentes", pedidoFornadaPendente);
+        resultado.put("cancelados", pedidoFornadaCancelado);
+
+        return resultado;
     }
 
     public List<Map<String, Object>> getBolosMaisPedidos() {
