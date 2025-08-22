@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -133,4 +134,37 @@ public class DashboardController {
         }
         return ResponseEntity.ok(qtdPedidosFornada);
     }
+
+    @Operation(summary = "Conta as quantidades de pedidos de fornadas com os status concluído e cancelado")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Quantidade dos pedidos de fornadas concluídos e cancelados"),
+            @ApiResponse(responseCode = "204", description = "Nenhum pedido encontrado")
+    })
+    @GetMapping("/qtdPedidosFornadaPorPeriodo")
+    public ResponseEntity<Map<String, Map<String, Long>>> countPedidosFornadaPorPeriodo(
+            @RequestParam String periodo
+    ) {
+        Map<String, Map<String, Long>> qtdPedidosFornadaConcluidosECancelados = dashboardService.countPedidosFornadaPorPeriodo(periodo);
+        if (qtdPedidosFornadaConcluidosECancelados.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.ok(qtdPedidosFornadaConcluidosECancelados);
+    }
+
+    @Operation(summary = "Conta as quantidades de pedidos de bolos com os status concluído e cancelado")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Quantidade dos pedidos de bolos concluídos e cancelados"),
+            @ApiResponse(responseCode = "204", description = "Nenhum pedido encontrado")
+    })
+    @GetMapping("/qtdPedidosBoloPorPeriodo")
+    public ResponseEntity<Map<String, Map<String, Long>>> countPedidosBolosPorPeriodo(
+            @RequestParam String periodo
+    ) {
+        Map<String, Map<String, Long>> qtdPedidosBoloConcluidosECancelados = dashboardService.countPedidosBolosPorPeriodo(periodo);
+        if (qtdPedidosBoloConcluidosECancelados.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.ok(qtdPedidosBoloConcluidosECancelados);
+    }
+
 }

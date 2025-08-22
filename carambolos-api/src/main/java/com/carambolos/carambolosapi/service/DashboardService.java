@@ -4,6 +4,8 @@ import com.carambolos.carambolosapi.model.*;
 import com.carambolos.carambolosapi.model.enums.StatusEnum;
 import com.carambolos.carambolosapi.repository.*;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -297,4 +299,69 @@ public class DashboardService {
         }
         return ultimosPedidos;
     }
+
+    public Map<String, Map<String, Long>> processarPedidosPorPeriodoComStatus(List<ResumoPedido> pedidos, String periodo) {
+        Map<String, Map<String, Long>> resultado = new HashMap<>();
+        if (periodo.equalsIgnoreCase("mes")) {
+             Map<String, List<ResumoPedido>> pedidosPorMes = pedidos.stream()
+                     .collect(Collectors.groupingBy(
+                             pedido -> {
+                                 int mes = pedido.getDataPedido().getMonthValue();
+                                 return String.format("%02d", mes);
+                             }
+                     ));
+            for (int i = 1; i <= 12 ; i++) {
+                String mesKey = String.format("%02d", i);
+                List<ResumoPedido> pedidosDoMes = pedidosPorMes.getOrDefault(mesKey, new ArrayList<>());
+
+                Map<String, Long> statusCount = new HashMap<>();
+                statusCount.put("cancelados",
+                        pedidosDoMes.stream()
+                                .filter(p -> p.getStatus() == StatusEnum.CANCELADO)
+                                .count());
+               statusCount.put("concluidos",
+                       pedidosDoMes.stream()
+                               .filter(p -> p.getStatus() == StatusEnum.CONCLUIDO)
+                               .count());
+            resultado.put(mesKey, statusCount);
+            }
+        } else if(periodo.equalsIgnoreCase("ano")) {
+            Map<String, List<ResumoPedido>> pedidosPorAno = pedidos.stream()
+                    .collect(Collectors.groupingBy(
+                            pedido -> String.valueOf(pedido.getDataPedido().getYear())
+                    ));
+            if (pedidosPorAno.isEmpty()) {
+                String anoAtual = String.valueOf(LocalDateTime.now().getYear());
+                Map<String, Long> statusCount = new HashMap<>();
+                statusCount.put("cancelados", 0L);
+                statusCount.put("concluidos", 0L);
+                resultado.put(anoAtual, statusCount);
+            } else {
+            pedidosPorAno.forEach((ano, pedidosDoAno) -> {
+                Map<String, Long> statusCount = new HashMap<>();
+                statusCount.put("cancelados",
+                        pedidosDoAno.stream()
+                                .filter(p -> p.getStatus() == StatusEnum.CANCELADO)
+                                .count());
+                statusCount.put("concluidos",
+                        pedidosDoAno.stream()
+                                .filter(p -> p.getStatus() == StatusEnum.CONCLUIDO)
+                                .count());
+                resultado.put(ano, statusCount);
+            });
+            }
+        }
+        return resultado;
+    }
+
+    public Map<String, Map<String, Long>> countPedidosBolosPorPeriodo(String periodo) {
+        List<ResumoPedido> pedidosBolo = resumoPedidoRepository.findByStatusInAndPedidoBoloIdIsNotNull(List.of(StatusEnum.CANCELADO, StatusEnum.CONCLUIDO));
+        return processarPedidosPorPeriodoComStatus(pedidosBolo, periodo);
+    }
+
+    public Map<String, Map<String, Long>> countPedidosFornadaPorPeriodo(String periodo) {
+        List<ResumoPedido> pedidosFornada = resumoPedidoRepository.findByStatusInAndPedidoFornadaIdIsNotNull(List.of(StatusEnum.CANCELADO, StatusEnum.CONCLUIDO));
+        return processarPedidosPorPeriodoComStatus(pedidosFornada, periodo);
+    }
+
 }
