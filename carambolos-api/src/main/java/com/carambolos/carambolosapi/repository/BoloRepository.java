@@ -19,17 +19,17 @@ public interface BoloRepository extends JpaRepository<Bolo, Integer> {
 
     @Query(value = """
             SELECT
-              b.id AS bolo_id,
+              b.id AS boloId,
               d.nome AS produto,
-              b.categoria,
-              m.sabor AS sabor_massa,
-              COALESCE(CONCAT(ru1.sabor, ' com ', ru2.sabor) , CONCAT(reu1.sabor, ' com ', reu2.sabor)) AS sabor_recheio,
-              c.cor AS cor_cobertura,
+              b.categoria AS categoria,
+              m.sabor AS saborMassa,
+              COALESCE(CONCAT(ru1.sabor, ' com ', ru2.sabor) , CONCAT(reu1.sabor, ' com ', reu2.sabor)) AS saborRecheio,
+              c.cor AS corCobertura,
               b.formato,
               b.tamanho,
-              (m.valor + COALESCE(ru1.valor + ru2.valor, reu1.valor + reu2.valor)) AS preco_total,
-              b.decoracao_id AS decoracao_id,   
-              b.is_ativo AS status
+              (m.valor + COALESCE(ru1.valor + ru2.valor, reu1.valor + reu2.valor)) AS precoTotal,
+              b.decoracao_id AS decoracaoId,   
+              b.is_ativo AS ativo
             FROM bolo b
             JOIN massa m ON b.massa_id = m.id
             JOIN recheio_pedido rp ON b.recheio_pedido_id = rp.id

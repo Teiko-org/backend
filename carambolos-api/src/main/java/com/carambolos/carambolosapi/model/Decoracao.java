@@ -28,6 +28,9 @@ public class Decoracao {
     @Schema(description = "Indica se a decoração está ativa", example = "true")
     private Boolean isAtivo = true;
 
+    @Schema(description = "Categoria para exibição (pré-decoração)", example = "Vintage")
+    private String categoria;
+
     public Integer getId() {
         return id;
     }
@@ -74,5 +77,13 @@ public class Decoracao {
 
     public void setIsAtivo(Boolean isAtivo) {
         this.isAtivo = isAtivo;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
     }
 }

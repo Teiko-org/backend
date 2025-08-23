@@ -5,14 +5,14 @@ public class RecheioPedidoProjection {
     private String sabor1;
     private String sabor2;
     private Double valor;
-    private int isAtivo;
+    private Boolean isAtivo;
 
-    public RecheioPedidoProjection(Integer id, String sabor1, String sabor2, Double valor, int isAtivo) {
+    public RecheioPedidoProjection(Integer id, String sabor1, String sabor2, Double valor, Boolean isAtivo) {
         this.id = id;
         this.sabor1 = sabor1;
         this.sabor2 = sabor2;
         this.valor = valor;
-        this.isAtivo = isAtivo;
+        this.isAtivo = Boolean.TRUE.equals(isAtivo);
     }
 
     public Integer getId() {
@@ -27,17 +27,13 @@ public class RecheioPedidoProjection {
         return sabor1;
     }
 
-    public void setSabor1(String sabor1) {
-        this.sabor1 = sabor1;
-    }
+    public void setSabor1(String sabor1) { this.sabor1 = sabor1; }
 
     public String getSabor2() {
         return sabor2;
     }
 
-    public void setSabor2(String sabor2) {
-        this.sabor2 = sabor2;
-    }
+    public void setSabor2(String sabor2) { this.sabor2 = sabor2; }
 
     public Double getValor() {
         return valor;
@@ -47,11 +43,11 @@ public class RecheioPedidoProjection {
         this.valor = valor;
     }
 
-    public int getIsAtivo() {
+    public Boolean getIsAtivo() {
         return isAtivo;
     }
 
-    public void setIsAtivo(int isAtivo) {
+    public void setIsAtivo(Boolean isAtivo) {
         this.isAtivo = isAtivo;
     }
 }

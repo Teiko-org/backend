@@ -11,4 +11,6 @@ public interface DecoracaoRepository extends JpaRepository<Decoracao, Integer> {
     List<Decoracao> findByIsAtivoTrue();
 
     boolean existsByIdAndIsAtivoTrue(Integer id);
+
+    List<Decoracao> findByIsAtivoTrueAndCategoriaIsNotNull();
 }

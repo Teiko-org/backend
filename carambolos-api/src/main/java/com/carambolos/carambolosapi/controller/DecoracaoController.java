@@ -40,9 +40,10 @@ public class DecoracaoController {
     public ResponseEntity<DecoracaoResponseDTO> criar(
             @RequestPart("nome") String nome,
             @RequestPart("observacao") String observacao,
+            @RequestPart(value = "categoria", required = false) String categoria,
             @RequestPart("imagens") MultipartFile[] imagens) {
 
-        DecoracaoResponseDTO decoracao = decoracaoService.cadastrar(nome, observacao, imagens);
+        DecoracaoResponseDTO decoracao = decoracaoService.cadastrar(nome, observacao, categoria, imagens);
         return ResponseEntity.ok(decoracao);
     }
 
@@ -58,6 +59,23 @@ public class DecoracaoController {
     @GetMapping
     public ResponseEntity<List<DecoracaoResponseDTO>> listarAtivas() {
         List<DecoracaoResponseDTO> decoracoes = decoracaoService.listarAtivas();
+        if (decoracoes.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(decoracoes);
+    }
+
+    @Operation(summary = "Listar pré-decorações para Home", description = "Retorna decorações ativas com categoria não nula")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = DecoracaoResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "204", description = "Nenhuma decoração encontrada", content = @Content)
+    })
+    @GetMapping("/featured")
+    public ResponseEntity<List<DecoracaoResponseDTO>> listarFeatured() {
+        List<DecoracaoResponseDTO> decoracoes = decoracaoService.listarAtivasComCategoria();
         if (decoracoes.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
