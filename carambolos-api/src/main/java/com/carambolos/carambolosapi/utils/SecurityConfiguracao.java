@@ -52,12 +52,26 @@ public class SecurityConfiguracao {
             new AntPathRequestMatcher("/h2-console/**"),
             new AntPathRequestMatcher("/h2-console/**/**"),
             new AntPathRequestMatcher("/error/**"),
+            new AntPathRequestMatcher("/**", "OPTIONS"),
             new AntPathRequestMatcher("/fornadas", "GET"),
+            new AntPathRequestMatcher("/fornadas/**", "GET"),
             new AntPathRequestMatcher("/bolos", "GET"),
+            new AntPathRequestMatcher("/bolos/**", "GET"),
             new AntPathRequestMatcher("/decoracoes", "GET"),
+            new AntPathRequestMatcher("/decoracoes/**", "GET"),
             new AntPathRequestMatcher("/resumo-pedido"),
             new AntPathRequestMatcher("/resumo-pedido/**"),
-            new AntPathRequestMatcher("/usuarios")
+            new AntPathRequestMatcher("/usuarios"),
+            new AntPathRequestMatcher("/enderecos", "POST"),
+            new AntPathRequestMatcher("/bolos", "POST"),
+            new AntPathRequestMatcher("/bolos/pedido", "POST"),
+            new AntPathRequestMatcher("/bolos/recheio-pedido", "POST"),
+            new AntPathRequestMatcher("/bolos/recheio-pedido", "GET"),
+            new AntPathRequestMatcher("/bolos/recheio-pedido/**", "GET"),
+            new AntPathRequestMatcher("/bolos/recheio-unitario", "POST"),
+            new AntPathRequestMatcher("/bolos/cobertura", "POST"),
+            new AntPathRequestMatcher("/bolos/cobertura", "GET"),
+            new AntPathRequestMatcher("/fornadas/pedidos", "POST")
     };
 
     @Bean

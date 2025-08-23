@@ -287,9 +287,9 @@ public class BoloService {
     }
 
     public List<RecheioPedidoProjection> listarRecheiosPedido() {
-        return recheioPedidoRepository.listarRecheiosPedido().stream().filter(
-                recheioPedido -> recheioPedido.getIsAtivo() != 0
-        ).toList();
+        return recheioPedidoRepository.listarRecheiosPedido().stream()
+                .filter(recheioPedido -> Boolean.TRUE.equals(recheioPedido.getIsAtivo()))
+                .toList();
     }
 
     public void deletarRecheioPedido(Integer id) {

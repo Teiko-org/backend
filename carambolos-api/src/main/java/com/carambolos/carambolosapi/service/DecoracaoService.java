@@ -23,10 +23,11 @@ public class DecoracaoService {
     @Autowired
     private AzureStorageService azureStorageService;
 
-    public DecoracaoResponseDTO cadastrar(String nome, String observacao, MultipartFile[] arquivos) {
+    public DecoracaoResponseDTO cadastrar(String nome, String observacao, String categoria, MultipartFile[] arquivos) {
         Decoracao decoracao = new Decoracao();
         decoracao.setNome(nome);
         decoracao.setObservacao(observacao);
+        decoracao.setCategoria(categoria);
         decoracao.setIsAtivo(true);
 
         List<ImagemDecoracao> imagens = new ArrayList<>();
@@ -47,6 +48,13 @@ public class DecoracaoService {
 
     public List<DecoracaoResponseDTO> listarAtivas() {
         return decoracaoRepository.findByIsAtivoTrue()
+                .stream()
+                .map(DecoracaoResponseDTO::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    public List<DecoracaoResponseDTO> listarAtivasComCategoria() {
+        return decoracaoRepository.findByIsAtivoTrueAndCategoriaIsNotNull()
                 .stream()
                 .map(DecoracaoResponseDTO::fromEntity)
                 .collect(Collectors.toList());
@@ -77,6 +85,7 @@ public class DecoracaoService {
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Decoração não encontrada"));
 
         decoracao.setObservacao(request.observacao());
+        decoracao.setCategoria(request.categoria());
 
         return DecoracaoResponseDTO.fromEntity(decoracaoRepository.save(decoracao));
     }

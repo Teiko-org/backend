@@ -18,7 +18,10 @@ public record DecoracaoResponseDTO(
         String observacao,
 
         @Schema(description = "Nome do tipo da decoração", example = "Bolo de natal")
-        String nome
+        String nome,
+
+        @Schema(description = "Categoria para exibição (pré-decoração)", example = "Vintage")
+        String categoria
 ) {
     public static DecoracaoResponseDTO fromEntity(Decoracao decoracao) {
         List<String> urls = decoracao.getImagens()
@@ -30,7 +33,8 @@ public record DecoracaoResponseDTO(
                 decoracao.getId(),
                 urls,
                 decoracao.getObservacao(),
-                decoracao.getNome()
+                decoracao.getNome(),
+                decoracao.getCategoria()
         );
     }
 }

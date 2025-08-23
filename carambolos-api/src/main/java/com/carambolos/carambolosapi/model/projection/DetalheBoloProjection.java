@@ -13,7 +13,7 @@ public class DetalheBoloProjection {
     Integer decoracaoId;
     Boolean isAtivo;
 
-    public DetalheBoloProjection(Integer boloId, String produto, String categoria, String saborMassa, String saborRecheio, String corCobertura, String formato, String tamanho, Double precoTotal, Integer decoracaoId, int isAtivo) {
+    public DetalheBoloProjection(Integer boloId, String produto, String categoria, String saborMassa, String saborRecheio, String corCobertura, String formato, String tamanho, Double precoTotal, Integer decoracaoId, Boolean isAtivo) {
         this.boloId = boloId;
         this.produto = produto;
         this.categoria = categoria;
@@ -25,11 +25,7 @@ public class DetalheBoloProjection {
         this.precoTotal = precoTotal;
         this.decoracaoId = decoracaoId;
 
-        if (isAtivo == 0) {
-            this.isAtivo = false;
-        } else {
-            this.isAtivo = true;
-        }
+        this.isAtivo = Boolean.TRUE.equals(isAtivo);
     }
 
     public Integer getBoloId() {

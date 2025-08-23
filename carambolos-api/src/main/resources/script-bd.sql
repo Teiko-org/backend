@@ -166,6 +166,7 @@ CREATE TABLE IF NOT EXISTS teiko.decoracao (
   id INT NOT NULL AUTO_INCREMENT,
   observacao VARCHAR(70),
   nome varchar(70),
+  categoria varchar(70),
   is_ativo TINYINT NULL,
   PRIMARY KEY (id)
 );

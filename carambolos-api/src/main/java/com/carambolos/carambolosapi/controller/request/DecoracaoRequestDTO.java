@@ -8,5 +8,7 @@ public record DecoracaoRequestDTO(
         @Schema(description = "Observações da decoração", example = "Tema Frozen, tons de azul")
         @Size(max = 70)
         String observacao,
-        String nome
+        String nome,
+        @Schema(description = "Categoria para exibição (pré-decoração)", example = "Vintage")
+        String categoria
 ) {}
