@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -112,11 +113,20 @@ public class UsuarioController {
                     content = @Content())
     })
     @PostMapping("/login")
-    public ResponseEntity<UsuarioTokenDTO> login(@RequestBody LoginRequestDTO loginRequestDTO) {
+    public ResponseEntity<UsuarioTokenDTO> login(
+            @RequestBody LoginRequestDTO loginRequestDTO,
+            HttpServletResponse response
+    ) {
         final Usuario usuario = LoginRequestDTO.toEntity(loginRequestDTO);
-        UsuarioTokenDTO usuarioTokenDto = usuarioService.autenticar(usuario);
+        UsuarioTokenDTO usuarioTokenDto = usuarioService.autenticar(usuario, response);
 
         return ResponseEntity.status(200).body(usuarioTokenDto);
+    }
+
+    @PostMapping("/logOut")
+    public ResponseEntity<Void> logOut(HttpServletResponse response) {
+        usuarioService.logOut(response);
+        return ResponseEntity.ok().build();
     }
 
     @Operation(
