@@ -27,17 +27,13 @@ public class RecheioPedidoProjection {
         return sabor1;
     }
 
-    public void setSabor1(String sabor1) {
-        this.sabor1 = sabor1;
-    }
+    public void setSabor1(String sabor1) { this.sabor1 = sabor1; }
 
     public String getSabor2() {
         return sabor2;
     }
 
-    public void setSabor2(String sabor2) {
-        this.sabor2 = sabor2;
-    }
+    public void setSabor2(String sabor2) { this.sabor2 = sabor2; }
 
     public Double getValor() {
         return valor;
