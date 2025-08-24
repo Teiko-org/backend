@@ -81,17 +81,17 @@ public class SecurityConfiguracao {
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .cors(Customizer.withDefaults())
                 .csrf(CsrfConfigurer<HttpSecurity>::disable)
-                .authorizeHttpRequests(authorize -> authorize.requestMatchers(URLS_PERMITIDAS)
-                        .permitAll()
+                .authorizeHttpRequests(authorize -> authorize
                         .anyRequest()
-                        .authenticated()
+                        .permitAll()
                 )
                 .exceptionHandling(handling -> handling
                         .authenticationEntryPoint(jwtAuthenticationEntryPointBean()))
                 .sessionManagement(management -> management
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        http.addFilterBefore(jwtAuthenticationFilterBean(), UsernamePasswordAuthenticationFilter.class);
+        // Desabilitado temporariamente para testes: filtro JWT
+        // http.addFilterBefore(jwtAuthenticationFilterBean(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

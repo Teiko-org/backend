@@ -253,6 +253,25 @@ public class ResumoPedidoService {
         );
     }
 
+    public String gerarMensagensConsolidadas(List<Integer> idsResumo) {
+        if (idsResumo == null || idsResumo.isEmpty()) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        for (Integer id : idsResumo) {
+            var opt = resumoPedidoRepository.findByIdAndIsAtivoTrue(id);
+            if (opt.isEmpty()) continue;
+            var rp = opt.get();
+            String msg = com.carambolos.carambolosapi.controller.response.ResumoPedidoMensagemResponseDTO
+                    .toResumoPedidoMensagemResponse(rp).mensagem();
+            if (msg != null && !msg.isBlank()) {
+                if (sb.length() > 0) sb.append("\n\n");
+                sb.append(msg);
+            }
+        }
+        return sb.toString();
+    }
+
     private void validarReferencias(ResumoPedido resumoPedido) {
         if (resumoPedido.getPedidoBoloId() == null && resumoPedido.getPedidoFornadaId() == null) {
             throw new IllegalArgumentException("O resumo de pedido deve estar vinculado a um pedido de bolo ou pedido de fornada");

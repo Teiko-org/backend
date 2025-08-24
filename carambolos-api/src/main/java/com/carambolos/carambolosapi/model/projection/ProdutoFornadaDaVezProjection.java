@@ -16,7 +16,7 @@ public class ProdutoFornadaDaVezProjection {
     LocalDate dataInicio;
     LocalDate dataFim;
 
-    public ProdutoFornadaDaVezProjection(Integer fornadaDaVezId, Integer produtoFornadaId, String produto, String descricao, Double valor, String categoria, Integer quantidade, int isAtivoPf, int isAtivoFdv, Date dataInicio, Date dataFim) {
+    public ProdutoFornadaDaVezProjection(Integer fornadaDaVezId, Integer produtoFornadaId, String produto, String descricao, Double valor, String categoria, Integer quantidade, Boolean isAtivoPf, Boolean isAtivoFdv, Date dataInicio, Date dataFim) {
         this.fornadaDaVezId = fornadaDaVezId;
         this.produtoFornadaId = produtoFornadaId;
         this.produto = produto;
@@ -24,18 +24,10 @@ public class ProdutoFornadaDaVezProjection {
         this.valor = valor;
         this.categoria = categoria;
         this.quantidade = quantidade;
-        if (isAtivoPf == 1) {
-            this.isAtivoPf = true;
-        } else {
-            this.isAtivoPf = false;
-        }
-        if (isAtivoFdv == 1) {
-            this.isAtivoFdv = true;
-        } else {
-            this.isAtivoFdv = false;
-        }
-        this.dataInicio = dataInicio.toLocalDate();
-        this.dataFim = dataFim.toLocalDate();
+        this.isAtivoPf = Boolean.TRUE.equals(isAtivoPf);
+        this.isAtivoFdv = Boolean.TRUE.equals(isAtivoFdv);
+        this.dataInicio = (dataInicio != null ? dataInicio.toLocalDate() : null);
+        this.dataFim = (dataFim != null ? dataFim.toLocalDate() : null);
     }
 
     public Integer getFornadaDaVezId() {
