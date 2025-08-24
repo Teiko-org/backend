@@ -15,7 +15,7 @@ import java.util.Optional;
 @Service
 public class FornadaService {
 
-    private FornadaRepository fornadaRepository;
+    private final FornadaRepository fornadaRepository;
 
     public FornadaService(FornadaRepository fornadaRepository) {
         this.fornadaRepository = fornadaRepository;

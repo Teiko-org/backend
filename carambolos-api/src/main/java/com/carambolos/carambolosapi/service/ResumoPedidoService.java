@@ -17,41 +17,49 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@SuppressWarnings("unused")
 public class ResumoPedidoService {
 
-    @Autowired
-    private ResumoPedidoRepository resumoPedidoRepository;
+    private final ResumoPedidoRepository resumoPedidoRepository;
+    private final PedidoBoloRepository pedidoBoloRepository;
+    private final PedidoFornadaRepository pedidoFornadaRepository;
+    private final FornadaDaVezRepository fornadaDaVezRepository;
+    private final ProdutoFornadaRepository produtoFornadaRepository;
+    private final BoloRepository boloRepository;
+    private final RecheioPedidoRepository recheioPedidoRepository;
+    private final RecheioExclusivoRepository recheioExclusivoRepository;
+    private final RecheioUnitarioRepository recheioUnitarioRepository;
+    private final MassaRepository massaRepository;
+    private final CoberturaRepository coberturaRepository;
+    private final EnderecoRepository enderecoRepository;
 
-    @Autowired
-    private PedidoBoloRepository pedidoBoloRepository;
-
-    @Autowired
-    private PedidoFornadaRepository pedidoFornadaRepository;
-
-    @Autowired
-    private FornadaDaVezRepository fornadaDaVezRepository;
-
-    @Autowired
-    private ProdutoFornadaRepository produtoFornadaRepository;
-
-    @Autowired
-    private BoloRepository boloRepository;
-
-    @Autowired
-    private RecheioPedidoRepository recheioPedidoRepository;
-
-    @Autowired
-    private RecheioExclusivoRepository recheioExclusivoRepository;
-
-    @Autowired
-    private RecheioUnitarioRepository recheioUnitarioRepository;
-
-    @Autowired
-    private MassaRepository massaRepository;
-    @Autowired
-    private CoberturaRepository coberturaRepository;
-    @Autowired
-    private EnderecoRepository enderecoRepository;
+    public ResumoPedidoService(
+            ResumoPedidoRepository resumoPedidoRepository,
+            PedidoBoloRepository pedidoBoloRepository,
+            PedidoFornadaRepository pedidoFornadaRepository,
+            FornadaDaVezRepository fornadaDaVezRepository,
+            ProdutoFornadaRepository produtoFornadaRepository,
+            BoloRepository boloRepository,
+            RecheioPedidoRepository recheioPedidoRepository,
+            RecheioExclusivoRepository recheioExclusivoRepository,
+            RecheioUnitarioRepository recheioUnitarioRepository,
+            MassaRepository massaRepository,
+            CoberturaRepository coberturaRepository,
+            EnderecoRepository enderecoRepository
+    ) {
+        this.resumoPedidoRepository = resumoPedidoRepository;
+        this.pedidoBoloRepository = pedidoBoloRepository;
+        this.pedidoFornadaRepository = pedidoFornadaRepository;
+        this.fornadaDaVezRepository = fornadaDaVezRepository;
+        this.produtoFornadaRepository = produtoFornadaRepository;
+        this.boloRepository = boloRepository;
+        this.recheioPedidoRepository = recheioPedidoRepository;
+        this.recheioExclusivoRepository = recheioExclusivoRepository;
+        this.recheioUnitarioRepository = recheioUnitarioRepository;
+        this.massaRepository = massaRepository;
+        this.coberturaRepository = coberturaRepository;
+        this.enderecoRepository = enderecoRepository;
+    }
 
     public List<ResumoPedido> listarResumosPedidos() {
         return resumoPedidoRepository.findAllByIsAtivoTrue();
@@ -265,7 +273,7 @@ public class ResumoPedidoService {
             String msg = com.carambolos.carambolosapi.controller.response.ResumoPedidoMensagemResponseDTO
                     .toResumoPedidoMensagemResponse(rp).mensagem();
             if (msg != null && !msg.isBlank()) {
-                if (sb.length() > 0) sb.append("\n\n");
+                if (!sb.isEmpty()) sb.append("\n\n");
                 sb.append(msg);
             }
         }

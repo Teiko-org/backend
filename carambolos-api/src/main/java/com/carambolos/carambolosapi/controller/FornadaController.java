@@ -1,8 +1,6 @@
 package com.carambolos.carambolosapi.controller;
 
 import com.carambolos.carambolosapi.controller.request.*;
-import com.carambolos.carambolosapi.controller.response.DetalhePedidoBoloDTO;
-import com.carambolos.carambolosapi.controller.response.DetalhePedidoFornadaDTO;
 import com.carambolos.carambolosapi.controller.response.ProdutoFornadaDaVezResponse;
 import com.carambolos.carambolosapi.controller.response.MesAnoResponse;
 import com.carambolos.carambolosapi.controller.response.FornadaComItensResponse;
@@ -38,6 +36,7 @@ import java.util.List;
 @RequestMapping("/fornadas")
 @Tag(name = "Fornada Controller", description = "Gerencia Fornadas, Produtos da Fornada, Fornadas da Vez e Pedidos de Fornada")
 @SecurityRequirement(name = "Bearer")
+@SuppressWarnings("unused")
 public class FornadaController {
 
     @Autowired
