@@ -5,9 +5,9 @@ public class RecheioExclusivoProjection {
     private String nome;
     private String sabor1;
     private String sabor2;
-    private int isAtivo;
+    private Integer isAtivo;
 
-    public RecheioExclusivoProjection(Integer id, String nome, String sabor1, String sabor2, int isAtivo) {
+    public RecheioExclusivoProjection(Integer id, String nome, String sabor1, String sabor2, Integer isAtivo) {
         this.id = id;
         this.nome = nome;
         this.sabor1 = sabor1;
@@ -47,11 +47,11 @@ public class RecheioExclusivoProjection {
         this.sabor2 = sabor2;
     }
 
-    public int getIsAtivo() {
+    public Integer getIsAtivo() {
         return isAtivo;
     }
 
-    public void setIsAtivo(int isAtivo) {
+    public void setIsAtivo(Integer isAtivo) {
         this.isAtivo = isAtivo;
     }
 }

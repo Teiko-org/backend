@@ -207,9 +207,9 @@ public class BoloService {
     }
 
     public List<RecheioExclusivoProjection> listarRecheiosExclusivos() {
-        return recheioExclusivoRepository.listarRecheiosExclusivos().stream().filter(
-                recheioExclusivo -> recheioExclusivo.getIsAtivo() != 0
-        ).toList();
+        return recheioExclusivoRepository.listarRecheiosExclusivos().stream()
+                .filter(recheioExclusivo -> recheioExclusivo.getIsAtivo() != null && recheioExclusivo.getIsAtivo() == 1)
+                .toList();
     }
 
     public RecheioExclusivoProjection editarRecheioExclusivo(RecheioExclusivo recheioExclusivo, Integer id) {

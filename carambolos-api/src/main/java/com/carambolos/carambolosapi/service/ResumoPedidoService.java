@@ -130,7 +130,9 @@ public class ResumoPedidoService {
     }
 
     public DetalhePedidoBoloDTO obterDetalhePedidoBolo(Integer pedidoResumoId) {
-        ResumoPedido resumoPedido = resumoPedidoRepository.findByPedidoBoloId(pedidoResumoId);
+        ResumoPedido resumoPedido = resumoPedidoRepository
+                .findTop1ByPedidoBoloIdAndIsAtivoTrueOrderByDataPedidoDesc(pedidoResumoId)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Resumo de pedido (bolo) não encontrado"));
 
         if (resumoPedido.getPedidoBoloId() == null) {
             throw new EntidadeImprocessavelException("O resumo de pedido #" + pedidoResumoId + " não está vinculado a um pedido de bolo");
@@ -221,7 +223,9 @@ public class ResumoPedidoService {
     }
 
     public DetalhePedidoFornadaDTO obterDetalhePedidoFornada(Integer pedidoResumoId) {
-        ResumoPedido resumoPedido = resumoPedidoRepository.findByPedidoFornadaId(pedidoResumoId);
+        ResumoPedido resumoPedido = resumoPedidoRepository
+                .findTop1ByPedidoFornadaIdAndIsAtivoTrueOrderByDataPedidoDesc(pedidoResumoId)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Resumo de pedido (fornada) não encontrado"));
 
         if (resumoPedido.getPedidoFornadaId() == null) {
             throw new EntidadeImprocessavelException("O resumo de pedido #" + pedidoResumoId + " não está vinculado a um pedido de fornada");

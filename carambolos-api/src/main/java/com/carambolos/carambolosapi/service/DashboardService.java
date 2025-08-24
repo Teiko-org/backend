@@ -110,15 +110,15 @@ public class DashboardService {
     }
 
     public Map<String, Long> countPedidosFornada() {
-        long pedidoBolo = resumoPedidoRepository.countByPedidoFornadaIdIsNotNull();
+        long pedidoFornada = resumoPedidoRepository.countByPedidoFornadaIdIsNotNull();
         long pedidoFornadaConcluido = resumoPedidoRepository.countByStatusAndPedidoFornadaIdIsNotNull(StatusEnum.CONCLUIDO);
-        long pedidoFornadaPago = resumoPedidoRepository.countByStatusAndPedidoBoloIdIsNotNull(StatusEnum.PAGO);
-        long pedidoFornadaPendente = resumoPedidoRepository.countByStatusAndPedidoBoloIdIsNotNull(StatusEnum.PENDENTE);
+        long pedidoFornadaPago = resumoPedidoRepository.countByStatusAndPedidoFornadaIdIsNotNull(StatusEnum.PAGO);
+        long pedidoFornadaPendente = resumoPedidoRepository.countByStatusAndPedidoFornadaIdIsNotNull(StatusEnum.PENDENTE);
         long pedidoFornadaCancelado = resumoPedidoRepository.countByStatusAndPedidoFornadaIdIsNotNull(StatusEnum.CANCELADO);
 
         Map<String, Long> resultado = new HashMap<>();
 
-        resultado.put("total", pedidoBolo);
+        resultado.put("total", pedidoFornada);
         resultado.put("concluídos", pedidoFornadaConcluido);
         resultado.put("pagos", pedidoFornadaPago);
         resultado.put("pendentes", pedidoFornadaPendente);
@@ -143,10 +143,10 @@ public class DashboardService {
 
                     Double valorTotal = pedidosBolo.stream()
                             .filter(p -> p.getBoloId().equals(boloId))
-                            .mapToDouble(p -> {
-                                ResumoPedido resumoPedido = resumoPedidoRepository.findByPedidoBoloId(p.getId());
-                                return resumoPedido != null ? resumoPedido.getValor() : 0.0;
-                            })
+                            .mapToDouble(p -> resumoPedidoRepository
+                                    .findTop1ByPedidoBoloIdAndIsAtivoTrueOrderByDataPedidoDesc(p.getId())
+                                    .map(ResumoPedido::getValor)
+                                    .orElse(0.0))
                             .sum();
 
                     String nomeBolo = "Bolo Desconhecido";
