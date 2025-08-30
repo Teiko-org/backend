@@ -127,8 +127,8 @@ public class SecurityConfiguracao {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuracao = new CorsConfiguration();
-        configuracao.setAllowedOrigins(List.of("http://localhost:5173")); // 🔹 origem do React
-        configuracao.setAllowCredentials(true); // 🔹 permite envio de cookies
+        configuracao.setAllowedOrigins(List.of("http://localhost:5173"));
+        configuracao.setAllowCredentials(true);
         configuracao.setAllowedMethods(Arrays.asList(
                 HttpMethod.GET.name(),
                 HttpMethod.POST.name(),
