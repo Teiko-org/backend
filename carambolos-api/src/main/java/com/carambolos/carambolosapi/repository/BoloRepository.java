@@ -54,7 +54,7 @@ public interface BoloRepository extends JpaRepository<Bolo, Integer> {
             """, nativeQuery = true)
     void atualizarStatusBolo(Integer status, Integer id);
 
-    @Query(value = "SELECT * FROM imagem_decoracao WHERE decoracao_id = ?1", nativeQuery = true)
+    @Query(value = "SELECT * FROM imagem_decoracao WHERE decoracao_id = ?1 ORDER BY id DESC LIMIT 1", nativeQuery = true)
     ImagemDecoracao findImagemByBolo(Integer idDecoracao);
 
 }

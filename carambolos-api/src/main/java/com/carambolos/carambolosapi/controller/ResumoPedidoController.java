@@ -19,6 +19,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.carambolos.carambolosapi.controller.request.MensagensResumoRequestDTO;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -292,5 +293,12 @@ public class ResumoPedidoController {
     public ResponseEntity<DetalhePedidoFornadaDTO> obterDetalhePedidoFornada(@PathVariable Integer id) {
         DetalhePedidoFornadaDTO detalhe = resumoPedidoService.obterDetalhePedidoFornada(id);
         return ResponseEntity.ok(detalhe);
+    }
+
+    @Operation(summary = "Gerar mensagem consolidada de múltiplos resumos", description = "Concatena as mensagens de WhatsApp de vários resumos de pedido")
+    @PostMapping("/mensagens")
+    public ResponseEntity<String> gerarMensagensConsolidadas(@RequestBody MensagensResumoRequestDTO request) {
+        String mensagem = resumoPedidoService.gerarMensagensConsolidadas(request.idsResumo());
+        return ResponseEntity.ok(mensagem);
     }
 }

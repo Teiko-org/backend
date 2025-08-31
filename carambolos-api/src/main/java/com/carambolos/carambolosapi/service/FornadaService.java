@@ -7,12 +7,15 @@ import com.carambolos.carambolosapi.model.Fornada;
 import com.carambolos.carambolosapi.repository.FornadaRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class FornadaService {
 
-    private FornadaRepository fornadaRepository;
+    private final FornadaRepository fornadaRepository;
 
     public FornadaService(FornadaRepository fornadaRepository) {
         this.fornadaRepository = fornadaRepository;
@@ -30,6 +33,17 @@ public class FornadaService {
 
     public List<Fornada> listarFornada() {
         return fornadaRepository.findAll().stream().filter(Fornada::isAtivo).toList();
+    }
+
+    public List<Fornada> listarFornadasPorMesAno(int ano, int mes) {
+        YearMonth ym = YearMonth.of(ano, mes);
+        LocalDate inicio = ym.atDay(1);
+        LocalDate fim = ym.atEndOfMonth();
+        return fornadaRepository.findByIsAtivoTrueAndDataInicioBetweenOrderByDataInicioAsc(inicio, fim);
+    }
+
+    public Optional<Fornada> buscarFornadaMaisRecente() {
+        return fornadaRepository.findTop1ByIsAtivoTrueOrderByDataInicioDesc();
     }
 
     public Fornada buscarFornada(Integer id) {

@@ -1,9 +1,9 @@
 package com.carambolos.carambolosapi.controller;
 
 import com.carambolos.carambolosapi.controller.request.*;
-import com.carambolos.carambolosapi.controller.response.DetalhePedidoBoloDTO;
-import com.carambolos.carambolosapi.controller.response.DetalhePedidoFornadaDTO;
 import com.carambolos.carambolosapi.controller.response.ProdutoFornadaDaVezResponse;
+import com.carambolos.carambolosapi.controller.response.MesAnoResponse;
+import com.carambolos.carambolosapi.controller.response.FornadaComItensResponse;
 import com.carambolos.carambolosapi.controller.response.ProdutoFornadaResponseDTO;
 import com.carambolos.carambolosapi.model.Fornada;
 import com.carambolos.carambolosapi.model.FornadaDaVez;
@@ -29,12 +29,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping("/fornadas")
 @Tag(name = "Fornada Controller", description = "Gerencia Fornadas, Produtos da Fornada, Fornadas da Vez e Pedidos de Fornada")
 @SecurityRequirement(name = "Bearer")
+@SuppressWarnings("unused")
 public class FornadaController {
 
     @Autowired
@@ -76,6 +78,50 @@ public class FornadaController {
     @GetMapping
     public ResponseEntity<List<Fornada>> listarFornadas() {
         return ResponseEntity.status(200).body(fornadaService.listarFornada());
+    }
+
+    @Operation(summary = "Lista meses/anos que tiveram fornadas (para filtro)")
+    @GetMapping("/meses-anos")
+    public ResponseEntity<List<MesAnoResponse>> listarMesesAnosDisponiveis() {
+        var proj = fornadaService
+                .listarFornada() // obter todas e derivar mês/ano distintos em memória caso native indisponível via service
+                .stream()
+                .filter(Fornada::isAtivo)
+                .map(f -> new MesAnoResponse(f.getDataInicio().getYear(), f.getDataInicio().getMonthValue()))
+                .distinct()
+                .sorted((a, b) -> {
+                    int byYear = b.ano().compareTo(a.ano());
+                    if (byYear != 0) return byYear;
+                    return b.mes().compareTo(a.mes());
+                })
+                .toList();
+        return ResponseEntity.ok(proj);
+    }
+
+    @Operation(summary = "Lista fornadas com itens por mês/ano")
+    @GetMapping("/com-itens")
+    public ResponseEntity<List<FornadaComItensResponse>> listarFornadasComItensPorMesAno(
+            @RequestParam("ano") Integer ano,
+            @RequestParam("mes") Integer mes
+    ) {
+        var fornadas = fornadaService.listarFornadasPorMesAno(ano, mes);
+        List<FornadaComItensResponse> resposta = new ArrayList<>();
+        for (Fornada f : fornadas) {
+            var itens = fornadaDaVezService.buscarProdutosPorFornadaId(f.getId());
+            resposta.add(FornadaComItensResponse.of(f, itens));
+        }
+        return ResponseEntity.ok(resposta);
+    }
+
+    @Operation(summary = "Lista produtos da fornada mais recente (sem imagens)")
+    @GetMapping("/mais-recente/produtos")
+    public ResponseEntity<List<ProdutoFornadaDaVezResponse>> listarProdutosDaFornadaMaisRecente() {
+        var fornadaOpt = fornadaService.buscarFornadaMaisRecente();
+        if (fornadaOpt.isEmpty()) {
+            return ResponseEntity.ok(List.of());
+        }
+        var itens = fornadaDaVezService.buscarProdutosPorFornadaId(fornadaOpt.get().getId());
+        return ResponseEntity.ok(ProdutoFornadaDaVezResponse.toProdutoFornadaDaVezResonse(itens));
     }
 
     @Operation(summary = "Busca uma fornada por ID")
