@@ -7,6 +7,7 @@ import com.carambolos.carambolosapi.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.model.Usuario;
 import com.carambolos.carambolosapi.repository.UsuarioRepository;
 import com.carambolos.carambolosapi.utils.GerenciadorTokenJwt;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,9 @@ public class UsuarioService {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private TokenBlacklistService tokenBlacklistService;
 
     public List<Usuario> listar() {
         return usuarioRepository.findAllByIsAtivoTrue();
@@ -118,7 +122,7 @@ public class UsuarioService {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        final String token = gerenciadorTokenJwt.generateToken(authentication);
+        final String token = gerenciadorTokenJwt.generateToken(authentication, usuarioAutenticado.getSysAdmin());
 
         Cookie cookie = new Cookie("authToken", token);
         cookie.setHttpOnly(true);
@@ -130,7 +134,11 @@ public class UsuarioService {
         return UsuarioTokenDTO.toTokenDTO(usuarioAutenticado);
     }
 
-    public void logOut(HttpServletResponse response) {
+    public void logOut(HttpServletResponse response , String token) {
+        String jti = gerenciadorTokenJwt.getClaimForToken(token, Claims::getId);
+        long exp = gerenciadorTokenJwt.getExpirationDateFromToken(token).getTime();
+        tokenBlacklistService.blacklistToken(token);
+
         Cookie cookie = new Cookie("authToken", null);
         cookie.setHttpOnly(true);
 //        cookie.setSecure(true); // Descomentar caso seja usado HTTPS

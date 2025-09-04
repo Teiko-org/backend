@@ -34,6 +34,9 @@ public class SecurityConfiguracao {
     @Autowired
     private AutenticacaoService autenticacaoService;
 
+    @Autowired
+    private JwtBlacklistFilter jwtBlacklistFilter;
+
     private static final AntPathRequestMatcher[] URLS_PERMITIDAS = {
             new AntPathRequestMatcher("/swagger-ui/**"),
             new AntPathRequestMatcher("/swagger-ui.html"),
@@ -61,7 +64,7 @@ public class SecurityConfiguracao {
             new AntPathRequestMatcher("/resumo-pedido"),
             new AntPathRequestMatcher("/resumo-pedido/**"),
             new AntPathRequestMatcher("/usuarios"),
-            new AntPathRequestMatcher("/enderecos", "POST"),
+//            new AntPathRequestMatcher("/enderecos", "POST"),
             new AntPathRequestMatcher("/bolos", "POST"),
             new AntPathRequestMatcher("/bolos/pedido", "POST"),
             new AntPathRequestMatcher("/bolos/recheio-pedido", "POST"),
@@ -76,8 +79,9 @@ public class SecurityConfiguracao {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .headers(headers -> headers
-                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
+                .addFilterBefore(jwtBlacklistFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilterBean(), UsernamePasswordAuthenticationFilter.class)
+                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .cors(Customizer.withDefaults())
                 .csrf(CsrfConfigurer<HttpSecurity>::disable)
                 .authorizeHttpRequests(authorize -> authorize
@@ -126,8 +130,8 @@ public class SecurityConfiguracao {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuracao = new CorsConfiguration();
-        configuracao.setAllowedOrigins(List.of("http://localhost:5173")); // 🔹 origem do React
-        configuracao.setAllowCredentials(true); // 🔹 permite envio de cookies
+        configuracao.setAllowedOrigins(List.of("http://localhost:5173"));
+        configuracao.setAllowCredentials(true);
         configuracao.setAllowedMethods(Arrays.asList(
                 HttpMethod.GET.name(),
                 HttpMethod.POST.name(),

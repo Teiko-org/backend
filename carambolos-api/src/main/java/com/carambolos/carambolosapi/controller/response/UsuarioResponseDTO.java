@@ -27,6 +27,8 @@ public class UsuarioResponseDTO {
 
     private boolean isAtivo;
 
+    private boolean isAdmin;
+
     public static UsuarioResponseDTO toResponseDTO(Usuario usuario) {
         UsuarioResponseDTO responseDto = new UsuarioResponseDTO();
 
@@ -37,9 +39,13 @@ public class UsuarioResponseDTO {
         responseDto.setGenero(usuario.getGenero());
         responseDto.setImagemUrl(usuario.getImagemUrl());
         responseDto.setAtivo(usuario.isAtivo());
+        if (usuario.getSysAdmin() == null) {
+            responseDto.setAdmin(false);
+        } else {
+            responseDto.setAdmin(usuario.getSysAdmin());
+        }
 
         return responseDto;
-
     }
 
     public Integer getId() {
@@ -96,5 +102,13 @@ public class UsuarioResponseDTO {
 
     public void setAtivo(boolean ativo) {
         isAtivo = ativo;
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
     }
 }

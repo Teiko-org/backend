@@ -124,8 +124,11 @@ public class UsuarioController {
     }
 
     @PostMapping("/logOut")
-    public ResponseEntity<Void> logOut(HttpServletResponse response) {
-        usuarioService.logOut(response);
+    public ResponseEntity<Void> logOut(
+            HttpServletResponse response,
+            @CookieValue(value = "authToken", required = false) String token
+    ) {
+        usuarioService.logOut(response, token.replace("Bearer ", ""));
         return ResponseEntity.ok().build();
     }
 
