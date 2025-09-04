@@ -46,6 +46,11 @@ public class FornadaService {
         return fornadaRepository.findTop1ByIsAtivoTrueOrderByDataInicioDesc();
     }
 
+    public Optional<Fornada> buscarProximaFornada() {
+        LocalDate hoje = LocalDate.now();
+        return fornadaRepository.findTop1ByIsAtivoTrueAndDataInicioAfterOrderByDataInicioAsc(hoje);
+    }
+
     public Fornada buscarFornada(Integer id) {
         return fornadaRepository.findById(id)
                 .filter(Fornada::isAtivo)

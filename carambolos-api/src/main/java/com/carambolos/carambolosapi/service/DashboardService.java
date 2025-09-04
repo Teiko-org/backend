@@ -5,6 +5,7 @@ import com.carambolos.carambolosapi.model.enums.StatusEnum;
 import com.carambolos.carambolosapi.repository.*;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -362,6 +363,140 @@ public class DashboardService {
     public Map<String, Map<String, Long>> countPedidosFornadaPorPeriodo(String periodo) {
         List<ResumoPedido> pedidosFornada = resumoPedidoRepository.findByStatusInAndPedidoFornadaIdIsNotNull(List.of(StatusEnum.CANCELADO, StatusEnum.CONCLUIDO));
         return processarPedidosPorPeriodoComStatus(pedidosFornada, periodo);
+    }
+
+    // KPIs específicos para fornadas
+    public Map<String, Object> getKPIFornada(Integer fornadaId) {
+        try {
+            // Buscar produtos da fornada usando FornadaDaVez
+            List<FornadaDaVez> produtosFornada = fornadaDaVezRepository.findByFornada(fornadaId);
+            
+            if (produtosFornada.isEmpty()) {
+                return criarKPIVazio();
+            }
+
+            int quantidadeDisponivel = 0;
+            int quantidadeVendida = 0;
+            double totalDisponivel = 0.0;
+            double totalVendido = 0.0;
+
+            for (FornadaDaVez fornadaDaVez : produtosFornada) {
+                // Buscar o produto da fornada
+                ProdutoFornada produto = produtoFornadaRepository.findById(fornadaDaVez.getProdutoFornada())
+                    .orElse(null);
+                
+                if (produto == null) continue;
+
+                // Quantidade total disponível
+                int qtdDisponivel = fornadaDaVez.getQuantidade();
+                quantidadeDisponivel += qtdDisponivel;
+                
+                // Valor total disponível
+                double valorDisponivel = qtdDisponivel * produto.getValor();
+                totalDisponivel += valorDisponivel;
+
+                // Buscar pedidos para este produto da fornada
+                List<PedidoFornada> pedidos = pedidoFornadaRepository.findAll().stream()
+                    .filter(p -> p.getFornadaDaVez().equals(fornadaDaVez.getId()))
+                    .collect(Collectors.toList());
+                
+                // Calcular quantidade vendida
+                int qtdVendida = pedidos.stream()
+                    .mapToInt(PedidoFornada::getQuantidade)
+                    .sum();
+                quantidadeVendida += qtdVendida;
+                
+                // Calcular valor vendido
+                double valorVendido = qtdVendida * produto.getValor();
+                totalVendido += valorVendido;
+            }
+
+            // Calcular valor perdido
+            double valorPerdido = totalDisponivel - totalVendido;
+
+            Map<String, Object> kpi = new HashMap<>();
+            kpi.put("quantidadeDisponivel", quantidadeDisponivel);
+            kpi.put("quantidadeVendida", quantidadeVendida);
+            kpi.put("totalDisponivel", totalDisponivel);
+            kpi.put("totalVendido", totalVendido);
+            kpi.put("valorPerdido", valorPerdido);
+            kpi.put("percentualVendido", quantidadeDisponivel > 0 ? 
+                (double) quantidadeVendida / quantidadeDisponivel * 100 : 0.0);
+
+            return kpi;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return criarKPIVazio();
+        }
+    }
+
+    public Map<String, Object> getKPIFornadaMaisRecente() {
+        try {
+            Optional<Fornada> fornadaOpt = fornadaRepository.findTop1ByIsAtivoTrueOrderByDataInicioDesc();
+            if (fornadaOpt.isEmpty()) {
+                return criarKPIVazio();
+            }
+            return getKPIFornada(fornadaOpt.get().getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return criarKPIVazio();
+        }
+    }
+
+    public Map<String, Object> getKPIFornadasPorMesAno(int ano, int mes) {
+        try {
+            List<Fornada> fornadas = fornadaRepository.findByIsAtivoTrueAndDataInicioBetweenOrderByDataInicioAsc(
+                LocalDate.of(ano, mes, 1),
+                LocalDate.of(ano, mes, 1).plusMonths(1).minusDays(1)
+            );
+
+            if (fornadas.isEmpty()) {
+                return criarKPIVazio();
+            }
+
+            double totalDisponivel = 0.0;
+            double totalVendido = 0.0;
+            int quantidadeDisponivel = 0;
+            int quantidadeVendida = 0;
+
+            for (Fornada fornada : fornadas) {
+                Map<String, Object> kpiFornada = getKPIFornada(fornada.getId());
+                
+                quantidadeDisponivel += (Integer) kpiFornada.get("quantidadeDisponivel");
+                quantidadeVendida += (Integer) kpiFornada.get("quantidadeVendida");
+                totalDisponivel += (Double) kpiFornada.get("totalDisponivel");
+                totalVendido += (Double) kpiFornada.get("totalVendido");
+            }
+
+            double valorPerdido = totalDisponivel - totalVendido;
+
+            Map<String, Object> kpi = new HashMap<>();
+            kpi.put("quantidadeDisponivel", quantidadeDisponivel);
+            kpi.put("quantidadeVendida", quantidadeVendida);
+            kpi.put("totalDisponivel", totalDisponivel);
+            kpi.put("totalVendido", totalVendido);
+            kpi.put("valorPerdido", valorPerdido);
+            kpi.put("percentualVendido", quantidadeDisponivel > 0 ? 
+                (double) quantidadeVendida / quantidadeDisponivel * 100 : 0.0);
+            kpi.put("mes", mes);
+            kpi.put("ano", ano);
+
+            return kpi;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return criarKPIVazio();
+        }
+    }
+
+    private Map<String, Object> criarKPIVazio() {
+        Map<String, Object> kpi = new HashMap<>();
+        kpi.put("quantidadeDisponivel", 0);
+        kpi.put("quantidadeVendida", 0);
+        kpi.put("totalDisponivel", 0.0);
+        kpi.put("totalVendido", 0.0);
+        kpi.put("valorPerdido", 0.0);
+        kpi.put("percentualVendido", 0.0);
+        return kpi;
     }
 
 }

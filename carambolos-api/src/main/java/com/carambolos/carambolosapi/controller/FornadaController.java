@@ -124,6 +124,20 @@ public class FornadaController {
         return ResponseEntity.ok(ProdutoFornadaDaVezResponse.toProdutoFornadaDaVezResonse(itens));
     }
 
+    @Operation(summary = "Busca a próxima fornada")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Próxima fornada encontrada com sucesso"),
+            @ApiResponse(responseCode = "204", description = "Nenhuma fornada futura encontrada")
+    })
+    @GetMapping("/proxima")
+    public ResponseEntity<Fornada> buscarProximaFornada() {
+        var fornadaOpt = fornadaService.buscarProximaFornada();
+        if (fornadaOpt.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(fornadaOpt.get());
+    }
+
     @Operation(summary = "Busca uma fornada por ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Fornada encontrada com sucesso"),
