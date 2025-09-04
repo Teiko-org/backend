@@ -4,7 +4,6 @@ import com.carambolos.carambolosapi.model.ResumoPedido;
 import com.carambolos.carambolosapi.model.enums.StatusEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -18,8 +17,8 @@ public interface ResumoPedidoRepository extends JpaRepository<ResumoPedido, Inte
    List<ResumoPedido> findByPedidoFornadaIdIsNotNullAndIsAtivoTrue();
    List<ResumoPedido> findByStatusAndIsAtivoTrue(StatusEnum status);
    boolean existsByIdAndIsAtivoTrue(Integer id);
-   ResumoPedido findByPedidoBoloId(Integer id);
-   ResumoPedido findByPedidoFornadaId(Integer id);
+   Optional<ResumoPedido> findTop1ByPedidoBoloIdAndIsAtivoTrueOrderByDataPedidoDesc(Integer id);
+   Optional<ResumoPedido> findTop1ByPedidoFornadaIdAndIsAtivoTrueOrderByDataPedidoDesc(Integer id);
    long countByStatus(StatusEnum status);
    long countByStatusIn(List<StatusEnum> status);
    long count();
