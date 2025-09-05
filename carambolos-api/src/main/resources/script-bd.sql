@@ -324,6 +324,17 @@ CREATE TABLE IF NOT EXISTS teiko.resumo_pedido (
     REFERENCES teiko.pedido_bolo (id)
 );
 
+-- -----------------------------------------------------
+-- JWT Token Blacklist
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS jwt_token_blacklist (
+    id INT NOT NULL AUTO_INCREMENT,
+    token VARCHAR(500) NOT NULL,
+    blacklisted_at DATETIME NOT NULL,
+    PRIMARY KEY (id),
+    INDEX token_idx (token ASC) VISIBLE
+);
+
 -- Alterações nas colunas para suportar textos maiores
 ALTER TABLE teiko.recheio_unitario MODIFY COLUMN sabor VARCHAR(255);
 ALTER TABLE teiko.recheio_unitario MODIFY COLUMN descricao VARCHAR(255);

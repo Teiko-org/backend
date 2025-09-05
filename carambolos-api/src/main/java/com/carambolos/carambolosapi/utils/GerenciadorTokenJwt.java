@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -30,14 +31,21 @@ public class GerenciadorTokenJwt {
         return getClaimForToken(token, Claims::getExpiration);
     }
 
-    public String generateToken(final Authentication authentication) {
+    public String generateToken(final Authentication authentication, Boolean sysAdmin) {
 
         final String authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
-        return Jwts.builder().setSubject(authentication.getName())
-                .signWith(parseSecret()).setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + jwtTokenValidity * 1_000)).compact();
+        String jti = UUID.randomUUID().toString();
+
+        return Jwts.builder()
+                .setSubject(authentication.getName())
+                .claim("sys_admin", sysAdmin)
+                .signWith(parseSecret())
+                .setId(jti)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + jwtTokenValidity * 1_000))
+                .compact();
     }
 
     public <T> T getClaimForToken(String token, Function<Claims, T> claimsResolver) {

@@ -95,4 +95,8 @@ public class Usuario {
     public void setAtivo(boolean ativo) {
         isAtivo = ativo;
     }
+
+    public Boolean getSysAdmin() {
+        return sysAdmin;
+    }
 }
