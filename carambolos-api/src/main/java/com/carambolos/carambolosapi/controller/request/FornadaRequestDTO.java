@@ -1,6 +1,7 @@
 package com.carambolos.carambolosapi.controller.request;
 
 import com.carambolos.carambolosapi.model.Fornada;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
@@ -12,9 +13,11 @@ public record FornadaRequestDTO(
         Integer id,
 
         @Schema(description = "Data de início da fornada", example = "2025-05-01")
+        @JsonFormat(pattern = "yyyy-MM-dd")
         LocalDate dataInicio,
 
         @Schema(description = "Data de fim da fornada", example = "2025-05-07")
+        @JsonFormat(pattern = "yyyy-MM-dd")
         LocalDate dataFim
 
 ) {

@@ -45,11 +45,22 @@ public class AutenticacaoFilter extends OncePerRequestFilter {
                 LOGGER.info("[FALHA AUTENTICACAO] - Token expirado, usuario: {} - {}",
                         exception.getClaims().getSubject(), exception.getMessage());
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            } catch (Exception exception) {
+                LOGGER.warn("[FALHA AUTENTICACAO] - Token inválido: {}", exception.getMessage());
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
             }
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            addUsernameInContext(request, username, jwtToken);
+            try {
+                addUsernameInContext(request, username, jwtToken);
+            } catch (Exception exception) {
+                LOGGER.warn("[FALHA AUTENTICACAO] - Erro ao autenticar usuário {}: {}", username, exception.getMessage());
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
         }
 
         filterChain.doFilter(request, response);

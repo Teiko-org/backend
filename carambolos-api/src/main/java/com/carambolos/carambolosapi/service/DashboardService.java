@@ -129,143 +129,221 @@ public class DashboardService {
     }
 
     public List<Map<String, Object>> getBolosMaisPedidos() {
-        List<PedidoBolo> pedidosBolo = pedidoBoloRepository.findAll();
+        try {
+            List<PedidoBolo> pedidosBolo = pedidoBoloRepository.findAll();
+            if (pedidosBolo.isEmpty()) {
+                return new ArrayList<>();
+            }
 
-        Map<Integer, Long> contagemBolos = pedidosBolo.stream()
-                .collect(Collectors.groupingBy(PedidoBolo::getBoloId, Collectors.counting()));
+            Map<Integer, Long> contagemBolos = pedidosBolo.stream()
+                    .filter(p -> p.getBoloId() != null)
+                    .collect(Collectors.groupingBy(PedidoBolo::getBoloId, Collectors.counting()));
 
-        return contagemBolos.entrySet().stream()
-                .sorted(Map.Entry.<Integer, Long>comparingByValue().reversed())
-                .map(entry -> {
-                    Integer boloId = entry.getKey();
-                    Long quantidade = entry.getValue();
+            return contagemBolos.entrySet().stream()
+                    .sorted(Map.Entry.<Integer, Long>comparingByValue().reversed())
+                    .map(entry -> {
+                        try {
+                            Integer boloId = entry.getKey();
+                            Long quantidade = entry.getValue();
 
-                    Optional<Bolo> boloOpt = boloRepository.findById(boloId);
+                            Optional<Bolo> boloOpt = boloRepository.findById(boloId);
 
-                    Double valorTotal = pedidosBolo.stream()
-                            .filter(p -> p.getBoloId().equals(boloId))
-                            .mapToDouble(p -> resumoPedidoRepository
-                                    .findTop1ByPedidoBoloIdAndIsAtivoTrueOrderByDataPedidoDesc(p.getId())
-                                    .map(ResumoPedido::getValor)
-                                    .orElse(0.0))
-                            .sum();
+                            Double valorTotal = pedidosBolo.stream()
+                                    .filter(p -> p.getBoloId() != null && p.getBoloId().equals(boloId))
+                                    .mapToDouble(p -> {
+                                        try {
+                                            return resumoPedidoRepository
+                                                    .findTop1ByPedidoBoloIdAndIsAtivoTrueOrderByDataPedidoDesc(p.getId())
+                                                    .map(ResumoPedido::getValor)
+                                                    .orElse(0.0);
+                                        } catch (Exception e) {
+                                            return 0.0;
+                                        }
+                                    })
+                                    .sum();
 
-                    String nomeBolo = "Bolo Desconhecido";
-                    if (boloOpt.isPresent()) {
-                        Bolo bolo = boloOpt.get();
+                            String nomeBolo = "Bolo Desconhecido";
+                            if (boloOpt.isPresent()) {
+                                Bolo bolo = boloOpt.get();
 
-                        String decoracaoNome = bolo.getDecoracao() != null ?
-                                decoracaoRepository.findById(bolo.getDecoracao())
-                                        .map(Decoracao::getNome)
-                                        .orElse("Sem Decoração")
-                                : "Sem Decoração";
+                                String decoracaoNome = bolo.getDecoracao() != null ?
+                                        decoracaoRepository.findById(bolo.getDecoracao())
+                                                .map(Decoracao::getNome)
+                                                .orElse("Sem Decoração")
+                                        : "Sem Decoração";
 
-                        nomeBolo =  decoracaoNome;
-                    }
+                                nomeBolo = decoracaoNome;
+                            }
 
-                    Map<String, Object> resultado = new HashMap<>();
-                    resultado.put("boloId", boloId);
-                    resultado.put("quantidade", quantidade);
-                    resultado.put("nome", nomeBolo);
-                    resultado.put("valorTotal", valorTotal);
-                    return resultado;
-                })
-                .collect(Collectors.toList());
+                            Map<String, Object> resultado = new HashMap<>();
+                            resultado.put("boloId", boloId);
+                            resultado.put("quantidade", quantidade);
+                            resultado.put("nome", nomeBolo);
+                            resultado.put("valorTotal", valorTotal);
+                            return resultado;
+                        } catch (Exception e) {
+                            System.err.println("Erro ao processar bolo: " + e.getMessage());
+                            return null;
+                        }
+                    })
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            System.err.println("Erro em getBolosMaisPedidos: " + e.getMessage());
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
 
     public List<Map<String, Object>> getFornadasMaisPedidas() {
-        List<PedidoFornada> pedidoFornadas = pedidoFornadaRepository.findAll();
-
-        Map<Integer, Integer> quantidadePorFornadaDaVez = pedidoFornadas.stream()
-                .collect(Collectors.groupingBy(
-                        PedidoFornada::getFornadaDaVez,
-                        Collectors.summingInt(PedidoFornada::getQuantidade)
-                ));
-
-        List<FornadaDaVez> fornadasDaVez = fornadaDaVezRepository.findAll();
-
-        Map<Integer, Integer> quantidadePorProduto = new HashMap<>();
-        Map<Integer, ProdutoFornada> produtoMap = new HashMap<>();
-        Map<Integer, Double> valorTotalPorProduto = new HashMap<>();
-
-        for (FornadaDaVez fdv : fornadasDaVez) {
-            Integer qtdPedida = quantidadePorFornadaDaVez.getOrDefault(fdv.getId(), 0);
-            Integer produtoId = fdv.getProdutoFornada();
-
-            quantidadePorProduto.merge(produtoId, qtdPedida, Integer::sum);
-
-            if (!produtoMap.containsKey(produtoId)) {
-                ProdutoFornada produto = produtoFornadaRepository.findById(produtoId).orElse(null);
-                if (produto != null) {
-                    produtoMap.put(produtoId, produto);
-                    Double valorTotal = qtdPedida * produto.getValor();
-                    valorTotalPorProduto.put(produtoId, valorTotal);
-                }
-            } else {
-                ProdutoFornada produto = produtoMap.get(produtoId);
-                Double valorAtual = valorTotalPorProduto.getOrDefault(produtoId, 0.0);
-                Double novoValor = valorAtual + (qtdPedida * produto.getValor());
-                valorTotalPorProduto.put(produtoId, novoValor);
+        try {
+            List<PedidoFornada> pedidoFornadas = pedidoFornadaRepository.findAll();
+            if (pedidoFornadas.isEmpty()) {
+                return new ArrayList<>();
             }
+
+            Map<Integer, Integer> quantidadePorFornadaDaVez = pedidoFornadas.stream()
+                    .filter(p -> p.getFornadaDaVez() != null && p.getQuantidade() != null)
+                    .collect(Collectors.groupingBy(
+                            PedidoFornada::getFornadaDaVez,
+                            Collectors.summingInt(PedidoFornada::getQuantidade)
+                    ));
+
+            List<FornadaDaVez> fornadasDaVez = fornadaDaVezRepository.findAll();
+            if (fornadasDaVez.isEmpty()) {
+                return new ArrayList<>();
+            }
+
+            Map<Integer, Integer> quantidadePorProduto = new HashMap<>();
+            Map<Integer, ProdutoFornada> produtoMap = new HashMap<>();
+            Map<Integer, Double> valorTotalPorProduto = new HashMap<>();
+
+            for (FornadaDaVez fdv : fornadasDaVez) {
+                try {
+                    Integer qtdPedida = quantidadePorFornadaDaVez.getOrDefault(fdv.getId(), 0);
+                    Integer produtoId = fdv.getProdutoFornada();
+
+                    if (produtoId == null) continue;
+
+                    quantidadePorProduto.merge(produtoId, qtdPedida, Integer::sum);
+
+                    if (!produtoMap.containsKey(produtoId)) {
+                        ProdutoFornada produto = produtoFornadaRepository.findById(produtoId).orElse(null);
+                        if (produto != null) {
+                            produtoMap.put(produtoId, produto);
+                            Double valorTotal = qtdPedida * produto.getValor();
+                            valorTotalPorProduto.put(produtoId, valorTotal);
+                        }
+                    } else {
+                        ProdutoFornada produto = produtoMap.get(produtoId);
+                        if (produto != null) {
+                            Double valorAtual = valorTotalPorProduto.getOrDefault(produtoId, 0.0);
+                            Double novoValor = valorAtual + (qtdPedida * produto.getValor());
+                            valorTotalPorProduto.put(produtoId, novoValor);
+                        }
+                    }
+                } catch (Exception e) {
+                    System.err.println("Erro ao processar fornada da vez: " + e.getMessage());
+                    continue;
+                }
+            }
+
+            return quantidadePorProduto.entrySet().stream()
+                    .map(entry -> {
+                        try {
+                            Integer produtoId = entry.getKey();
+                            ProdutoFornada produto = produtoMap.get(produtoId);
+
+                            Map<String, Object> result = new HashMap<>();
+                            result.put("produtoId", produtoId);
+                            result.put("nomeProduto", produto != null ? produto.getProduto() : "Produto não encontrado");
+                            result.put("quantidadeTotal", entry.getValue());
+                            result.put("valorTotal", valorTotalPorProduto.getOrDefault(produtoId, 0.0));
+                            return result;
+                        } catch (Exception e) {
+                            System.err.println("Erro ao criar resultado de fornada: " + e.getMessage());
+                            return null;
+                        }
+                    })
+                    .filter(Objects::nonNull)
+                    .filter(map -> produtoMap.get(((Integer) map.get("produtoId"))) != null)
+                    .sorted((m1, m2) -> {
+                        try {
+                            Integer qtd1 = (Integer) m1.get("quantidadeTotal");
+                            Integer qtd2 = (Integer) m2.get("quantidadeTotal");
+                            if (qtd1 == null || qtd2 == null) return 0;
+                            return Integer.compare(qtd2, qtd1);
+                        } catch (Exception e) {
+                            return 0;
+                        }
+                    })
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            System.err.println("Erro em getFornadasMaisPedidas: " + e.getMessage());
+            e.printStackTrace();
+            return new ArrayList<>();
         }
-
-        return quantidadePorProduto.entrySet().stream()
-                .map(entry -> {
-                    Integer produtoId = entry.getKey();
-                    ProdutoFornada produto = produtoMap.get(produtoId);
-
-                    Map<String, Object> result = new HashMap<>();
-                    result.put("produtoId", produtoId);
-                    result.put("nomeProduto", produto != null ? produto.getProduto() : "Produto não encontrado");
-                    result.put("quantidadeTotal", entry.getValue());
-                    result.put("valorTotal", valorTotalPorProduto.getOrDefault(produtoId, 0.0));
-                    return result;
-                })
-                .filter(map -> produtoMap.get(((Integer) map.get("produtoId"))) != null)
-                .sorted((m1, m2) -> Integer.compare(
-                        (Integer) m2.get("quantidadeTotal"),
-                        (Integer) m1.get("quantidadeTotal")
-                ))
-                .collect(Collectors.toList());
     }
 
     public List<Map<String, Object>> getProdutosMaisPedidos() {
+        try {
+            List<Map<String, Object>> todosProdutos = new ArrayList<>();
 
-        List<Map<String, Object>> todasFornadas = getFornadasMaisPedidas();
-        List<Map<String, Object>> todosBolos = getBolosMaisPedidos();
+            // Adicionar produtos de fornada
+            try {
+                List<Map<String, Object>> todasFornadas = getFornadasMaisPedidas();
+                todasFornadas.forEach(produto -> {
+                    Map<String, Object> produtoUnificado = new HashMap<>();
+                    produtoUnificado.put("id", produto.get("produtoId"));
+                    produtoUnificado.put("nome", produto.get("nomeProduto"));
+                    produtoUnificado.put("quantidade", produto.get("quantidadeTotal"));
+                    produtoUnificado.put("valorTotal", produto.get("valorTotal"));
+                    produtoUnificado.put("tipo", "FORNADA");
+                    todosProdutos.add(produtoUnificado);
+                });
+            } catch (Exception e) {
+                System.err.println("Erro ao buscar fornadas: " + e.getMessage());
+                e.printStackTrace();
+            }
 
-        List<Map<String, Object>> todosProdutos = new ArrayList<>();
+            // Adicionar bolos
+            try {
+                List<Map<String, Object>> todosBolos = getBolosMaisPedidos();
+                todosBolos.forEach(bolo -> {
+                    Map<String, Object> boloUnificado = new HashMap<>();
+                    boloUnificado.put("id", bolo.get("boloId"));
+                    boloUnificado.put("nome", bolo.get("nome"));
+                    boloUnificado.put("quantidade", bolo.get("quantidade"));
+                    boloUnificado.put("valorTotal", bolo.get("valorTotal"));
+                    boloUnificado.put("tipo", "BOLO");
+                    todosProdutos.add(boloUnificado);
+                });
+            } catch (Exception e) {
+                System.err.println("Erro ao buscar bolos: " + e.getMessage());
+                e.printStackTrace();
+            }
 
-        todasFornadas.forEach(produto -> {
-            Map<String, Object> produtoUnificado = new HashMap<>();
-            produtoUnificado.put("id", produto.get("produtoId"));
-            produtoUnificado.put("nome", produto.get("nomeProduto"));
-            produtoUnificado.put("quantidade", produto.get("quantidadeTotal"));
-            produtoUnificado.put("valorTotal", produto.get("valorTotal"));
-            produtoUnificado.put("tipo", "FORNADA");
-            todosProdutos.add(produtoUnificado);
-        });
-
-        todosBolos.forEach(bolo -> {
-            Map<String, Object> boloUnificado = new HashMap<>();
-            boloUnificado.put("id", bolo.get("boloId"));
-            boloUnificado.put("nome", bolo.get("nome"));
-            boloUnificado.put("quantidade", bolo.get("quantidade"));
-            boloUnificado.put("valorTotal", bolo.get("valorTotal"));
-            boloUnificado.put("tipo", "BOLO");
-            todosProdutos.add(boloUnificado);
-        });
-
-        return todosProdutos.stream()
-                .sorted((p1, p2) -> Long.compare(
-                        ((Number) p2.get("quantidade")).longValue(),
-                        ((Number) p1.get("quantidade")).longValue()
-                ))
-                .collect(Collectors.toList());
+            return todosProdutos.stream()
+                    .sorted((p1, p2) -> {
+                        try {
+                            Number qtd1 = (Number) p1.get("quantidade");
+                            Number qtd2 = (Number) p2.get("quantidade");
+                            if (qtd1 == null || qtd2 == null) return 0;
+                            return Long.compare(qtd2.longValue(), qtd1.longValue());
+                        } catch (Exception e) {
+                            return 0;
+                        }
+                    })
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            System.err.println("Erro geral em getProdutosMaisPedidos: " + e.getMessage());
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
 
     public List<Map<String, Object>> getUltimosPedidos() {
-        List<ResumoPedido> resumoPedidos = resumoPedidoRepository.findByStatusInOrderByDataPedidoDesc(List.of(StatusEnum.PAGO, StatusEnum.PENDENTE));
+        List<ResumoPedido> resumoPedidos = resumoPedidoRepository.findByStatusInOrderByDataPedidoDesc(List.of(StatusEnum.PAGO, StatusEnum.PENDENTE, StatusEnum.CONCLUIDO));
 
         List<Map<String, Object>> ultimosPedidos = new ArrayList<>();
 
@@ -285,6 +363,7 @@ public class DashboardService {
                     pedido.put("telefoneDoCliente", pedidoBolo.getTelefoneCliente());
                     pedido.put("tipoDoPedido", pedidoBolo.getTipoEntrega());
                     pedido.put("tipoProduto", "BOLO");
+                    pedido.put("pedidoBoloId", resumo.getPedidoBoloId());
                 }
             } else if (resumo.getPedidoFornadaId() != null) {
                 PedidoFornada pedidoFornada = pedidoFornadaRepository.findById(resumo.getPedidoFornadaId()).orElse(null);
@@ -294,6 +373,7 @@ public class DashboardService {
                     pedido.put("telefoneDoCliente", pedidoFornada.getTelefoneCliente());
                     pedido.put("tipoDoPedido", pedidoFornada.getTipoEntrega());
                     pedido.put("tipoProduto", "FORNADA");
+                    pedido.put("pedidoFornadaId", resumo.getPedidoFornadaId());
                 }
             }
             ultimosPedidos.add(pedido);

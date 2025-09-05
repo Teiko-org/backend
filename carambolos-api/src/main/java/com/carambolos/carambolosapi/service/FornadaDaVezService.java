@@ -41,9 +41,30 @@ public class FornadaDaVezService {
                 .filter(Fornada::isAtivo)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Fornada com ID " + request.fornadaId() + " não encontrada."));
 
-        FornadaDaVez fornadaDaVez = request.toEntity(request);
+        // Verificar se já existe este produto nesta fornada
+        FornadaDaVez fornadaDaVezExistente = fornadaDaVezRepository
+                .findByFornadaAndProdutoFornadaAndIsAtivoTrue(request.fornadaId(), request.produtoFornadaId());
 
-        return fornadaDaVezRepository.save(fornadaDaVez);
+        if (fornadaDaVezExistente != null) {
+            // Se já existe, somar a quantidade
+            int novaQuantidade = fornadaDaVezExistente.getQuantidade() + request.quantidade();
+            fornadaDaVezExistente.setQuantidade(novaQuantidade);
+            
+            System.out.println("✅ PRODUTO JÁ EXISTE NA FORNADA: Produto " + request.produtoFornadaId() +
+                    " | Quantidade anterior: " + (fornadaDaVezExistente.getQuantidade() - request.quantidade()) +
+                    " | Adicionando: " + request.quantidade() +
+                    " | Nova quantidade total: " + novaQuantidade);
+            
+            return fornadaDaVezRepository.save(fornadaDaVezExistente);
+        } else {
+            // Se não existe, criar novo registro
+            FornadaDaVez fornadaDaVez = request.toEntity(request);
+            
+            System.out.println("✅ NOVO PRODUTO NA FORNADA: Produto " + request.produtoFornadaId() +
+                    " | Quantidade: " + request.quantidade());
+            
+            return fornadaDaVezRepository.save(fornadaDaVez);
+        }
     }
 
     public List<FornadaDaVez> listarFornadasDaVez() {
