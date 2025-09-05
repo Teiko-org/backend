@@ -16,7 +16,8 @@ public class ProdutoFornadaDaVezProjection {
     LocalDate dataInicio;
     LocalDate dataFim;
 
-    public ProdutoFornadaDaVezProjection(Integer fornadaDaVezId, Integer produtoFornadaId, String produto, String descricao, Double valor, String categoria, Integer quantidade, Boolean isAtivoPf, Boolean isAtivoFdv, Date dataInicio, Date dataFim) {
+    // Construtor único que aceita Object para lidar com diferentes tipos do MySQL
+    public ProdutoFornadaDaVezProjection(Integer fornadaDaVezId, Integer produtoFornadaId, String produto, String descricao, Double valor, String categoria, Integer quantidade, Object isAtivoPf, Object isAtivoFdv, Date dataInicio, Date dataFim) {
         this.fornadaDaVezId = fornadaDaVezId;
         this.produtoFornadaId = produtoFornadaId;
         this.produto = produto;
@@ -24,10 +25,34 @@ public class ProdutoFornadaDaVezProjection {
         this.valor = valor;
         this.categoria = categoria;
         this.quantidade = quantidade;
-        this.isAtivoPf = Boolean.TRUE.equals(isAtivoPf);
-        this.isAtivoFdv = Boolean.TRUE.equals(isAtivoFdv);
+        
+        // Converter Object para Boolean de forma segura
+        this.isAtivoPf = convertToBoolean(isAtivoPf);
+        this.isAtivoFdv = convertToBoolean(isAtivoFdv);
+        
         this.dataInicio = (dataInicio != null ? dataInicio.toLocalDate() : null);
         this.dataFim = (dataFim != null ? dataFim.toLocalDate() : null);
+    }
+    
+    // Método auxiliar para converter Object para Boolean
+    private Boolean convertToBoolean(Object value) {
+        if (value == null) {
+            return false;
+        }
+        
+        if (value instanceof Boolean) {
+            return (Boolean) value;
+        }
+        
+        if (value instanceof Number) {
+            return ((Number) value).intValue() == 1;
+        }
+        
+        if (value instanceof String) {
+            return "1".equals(value) || "true".equalsIgnoreCase((String) value);
+        }
+        
+        return false;
     }
 
     public Integer getFornadaDaVezId() {

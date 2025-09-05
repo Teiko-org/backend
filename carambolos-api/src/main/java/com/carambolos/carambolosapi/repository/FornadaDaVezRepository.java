@@ -21,14 +21,14 @@ public interface FornadaDaVezRepository extends JpaRepository<FornadaDaVez, Inte
                 pf.valor,
                 pf.categoria,
                 fdv.quantidade,
-                pf.is_ativo is_ativo_pf,
-                fdv.is_ativo is_ativo_fdv,
+                CAST(pf.is_ativo AS SIGNED) is_ativo_pf,
+                CAST(fdv.is_ativo AS SIGNED) is_ativo_fdv,
                 f.data_inicio,
                 f.data_fim
             from fornada_da_vez fdv
             join produto_fornada pf on fdv.produto_fornada_id = pf.id
             join fornada f on f.data_inicio = ?1 AND f.data_fim = ?2
-            """, nativeQuery = true)
+""", nativeQuery = true)
     List<ProdutoFornadaDaVezProjection> findProductsByFornada(LocalDate dataInicio, LocalDate dataFim);
 
     @Query(value = """
@@ -40,8 +40,8 @@ public interface FornadaDaVezRepository extends JpaRepository<FornadaDaVez, Inte
                 pf.valor,
                 pf.categoria,
                 fdv.quantidade,
-                pf.is_ativo is_ativo_pf,
-                fdv.is_ativo is_ativo_fdv,
+                CAST(pf.is_ativo AS SIGNED) is_ativo_pf,
+                CAST(fdv.is_ativo AS SIGNED) is_ativo_fdv,
                 f.data_inicio,
                 f.data_fim
             from fornada_da_vez fdv
@@ -60,8 +60,8 @@ public interface FornadaDaVezRepository extends JpaRepository<FornadaDaVez, Inte
                 pf.valor,
                 pf.categoria,
                 fdv.quantidade,
-                pf.is_ativo is_ativo_pf,
-                fdv.is_ativo is_ativo_fdv,
+                CAST(pf.is_ativo AS SIGNED) is_ativo_pf,
+                CAST(fdv.is_ativo AS SIGNED) is_ativo_fdv,
                 f.data_inicio,
                 f.data_fim
             from fornada_da_vez fdv
@@ -81,8 +81,8 @@ public interface FornadaDaVezRepository extends JpaRepository<FornadaDaVez, Inte
                 pf.valor,
                 pf.categoria,
                 fdv.quantidade,
-                pf.is_ativo is_ativo_pf,
-                fdv.is_ativo is_ativo_fdv,
+                CAST(pf.is_ativo AS SIGNED) is_ativo_pf,
+                CAST(fdv.is_ativo AS SIGNED) is_ativo_fdv,
                 f.data_inicio,
                 f.data_fim
             from fornada_da_vez fdv
