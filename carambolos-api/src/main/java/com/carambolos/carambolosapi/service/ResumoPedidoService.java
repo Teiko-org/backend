@@ -125,6 +125,33 @@ public class ResumoPedidoService {
         if (!isTransicaoStatusValida(statusAtual, novoStatus)) {
             throw new EntidadeImprocessavelException("Não é possível alterar o status de %s para %s".formatted(statusAtual, novoStatus));
         }
+
+        try {
+            if (resumoPedido.getPedidoFornadaId() != null) {
+                var pedidoFornadaOpt = pedidoFornadaRepository.findById(resumoPedido.getPedidoFornadaId());
+                if (pedidoFornadaOpt.isPresent()) {
+                    var pedidoFornada = pedidoFornadaOpt.get();
+                    var fdvOpt = fornadaDaVezRepository.findById(pedidoFornada.getFornadaDaVez());
+                    if (fdvOpt.isPresent()) {
+                        var fdv = fdvOpt.get();
+                        if (novoStatus == StatusEnum.CANCELADO && statusAtual != StatusEnum.CANCELADO) {
+                            int novaQtd = (fdv.getQuantidade() != null ? fdv.getQuantidade() : 0) + pedidoFornada.getQuantidade();
+                            fdv.setQuantidade(novaQtd);
+                            fornadaDaVezRepository.save(fdv);
+                        }
+                        if (statusAtual == StatusEnum.CANCELADO && novoStatus != StatusEnum.CANCELADO) {
+                            int atual = (fdv.getQuantidade() != null ? fdv.getQuantidade() : 0);
+                            int novaQtd = Math.max(0, atual - pedidoFornada.getQuantidade());
+                            fdv.setQuantidade(novaQtd);
+                            fornadaDaVezRepository.save(fdv);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[ESTOQUE] Falha ao ajustar estoque ao alterar status do pedido fornada: " + e.getMessage());
+        }
+
         resumoPedido.setStatus(novoStatus);
         return resumoPedidoRepository.save(resumoPedido);
     }

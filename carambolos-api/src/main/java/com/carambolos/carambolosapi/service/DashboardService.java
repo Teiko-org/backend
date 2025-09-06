@@ -343,11 +343,13 @@ public class DashboardService {
     }
 
     public List<Map<String, Object>> getUltimosPedidos() {
-        List<ResumoPedido> resumoPedidos = resumoPedidoRepository.findByStatusInOrderByDataPedidoDesc(List.of(StatusEnum.PAGO, StatusEnum.PENDENTE, StatusEnum.CONCLUIDO));
+        // Buscar por data mais recente (independente do status) e limitar para performance
+        List<ResumoPedido> resumoPedidos = resumoPedidoRepository
+                .findAllByOrderByDataPedidoDesc();
 
         List<Map<String, Object>> ultimosPedidos = new ArrayList<>();
 
-        for (ResumoPedido resumo : resumoPedidos) {
+        for (ResumoPedido resumo : resumoPedidos.stream().limit(50).collect(Collectors.toList())) {
             Map<String, Object> pedido = new HashMap<>();
 
             pedido.put("id", resumo.getId());
@@ -464,29 +466,28 @@ public class DashboardService {
                 // Buscar o produto da fornada
                 ProdutoFornada produto = produtoFornadaRepository.findById(fornadaDaVez.getProdutoFornada())
                     .orElse(null);
-                
                 if (produto == null) continue;
-
-                // Quantidade total disponível
-                int qtdDisponivel = fornadaDaVez.getQuantidade();
-                quantidadeDisponivel += qtdDisponivel;
-                
-                // Valor total disponível
-                double valorDisponivel = qtdDisponivel * produto.getValor();
-                totalDisponivel += valorDisponivel;
 
                 // Buscar pedidos para este produto da fornada
                 List<PedidoFornada> pedidos = pedidoFornadaRepository.findAll().stream()
                     .filter(p -> p.getFornadaDaVez().equals(fornadaDaVez.getId()))
                     .collect(Collectors.toList());
-                
-                // Calcular quantidade vendida
+
+                // Quantidade vendida (soma dos pedidos)
                 int qtdVendida = pedidos.stream()
                     .mapToInt(PedidoFornada::getQuantidade)
                     .sum();
                 quantidadeVendida += qtdVendida;
-                
-                // Calcular valor vendido
+
+                // Quantidade planejada original = quantidade restante atual + quantidade já vendida
+                int qtdAtual = fornadaDaVez.getQuantidade() != null ? fornadaDaVez.getQuantidade() : 0;
+                int qtdPlanejada = qtdAtual + qtdVendida;
+                quantidadeDisponivel += qtdPlanejada;
+
+                // Totais monetários
+                double valorDisponivel = qtdPlanejada * produto.getValor();
+                totalDisponivel += valorDisponivel;
+
                 double valorVendido = qtdVendida * produto.getValor();
                 totalVendido += valorVendido;
             }
