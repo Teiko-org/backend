@@ -23,6 +23,20 @@ public class JwtBlacklistFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
+        String path = request.getRequestURI();
+        if (("/usuarios/login".equals(path) && "POST".equalsIgnoreCase(request.getMethod())) ||
+                ("/usuarios".equals(path) && "POST".equalsIgnoreCase(request.getMethod()))) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        if ("GET".equalsIgnoreCase(request.getMethod())) {
+            if (path.startsWith("/dashboard") || path.startsWith("/decoracoes") || path.startsWith("/bolos") ||
+                    path.startsWith("/fornadas") || path.startsWith("/resumo-pedido")) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+        }
         String token = extractToken(request);
 
         if (token != null && tokenBlacklistService.isTokenBlacklisted(token)) {

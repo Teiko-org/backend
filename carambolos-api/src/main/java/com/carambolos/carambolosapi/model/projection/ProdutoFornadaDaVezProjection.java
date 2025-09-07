@@ -11,12 +11,14 @@ public class ProdutoFornadaDaVezProjection {
     Double valor;
     String categoria;
     Integer quantidade;
+    Integer quantidadeVendida;
     Boolean isAtivoPf;
     Boolean isAtivoFdv;
     LocalDate dataInicio;
     LocalDate dataFim;
 
-    public ProdutoFornadaDaVezProjection(Integer fornadaDaVezId, Integer produtoFornadaId, String produto, String descricao, Double valor, String categoria, Integer quantidade, Boolean isAtivoPf, Boolean isAtivoFdv, Date dataInicio, Date dataFim) {
+    // Construtor único que aceita Object para lidar com diferentes tipos do MySQL
+    public ProdutoFornadaDaVezProjection(Integer fornadaDaVezId, Integer produtoFornadaId, String produto, String descricao, Double valor, String categoria, Integer quantidade, Object quantidadeVendida, Object isAtivoPf, Object isAtivoFdv, Date dataInicio, Date dataFim) {
         this.fornadaDaVezId = fornadaDaVezId;
         this.produtoFornadaId = produtoFornadaId;
         this.produto = produto;
@@ -24,10 +26,74 @@ public class ProdutoFornadaDaVezProjection {
         this.valor = valor;
         this.categoria = categoria;
         this.quantidade = quantidade;
-        this.isAtivoPf = Boolean.TRUE.equals(isAtivoPf);
-        this.isAtivoFdv = Boolean.TRUE.equals(isAtivoFdv);
+        this.quantidadeVendida = convertToInteger(quantidadeVendida);
+        
+        // Converter Object para Boolean de forma segura
+        this.isAtivoPf = convertToBoolean(isAtivoPf);
+        this.isAtivoFdv = convertToBoolean(isAtivoFdv);
+        
         this.dataInicio = (dataInicio != null ? dataInicio.toLocalDate() : null);
         this.dataFim = (dataFim != null ? dataFim.toLocalDate() : null);
+    }
+
+    // Construtor alternativo para consultas que não retornam quantidadeVendida (11 colunas)
+    public ProdutoFornadaDaVezProjection(Integer fornadaDaVezId, Integer produtoFornadaId, String produto, String descricao, Double valor, String categoria, Integer quantidade, Object isAtivoPf, Object isAtivoFdv, Date dataInicio, Date dataFim) {
+        this.fornadaDaVezId = fornadaDaVezId;
+        this.produtoFornadaId = produtoFornadaId;
+        this.produto = produto;
+        this.descricao = descricao;
+        this.valor = valor;
+        this.categoria = categoria;
+        this.quantidade = quantidade;
+        this.quantidadeVendida = 0; // padrão quando a consulta não agrega vendas
+
+        this.isAtivoPf = convertToBoolean(isAtivoPf);
+        this.isAtivoFdv = convertToBoolean(isAtivoFdv);
+
+        this.dataInicio = (dataInicio != null ? dataInicio.toLocalDate() : null);
+        this.dataFim = (dataFim != null ? dataFim.toLocalDate() : null);
+    }
+    
+    // Método auxiliar para converter Object para Boolean
+    private Boolean convertToBoolean(Object value) {
+        if (value == null) {
+            return false;
+        }
+        
+        if (value instanceof Boolean) {
+            return (Boolean) value;
+        }
+        
+        if (value instanceof Number) {
+            return ((Number) value).intValue() == 1;
+        }
+        
+        if (value instanceof String) {
+            return "1".equals(value) || "true".equalsIgnoreCase((String) value);
+        }
+        
+        return false;
+    }
+    
+    // Método auxiliar para converter Object para Integer
+    private Integer convertToInteger(Object value) {
+        if (value == null) {
+            return 0;
+        }
+        
+        if (value instanceof Number) {
+            return ((Number) value).intValue();
+        }
+        
+        if (value instanceof String) {
+            try {
+                return Integer.parseInt((String) value);
+            } catch (NumberFormatException e) {
+                return 0;
+            }
+        }
+        
+        return 0;
     }
 
     public Integer getFornadaDaVezId() {
@@ -84,6 +150,14 @@ public class ProdutoFornadaDaVezProjection {
 
     public void setQuantidade(Integer quantidade) {
         this.quantidade = quantidade;
+    }
+
+    public Integer getQuantidadeVendida() {
+        return quantidadeVendida;
+    }
+
+    public void setQuantidadeVendida(Integer quantidadeVendida) {
+        this.quantidadeVendida = quantidadeVendida;
     }
 
     public Boolean getAtivoPf() {

@@ -18,6 +18,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -63,7 +64,6 @@ public class SecurityConfiguracao {
             new AntPathRequestMatcher("/decoracoes/**", "GET"),
             new AntPathRequestMatcher("/resumo-pedido"),
             new AntPathRequestMatcher("/resumo-pedido/**"),
-            new AntPathRequestMatcher("/usuarios"),
 //            new AntPathRequestMatcher("/enderecos", "POST"),
             new AntPathRequestMatcher("/bolos", "POST"),
             new AntPathRequestMatcher("/bolos/pedido", "POST"),
@@ -73,7 +73,8 @@ public class SecurityConfiguracao {
             new AntPathRequestMatcher("/bolos/recheio-unitario", "POST"),
             new AntPathRequestMatcher("/bolos/cobertura", "POST"),
             new AntPathRequestMatcher("/bolos/cobertura", "GET"),
-            new AntPathRequestMatcher("/fornadas/pedidos", "POST")
+            new AntPathRequestMatcher("/fornadas/pedidos", "POST"),
+            new AntPathRequestMatcher("/dashboard/**", "GET")
     };
 
     @Bean
@@ -84,17 +85,17 @@ public class SecurityConfiguracao {
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .cors(Customizer.withDefaults())
                 .csrf(CsrfConfigurer<HttpSecurity>::disable)
-                .authorizeHttpRequests(authorize -> authorize
-                        .anyRequest()
+                .authorizeHttpRequests(authorize -> authorize.requestMatchers(URLS_PERMITIDAS)
                         .permitAll()
+                        .anyRequest()
+                        .authenticated()
                 )
                 .exceptionHandling(handling -> handling
                         .authenticationEntryPoint(jwtAuthenticationEntryPointBean()))
                 .sessionManagement(management -> management
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        // Desabilitado temporariamente para testes: filtro JWT
-        // http.addFilterBefore(jwtAuthenticationFilterBean(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtAuthenticationFilterBean(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

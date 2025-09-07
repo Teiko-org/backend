@@ -125,144 +125,218 @@ public class ResumoPedidoService {
         if (!isTransicaoStatusValida(statusAtual, novoStatus)) {
             throw new EntidadeImprocessavelException("Não é possível alterar o status de %s para %s".formatted(statusAtual, novoStatus));
         }
+
+        try {
+            if (resumoPedido.getPedidoFornadaId() != null) {
+                var pedidoFornadaOpt = pedidoFornadaRepository.findById(resumoPedido.getPedidoFornadaId());
+                if (pedidoFornadaOpt.isPresent()) {
+                    var pedidoFornada = pedidoFornadaOpt.get();
+                    var fdvOpt = fornadaDaVezRepository.findById(pedidoFornada.getFornadaDaVez());
+                    if (fdvOpt.isPresent()) {
+                        var fdv = fdvOpt.get();
+                        if (novoStatus == StatusEnum.CANCELADO && statusAtual != StatusEnum.CANCELADO) {
+                            int novaQtd = (fdv.getQuantidade() != null ? fdv.getQuantidade() : 0) + pedidoFornada.getQuantidade();
+                            fdv.setQuantidade(novaQtd);
+                            fornadaDaVezRepository.save(fdv);
+                        }
+                        if (statusAtual == StatusEnum.CANCELADO && novoStatus != StatusEnum.CANCELADO) {
+                            int atual = (fdv.getQuantidade() != null ? fdv.getQuantidade() : 0);
+                            int novaQtd = Math.max(0, atual - pedidoFornada.getQuantidade());
+                            fdv.setQuantidade(novaQtd);
+                            fornadaDaVezRepository.save(fdv);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[ESTOQUE] Falha ao ajustar estoque ao alterar status do pedido fornada: " + e.getMessage());
+        }
+
         resumoPedido.setStatus(novoStatus);
         return resumoPedidoRepository.save(resumoPedido);
     }
 
     public DetalhePedidoBoloDTO obterDetalhePedidoBolo(Integer pedidoResumoId) {
-        ResumoPedido resumoPedido = resumoPedidoRepository
-                .findTop1ByPedidoBoloIdAndIsAtivoTrueOrderByDataPedidoDesc(pedidoResumoId)
-                .orElseThrow(() -> new EntidadeNaoEncontradaException("Resumo de pedido (bolo) não encontrado"));
+        try {
+            ResumoPedido resumoPedido = resumoPedidoRepository
+                    .findTop1ByPedidoBoloIdAndIsAtivoTrueOrderByDataPedidoDesc(pedidoResumoId)
+                    .orElseThrow(() -> new EntidadeNaoEncontradaException("Resumo de pedido (bolo) não encontrado"));
 
-        if (resumoPedido.getPedidoBoloId() == null) {
-            throw new EntidadeImprocessavelException("O resumo de pedido #" + pedidoResumoId + " não está vinculado a um pedido de bolo");
-        }
+            if (resumoPedido.getPedidoBoloId() == null) {
+                throw new EntidadeImprocessavelException("O resumo de pedido #" + pedidoResumoId + " não está vinculado a um pedido de bolo");
+            }
 
-        PedidoBolo pedido = pedidoBoloRepository.findById(resumoPedido.getPedidoBoloId())
-                .filter(PedidoBolo::getAtivo)
-                .orElseThrow(() -> new EntidadeNaoEncontradaException("Pedido com o id %d não encontrado".formatted(resumoPedido.getPedidoBoloId())));
+            PedidoBolo pedido = pedidoBoloRepository.findById(resumoPedido.getPedidoBoloId())
+                    .filter(PedidoBolo::getAtivo)
+                    .orElseThrow(() -> new EntidadeNaoEncontradaException("Pedido com o id %d não encontrado".formatted(resumoPedido.getPedidoBoloId())));
 
-        Bolo bolo = boloRepository.findById(pedido.getBoloId())
-                .orElseThrow(() -> new EntidadeNaoEncontradaException("Bolo com id %d não encontrado".formatted(pedido.getBoloId())));
+            Bolo bolo = boloRepository.findById(pedido.getBoloId())
+                    .orElseThrow(() -> new EntidadeNaoEncontradaException("Bolo com id %d não encontrado".formatted(pedido.getBoloId())));
 
-        String massaNome = massaRepository.findById(bolo.getMassa())
-                .map(Massa::getSabor)
-                .orElse("Não especificada");
+            String massaNome = massaRepository.findById(bolo.getMassa())
+                    .map(Massa::getSabor)
+                    .orElse("Não especificada");
 
-        String recheioNome = recheioPedidoRepository.findById(bolo.getRecheioPedido())
-                .map(recheioPedido -> {
-                    StringBuilder nomes = new StringBuilder();
+            String recheioNome = "Não especificado";
+            try {
+                recheioNome = recheioPedidoRepository.findById(bolo.getRecheioPedido())
+                        .map(recheioPedido -> {
+                            StringBuilder nomes = new StringBuilder();
 
-                    if (recheioPedido.getRecheioExclusivo() != null) {
-                        return recheioExclusivoRepository.buscarRecheioExclusivoPorId(recheioPedido.getRecheioExclusivo())
-                                .getNome() + " (" +
-                                recheioExclusivoRepository.buscarRecheioExclusivoPorId(recheioPedido.getRecheioExclusivo()).getSabor1() +
-                                " + " +
-                                recheioExclusivoRepository.buscarRecheioExclusivoPorId(recheioPedido.getRecheioExclusivo()).getSabor2() +
-                                ")";
-                    } else {
-                        if (recheioPedido.getRecheioUnitarioId1() != null) {
-                            recheioUnitarioRepository.findById(recheioPedido.getRecheioUnitarioId1())
-                                    .ifPresent(recheio -> nomes.append(recheio.getSabor()));
-                        }
+                            if (recheioPedido.getRecheioExclusivo() != null) {
+                                try {
+                                    return recheioExclusivoRepository.buscarRecheioExclusivoPorId(recheioPedido.getRecheioExclusivo())
+                                            .getNome() + " (" +
+                                            recheioExclusivoRepository.buscarRecheioExclusivoPorId(recheioPedido.getRecheioExclusivo()).getSabor1() +
+                                            " + " +
+                                            recheioExclusivoRepository.buscarRecheioExclusivoPorId(recheioPedido.getRecheioExclusivo()).getSabor2() +
+                                            ")";
+                                } catch (Exception e) {
+                                    return "Recheio exclusivo não encontrado";
+                                }
+                            } else {
+                                if (recheioPedido.getRecheioUnitarioId1() != null) {
+                                    recheioUnitarioRepository.findById(recheioPedido.getRecheioUnitarioId1())
+                                            .ifPresent(recheio -> nomes.append(recheio.getSabor()));
+                                }
 
-                        if (recheioPedido.getRecheioUnitarioId2() != null) {
-                            if (!nomes.isEmpty()) {
-                                nomes.append(" + ");
+                                if (recheioPedido.getRecheioUnitarioId2() != null) {
+                                    if (!nomes.isEmpty()) {
+                                        nomes.append(" + ");
+                                    }
+                                    recheioUnitarioRepository.findById(recheioPedido.getRecheioUnitarioId2())
+                                            .ifPresent(recheio -> nomes.append(recheio.getSabor()));
+                                }
+                                return nomes.toString();
                             }
-                            recheioUnitarioRepository.findById(recheioPedido.getRecheioUnitarioId2())
-                                    .ifPresent(recheio -> nomes.append(recheio.getSabor()));
-                        }
-                        return nomes.toString();
-                    }
-                })
-                .orElse("Não especificado");
+                        })
+                        .orElse("Não especificado");
+            } catch (Exception e) {
+                System.err.println("Erro ao buscar recheio: " + e.getMessage());
+                recheioNome = "Erro ao carregar recheio";
+            }
 
+            String coberturaNome = coberturaRepository.findById(bolo.getCobertura())
+                    .map(Cobertura::getDescricao)
+                    .orElse("Não especificada");
 
-        String coberturaNome = coberturaRepository.findById(bolo.getCobertura())
-                .map(Cobertura::getDescricao)
-                .orElse("Não especificada");
+            String imagemUrl = "";
+            String[] imagensDecoracao = new String[]{};
+            try {
+                ImagemDecoracao imagem = boloRepository.findImagemByBolo(bolo.getDecoracao());
+                if (imagem != null && imagem.getUrl() != null) {
+                    imagemUrl = imagem.getUrl();
+                    imagensDecoracao = new String[]{ imagemUrl };
+                }
+            } catch (Exception e) {
+                System.err.println("Erro ao buscar imagem da decoração: " + e.getMessage());
+                imagemUrl = "";
+                imagensDecoracao = new String[]{};
+            }
 
-        //TODO: Implementar lógica para buscar imagens de decoração
-        ImagemDecoracao imagem = boloRepository.findImagemByBolo(bolo.getDecoracao());
+            EnderecoResponseDTO enderecoDTO = null;
+            try {
+                if (pedido.getTipoEntrega() == TipoEntregaEnum.ENTREGA && pedido.getEnderecoId() != null) {
+                    enderecoDTO = enderecoRepository.findById(pedido.getEnderecoId())
+                            .filter(Endereco::isAtivo)
+                            .map(EnderecoResponseDTO::toResponseDTO)
+                            .orElse(null);
+                }
+            } catch (Exception e) {
+                System.err.println("Erro ao buscar endereço: " + e.getMessage());
+                enderecoDTO = null;
+            }
 
-        String imagemUrl;
+            // Adicionais: hoje não há coluna específica; tentar derivar da observação
+            String adicionais = null;
+            try {
+                String obs = pedido.getObservacao();
+                if (obs != null && obs.contains("Adicionais:")) {
+                    adicionais = obs.substring(obs.indexOf("Adicionais:") + 11).trim();
+                }
+            } catch (Exception ignored) {}
 
-        if (imagem != null) {
-            imagemUrl = imagem.getUrl() == null ? "" : imagem.getUrl();
-        } else {
-
-            imagemUrl = "";
-
+            return DetalhePedidoBoloDTO.toDetalhePedidoResponse(
+                    pedido.getId(),
+                    bolo.getTamanho(),
+                    bolo.getFormato(),
+                    massaNome,
+                    recheioNome,
+                    coberturaNome,
+                    imagemUrl,
+                    imagensDecoracao,
+                    adicionais,
+                    pedido.getObservacao(),
+                    pedido.getTipoEntrega(),
+                    resumoPedido.getDataPedido(),
+                    pedido.getNomeCliente(),
+                    pedido.getTelefoneCliente(),
+                    enderecoDTO
+            );
+        } catch (Exception e) {
+            System.err.println("Erro geral em obterDetalhePedidoBolo: " + e.getMessage());
+            e.printStackTrace();
+            throw new EntidadeImprocessavelException("Erro ao buscar detalhes do pedido de bolo: " + e.getMessage());
         }
-
-
-        EnderecoResponseDTO enderecoDTO = null;
-        if (pedido.getTipoEntrega() == TipoEntregaEnum.ENTREGA && pedido.getEnderecoId() != null) {
-            enderecoDTO = enderecoRepository.findById(pedido.getEnderecoId())
-                    .filter(Endereco::isAtivo)
-                    .map(EnderecoResponseDTO::toResponseDTO)
-                    .orElse(null);
-        }
-
-        return DetalhePedidoBoloDTO.toDetalhePedidoResponse(
-                pedido.getId(),
-                bolo.getTamanho(),
-                bolo.getFormato(),
-                massaNome,
-                recheioNome,
-                coberturaNome,
-                imagemUrl,
-                pedido.getObservacao(),
-                pedido.getTipoEntrega(),
-                resumoPedido.getDataPedido(),
-                pedido.getNomeCliente(),
-                pedido.getTelefoneCliente(),
-                enderecoDTO
-        );
     }
 
     public DetalhePedidoFornadaDTO obterDetalhePedidoFornada(Integer pedidoResumoId) {
-        ResumoPedido resumoPedido = resumoPedidoRepository
-                .findTop1ByPedidoFornadaIdAndIsAtivoTrueOrderByDataPedidoDesc(pedidoResumoId)
-                .orElseThrow(() -> new EntidadeNaoEncontradaException("Resumo de pedido (fornada) não encontrado"));
+        try {
+            ResumoPedido resumoPedido = resumoPedidoRepository
+                    .findTop1ByPedidoFornadaIdAndIsAtivoTrueOrderByDataPedidoDesc(pedidoResumoId)
+                    .orElseThrow(() -> new EntidadeNaoEncontradaException("Resumo de pedido (fornada) não encontrado"));
 
-        if (resumoPedido.getPedidoFornadaId() == null) {
-            throw new EntidadeImprocessavelException("O resumo de pedido #" + pedidoResumoId + " não está vinculado a um pedido de fornada");
+            if (resumoPedido.getPedidoFornadaId() == null) {
+                throw new EntidadeImprocessavelException("O resumo de pedido #" + pedidoResumoId + " não está vinculado a um pedido de fornada");
+            }
+
+            PedidoFornada pedidoFornada = pedidoFornadaRepository.findById(resumoPedido.getPedidoFornadaId())
+                    .filter(PedidoFornada::isAtivo)
+                    .orElseThrow(() -> new EntidadeNaoEncontradaException("Pedido de fornada com ID " + resumoPedido.getPedidoFornadaId() + " não encontrado."));
+
+            FornadaDaVez fornadaDaVez = fornadaDaVezRepository.findById(pedidoFornada.getFornadaDaVez())
+                    .orElseThrow(() -> new EntidadeNaoEncontradaException("FornadaDaVez com ID " + pedidoFornada.getFornadaDaVez() + " não encontrada."));
+
+            String produtoFornada = "Produto não especificado";
+            try {
+                if (fornadaDaVez.getProdutoFornada() != null) {
+                    produtoFornada = produtoFornadaRepository.findById(fornadaDaVez.getProdutoFornada())
+                            .map(ProdutoFornada::getProduto)
+                            .orElse("Produto não especificado");
+                }
+            } catch (Exception e) {
+                System.err.println("Erro ao buscar produto da fornada: " + e.getMessage());
+                produtoFornada = "Erro ao carregar produto";
+            }
+
+            EnderecoResponseDTO enderecoDTO = null;
+            try {
+                if (pedidoFornada.getTipoEntrega() == TipoEntregaEnum.ENTREGA && pedidoFornada.getEndereco() != null) {
+                    enderecoDTO = enderecoRepository.findById(pedidoFornada.getEndereco())
+                            .filter(Endereco::isAtivo)
+                            .map(EnderecoResponseDTO::toResponseDTO)
+                            .orElse(null);
+                }
+            } catch (Exception e) {
+                System.err.println("Erro ao buscar endereço da fornada: " + e.getMessage());
+                enderecoDTO = null;
+            }
+
+            return DetalhePedidoFornadaDTO.toDetalhePedidoResponse(
+                    pedidoFornada.getQuantidade(),
+                    produtoFornada,
+                    pedidoFornada.getTipoEntrega(),
+                    pedidoFornada.getNomeCliente(),
+                    pedidoFornada.getTelefoneCliente(),
+                    pedidoFornada.getObservacoes(),
+                    resumoPedido.getDataPedido(),
+                    enderecoDTO
+            );
+        } catch (Exception e) {
+            System.err.println("Erro geral em obterDetalhePedidoFornada: " + e.getMessage());
+            e.printStackTrace();
+            throw new EntidadeImprocessavelException("Erro ao buscar detalhes do pedido de fornada: " + e.getMessage());
         }
-
-        PedidoFornada pedidoFornada = pedidoFornadaRepository.findById(resumoPedido.getPedidoFornadaId())
-                .filter(PedidoFornada::isAtivo)
-                .orElseThrow(() -> new EntidadeNaoEncontradaException("Pedido de fornada com ID " + resumoPedido.getPedidoFornadaId() + " não encontrado."));
-
-        FornadaDaVez fornadaDaVez = fornadaDaVezRepository.findById(pedidoFornada.getFornadaDaVez())
-                .orElseThrow(() -> new EntidadeNaoEncontradaException("FornadaDaVez com ID " + pedidoFornada.getFornadaDaVez() + " não encontrada."));
-
-        String produtoFornada = "Produto não especificado";
-        if (fornadaDaVez.getProdutoFornada() != null) {
-            produtoFornada = produtoFornadaRepository.findById(fornadaDaVez.getProdutoFornada())
-                    .map(ProdutoFornada::getProduto)
-                    .orElse("Produto não especificado");
-        }
-
-        EnderecoResponseDTO enderecoDTO = null;
-        if (pedidoFornada.getTipoEntrega() == TipoEntregaEnum.ENTREGA && pedidoFornada.getEndereco() != null) {
-            enderecoDTO = enderecoRepository.findById(pedidoFornada.getEndereco())
-                    .filter(Endereco::isAtivo)
-                    .map(EnderecoResponseDTO::toResponseDTO)
-                    .orElse(null);
-        }
-
-        return DetalhePedidoFornadaDTO.toDetalhePedidoResponse(
-                pedidoFornada.getQuantidade(),
-                produtoFornada,
-                pedidoFornada.getTipoEntrega(),
-                pedidoFornada.getNomeCliente(),
-                pedidoFornada.getTelefoneCliente(),
-                pedidoFornada.getObservacoes(),
-                resumoPedido.getDataPedido(),
-                enderecoDTO
-        );
     }
 
     public String gerarMensagensConsolidadas(List<Integer> idsResumo) {

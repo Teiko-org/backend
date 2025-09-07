@@ -88,6 +88,17 @@ public class PedidoFornadaService {
 
     public void excluirPedidoFornada(Integer id) {
         PedidoFornada pedidoFornada = buscarPedidoFornada(id);
+        try {
+            FornadaDaVez fdv = fornadaDaVezRepository.findById(pedidoFornada.getFornadaDaVez())
+                    .orElse(null);
+            if (fdv != null) {
+                int atual = fdv.getQuantidade() != null ? fdv.getQuantidade() : 0;
+                fdv.setQuantidade(atual + (pedidoFornada.getQuantidade() != null ? pedidoFornada.getQuantidade() : 0));
+                fornadaDaVezRepository.save(fdv);
+            }
+        } catch (Exception e) {
+            System.err.println("[ESTOQUE] Falha ao repor estoque ao excluir pedido fornada: " + e.getMessage());
+        }
         pedidoFornada.setAtivo(false);
         pedidoFornadaRepository.save(pedidoFornada);
     }
@@ -97,6 +108,31 @@ public class PedidoFornadaService {
 
         if (request.quantidade() == null || request.quantidade() <= 0) {
             throw new IllegalArgumentException("A quantidade deve ser maior que zero.");
+        }
+
+        // Ajustar estoque conforme a diferença de quantidade
+        try {
+            int antigaQtd = pedidoFornada.getQuantidade() != null ? pedidoFornada.getQuantidade() : 0;
+            int novaQtd = request.quantidade();
+            int delta = novaQtd - antigaQtd; // positivo: precisa reservar mais; negativo: devolver
+
+            if (delta != 0) {
+                FornadaDaVez fdv = fornadaDaVezRepository.findById(pedidoFornada.getFornadaDaVez())
+                        .orElse(null);
+                if (fdv != null) {
+                    int atual = fdv.getQuantidade() != null ? fdv.getQuantidade() : 0;
+                    int ajustado = delta > 0 ? (atual - delta) : (atual + (-delta));
+                    if (ajustado < 0) {
+                        throw new EntidadeImprocessavelException("Estoque insuficiente para aumentar a quantidade do pedido.");
+                    }
+                    fdv.setQuantidade(ajustado);
+                    fornadaDaVezRepository.save(fdv);
+                }
+            }
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            System.err.println("[ESTOQUE] Falha ao ajustar estoque ao atualizar pedido fornada: " + e.getMessage());
         }
 
         pedidoFornada.setQuantidade(request.quantidade());

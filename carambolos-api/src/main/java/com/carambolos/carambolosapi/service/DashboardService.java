@@ -5,6 +5,7 @@ import com.carambolos.carambolosapi.model.enums.StatusEnum;
 import com.carambolos.carambolosapi.repository.*;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -128,147 +129,227 @@ public class DashboardService {
     }
 
     public List<Map<String, Object>> getBolosMaisPedidos() {
-        List<PedidoBolo> pedidosBolo = pedidoBoloRepository.findAll();
+        try {
+            List<PedidoBolo> pedidosBolo = pedidoBoloRepository.findAll();
+            if (pedidosBolo.isEmpty()) {
+                return new ArrayList<>();
+            }
 
-        Map<Integer, Long> contagemBolos = pedidosBolo.stream()
-                .collect(Collectors.groupingBy(PedidoBolo::getBoloId, Collectors.counting()));
+            Map<Integer, Long> contagemBolos = pedidosBolo.stream()
+                    .filter(p -> p.getBoloId() != null)
+                    .collect(Collectors.groupingBy(PedidoBolo::getBoloId, Collectors.counting()));
 
-        return contagemBolos.entrySet().stream()
-                .sorted(Map.Entry.<Integer, Long>comparingByValue().reversed())
-                .map(entry -> {
-                    Integer boloId = entry.getKey();
-                    Long quantidade = entry.getValue();
+            return contagemBolos.entrySet().stream()
+                    .sorted(Map.Entry.<Integer, Long>comparingByValue().reversed())
+                    .map(entry -> {
+                        try {
+                            Integer boloId = entry.getKey();
+                            Long quantidade = entry.getValue();
 
-                    Optional<Bolo> boloOpt = boloRepository.findById(boloId);
+                            Optional<Bolo> boloOpt = boloRepository.findById(boloId);
 
-                    Double valorTotal = pedidosBolo.stream()
-                            .filter(p -> p.getBoloId().equals(boloId))
-                            .mapToDouble(p -> resumoPedidoRepository
-                                    .findTop1ByPedidoBoloIdAndIsAtivoTrueOrderByDataPedidoDesc(p.getId())
-                                    .map(ResumoPedido::getValor)
-                                    .orElse(0.0))
-                            .sum();
+                            Double valorTotal = pedidosBolo.stream()
+                                    .filter(p -> p.getBoloId() != null && p.getBoloId().equals(boloId))
+                                    .mapToDouble(p -> {
+                                        try {
+                                            return resumoPedidoRepository
+                                                    .findTop1ByPedidoBoloIdAndIsAtivoTrueOrderByDataPedidoDesc(p.getId())
+                                                    .map(ResumoPedido::getValor)
+                                                    .orElse(0.0);
+                                        } catch (Exception e) {
+                                            return 0.0;
+                                        }
+                                    })
+                                    .sum();
 
-                    String nomeBolo = "Bolo Desconhecido";
-                    if (boloOpt.isPresent()) {
-                        Bolo bolo = boloOpt.get();
+                            String nomeBolo = "Bolo Desconhecido";
+                            if (boloOpt.isPresent()) {
+                                Bolo bolo = boloOpt.get();
 
-                        String decoracaoNome = bolo.getDecoracao() != null ?
-                                decoracaoRepository.findById(bolo.getDecoracao())
-                                        .map(Decoracao::getNome)
-                                        .orElse("Sem Decoração")
-                                : "Sem Decoração";
+                                String decoracaoNome = bolo.getDecoracao() != null ?
+                                        decoracaoRepository.findById(bolo.getDecoracao())
+                                                .map(Decoracao::getNome)
+                                                .orElse("Sem Decoração")
+                                        : "Sem Decoração";
 
-                        nomeBolo =  decoracaoNome;
-                    }
+                                nomeBolo = decoracaoNome;
+                            }
 
-                    Map<String, Object> resultado = new HashMap<>();
-                    resultado.put("boloId", boloId);
-                    resultado.put("quantidade", quantidade);
-                    resultado.put("nome", nomeBolo);
-                    resultado.put("valorTotal", valorTotal);
-                    return resultado;
-                })
-                .collect(Collectors.toList());
+                            Map<String, Object> resultado = new HashMap<>();
+                            resultado.put("boloId", boloId);
+                            resultado.put("quantidade", quantidade);
+                            resultado.put("nome", nomeBolo);
+                            resultado.put("valorTotal", valorTotal);
+                            return resultado;
+                        } catch (Exception e) {
+                            System.err.println("Erro ao processar bolo: " + e.getMessage());
+                            return null;
+                        }
+                    })
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            System.err.println("Erro em getBolosMaisPedidos: " + e.getMessage());
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
 
     public List<Map<String, Object>> getFornadasMaisPedidas() {
-        List<PedidoFornada> pedidoFornadas = pedidoFornadaRepository.findAll();
-
-        Map<Integer, Integer> quantidadePorFornadaDaVez = pedidoFornadas.stream()
-                .collect(Collectors.groupingBy(
-                        PedidoFornada::getFornadaDaVez,
-                        Collectors.summingInt(PedidoFornada::getQuantidade)
-                ));
-
-        List<FornadaDaVez> fornadasDaVez = fornadaDaVezRepository.findAll();
-
-        Map<Integer, Integer> quantidadePorProduto = new HashMap<>();
-        Map<Integer, ProdutoFornada> produtoMap = new HashMap<>();
-        Map<Integer, Double> valorTotalPorProduto = new HashMap<>();
-
-        for (FornadaDaVez fdv : fornadasDaVez) {
-            Integer qtdPedida = quantidadePorFornadaDaVez.getOrDefault(fdv.getId(), 0);
-            Integer produtoId = fdv.getProdutoFornada();
-
-            quantidadePorProduto.merge(produtoId, qtdPedida, Integer::sum);
-
-            if (!produtoMap.containsKey(produtoId)) {
-                ProdutoFornada produto = produtoFornadaRepository.findById(produtoId).orElse(null);
-                if (produto != null) {
-                    produtoMap.put(produtoId, produto);
-                    Double valorTotal = qtdPedida * produto.getValor();
-                    valorTotalPorProduto.put(produtoId, valorTotal);
-                }
-            } else {
-                ProdutoFornada produto = produtoMap.get(produtoId);
-                Double valorAtual = valorTotalPorProduto.getOrDefault(produtoId, 0.0);
-                Double novoValor = valorAtual + (qtdPedida * produto.getValor());
-                valorTotalPorProduto.put(produtoId, novoValor);
+        try {
+            List<PedidoFornada> pedidoFornadas = pedidoFornadaRepository.findAll();
+            if (pedidoFornadas.isEmpty()) {
+                return new ArrayList<>();
             }
+
+            Map<Integer, Integer> quantidadePorFornadaDaVez = pedidoFornadas.stream()
+                    .filter(p -> p.getFornadaDaVez() != null && p.getQuantidade() != null)
+                    .collect(Collectors.groupingBy(
+                            PedidoFornada::getFornadaDaVez,
+                            Collectors.summingInt(PedidoFornada::getQuantidade)
+                    ));
+
+            List<FornadaDaVez> fornadasDaVez = fornadaDaVezRepository.findAll();
+            if (fornadasDaVez.isEmpty()) {
+                return new ArrayList<>();
+            }
+
+            Map<Integer, Integer> quantidadePorProduto = new HashMap<>();
+            Map<Integer, ProdutoFornada> produtoMap = new HashMap<>();
+            Map<Integer, Double> valorTotalPorProduto = new HashMap<>();
+
+            for (FornadaDaVez fdv : fornadasDaVez) {
+                try {
+                    Integer qtdPedida = quantidadePorFornadaDaVez.getOrDefault(fdv.getId(), 0);
+                    Integer produtoId = fdv.getProdutoFornada();
+
+                    if (produtoId == null) continue;
+
+                    quantidadePorProduto.merge(produtoId, qtdPedida, Integer::sum);
+
+                    if (!produtoMap.containsKey(produtoId)) {
+                        ProdutoFornada produto = produtoFornadaRepository.findById(produtoId).orElse(null);
+                        if (produto != null) {
+                            produtoMap.put(produtoId, produto);
+                            Double valorTotal = qtdPedida * produto.getValor();
+                            valorTotalPorProduto.put(produtoId, valorTotal);
+                        }
+                    } else {
+                        ProdutoFornada produto = produtoMap.get(produtoId);
+                        if (produto != null) {
+                            Double valorAtual = valorTotalPorProduto.getOrDefault(produtoId, 0.0);
+                            Double novoValor = valorAtual + (qtdPedida * produto.getValor());
+                            valorTotalPorProduto.put(produtoId, novoValor);
+                        }
+                    }
+                } catch (Exception e) {
+                    System.err.println("Erro ao processar fornada da vez: " + e.getMessage());
+                    continue;
+                }
+            }
+
+            return quantidadePorProduto.entrySet().stream()
+                    .map(entry -> {
+                        try {
+                            Integer produtoId = entry.getKey();
+                            ProdutoFornada produto = produtoMap.get(produtoId);
+
+                            Map<String, Object> result = new HashMap<>();
+                            result.put("produtoId", produtoId);
+                            result.put("nomeProduto", produto != null ? produto.getProduto() : "Produto não encontrado");
+                            result.put("quantidadeTotal", entry.getValue());
+                            result.put("valorTotal", valorTotalPorProduto.getOrDefault(produtoId, 0.0));
+                            return result;
+                        } catch (Exception e) {
+                            System.err.println("Erro ao criar resultado de fornada: " + e.getMessage());
+                            return null;
+                        }
+                    })
+                    .filter(Objects::nonNull)
+                    .filter(map -> produtoMap.get(((Integer) map.get("produtoId"))) != null)
+                    .sorted((m1, m2) -> {
+                        try {
+                            Integer qtd1 = (Integer) m1.get("quantidadeTotal");
+                            Integer qtd2 = (Integer) m2.get("quantidadeTotal");
+                            if (qtd1 == null || qtd2 == null) return 0;
+                            return Integer.compare(qtd2, qtd1);
+                        } catch (Exception e) {
+                            return 0;
+                        }
+                    })
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            System.err.println("Erro em getFornadasMaisPedidas: " + e.getMessage());
+            e.printStackTrace();
+            return new ArrayList<>();
         }
-
-        return quantidadePorProduto.entrySet().stream()
-                .map(entry -> {
-                    Integer produtoId = entry.getKey();
-                    ProdutoFornada produto = produtoMap.get(produtoId);
-
-                    Map<String, Object> result = new HashMap<>();
-                    result.put("produtoId", produtoId);
-                    result.put("nomeProduto", produto != null ? produto.getProduto() : "Produto não encontrado");
-                    result.put("quantidadeTotal", entry.getValue());
-                    result.put("valorTotal", valorTotalPorProduto.getOrDefault(produtoId, 0.0));
-                    return result;
-                })
-                .filter(map -> produtoMap.get(((Integer) map.get("produtoId"))) != null)
-                .sorted((m1, m2) -> Integer.compare(
-                        (Integer) m2.get("quantidadeTotal"),
-                        (Integer) m1.get("quantidadeTotal")
-                ))
-                .collect(Collectors.toList());
     }
 
     public List<Map<String, Object>> getProdutosMaisPedidos() {
+        try {
+            List<Map<String, Object>> todosProdutos = new ArrayList<>();
 
-        List<Map<String, Object>> todasFornadas = getFornadasMaisPedidas();
-        List<Map<String, Object>> todosBolos = getBolosMaisPedidos();
+            // Adicionar produtos de fornada
+            try {
+                List<Map<String, Object>> todasFornadas = getFornadasMaisPedidas();
+                todasFornadas.forEach(produto -> {
+                    Map<String, Object> produtoUnificado = new HashMap<>();
+                    produtoUnificado.put("id", produto.get("produtoId"));
+                    produtoUnificado.put("nome", produto.get("nomeProduto"));
+                    produtoUnificado.put("quantidade", produto.get("quantidadeTotal"));
+                    produtoUnificado.put("valorTotal", produto.get("valorTotal"));
+                    produtoUnificado.put("tipo", "FORNADA");
+                    todosProdutos.add(produtoUnificado);
+                });
+            } catch (Exception e) {
+                System.err.println("Erro ao buscar fornadas: " + e.getMessage());
+                e.printStackTrace();
+            }
 
-        List<Map<String, Object>> todosProdutos = new ArrayList<>();
+            // Adicionar bolos
+            try {
+                List<Map<String, Object>> todosBolos = getBolosMaisPedidos();
+                todosBolos.forEach(bolo -> {
+                    Map<String, Object> boloUnificado = new HashMap<>();
+                    boloUnificado.put("id", bolo.get("boloId"));
+                    boloUnificado.put("nome", bolo.get("nome"));
+                    boloUnificado.put("quantidade", bolo.get("quantidade"));
+                    boloUnificado.put("valorTotal", bolo.get("valorTotal"));
+                    boloUnificado.put("tipo", "BOLO");
+                    todosProdutos.add(boloUnificado);
+                });
+            } catch (Exception e) {
+                System.err.println("Erro ao buscar bolos: " + e.getMessage());
+                e.printStackTrace();
+            }
 
-        todasFornadas.forEach(produto -> {
-            Map<String, Object> produtoUnificado = new HashMap<>();
-            produtoUnificado.put("id", produto.get("produtoId"));
-            produtoUnificado.put("nome", produto.get("nomeProduto"));
-            produtoUnificado.put("quantidade", produto.get("quantidadeTotal"));
-            produtoUnificado.put("valorTotal", produto.get("valorTotal"));
-            produtoUnificado.put("tipo", "FORNADA");
-            todosProdutos.add(produtoUnificado);
-        });
-
-        todosBolos.forEach(bolo -> {
-            Map<String, Object> boloUnificado = new HashMap<>();
-            boloUnificado.put("id", bolo.get("boloId"));
-            boloUnificado.put("nome", bolo.get("nome"));
-            boloUnificado.put("quantidade", bolo.get("quantidade"));
-            boloUnificado.put("valorTotal", bolo.get("valorTotal"));
-            boloUnificado.put("tipo", "BOLO");
-            todosProdutos.add(boloUnificado);
-        });
-
-        return todosProdutos.stream()
-                .sorted((p1, p2) -> Long.compare(
-                        ((Number) p2.get("quantidade")).longValue(),
-                        ((Number) p1.get("quantidade")).longValue()
-                ))
-                .collect(Collectors.toList());
+            return todosProdutos.stream()
+                    .sorted((p1, p2) -> {
+                        try {
+                            Number qtd1 = (Number) p1.get("quantidade");
+                            Number qtd2 = (Number) p2.get("quantidade");
+                            if (qtd1 == null || qtd2 == null) return 0;
+                            return Long.compare(qtd2.longValue(), qtd1.longValue());
+                        } catch (Exception e) {
+                            return 0;
+                        }
+                    })
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            System.err.println("Erro geral em getProdutosMaisPedidos: " + e.getMessage());
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
 
     public List<Map<String, Object>> getUltimosPedidos() {
-        List<ResumoPedido> resumoPedidos = resumoPedidoRepository.findByStatusInOrderByDataPedidoDesc(List.of(StatusEnum.PAGO, StatusEnum.PENDENTE));
+        // Buscar por data mais recente (independente do status) e limitar para performance
+        List<ResumoPedido> resumoPedidos = resumoPedidoRepository
+                .findAllByOrderByDataPedidoDesc();
 
         List<Map<String, Object>> ultimosPedidos = new ArrayList<>();
 
-        for (ResumoPedido resumo : resumoPedidos) {
+        for (ResumoPedido resumo : resumoPedidos.stream().limit(50).collect(Collectors.toList())) {
             Map<String, Object> pedido = new HashMap<>();
 
             pedido.put("id", resumo.getId());
@@ -284,6 +365,7 @@ public class DashboardService {
                     pedido.put("telefoneDoCliente", pedidoBolo.getTelefoneCliente());
                     pedido.put("tipoDoPedido", pedidoBolo.getTipoEntrega());
                     pedido.put("tipoProduto", "BOLO");
+                    pedido.put("pedidoBoloId", resumo.getPedidoBoloId());
                 }
             } else if (resumo.getPedidoFornadaId() != null) {
                 PedidoFornada pedidoFornada = pedidoFornadaRepository.findById(resumo.getPedidoFornadaId()).orElse(null);
@@ -293,6 +375,7 @@ public class DashboardService {
                     pedido.put("telefoneDoCliente", pedidoFornada.getTelefoneCliente());
                     pedido.put("tipoDoPedido", pedidoFornada.getTipoEntrega());
                     pedido.put("tipoProduto", "FORNADA");
+                    pedido.put("pedidoFornadaId", resumo.getPedidoFornadaId());
                 }
             }
             ultimosPedidos.add(pedido);
@@ -362,6 +445,166 @@ public class DashboardService {
     public Map<String, Map<String, Long>> countPedidosFornadaPorPeriodo(String periodo) {
         List<ResumoPedido> pedidosFornada = resumoPedidoRepository.findByStatusInAndPedidoFornadaIdIsNotNull(List.of(StatusEnum.CANCELADO, StatusEnum.CONCLUIDO));
         return processarPedidosPorPeriodoComStatus(pedidosFornada, periodo);
+    }
+
+    // KPIs específicos para fornadas
+    public Map<String, Object> getKPIFornada(Integer fornadaId) {
+        try {
+            System.out.println("[KPI] getKPIFornada fornadaId=" + fornadaId);
+            // Buscar produtos da fornada usando FornadaDaVez
+            List<FornadaDaVez> produtosFornada = fornadaDaVezRepository.findByFornada(fornadaId);
+            System.out.println("[KPI] FDV itens=" + (produtosFornada != null ? produtosFornada.size() : 0));
+            if (produtosFornada != null) {
+                for (var fdv : produtosFornada) {
+                    System.out.println("[KPI] fdvId=" + fdv.getId() + " produtoFornadaId=" + fdv.getProdutoFornada() + " qtdAtual=" + fdv.getQuantidade());
+                }
+            }
+            
+            if (produtosFornada.isEmpty()) {
+                return criarKPIVazio();
+            }
+
+            int quantidadeDisponivel = 0;
+            int quantidadeVendida = 0;
+            double totalDisponivel = 0.0;
+            double totalVendido = 0.0;
+
+            for (FornadaDaVez fornadaDaVez : produtosFornada) {
+                // Buscar o produto da fornada
+                ProdutoFornada produto = produtoFornadaRepository.findById(fornadaDaVez.getProdutoFornada())
+                    .orElse(null);
+                if (produto == null) continue;
+
+                // Buscar pedidos para este produto da fornada
+                List<PedidoFornada> pedidos = pedidoFornadaRepository.findAll().stream()
+                    .filter(p -> p.getFornadaDaVez() != null && p.getFornadaDaVez().equals(fornadaDaVez.getId()))
+                    .collect(Collectors.toList());
+
+                // Quantidade vendida (soma dos pedidos)
+                int qtdVendida = pedidos.stream()
+                    .mapToInt(PedidoFornada::getQuantidade)
+                    .sum();
+                quantidadeVendida += qtdVendida;
+
+                // Quantidade planejada original = quantidade restante atual + quantidade já vendida
+                int qtdAtual = fornadaDaVez.getQuantidade() != null ? fornadaDaVez.getQuantidade() : 0;
+                int qtdPlanejada = qtdAtual + qtdVendida;
+                quantidadeDisponivel += qtdPlanejada;
+
+                // Totais monetários
+                double valorDisponivel = qtdPlanejada * produto.getValor();
+                totalDisponivel += valorDisponivel;
+
+                double valorVendido = qtdVendida * produto.getValor();
+                totalVendido += valorVendido;
+            }
+
+            // Calcular valor perdido
+            double valorPerdido = totalDisponivel - totalVendido;
+
+            Map<String, Object> kpi = new HashMap<>();
+            kpi.put("quantidadeDisponivel", quantidadeDisponivel);
+            kpi.put("quantidadeVendida", quantidadeVendida);
+            kpi.put("totalDisponivel", totalDisponivel);
+            kpi.put("totalVendido", totalVendido);
+            kpi.put("valorPerdido", valorPerdido);
+            kpi.put("percentualVendido", quantidadeDisponivel > 0 ? 
+                (double) quantidadeVendida / quantidadeDisponivel * 100 : 0.0);
+
+            return kpi;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return criarKPIVazio();
+        }
+    }
+
+    public Map<String, Object> getKPIFornadaMaisRecente() {
+        try {
+            LocalDate hoje = LocalDate.now();
+            System.out.println("[KPI] getKPIFornadaMaisRecente hoje=" + hoje);
+            var todas = fornadaRepository.findAll();
+            System.out.println("[KPI] total fornadas=" + (todas != null ? todas.size() : 0));
+            Optional<Fornada> ultimaEncerrada = todas
+                    .stream()
+                    // Última ENCERRADA: inativa e já iniciada
+                    .filter(f -> !Boolean.TRUE.equals(f.isAtivo()))
+                    .filter(f -> f.getDataInicio() != null && !f.getDataInicio().isAfter(hoje))
+
+
+                    .peek(f -> System.out.println("[KPI] candidata id=" + f.getId() + " ini=" + f.getDataInicio() + " fim=" + f.getDataFim()))
+                    // Critério de "última": maior ID (encerrou por último em nossa modelagem)
+                    .max(Comparator.comparingInt(Fornada::getId));
+
+            if (ultimaEncerrada.isEmpty()) {
+                System.out.println("[KPI] nenhuma encerrada encontrada");
+                return criarKPIVazio();
+            }
+            System.out.println("[KPI] selecionada id=" + ultimaEncerrada.get().getId());
+            Map<String, Object> kpi = getKPIFornada(ultimaEncerrada.get().getId());
+            // incluir intervalo para exibição
+            kpi.put("dataInicio", ultimaEncerrada.get().getDataInicio());
+            kpi.put("dataFim", ultimaEncerrada.get().getDataFim());
+            kpi.put("fornadaId", ultimaEncerrada.get().getId());
+            return kpi;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return criarKPIVazio();
+        }
+    }
+
+    public Map<String, Object> getKPIFornadasPorMesAno(int ano, int mes) {
+        try {
+            List<Fornada> fornadas = fornadaRepository.findByIsAtivoTrueAndDataInicioBetweenOrderByDataInicioAsc(
+                LocalDate.of(ano, mes, 1),
+                LocalDate.of(ano, mes, 1).plusMonths(1).minusDays(1)
+            );
+
+            if (fornadas.isEmpty()) {
+                return criarKPIVazio();
+            }
+
+            double totalDisponivel = 0.0;            double totalVendido = 0.0;
+            int quantidadeDisponivel = 0;
+            int quantidadeVendida = 0;
+
+            for (Fornada fornada : fornadas) {
+                Map<String, Object> kpiFornada = getKPIFornada(fornada.getId());
+                
+                quantidadeDisponivel += (Integer) kpiFornada.get("quantidadeDisponivel");
+                quantidadeVendida += (Integer) kpiFornada.get("quantidadeVendida");
+                totalDisponivel += (Double) kpiFornada.get("totalDisponivel");
+                totalVendido += (Double) kpiFornada.get("totalVendido");
+            }
+
+            double valorPerdido = totalDisponivel - totalVendido;
+
+            Map<String, Object> kpi = new HashMap<>();
+            kpi.put("quantidadeDisponivel", quantidadeDisponivel);
+            kpi.put("quantidadeVendida", quantidadeVendida);
+            kpi.put("totalDisponivel", totalDisponivel);
+            kpi.put("totalVendido", totalVendido);
+            kpi.put("valorPerdido", valorPerdido);
+            kpi.put("percentualVendido", quantidadeDisponivel > 0 ? 
+                (double) quantidadeVendida / quantidadeDisponivel * 100 : 0.0);
+            kpi.put("mes", mes);
+            kpi.put("ano", ano);
+
+            return kpi;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return criarKPIVazio();
+        }
+    }
+
+    private Map<String, Object> criarKPIVazio() {
+        Map<String, Object> kpi = new HashMap<>();
+        kpi.put("quantidadeDisponivel", 0);
+        kpi.put("quantidadeVendida", 0);
+        kpi.put("totalDisponivel", 0.0);
+        kpi.put("totalVendido", 0.0);
+        kpi.put("valorPerdido", 0.0);
+        kpi.put("percentualVendido", 0.0);
+        return kpi;
     }
 
 }

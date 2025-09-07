@@ -77,16 +77,27 @@ public class FornadaController {
     })
     @GetMapping
     public ResponseEntity<List<Fornada>> listarFornadas() {
-        return ResponseEntity.status(200).body(fornadaService.listarFornada());
+        var list = fornadaService.listarFornada();
+        System.out.println("[BACK][FORNADAS][ATIVAS] total=" + (list != null ? list.size() : 0));
+        if (list != null) list.forEach(f -> System.out.println("  id="+f.getId()+" ini="+f.getDataInicio()+" fim="+f.getDataFim()+" ativo="+f.isAtivo()));
+        return ResponseEntity.status(200).body(list);
+    }
+
+    @Operation(summary = "Lista todas as fornadas (ativas e encerradas)")
+    @GetMapping("/todas")
+    public ResponseEntity<List<Fornada>> listarTodasFornadas() {
+        var list = fornadaService.listarTodasFornadas();
+        System.out.println("[BACK][FORNADAS][TODAS] total=" + (list != null ? list.size() : 0));
+        if (list != null) list.forEach(f -> System.out.println("  id="+f.getId()+" ini="+f.getDataInicio()+" fim="+f.getDataFim()+" ativo="+f.isAtivo()));
+        return ResponseEntity.ok(list);
     }
 
     @Operation(summary = "Lista meses/anos que tiveram fornadas (para filtro)")
     @GetMapping("/meses-anos")
     public ResponseEntity<List<MesAnoResponse>> listarMesesAnosDisponiveis() {
         var proj = fornadaService
-                .listarFornada() // obter todas e derivar mês/ano distintos em memória caso native indisponível via service
+                .listarTodasFornadas() // incluir ativas e encerradas para o filtro
                 .stream()
-                .filter(Fornada::isAtivo)
                 .map(f -> new MesAnoResponse(f.getDataInicio().getYear(), f.getDataInicio().getMonthValue()))
                 .distinct()
                 .sorted((a, b) -> {
@@ -95,6 +106,7 @@ public class FornadaController {
                     return b.mes().compareTo(a.mes());
                 })
                 .toList();
+        System.out.println("[BACK][FORNADAS][MESES-ANOS] retornando " + proj.size() + " entradas");
         return ResponseEntity.ok(proj);
     }
 
@@ -122,6 +134,20 @@ public class FornadaController {
         }
         var itens = fornadaDaVezService.buscarProdutosPorFornadaId(fornadaOpt.get().getId());
         return ResponseEntity.ok(ProdutoFornadaDaVezResponse.toProdutoFornadaDaVezResonse(itens));
+    }
+
+    @Operation(summary = "Busca a próxima fornada")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Próxima fornada encontrada com sucesso"),
+            @ApiResponse(responseCode = "204", description = "Nenhuma fornada futura encontrada")
+    })
+    @GetMapping("/proxima")
+    public ResponseEntity<Fornada> buscarProximaFornada() {
+        var fornadaOpt = fornadaService.buscarProximaFornada();
+        if (fornadaOpt.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(fornadaOpt.get());
     }
 
     @Operation(summary = "Busca uma fornada por ID")

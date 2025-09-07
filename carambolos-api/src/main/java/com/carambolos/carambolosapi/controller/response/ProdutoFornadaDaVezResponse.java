@@ -13,6 +13,7 @@ public record ProdutoFornadaDaVezResponse(
         Double valor,
         String categoria,
         Integer quantidade,
+        Integer quantidadeVendida,
         Boolean isAtivo,
         LocalDate dataInicio,
         LocalDate dataFim
@@ -29,6 +30,7 @@ public record ProdutoFornadaDaVezResponse(
                 projection.getValor(),
                 projection.getCategoria(),
                 projection.getQuantidade(),
+                projection.getQuantidadeVendida(),
                 projection.getAtivoPf(),
                 projection.getDataInicio(),
                 projection.getDataFim()

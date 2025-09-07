@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -165,6 +166,52 @@ public class DashboardController {
             return ResponseEntity.status(204).build();
         }
         return ResponseEntity.ok(qtdPedidosBoloConcluidosECancelados);
+    }
+
+    // KPIs específicos para fornadas
+    @Operation(summary = "KPI de uma fornada específica")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "KPI da fornada retornado com sucesso"),
+            @ApiResponse(responseCode = "204", description = "Nenhum dado encontrado")
+    })
+    @GetMapping("/kpi-fornada/{fornadaId}")
+    public ResponseEntity<Map<String, Object>> getKPIFornada(@PathVariable Integer fornadaId) {
+        Map<String, Object> kpi = dashboardService.getKPIFornada(fornadaId);
+        if (kpi.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.ok(kpi);
+    }
+
+    @Operation(summary = "KPI da fornada mais recente")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "KPI da fornada mais recente retornado com sucesso"),
+            @ApiResponse(responseCode = "204", description = "Nenhum dado encontrado")
+    })
+    @GetMapping(value = "/kpi-fornada-mais-recente", produces = "application/json")
+    public ResponseEntity<Map<String, Object>> getKPIFornadaMaisRecente() {
+        Map<String, Object> kpi = dashboardService.getKPIFornadaMaisRecente();
+        if (kpi.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.ok(kpi);
+    }
+
+    @Operation(summary = "KPI de fornadas por mês/ano")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "KPI das fornadas do período retornado com sucesso"),
+            @ApiResponse(responseCode = "204", description = "Nenhum dado encontrado")
+    })
+    @GetMapping("/kpi-fornadas-por-periodo")
+    public ResponseEntity<Map<String, Object>> getKPIFornadasPorPeriodo(
+            @RequestParam Integer ano,
+            @RequestParam Integer mes
+    ) {
+        Map<String, Object> kpi = dashboardService.getKPIFornadasPorMesAno(ano, mes);
+        if (kpi.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.ok(kpi);
     }
 
 }

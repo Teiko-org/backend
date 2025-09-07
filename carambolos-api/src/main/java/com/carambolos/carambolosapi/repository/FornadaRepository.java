@@ -14,5 +14,10 @@ public interface FornadaRepository extends JpaRepository<Fornada, Integer> {
 
     Optional<Fornada> findTop1ByIsAtivoTrueOrderByDataInicioDesc();
 
+    Optional<Fornada> findTop1ByIsAtivoTrueAndDataInicioAfterOrderByDataInicioAsc(LocalDate dataInicio);
+
     List<Fornada> findByIsAtivoTrueAndDataInicioBetweenOrderByDataInicioAsc(LocalDate inicio, LocalDate fim);
+
+    // Histórico completo: incluir ativas e encerradas
+    List<Fornada> findByDataInicioBetweenOrderByDataInicioAsc(LocalDate inicio, LocalDate fim);
 }
