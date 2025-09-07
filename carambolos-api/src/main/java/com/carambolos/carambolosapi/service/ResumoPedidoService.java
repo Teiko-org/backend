@@ -66,8 +66,19 @@ public class ResumoPedidoService {
     }
 
     public ResumoPedido buscarResumoPedidoPorId(Integer id) {
-        return resumoPedidoRepository.findByIdAndIsAtivoTrue(id)
-                .orElseThrow(() -> new RuntimeException("Resumo de pedido não encontrado"));
+        System.out.println("🔍 [BUSCAR_PEDIDO] Buscando pedido com ID: " + id);
+        
+        var pedidoOpt = resumoPedidoRepository.findByIdAndIsAtivoTrue(id);
+        
+        if (pedidoOpt.isEmpty()) {
+            System.out.println("❌ [BUSCAR_PEDIDO] Pedido não encontrado ou inativo: " + id);
+            throw new EntidadeNaoEncontradaException("Resumo de pedido não encontrado");
+        }
+        
+        var pedido = pedidoOpt.get();
+        System.out.println("✅ [BUSCAR_PEDIDO] Pedido encontrado: ID=" + id + ", Status=" + pedido.getStatus() + ", Ativo=" + pedido.getAtivo());
+        
+        return pedido;
     }
 
     //LocalDateTime?
@@ -120,11 +131,19 @@ public class ResumoPedidoService {
     }
 
     public ResumoPedido alterarStatus(Integer id, StatusEnum novoStatus) {
+        System.out.println("🔄 [ALTERAR_STATUS] Iniciando alteração de status para pedido ID: " + id + " -> " + novoStatus);
+        
         ResumoPedido resumoPedido = buscarResumoPedidoPorId(id);
         StatusEnum statusAtual = resumoPedido.getStatus();
+        
+        System.out.println("📋 [ALTERAR_STATUS] Status atual: " + statusAtual + " | Novo status: " + novoStatus);
+        
         if (!isTransicaoStatusValida(statusAtual, novoStatus)) {
+            System.out.println("❌ [ALTERAR_STATUS] Transição inválida: " + statusAtual + " -> " + novoStatus);
             throw new EntidadeImprocessavelException("Não é possível alterar o status de %s para %s".formatted(statusAtual, novoStatus));
         }
+        
+        System.out.println("✅ [ALTERAR_STATUS] Transição válida, prosseguindo...");
 
         try {
             if (resumoPedido.getPedidoFornadaId() != null) {
@@ -385,11 +404,44 @@ public class ResumoPedidoService {
     }
 
     private boolean isTransicaoStatusValida(StatusEnum statusAtual, StatusEnum novoStatus) {
+        System.out.println("🔍 [VALIDACAO] Verificando transição: " + statusAtual + " -> " + novoStatus);
+        
         if (statusAtual == novoStatus) {
+            System.out.println("❌ [VALIDACAO] Transição inválida: mesmo status");
             return false;
         }
 
-        return true;
+        // Regras de transição de status
+        switch (statusAtual) {
+            case PENDENTE:
+                // PENDENTE pode ir para PAGO, CANCELADO
+                if (novoStatus == StatusEnum.PAGO || novoStatus == StatusEnum.CANCELADO) {
+                    System.out.println("✅ [VALIDACAO] Transição válida: PENDENTE -> " + novoStatus);
+                    return true;
+                }
+                break;
+            case PAGO:
+                // PAGO pode ir para CONCLUIDO, CANCELADO
+                if (novoStatus == StatusEnum.CONCLUIDO || novoStatus == StatusEnum.CANCELADO) {
+                    System.out.println("✅ [VALIDACAO] Transição válida: PAGO -> " + novoStatus);
+                    return true;
+                }
+                break;
+            case CONCLUIDO:
+                // CONCLUIDO não pode mudar para outro status
+                System.out.println("❌ [VALIDACAO] Transição inválida: CONCLUIDO não pode mudar");
+                return false;
+            case CANCELADO:
+                // CANCELADO pode voltar para PENDENTE
+                if (novoStatus == StatusEnum.PENDENTE) {
+                    System.out.println("✅ [VALIDACAO] Transição válida: CANCELADO -> PENDENTE");
+                    return true;
+                }
+                break;
+        }
+
+        System.out.println("❌ [VALIDACAO] Transição inválida: " + statusAtual + " -> " + novoStatus);
+        return false;
     }
 
     private Double calcularValorPedidoFornada(Integer pedidoFornadaId) {

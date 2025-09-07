@@ -94,6 +94,20 @@ public class DashboardController {
         return ResponseEntity.ok(produtosMaisPedidos);
     }
 
+    @Operation(summary = "Lista os produtos cadastrados no sistema")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Listagem dos produtos cadastrados com sucesso"),
+            @ApiResponse(responseCode = "204", description = "Nenhum produto encontrado")
+    })
+    @GetMapping("/produtosCadastrados")
+    public ResponseEntity<List<Map<String, Object>>> getProdutosCadastrados() {
+        List<Map<String, Object>> produtosCadastrados = dashboardService.getProdutosCadastrados();
+        if (produtosCadastrados.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.ok(produtosCadastrados);
+    }
+
     @Operation(summary = "Lista os últimos pedidos")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Listagem dos últimos pedidos"),

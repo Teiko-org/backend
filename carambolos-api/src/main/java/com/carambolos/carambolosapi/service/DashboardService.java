@@ -285,11 +285,11 @@ public class DashboardService {
         }
     }
 
+    @Deprecated
     public List<Map<String, Object>> getProdutosMaisPedidos() {
         try {
             List<Map<String, Object>> todosProdutos = new ArrayList<>();
 
-            // Adicionar produtos de fornada
             try {
                 List<Map<String, Object>> todasFornadas = getFornadasMaisPedidas();
                 todasFornadas.forEach(produto -> {
@@ -306,7 +306,6 @@ public class DashboardService {
                 e.printStackTrace();
             }
 
-            // Adicionar bolos
             try {
                 List<Map<String, Object>> todosBolos = getBolosMaisPedidos();
                 todosBolos.forEach(bolo -> {
@@ -337,6 +336,79 @@ public class DashboardService {
                     .collect(Collectors.toList());
         } catch (Exception e) {
             System.err.println("Erro geral em getProdutosMaisPedidos: " + e.getMessage());
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+    public List<Map<String, Object>> getProdutosCadastrados() {
+        try {
+            List<Map<String, Object>> produtosCadastrados = new ArrayList<>();
+
+            // Adicionar bolos cadastrados (excluindo pedidos de clientes com categoria PERSONALIZADO)
+            try {
+                List<Bolo> bolos = boloRepository.findAll();
+                bolos.forEach(bolo -> {
+                    if (bolo.getAtivo() != null && bolo.getAtivo()) {
+                        // Filtrar bolos que são pedidos de clientes (categoria PERSONALIZADO)
+                        if ("PERSONALIZADO".equals(bolo.getCategoria())) {
+                            return; // Pular bolos que são pedidos de clientes
+                        }
+                        
+                        Map<String, Object> boloMap = new HashMap<>();
+                        boloMap.put("id", bolo.getId());
+                        
+                        // Para bolos, o nome vem da decoração
+                        String nomeBolo = "Bolo Personalizado";
+                        if (bolo.getDecoracao() != null) {
+                            try {
+                                var decoracao = decoracaoRepository.findById(bolo.getDecoracao());
+                                if (decoracao.isPresent()) {
+                                    nomeBolo = decoracao.get().getNome();
+                                }
+                            } catch (Exception e) {
+                                System.err.println("Erro ao buscar decoração do bolo: " + e.getMessage());
+                            }
+                        }
+                        boloMap.put("nome", nomeBolo);
+                        boloMap.put("categoria", bolo.getCategoria());
+                        
+                        // Para bolos, não temos preço fixo - é calculado dinamicamente
+                        boloMap.put("preco", 0.0);
+                        boloMap.put("tipo", "BOLO");
+                        boloMap.put("ativo", bolo.getAtivo());
+                        produtosCadastrados.add(boloMap);
+                    }
+                });
+            } catch (Exception e) {
+                System.err.println("Erro ao buscar bolos cadastrados: " + e.getMessage());
+                e.printStackTrace();
+            }
+
+            // Adicionar produtos de fornada cadastrados
+            try {
+                List<ProdutoFornada> produtosFornada = produtoFornadaRepository.findAll();
+                produtosFornada.forEach(produto -> {
+                    if (produto.getAtivo() != null && produto.getAtivo()) {
+                        Map<String, Object> produtoMap = new HashMap<>();
+                        produtoMap.put("id", produto.getId());
+                        produtoMap.put("nome", produto.getProduto());
+                        produtoMap.put("categoria", produto.getCategoria());
+                        produtoMap.put("preco", produto.getValor());
+                        produtoMap.put("quantidade", 0); // Produtos de fornada não têm quantidade fixa
+                        produtoMap.put("tipo", "FORNADA");
+                        produtoMap.put("ativo", produto.getAtivo());
+                        produtosCadastrados.add(produtoMap);
+                    }
+                });
+            } catch (Exception e) {
+                System.err.println("Erro ao buscar produtos de fornada cadastrados: " + e.getMessage());
+                e.printStackTrace();
+            }
+
+            return produtosCadastrados;
+        } catch (Exception e) {
+            System.err.println("Erro geral em getProdutosCadastrados: " + e.getMessage());
             e.printStackTrace();
             return new ArrayList<>();
         }

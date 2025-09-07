@@ -44,6 +44,9 @@ public interface BoloRepository extends JpaRepository<Bolo, Integer> {
             LEFT JOIN recheio_exclusivo re ON rp.recheio_exclusivo = re.id
             LEFT JOIN recheio_unitario reu1 ON re.recheio_unitario_id1 = reu1.id
             LEFT JOIN recheio_unitario reu2 ON re.recheio_unitario_id2 = reu2.id
+            
+            -- Filtrar apenas bolos cadastrados (excluir pedidos de clientes com categoria PERSONALIZADO)
+            WHERE b.categoria != 'PERSONALIZADO' AND b.is_ativo = 1
             """, nativeQuery = true)
     List<DetalheBoloProjection> listarDetalheBolo();
 
