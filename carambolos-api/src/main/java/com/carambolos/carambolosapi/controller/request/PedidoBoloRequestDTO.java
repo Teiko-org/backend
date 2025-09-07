@@ -40,7 +40,10 @@ public record PedidoBoloRequestDTO(
 
         @Schema(description = "Telefone do cliente", example = "(11) 91234-5678")
         @NotBlank
-        String telefoneCliente
+        String telefoneCliente,
+
+        @Schema(description = "Horário de retirada (apenas para tipo RETIRADA)", example = "17:00")
+        String horarioRetirada
 ) {
     public static PedidoBolo toPedidoBolo(PedidoBoloRequestDTO request) {
         if (request == null) {
@@ -56,6 +59,7 @@ public record PedidoBoloRequestDTO(
         pedidoBolo.setTipoEntrega(request.tipoEntrega);
         pedidoBolo.setNomeCliente(request.nomeCliente);
         pedidoBolo.setTelefoneCliente(request.telefoneCliente);
+        pedidoBolo.setHorarioRetirada(request.horarioRetirada);
         return pedidoBolo;
     }
 }

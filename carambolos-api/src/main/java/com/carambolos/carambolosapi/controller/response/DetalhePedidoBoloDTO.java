@@ -21,6 +21,7 @@ public record DetalhePedidoBoloDTO(
     LocalDateTime data,
     String nomeCliente,
     String telefone,
+    String horarioRetirada,
     EnderecoResponseDTO endereco
 ) {
 
@@ -39,10 +40,11 @@ public record DetalhePedidoBoloDTO(
             LocalDateTime data,
             String nomeCliente,
             String telefone,
+            String horarioRetirada,
             EnderecoResponseDTO endereco
     ) {
         return new DetalhePedidoBoloDTO(
-                numeroPedido, tamanho, formato, massa, recheio, cobertura, decoracao, imagensDecoracao, adicionais, observacoes, tipoEntrega, data, nomeCliente, telefone, endereco
+                numeroPedido, tamanho, formato, massa, recheio, cobertura, decoracao, imagensDecoracao, adicionais, observacoes, tipoEntrega, data, nomeCliente, telefone, horarioRetirada, endereco
         );
     }
 }

@@ -98,7 +98,7 @@ public class UsuarioService {
 
     public Usuario cadastrar(Usuario usuario)  {
         if (usuarioRepository.findByContatoAndIsAtivoTrue(usuario.getContato()).isPresent()) {
-            throw new EntidadeJaExisteException("Esse telefone já está em uso.");
+            throw new EntidadeJaExisteException("Este telefone já está cadastrado. Tente fazer login ou use outro número.");
         }
 
         String senhaCriptografada = passwordEncoder.encode(usuario.getSenha());

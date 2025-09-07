@@ -9,6 +9,7 @@ import com.carambolos.carambolosapi.model.*;
 import com.carambolos.carambolosapi.model.enums.StatusEnum;
 import com.carambolos.carambolosapi.model.enums.TipoEntregaEnum;
 import com.carambolos.carambolosapi.repository.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -65,19 +66,8 @@ public class ResumoPedidoService {
     }
 
     public ResumoPedido buscarResumoPedidoPorId(Integer id) {
-        System.out.println("🔍 [BUSCAR_PEDIDO] Buscando pedido com ID: " + id);
-        
-        var pedidoOpt = resumoPedidoRepository.findByIdAndIsAtivoTrue(id);
-        
-        if (pedidoOpt.isEmpty()) {
-            System.out.println("❌ [BUSCAR_PEDIDO] Pedido não encontrado ou inativo: " + id);
-            throw new EntidadeNaoEncontradaException("Resumo de pedido não encontrado");
-        }
-        
-        var pedido = pedidoOpt.get();
-        System.out.println("✅ [BUSCAR_PEDIDO] Pedido encontrado: ID=" + id + ", Status=" + pedido.getStatus() + ", Ativo=" + pedido.getAtivo());
-        
-        return pedido;
+        return resumoPedidoRepository.findByIdAndIsAtivoTrue(id)
+                .orElseThrow(() -> new RuntimeException("Resumo de pedido não encontrado"));
     }
 
     //LocalDateTime?
@@ -130,19 +120,11 @@ public class ResumoPedidoService {
     }
 
     public ResumoPedido alterarStatus(Integer id, StatusEnum novoStatus) {
-        System.out.println("🔄 [ALTERAR_STATUS] Iniciando alteração de status para pedido ID: " + id + " -> " + novoStatus);
-        
         ResumoPedido resumoPedido = buscarResumoPedidoPorId(id);
         StatusEnum statusAtual = resumoPedido.getStatus();
-        
-        System.out.println("📋 [ALTERAR_STATUS] Status atual: " + statusAtual + " | Novo status: " + novoStatus);
-        
         if (!isTransicaoStatusValida(statusAtual, novoStatus)) {
-            System.out.println("❌ [ALTERAR_STATUS] Transição inválida: " + statusAtual + " -> " + novoStatus);
             throw new EntidadeImprocessavelException("Não é possível alterar o status de %s para %s".formatted(statusAtual, novoStatus));
         }
-        
-        System.out.println("✅ [ALTERAR_STATUS] Transição válida, prosseguindo...");
 
         try {
             if (resumoPedido.getPedidoFornadaId() != null) {
@@ -195,7 +177,7 @@ public class ResumoPedidoService {
                     .map(Massa::getSabor)
                     .orElse("Não especificada");
 
-            String recheioNome;
+            String recheioNome = "Não especificado";
             try {
                 recheioNome = recheioPedidoRepository.findById(bolo.getRecheioPedido())
                         .map(recheioPedido -> {
@@ -241,13 +223,18 @@ public class ResumoPedidoService {
             String imagemUrl = "";
             String[] imagensDecoracao = new String[]{};
             try {
-                ImagemDecoracao imagem = boloRepository.findImagemByBolo(bolo.getDecoracao());
-                if (imagem != null && imagem.getUrl() != null) {
-                    imagemUrl = imagem.getUrl();
-                    imagensDecoracao = new String[]{ imagemUrl };
+                List<ImagemDecoracao> imagens = boloRepository.findAllImagensByDecoracao(bolo.getDecoracao());
+                if (imagens != null && !imagens.isEmpty()) {
+                    // Usar a primeira imagem como imagem principal
+                    imagemUrl = imagens.get(0).getUrl();
+                    // Converter todas as imagens para array de strings
+                    imagensDecoracao = imagens.stream()
+                            .map(ImagemDecoracao::getUrl)
+                            .filter(url -> url != null && !url.trim().isEmpty())
+                            .toArray(String[]::new);
                 }
             } catch (Exception e) {
-                System.err.println("Erro ao buscar imagem da decoração: " + e.getMessage());
+                System.err.println("Erro ao buscar imagens da decoração: " + e.getMessage());
                 imagemUrl = "";
                 imagensDecoracao = new String[]{};
             }
@@ -265,14 +252,21 @@ public class ResumoPedidoService {
                 enderecoDTO = null;
             }
 
-            // Adicionais: hoje não há coluna específica; tentar derivar da observação
+            // Adicionais: extrair da observação
             String adicionais = null;
             try {
                 String obs = pedido.getObservacao();
                 if (obs != null && obs.contains("Adicionais:")) {
-                    adicionais = obs.substring(obs.indexOf("Adicionais:") + 11).trim();
+                    String adicionaisTexto = obs.substring(obs.indexOf("Adicionais:") + 11).trim();
+                    // Se há quebra de linha, pegar apenas a primeira linha dos adicionais
+                    if (adicionaisTexto.contains("\n")) {
+                        adicionaisTexto = adicionaisTexto.substring(0, adicionaisTexto.indexOf("\n")).trim();
+                    }
+                    adicionais = adicionaisTexto;
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception e) {
+                System.err.println("Erro ao extrair adicionais da observação: " + e.getMessage());
+            }
 
             return DetalhePedidoBoloDTO.toDetalhePedidoResponse(
                     pedido.getId(),
@@ -289,10 +283,12 @@ public class ResumoPedidoService {
                     resumoPedido.getDataPedido(),
                     pedido.getNomeCliente(),
                     pedido.getTelefoneCliente(),
+                    pedido.getHorarioRetirada(),
                     enderecoDTO
             );
         } catch (Exception e) {
             System.err.println("Erro geral em obterDetalhePedidoBolo: " + e.getMessage());
+            e.printStackTrace();
             throw new EntidadeImprocessavelException("Erro ao buscar detalhes do pedido de bolo: " + e.getMessage());
         }
     }
@@ -336,6 +332,7 @@ public class ResumoPedidoService {
                 }
             } catch (Exception e) {
                 System.err.println("Erro ao buscar endereço da fornada: " + e.getMessage());
+                enderecoDTO = null;
             }
 
             return DetalhePedidoFornadaDTO.toDetalhePedidoResponse(
@@ -350,6 +347,7 @@ public class ResumoPedidoService {
             );
         } catch (Exception e) {
             System.err.println("Erro geral em obterDetalhePedidoFornada: " + e.getMessage());
+            e.printStackTrace();
             throw new EntidadeImprocessavelException("Erro ao buscar detalhes do pedido de fornada: " + e.getMessage());
         }
     }
@@ -400,44 +398,11 @@ public class ResumoPedidoService {
     }
 
     private boolean isTransicaoStatusValida(StatusEnum statusAtual, StatusEnum novoStatus) {
-        System.out.println("🔍 [VALIDACAO] Verificando transição: " + statusAtual + " -> " + novoStatus);
-        
         if (statusAtual == novoStatus) {
-            System.out.println("❌ [VALIDACAO] Transição inválida: mesmo status");
             return false;
         }
 
-        // Regras de transição de status
-        switch (statusAtual) {
-            case PENDENTE:
-                // PENDENTE pode ir para PAGO, CANCELADO
-                if (novoStatus == StatusEnum.PAGO || novoStatus == StatusEnum.CANCELADO) {
-                    System.out.println("✅ [VALIDACAO] Transição válida: PENDENTE -> " + novoStatus);
-                    return true;
-                }
-                break;
-            case PAGO:
-                // PAGO pode ir para CONCLUIDO, CANCELADO
-                if (novoStatus == StatusEnum.CONCLUIDO || novoStatus == StatusEnum.CANCELADO) {
-                    System.out.println("✅ [VALIDACAO] Transição válida: PAGO -> " + novoStatus);
-                    return true;
-                }
-                break;
-            case CONCLUIDO:
-                // CONCLUIDO não pode mudar para outro status
-                System.out.println("❌ [VALIDACAO] Transição inválida: CONCLUIDO não pode mudar");
-                return false;
-            case CANCELADO:
-                // CANCELADO pode voltar para PENDENTE
-                if (novoStatus == StatusEnum.PENDENTE) {
-                    System.out.println("✅ [VALIDACAO] Transição válida: CANCELADO -> PENDENTE");
-                    return true;
-                }
-                break;
-        }
-
-        System.out.println("❌ [VALIDACAO] Transição inválida: " + statusAtual + " -> " + novoStatus);
-        return false;
+        return true;
     }
 
     private Double calcularValorPedidoFornada(Integer pedidoFornadaId) {
@@ -461,7 +426,7 @@ public class ResumoPedidoService {
         var bolo = boloRepository.findById(pedidoBolo.getBoloId())
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Bolo não encontrado"));
 
-        double valorTamanho = 0.0;
+        Double valorTamanho = 0.0;
         if (bolo.getTamanho() != null) {
             switch (bolo.getTamanho()) {
                 case TAMANHO_5 -> valorTamanho = 50.0;
@@ -524,6 +489,7 @@ public class ResumoPedidoService {
             }
         }
 
-        return valorTamanho + valorRecheio + valorMassa;
+        Double valorTotal = valorTamanho + valorRecheio + valorMassa;
+        return valorTotal;
     }
 }

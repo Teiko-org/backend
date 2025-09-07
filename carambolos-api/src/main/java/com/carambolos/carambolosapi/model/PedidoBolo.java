@@ -42,6 +42,9 @@ public class PedidoBolo {
     @Convert(converter = CryptoAttributeConverter.class)
     private String telefoneCliente;
 
+    @Column(name = "horario_retirada")
+    private String horarioRetirada;
+
     @Column(name = "is_ativo")
     private Boolean isAtivo = true;
 
@@ -119,6 +122,14 @@ public class PedidoBolo {
 
     public void setTelefoneCliente(String telefoneCliente) {
         this.telefoneCliente = telefoneCliente;
+    }
+
+    public String getHorarioRetirada() {
+        return horarioRetirada;
+    }
+
+    public void setHorarioRetirada(String horarioRetirada) {
+        this.horarioRetirada = horarioRetirada;
     }
 
     public void setTipoEntrega(TipoEntregaEnum tipoEntrega) {
