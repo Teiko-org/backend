@@ -138,6 +138,14 @@ public class DashboardService {
                             Long quantidade = entry.getValue();
 
                             Optional<Bolo> boloOpt = boloRepository.findById(boloId);
+                            
+                            // Filtrar apenas bolos cadastrados (não pedidos de clientes)
+                            if (boloOpt.isPresent()) {
+                                Bolo bolo = boloOpt.get();
+                                if ("PERSONALIZADO".equals(bolo.getCategoria())) {
+                                    return null; // Pular bolos que são pedidos de clientes
+                                }
+                            }
 
                             Double valorTotal = pedidosBolo.stream()
                                     .filter(p -> p.getBoloId() != null && p.getBoloId().equals(boloId))
@@ -332,11 +340,13 @@ public class DashboardService {
             try {
                 List<Bolo> bolos = boloRepository.findAll();
                 bolos.forEach(bolo -> {
-                    if (bolo.getAtivo() != null && bolo.getAtivo()) {
-                        // Filtrar bolos que são pedidos de clientes (categoria PERSONALIZADO)
-                        if ("PERSONALIZADO".equals(bolo.getCategoria())) {
-                            return; // Pular bolos que são pedidos de clientes
-                        }
+                    // Filtrar bolos que são pedidos de clientes (categoria PERSONALIZADO)
+                    if ("PERSONALIZADO".equals(bolo.getCategoria())) {
+                        return; // Pular bolos que são pedidos de clientes
+                    }
+                    
+                    // Incluir todos os bolos cadastrados (ativos e inativos)
+                    if (bolo.getAtivo() != null) {
                         
                         Map<String, Object> boloMap = new HashMap<>();
                         boloMap.put("id", bolo.getId());
@@ -371,7 +381,8 @@ public class DashboardService {
             try {
                 List<ProdutoFornada> produtosFornada = produtoFornadaRepository.findAll();
                 produtosFornada.forEach(produto -> {
-                    if (produto.getAtivo() != null && produto.getAtivo()) {
+                    // Incluir todos os produtos de fornada (ativos e inativos)
+                    if (produto.getAtivo() != null) {
                         Map<String, Object> produtoMap = new HashMap<>();
                         produtoMap.put("id", produto.getId());
                         produtoMap.put("nome", produto.getProduto());

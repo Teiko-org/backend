@@ -62,9 +62,12 @@ public class BoloService {
     }
 
     public Bolo cadastrarBolo(Bolo bolo) {
-        boolean existeBoloAtivo = boloRepository.existsByIdAndIsAtivoTrue(bolo.getId());
-        if (existeBoloAtivo) {
-            throw new EntidadeJaExisteException("Esse bolo já existe no banco de dados.");
+        // Para novos bolos, o ID será null ou 0, então não precisamos verificar se já existe
+        if (bolo.getId() != null && bolo.getId() > 0) {
+            boolean existeBoloAtivo = boloRepository.existsByIdAndIsAtivoTrue(bolo.getId());
+            if (existeBoloAtivo) {
+                throw new EntidadeJaExisteException("Esse bolo já existe no banco de dados.");
+            }
         }
 
         if (!massaRepository.existsByIdAndIsAtivo(bolo.getMassa(), true)) {
