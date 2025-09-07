@@ -617,7 +617,7 @@ public class DashboardService {
 
     public Map<String, Object> getKPIFornadasPorMesAno(int ano, int mes) {
         try {
-            List<Fornada> fornadas = fornadaRepository.findByIsAtivoTrueAndDataInicioBetweenOrderByDataInicioAsc(
+            List<Fornada> fornadas = fornadaRepository.findByDataInicioBetweenOrderByDataInicioAsc(
                 LocalDate.of(ano, mes, 1),
                 LocalDate.of(ano, mes, 1).plusMonths(1).minusDays(1)
             );
