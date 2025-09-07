@@ -9,7 +9,6 @@ import com.carambolos.carambolosapi.model.*;
 import com.carambolos.carambolosapi.model.enums.StatusEnum;
 import com.carambolos.carambolosapi.model.enums.TipoEntregaEnum;
 import com.carambolos.carambolosapi.repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -196,7 +195,7 @@ public class ResumoPedidoService {
                     .map(Massa::getSabor)
                     .orElse("Não especificada");
 
-            String recheioNome = "Não especificado";
+            String recheioNome;
             try {
                 recheioNome = recheioPedidoRepository.findById(bolo.getRecheioPedido())
                         .map(recheioPedido -> {
@@ -294,7 +293,6 @@ public class ResumoPedidoService {
             );
         } catch (Exception e) {
             System.err.println("Erro geral em obterDetalhePedidoBolo: " + e.getMessage());
-            e.printStackTrace();
             throw new EntidadeImprocessavelException("Erro ao buscar detalhes do pedido de bolo: " + e.getMessage());
         }
     }
@@ -338,7 +336,6 @@ public class ResumoPedidoService {
                 }
             } catch (Exception e) {
                 System.err.println("Erro ao buscar endereço da fornada: " + e.getMessage());
-                enderecoDTO = null;
             }
 
             return DetalhePedidoFornadaDTO.toDetalhePedidoResponse(
@@ -353,7 +350,6 @@ public class ResumoPedidoService {
             );
         } catch (Exception e) {
             System.err.println("Erro geral em obterDetalhePedidoFornada: " + e.getMessage());
-            e.printStackTrace();
             throw new EntidadeImprocessavelException("Erro ao buscar detalhes do pedido de fornada: " + e.getMessage());
         }
     }
@@ -465,7 +461,7 @@ public class ResumoPedidoService {
         var bolo = boloRepository.findById(pedidoBolo.getBoloId())
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Bolo não encontrado"));
 
-        Double valorTamanho = 0.0;
+        double valorTamanho = 0.0;
         if (bolo.getTamanho() != null) {
             switch (bolo.getTamanho()) {
                 case TAMANHO_5 -> valorTamanho = 50.0;
@@ -528,7 +524,6 @@ public class ResumoPedidoService {
             }
         }
 
-        Double valorTotal = valorTamanho + valorRecheio + valorMassa;
-        return valorTotal;
+        return valorTamanho + valorRecheio + valorMassa;
     }
 }

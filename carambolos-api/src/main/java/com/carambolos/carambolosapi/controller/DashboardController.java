@@ -20,6 +20,7 @@ import java.util.Map;
 @RequestMapping("/dashboard")
 @Tag(name = "Dashboard Controller", description = "Consulta endpoints de bolos, fornadas e clientes")
 @SecurityRequirement(name = "Bearer")
+@SuppressWarnings("unused")
 public class DashboardController {
 
     private final DashboardService dashboardService;
@@ -86,6 +87,7 @@ public class DashboardController {
             @ApiResponse(responseCode = "204", description = "Nenhum produto encontrado")
     })
     @GetMapping("/produtosMaisPedidos")
+    @SuppressWarnings("deprecation")
     public ResponseEntity<List<Map<String, Object>>> getProdutosMaisPedidos() {
         List<Map<String, Object>> produtosMaisPedidos = dashboardService.getProdutosMaisPedidos();
         if (produtosMaisPedidos.isEmpty()) {

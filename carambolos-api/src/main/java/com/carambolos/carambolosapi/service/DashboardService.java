@@ -14,12 +14,8 @@ import java.util.stream.Collectors;
 public class DashboardService {
 
     private final PedidoBoloRepository pedidoBoloRepository;
-    private final UsuarioRepository usuarioRepository;
     private final BoloRepository boloRepository;
     private final PedidoFornadaRepository pedidoFornadaRepository;
-    private final MassaRepository massaRepository;
-    private final RecheioPedidoRepository recheioPedidoRepository;
-    private final RecheioUnitarioRepository recheioUnitarioRepository;
     private final ProdutoFornadaRepository produtoFornadaRepository;
     private final FornadaDaVezRepository fornadaDaVezRepository;
     private final ResumoPedidoRepository resumoPedidoRepository;
@@ -27,21 +23,16 @@ public class DashboardService {
     private final FornadaRepository fornadaRepository;
 
     public DashboardService(PedidoBoloRepository pedidoBoloRepository,
-                            UsuarioRepository usuarioRepository,
                             BoloRepository boloRepository,
                             PedidoFornadaRepository pedidoFornadaRepository,
-                            MassaRepository massaRepository,
-                            RecheioPedidoRepository recheioPedidoRepository,
-                            RecheioUnitarioRepository recheioUnitarioRepository,
                             ProdutoFornadaRepository produtoFornadaRepository,
-                            FornadaDaVezRepository fornadaDaVezRepository, ResumoPedidoRepository resumoPedidoRepository, DecoracaoRepository decoracaoRepository, FornadaRepository fornadaRepository) {
+                            FornadaDaVezRepository fornadaDaVezRepository, 
+                            ResumoPedidoRepository resumoPedidoRepository, 
+                            DecoracaoRepository decoracaoRepository, 
+                            FornadaRepository fornadaRepository) {
         this.pedidoBoloRepository = pedidoBoloRepository;
-        this.usuarioRepository = usuarioRepository;
         this.boloRepository = boloRepository;
         this.pedidoFornadaRepository = pedidoFornadaRepository;
-        this.massaRepository = massaRepository;
-        this.recheioPedidoRepository = recheioPedidoRepository;
-        this.recheioUnitarioRepository = recheioUnitarioRepository;
         this.produtoFornadaRepository = produtoFornadaRepository;
         this.fornadaDaVezRepository = fornadaDaVezRepository;
         this.resumoPedidoRepository = resumoPedidoRepository;
@@ -166,13 +157,11 @@ public class DashboardService {
                             if (boloOpt.isPresent()) {
                                 Bolo bolo = boloOpt.get();
 
-                                String decoracaoNome = bolo.getDecoracao() != null ?
+                                nomeBolo = bolo.getDecoracao() != null ?
                                         decoracaoRepository.findById(bolo.getDecoracao())
                                                 .map(Decoracao::getNome)
                                                 .orElse("Sem Decoração")
                                         : "Sem Decoração";
-
-                                nomeBolo = decoracaoNome;
                             }
 
                             Map<String, Object> resultado = new HashMap<>();
@@ -190,7 +179,6 @@ public class DashboardService {
                     .collect(Collectors.toList());
         } catch (Exception e) {
             System.err.println("Erro em getBolosMaisPedidos: " + e.getMessage());
-            e.printStackTrace();
             return new ArrayList<>();
         }
     }
@@ -244,7 +232,6 @@ public class DashboardService {
                     }
                 } catch (Exception e) {
                     System.err.println("Erro ao processar fornada da vez: " + e.getMessage());
-                    continue;
                 }
             }
 
@@ -280,7 +267,6 @@ public class DashboardService {
                     .collect(Collectors.toList());
         } catch (Exception e) {
             System.err.println("Erro em getFornadasMaisPedidas: " + e.getMessage());
-            e.printStackTrace();
             return new ArrayList<>();
         }
     }
@@ -303,7 +289,6 @@ public class DashboardService {
                 });
             } catch (Exception e) {
                 System.err.println("Erro ao buscar fornadas: " + e.getMessage());
-                e.printStackTrace();
             }
 
             try {
@@ -319,7 +304,6 @@ public class DashboardService {
                 });
             } catch (Exception e) {
                 System.err.println("Erro ao buscar bolos: " + e.getMessage());
-                e.printStackTrace();
             }
 
             return todosProdutos.stream()
@@ -336,7 +320,6 @@ public class DashboardService {
                     .collect(Collectors.toList());
         } catch (Exception e) {
             System.err.println("Erro geral em getProdutosMaisPedidos: " + e.getMessage());
-            e.printStackTrace();
             return new ArrayList<>();
         }
     }
@@ -382,7 +365,6 @@ public class DashboardService {
                 });
             } catch (Exception e) {
                 System.err.println("Erro ao buscar bolos cadastrados: " + e.getMessage());
-                e.printStackTrace();
             }
 
             // Adicionar produtos de fornada cadastrados
@@ -403,13 +385,11 @@ public class DashboardService {
                 });
             } catch (Exception e) {
                 System.err.println("Erro ao buscar produtos de fornada cadastrados: " + e.getMessage());
-                e.printStackTrace();
             }
 
             return produtosCadastrados;
         } catch (Exception e) {
             System.err.println("Erro geral em getProdutosCadastrados: " + e.getMessage());
-            e.printStackTrace();
             return new ArrayList<>();
         }
     }
@@ -421,7 +401,7 @@ public class DashboardService {
 
         List<Map<String, Object>> ultimosPedidos = new ArrayList<>();
 
-        for (ResumoPedido resumo : resumoPedidos.stream().limit(50).collect(Collectors.toList())) {
+        for (ResumoPedido resumo : resumoPedidos.stream().limit(50).toList()) {
             Map<String, Object> pedido = new HashMap<>();
 
             pedido.put("id", resumo.getId());
@@ -532,7 +512,7 @@ public class DashboardService {
                 }
             }
             
-            if (produtosFornada.isEmpty()) {
+            if (produtosFornada == null || produtosFornada.isEmpty()) {
                 return criarKPIVazio();
             }
 
@@ -550,7 +530,7 @@ public class DashboardService {
                 // Buscar pedidos para este produto da fornada
                 List<PedidoFornada> pedidos = pedidoFornadaRepository.findAll().stream()
                     .filter(p -> p.getFornadaDaVez() != null && p.getFornadaDaVez().equals(fornadaDaVez.getId()))
-                    .collect(Collectors.toList());
+                    .toList();
 
                 // Quantidade vendida (soma dos pedidos)
                 int qtdVendida = pedidos.stream()
@@ -585,7 +565,7 @@ public class DashboardService {
 
             return kpi;
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Erro em getKPIFornada: " + e.getMessage());
             return criarKPIVazio();
         }
     }
@@ -595,7 +575,7 @@ public class DashboardService {
             LocalDate hoje = LocalDate.now();
             System.out.println("[KPI] getKPIFornadaMaisRecente hoje=" + hoje);
             var todas = fornadaRepository.findAll();
-            System.out.println("[KPI] total fornadas=" + (todas != null ? todas.size() : 0));
+            System.out.println("[KPI] total fornadas=" + todas.size());
             Optional<Fornada> ultimaEncerrada = todas
                     .stream()
                     // Última ENCERRADA: inativa e já iniciada
@@ -619,7 +599,7 @@ public class DashboardService {
             kpi.put("fornadaId", ultimaEncerrada.get().getId());
             return kpi;
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Erro em getKPIFornadaMaisRecente: " + e.getMessage());
             return criarKPIVazio();
         }
     }
@@ -663,7 +643,7 @@ public class DashboardService {
 
             return kpi;
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Erro em getKPIFornadasPorMesAno: " + e.getMessage());
             return criarKPIVazio();
         }
     }
