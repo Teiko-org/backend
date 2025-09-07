@@ -188,7 +188,7 @@ public class DashboardController {
             @ApiResponse(responseCode = "200", description = "KPI da fornada mais recente retornado com sucesso"),
             @ApiResponse(responseCode = "204", description = "Nenhum dado encontrado")
     })
-    @GetMapping("/kpi-fornada-mais-recente")
+    @GetMapping(value = "/kpi-fornada-mais-recente", produces = "application/json")
     public ResponseEntity<Map<String, Object>> getKPIFornadaMaisRecente() {
         Map<String, Object> kpi = dashboardService.getKPIFornadaMaisRecente();
         if (kpi.isEmpty()) {

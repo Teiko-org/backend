@@ -35,6 +35,24 @@ public class ProdutoFornadaDaVezProjection {
         this.dataInicio = (dataInicio != null ? dataInicio.toLocalDate() : null);
         this.dataFim = (dataFim != null ? dataFim.toLocalDate() : null);
     }
+
+    // Construtor alternativo para consultas que não retornam quantidadeVendida (11 colunas)
+    public ProdutoFornadaDaVezProjection(Integer fornadaDaVezId, Integer produtoFornadaId, String produto, String descricao, Double valor, String categoria, Integer quantidade, Object isAtivoPf, Object isAtivoFdv, Date dataInicio, Date dataFim) {
+        this.fornadaDaVezId = fornadaDaVezId;
+        this.produtoFornadaId = produtoFornadaId;
+        this.produto = produto;
+        this.descricao = descricao;
+        this.valor = valor;
+        this.categoria = categoria;
+        this.quantidade = quantidade;
+        this.quantidadeVendida = 0; // padrão quando a consulta não agrega vendas
+
+        this.isAtivoPf = convertToBoolean(isAtivoPf);
+        this.isAtivoFdv = convertToBoolean(isAtivoFdv);
+
+        this.dataInicio = (dataInicio != null ? dataInicio.toLocalDate() : null);
+        this.dataFim = (dataFim != null ? dataFim.toLocalDate() : null);
+    }
     
     // Método auxiliar para converter Object para Boolean
     private Boolean convertToBoolean(Object value) {

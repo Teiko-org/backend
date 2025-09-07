@@ -7,12 +7,19 @@ public class RecheioExclusivoProjection {
     private String sabor2;
     private Integer isAtivo;
 
-    public RecheioExclusivoProjection(Integer id, String nome, String sabor1, String sabor2, Integer isAtivo) {
-        this.id = id;
+    // Aceita tipos genéricos vindos de consultas nativas (Long/BigInteger/String)
+    public RecheioExclusivoProjection(Object id, String nome, String sabor1, String sabor2, Object isAtivo) {
+        this.id = convertToInteger(id);
         this.nome = nome;
         this.sabor1 = sabor1;
         this.sabor2 = sabor2;
-        this.isAtivo = isAtivo;
+        this.isAtivo = convertToInteger(isAtivo);
+    }
+
+    private Integer convertToInteger(Object value) {
+        if (value == null) return null;
+        if (value instanceof Number) return ((Number) value).intValue();
+        try { return Integer.parseInt(String.valueOf(value)); } catch (Exception e) { return null; }
     }
 
     public Integer getId() {

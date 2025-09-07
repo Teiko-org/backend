@@ -14,6 +14,8 @@ public record DetalhePedidoBoloDTO(
     String recheio,
     String cobertura,
     String decoracao,
+    String[] imagensDecoracao,
+    String adicionais,
     String observacoes,
     TipoEntregaEnum tipoEntrega,
     LocalDateTime data,
@@ -30,6 +32,8 @@ public record DetalhePedidoBoloDTO(
             String recheio,
             String cobertura,
             String decoracao,
+            String[] imagensDecoracao,
+            String adicionais,
             String observacoes,
             TipoEntregaEnum tipoEntrega,
             LocalDateTime data,
@@ -38,7 +42,7 @@ public record DetalhePedidoBoloDTO(
             EnderecoResponseDTO endereco
     ) {
         return new DetalhePedidoBoloDTO(
-                numeroPedido, tamanho, formato, massa, recheio, cobertura, decoracao, observacoes, tipoEntrega, data, nomeCliente, telefone, endereco
+                numeroPedido, tamanho, formato, massa, recheio, cobertura, decoracao, imagensDecoracao, adicionais, observacoes, tipoEntrega, data, nomeCliente, telefone, endereco
         );
     }
 }

@@ -450,8 +450,15 @@ public class DashboardService {
     // KPIs específicos para fornadas
     public Map<String, Object> getKPIFornada(Integer fornadaId) {
         try {
+            System.out.println("[KPI] getKPIFornada fornadaId=" + fornadaId);
             // Buscar produtos da fornada usando FornadaDaVez
             List<FornadaDaVez> produtosFornada = fornadaDaVezRepository.findByFornada(fornadaId);
+            System.out.println("[KPI] FDV itens=" + (produtosFornada != null ? produtosFornada.size() : 0));
+            if (produtosFornada != null) {
+                for (var fdv : produtosFornada) {
+                    System.out.println("[KPI] fdvId=" + fdv.getId() + " produtoFornadaId=" + fdv.getProdutoFornada() + " qtdAtual=" + fdv.getQuantidade());
+                }
+            }
             
             if (produtosFornada.isEmpty()) {
                 return criarKPIVazio();
@@ -470,7 +477,7 @@ public class DashboardService {
 
                 // Buscar pedidos para este produto da fornada
                 List<PedidoFornada> pedidos = pedidoFornadaRepository.findAll().stream()
-                    .filter(p -> p.getFornadaDaVez().equals(fornadaDaVez.getId()))
+                    .filter(p -> p.getFornadaDaVez() != null && p.getFornadaDaVez().equals(fornadaDaVez.getId()))
                     .collect(Collectors.toList());
 
                 // Quantidade vendida (soma dos pedidos)
@@ -513,11 +520,32 @@ public class DashboardService {
 
     public Map<String, Object> getKPIFornadaMaisRecente() {
         try {
-            Optional<Fornada> fornadaOpt = fornadaRepository.findTop1ByIsAtivoTrueOrderByDataInicioDesc();
-            if (fornadaOpt.isEmpty()) {
+            LocalDate hoje = LocalDate.now();
+            System.out.println("[KPI] getKPIFornadaMaisRecente hoje=" + hoje);
+            var todas = fornadaRepository.findAll();
+            System.out.println("[KPI] total fornadas=" + (todas != null ? todas.size() : 0));
+            Optional<Fornada> ultimaEncerrada = todas
+                    .stream()
+                    // Última ENCERRADA: inativa e já iniciada
+                    .filter(f -> !Boolean.TRUE.equals(f.isAtivo()))
+                    .filter(f -> f.getDataInicio() != null && !f.getDataInicio().isAfter(hoje))
+
+
+                    .peek(f -> System.out.println("[KPI] candidata id=" + f.getId() + " ini=" + f.getDataInicio() + " fim=" + f.getDataFim()))
+                    // Critério de "última": maior ID (encerrou por último em nossa modelagem)
+                    .max(Comparator.comparingInt(Fornada::getId));
+
+            if (ultimaEncerrada.isEmpty()) {
+                System.out.println("[KPI] nenhuma encerrada encontrada");
                 return criarKPIVazio();
             }
-            return getKPIFornada(fornadaOpt.get().getId());
+            System.out.println("[KPI] selecionada id=" + ultimaEncerrada.get().getId());
+            Map<String, Object> kpi = getKPIFornada(ultimaEncerrada.get().getId());
+            // incluir intervalo para exibição
+            kpi.put("dataInicio", ultimaEncerrada.get().getDataInicio());
+            kpi.put("dataFim", ultimaEncerrada.get().getDataFim());
+            kpi.put("fornadaId", ultimaEncerrada.get().getId());
+            return kpi;
         } catch (Exception e) {
             e.printStackTrace();
             return criarKPIVazio();
@@ -535,8 +563,7 @@ public class DashboardService {
                 return criarKPIVazio();
             }
 
-            double totalDisponivel = 0.0;
-            double totalVendido = 0.0;
+            double totalDisponivel = 0.0;            double totalVendido = 0.0;
             int quantidadeDisponivel = 0;
             int quantidadeVendida = 0;
 

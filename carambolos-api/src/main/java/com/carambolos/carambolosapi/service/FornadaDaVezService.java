@@ -100,6 +100,7 @@ public class FornadaDaVezService {
     }
 
     public List<ProdutoFornadaDaVezProjection> buscarProdutosPorFornadaId(Integer fornadaId) {
-        return fornadaDaVezRepository.findProductsByFornadaId(fornadaId);
+        // Para listagem histórica/KPI, aceitar fornadas encerradas
+        return fornadaDaVezRepository.findResumoKpiByFornadaId(fornadaId);
     }
 }

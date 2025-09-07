@@ -35,11 +35,16 @@ public class FornadaService {
         return fornadaRepository.findAll().stream().filter(Fornada::isAtivo).toList();
     }
 
+    public List<Fornada> listarTodasFornadas() {
+        return fornadaRepository.findAll();
+    }
+
     public List<Fornada> listarFornadasPorMesAno(int ano, int mes) {
         YearMonth ym = YearMonth.of(ano, mes);
         LocalDate inicio = ym.atDay(1);
         LocalDate fim = ym.atEndOfMonth();
-        return fornadaRepository.findByIsAtivoTrueAndDataInicioBetweenOrderByDataInicioAsc(inicio, fim);
+        // incluir ativas e encerradas para histórico completo
+        return fornadaRepository.findByDataInicioBetweenOrderByDataInicioAsc(inicio, fim);
     }
 
     public Optional<Fornada> buscarFornadaMaisRecente() {
@@ -48,7 +53,12 @@ public class FornadaService {
 
     public Optional<Fornada> buscarProximaFornada() {
         LocalDate hoje = LocalDate.now();
-        return fornadaRepository.findTop1ByIsAtivoTrueAndDataInicioAfterOrderByDataInicioAsc(hoje);
+        // Buscar todas ativas e filtrar manualmente para evitar incluir fornadas "encerradas" (dataFim < hoje)
+        return fornadaRepository.findAllByIsAtivoTrueOrderByDataInicioAsc()
+                .stream()
+                .filter(f -> f.getDataInicio() != null && f.getDataInicio().isAfter(hoje))
+                .filter(f -> f.getDataFim() == null || !f.getDataFim().isBefore(hoje))
+                .findFirst();
     }
 
     public Fornada buscarFornada(Integer id) {
@@ -58,9 +68,13 @@ public class FornadaService {
     }
 
     public void excluirFornada(Integer id) {
-        Fornada fornada = buscarFornada(id);
+        Fornada fornada = fornadaRepository.findById(id)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Fornada com cadastro " + id + " não encontrada."));
+        System.out.println("[ENCERRAR] encerrando fornada id=" + id + " ini=" + fornada.getDataInicio() + " fimAtual=" + fornada.getDataFim());
+        // Encerrar: marcar inativa e preservar o intervalo planejado
         fornada.setAtivo(false);
         fornadaRepository.save(fornada);
+        System.out.println("[ENCERRAR] fornada encerrada (ativo=false) id=" + id + " novoFim=" + fornada.getDataFim());
     }
 
     public Fornada atualizarFornada(Integer id, FornadaRequestDTO request) {

@@ -77,6 +77,30 @@ public interface FornadaDaVezRepository extends JpaRepository<FornadaDaVez, Inte
             and f.is_ativo = 1 and fdv.is_ativo = 1 and pf.is_ativo = 1
             """, nativeQuery = true)
     List<ProdutoFornadaDaVezProjection> findByFornadaId(@Param("fornadaId") Integer fornadaId);
+
+    // Variante para KPI: aceita fornadas encerradas (ativo=0) também
+    @Query(value = """
+            select
+                fdv.id fornada_da_vez_id,
+                pf.id produto_fornada_id,
+                pf.produto,
+                pf.descricao,
+                pf.valor,
+                pf.categoria,
+                fdv.quantidade,
+                COALESCE(SUM(pf_pedidos.quantidade), 0) as quantidade_vendida,
+                CAST(pf.is_ativo AS SIGNED) is_ativo_pf,
+                CAST(fdv.is_ativo AS SIGNED) is_ativo_fdv,
+                f.data_inicio,
+                f.data_fim
+            from fornada_da_vez fdv
+            join produto_fornada pf on fdv.produto_fornada_id = pf.id
+            join fornada f on fdv.fornada_id = f.id
+            left join pedido_fornada pf_pedidos on pf_pedidos.fornada_da_vez_id = fdv.id and pf_pedidos.is_ativo = 1
+            where f.id = :fornadaId and fdv.is_ativo = 1 and pf.is_ativo = 1
+            group by fdv.id, pf.id, pf.produto, pf.descricao, pf.valor, pf.categoria, fdv.quantidade, pf.is_ativo, fdv.is_ativo, f.data_inicio, f.data_fim
+            """, nativeQuery = true)
+    List<ProdutoFornadaDaVezProjection> findResumoKpiByFornadaId(@Param("fornadaId") Integer fornadaId);
     
     @Query(value = """
             select

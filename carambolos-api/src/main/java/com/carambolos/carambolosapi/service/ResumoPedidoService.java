@@ -221,14 +221,17 @@ public class ResumoPedidoService {
                     .orElse("Não especificada");
 
             String imagemUrl = "";
+            String[] imagensDecoracao = new String[]{};
             try {
                 ImagemDecoracao imagem = boloRepository.findImagemByBolo(bolo.getDecoracao());
                 if (imagem != null && imagem.getUrl() != null) {
                     imagemUrl = imagem.getUrl();
+                    imagensDecoracao = new String[]{ imagemUrl };
                 }
             } catch (Exception e) {
                 System.err.println("Erro ao buscar imagem da decoração: " + e.getMessage());
                 imagemUrl = "";
+                imagensDecoracao = new String[]{};
             }
 
             EnderecoResponseDTO enderecoDTO = null;
@@ -244,6 +247,15 @@ public class ResumoPedidoService {
                 enderecoDTO = null;
             }
 
+            // Adicionais: hoje não há coluna específica; tentar derivar da observação
+            String adicionais = null;
+            try {
+                String obs = pedido.getObservacao();
+                if (obs != null && obs.contains("Adicionais:")) {
+                    adicionais = obs.substring(obs.indexOf("Adicionais:") + 11).trim();
+                }
+            } catch (Exception ignored) {}
+
             return DetalhePedidoBoloDTO.toDetalhePedidoResponse(
                     pedido.getId(),
                     bolo.getTamanho(),
@@ -252,6 +264,8 @@ public class ResumoPedidoService {
                     recheioNome,
                     coberturaNome,
                     imagemUrl,
+                    imagensDecoracao,
+                    adicionais,
                     pedido.getObservacao(),
                     pedido.getTipoEntrega(),
                     resumoPedido.getDataPedido(),
