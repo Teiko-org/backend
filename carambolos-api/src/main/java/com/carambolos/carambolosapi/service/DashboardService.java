@@ -14,12 +14,8 @@ import java.util.stream.Collectors;
 public class DashboardService {
 
     private final PedidoBoloRepository pedidoBoloRepository;
-    private final UsuarioRepository usuarioRepository;
     private final BoloRepository boloRepository;
     private final PedidoFornadaRepository pedidoFornadaRepository;
-    private final MassaRepository massaRepository;
-    private final RecheioPedidoRepository recheioPedidoRepository;
-    private final RecheioUnitarioRepository recheioUnitarioRepository;
     private final ProdutoFornadaRepository produtoFornadaRepository;
     private final FornadaDaVezRepository fornadaDaVezRepository;
     private final ResumoPedidoRepository resumoPedidoRepository;
@@ -27,21 +23,16 @@ public class DashboardService {
     private final FornadaRepository fornadaRepository;
 
     public DashboardService(PedidoBoloRepository pedidoBoloRepository,
-                            UsuarioRepository usuarioRepository,
                             BoloRepository boloRepository,
                             PedidoFornadaRepository pedidoFornadaRepository,
-                            MassaRepository massaRepository,
-                            RecheioPedidoRepository recheioPedidoRepository,
-                            RecheioUnitarioRepository recheioUnitarioRepository,
                             ProdutoFornadaRepository produtoFornadaRepository,
-                            FornadaDaVezRepository fornadaDaVezRepository, ResumoPedidoRepository resumoPedidoRepository, DecoracaoRepository decoracaoRepository, FornadaRepository fornadaRepository) {
+                            FornadaDaVezRepository fornadaDaVezRepository, 
+                            ResumoPedidoRepository resumoPedidoRepository, 
+                            DecoracaoRepository decoracaoRepository, 
+                            FornadaRepository fornadaRepository) {
         this.pedidoBoloRepository = pedidoBoloRepository;
-        this.usuarioRepository = usuarioRepository;
         this.boloRepository = boloRepository;
         this.pedidoFornadaRepository = pedidoFornadaRepository;
-        this.massaRepository = massaRepository;
-        this.recheioPedidoRepository = recheioPedidoRepository;
-        this.recheioUnitarioRepository = recheioUnitarioRepository;
         this.produtoFornadaRepository = produtoFornadaRepository;
         this.fornadaDaVezRepository = fornadaDaVezRepository;
         this.resumoPedidoRepository = resumoPedidoRepository;
@@ -166,13 +157,11 @@ public class DashboardService {
                             if (boloOpt.isPresent()) {
                                 Bolo bolo = boloOpt.get();
 
-                                String decoracaoNome = bolo.getDecoracao() != null ?
+                                nomeBolo = bolo.getDecoracao() != null ?
                                         decoracaoRepository.findById(bolo.getDecoracao())
                                                 .map(Decoracao::getNome)
                                                 .orElse("Sem Decoração")
                                         : "Sem Decoração";
-
-                                nomeBolo = decoracaoNome;
                             }
 
                             Map<String, Object> resultado = new HashMap<>();
@@ -190,7 +179,6 @@ public class DashboardService {
                     .collect(Collectors.toList());
         } catch (Exception e) {
             System.err.println("Erro em getBolosMaisPedidos: " + e.getMessage());
-            e.printStackTrace();
             return new ArrayList<>();
         }
     }
@@ -244,7 +232,6 @@ public class DashboardService {
                     }
                 } catch (Exception e) {
                     System.err.println("Erro ao processar fornada da vez: " + e.getMessage());
-                    continue;
                 }
             }
 
@@ -280,16 +267,15 @@ public class DashboardService {
                     .collect(Collectors.toList());
         } catch (Exception e) {
             System.err.println("Erro em getFornadasMaisPedidas: " + e.getMessage());
-            e.printStackTrace();
             return new ArrayList<>();
         }
     }
 
+    @Deprecated
     public List<Map<String, Object>> getProdutosMaisPedidos() {
         try {
             List<Map<String, Object>> todosProdutos = new ArrayList<>();
 
-            // Adicionar produtos de fornada
             try {
                 List<Map<String, Object>> todasFornadas = getFornadasMaisPedidas();
                 todasFornadas.forEach(produto -> {
@@ -303,10 +289,8 @@ public class DashboardService {
                 });
             } catch (Exception e) {
                 System.err.println("Erro ao buscar fornadas: " + e.getMessage());
-                e.printStackTrace();
             }
 
-            // Adicionar bolos
             try {
                 List<Map<String, Object>> todosBolos = getBolosMaisPedidos();
                 todosBolos.forEach(bolo -> {
@@ -320,7 +304,6 @@ public class DashboardService {
                 });
             } catch (Exception e) {
                 System.err.println("Erro ao buscar bolos: " + e.getMessage());
-                e.printStackTrace();
             }
 
             return todosProdutos.stream()
@@ -337,7 +320,76 @@ public class DashboardService {
                     .collect(Collectors.toList());
         } catch (Exception e) {
             System.err.println("Erro geral em getProdutosMaisPedidos: " + e.getMessage());
-            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+    public List<Map<String, Object>> getProdutosCadastrados() {
+        try {
+            List<Map<String, Object>> produtosCadastrados = new ArrayList<>();
+
+            // Adicionar bolos cadastrados (excluindo pedidos de clientes com categoria PERSONALIZADO)
+            try {
+                List<Bolo> bolos = boloRepository.findAll();
+                bolos.forEach(bolo -> {
+                    if (bolo.getAtivo() != null && bolo.getAtivo()) {
+                        // Filtrar bolos que são pedidos de clientes (categoria PERSONALIZADO)
+                        if ("PERSONALIZADO".equals(bolo.getCategoria())) {
+                            return; // Pular bolos que são pedidos de clientes
+                        }
+                        
+                        Map<String, Object> boloMap = new HashMap<>();
+                        boloMap.put("id", bolo.getId());
+                        
+                        // Para bolos, o nome vem da decoração
+                        String nomeBolo = "Bolo Personalizado";
+                        if (bolo.getDecoracao() != null) {
+                            try {
+                                var decoracao = decoracaoRepository.findById(bolo.getDecoracao());
+                                if (decoracao.isPresent()) {
+                                    nomeBolo = decoracao.get().getNome();
+                                }
+                            } catch (Exception e) {
+                                System.err.println("Erro ao buscar decoração do bolo: " + e.getMessage());
+                            }
+                        }
+                        boloMap.put("nome", nomeBolo);
+                        boloMap.put("categoria", bolo.getCategoria());
+                        
+                        // Para bolos, não temos preço fixo - é calculado dinamicamente
+                        boloMap.put("preco", 0.0);
+                        boloMap.put("tipo", "BOLO");
+                        boloMap.put("ativo", bolo.getAtivo());
+                        produtosCadastrados.add(boloMap);
+                    }
+                });
+            } catch (Exception e) {
+                System.err.println("Erro ao buscar bolos cadastrados: " + e.getMessage());
+            }
+
+            // Adicionar produtos de fornada cadastrados
+            try {
+                List<ProdutoFornada> produtosFornada = produtoFornadaRepository.findAll();
+                produtosFornada.forEach(produto -> {
+                    if (produto.getAtivo() != null && produto.getAtivo()) {
+                        Map<String, Object> produtoMap = new HashMap<>();
+                        produtoMap.put("id", produto.getId());
+                        produtoMap.put("nome", produto.getProduto());
+                        produtoMap.put("categoria", produto.getCategoria());
+                        produtoMap.put("preco", produto.getValor());
+                        produtoMap.put("quantidade", 0); // Produtos de fornada não têm quantidade fixa
+                        produtoMap.put("tipo", "FORNADA");
+                        produtoMap.put("ativo", produto.getAtivo());
+                        produtosCadastrados.add(produtoMap);
+                    }
+                });
+            } catch (Exception e) {
+                System.err.println("Erro ao buscar produtos de fornada cadastrados: " + e.getMessage());
+            }
+
+            return produtosCadastrados;
+        } catch (Exception e) {
+            System.err.println("Erro geral em getProdutosCadastrados: " + e.getMessage());
             return new ArrayList<>();
         }
     }
@@ -349,7 +401,7 @@ public class DashboardService {
 
         List<Map<String, Object>> ultimosPedidos = new ArrayList<>();
 
-        for (ResumoPedido resumo : resumoPedidos.stream().limit(50).collect(Collectors.toList())) {
+        for (ResumoPedido resumo : resumoPedidos.stream().limit(50).toList()) {
             Map<String, Object> pedido = new HashMap<>();
 
             pedido.put("id", resumo.getId());
@@ -460,7 +512,7 @@ public class DashboardService {
                 }
             }
             
-            if (produtosFornada.isEmpty()) {
+            if (produtosFornada == null || produtosFornada.isEmpty()) {
                 return criarKPIVazio();
             }
 
@@ -478,7 +530,7 @@ public class DashboardService {
                 // Buscar pedidos para este produto da fornada
                 List<PedidoFornada> pedidos = pedidoFornadaRepository.findAll().stream()
                     .filter(p -> p.getFornadaDaVez() != null && p.getFornadaDaVez().equals(fornadaDaVez.getId()))
-                    .collect(Collectors.toList());
+                    .toList();
 
                 // Quantidade vendida (soma dos pedidos)
                 int qtdVendida = pedidos.stream()
@@ -513,7 +565,7 @@ public class DashboardService {
 
             return kpi;
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Erro em getKPIFornada: " + e.getMessage());
             return criarKPIVazio();
         }
     }
@@ -523,7 +575,7 @@ public class DashboardService {
             LocalDate hoje = LocalDate.now();
             System.out.println("[KPI] getKPIFornadaMaisRecente hoje=" + hoje);
             var todas = fornadaRepository.findAll();
-            System.out.println("[KPI] total fornadas=" + (todas != null ? todas.size() : 0));
+            System.out.println("[KPI] total fornadas=" + todas.size());
             Optional<Fornada> ultimaEncerrada = todas
                     .stream()
                     // Última ENCERRADA: inativa e já iniciada
@@ -547,7 +599,7 @@ public class DashboardService {
             kpi.put("fornadaId", ultimaEncerrada.get().getId());
             return kpi;
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Erro em getKPIFornadaMaisRecente: " + e.getMessage());
             return criarKPIVazio();
         }
     }
@@ -591,7 +643,7 @@ public class DashboardService {
 
             return kpi;
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Erro em getKPIFornadasPorMesAno: " + e.getMessage());
             return criarKPIVazio();
         }
     }

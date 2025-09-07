@@ -20,6 +20,7 @@ import java.util.Map;
 @RequestMapping("/dashboard")
 @Tag(name = "Dashboard Controller", description = "Consulta endpoints de bolos, fornadas e clientes")
 @SecurityRequirement(name = "Bearer")
+@SuppressWarnings("unused")
 public class DashboardController {
 
     private final DashboardService dashboardService;
@@ -86,12 +87,27 @@ public class DashboardController {
             @ApiResponse(responseCode = "204", description = "Nenhum produto encontrado")
     })
     @GetMapping("/produtosMaisPedidos")
+    @SuppressWarnings("deprecation")
     public ResponseEntity<List<Map<String, Object>>> getProdutosMaisPedidos() {
         List<Map<String, Object>> produtosMaisPedidos = dashboardService.getProdutosMaisPedidos();
         if (produtosMaisPedidos.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
         return ResponseEntity.ok(produtosMaisPedidos);
+    }
+
+    @Operation(summary = "Lista os produtos cadastrados no sistema")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Listagem dos produtos cadastrados com sucesso"),
+            @ApiResponse(responseCode = "204", description = "Nenhum produto encontrado")
+    })
+    @GetMapping("/produtosCadastrados")
+    public ResponseEntity<List<Map<String, Object>>> getProdutosCadastrados() {
+        List<Map<String, Object>> produtosCadastrados = dashboardService.getProdutosCadastrados();
+        if (produtosCadastrados.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.ok(produtosCadastrados);
     }
 
     @Operation(summary = "Lista os últimos pedidos")
