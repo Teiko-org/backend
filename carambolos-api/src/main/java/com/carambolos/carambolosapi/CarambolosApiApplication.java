@@ -1,5 +1,7 @@
 package com.carambolos.carambolosapi;
 
+import com.carambolos.carambolosapi.main.security.EnderecoHasher;
+import com.carambolos.carambolosapi.infrastructure.persistence.jpa.EnderecoRepository;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.servers.Server;
@@ -41,11 +43,11 @@ public class CarambolosApiApplication {
 
 	@Bean
 	@SuppressWarnings("unused")
-	CommandLineRunner backfillEnderecoDedupHash(com.carambolos.carambolosapi.repository.EnderecoRepository enderecoRepository) {
+	CommandLineRunner backfillEnderecoDedupHash(EnderecoRepository enderecoRepository) {
 		return args -> enderecoRepository.findAll().stream()
 				.filter(e -> e.getDedupHash() == null || e.getDedupHash().isBlank())
 				.forEach(e -> {
-					e.setDedupHash(com.carambolos.carambolosapi.utils.EnderecoHasher.computeDedupHash(e));
+					e.setDedupHash(EnderecoHasher.computeDedupHash(e));
 					enderecoRepository.save(e);
 				});
 	}
