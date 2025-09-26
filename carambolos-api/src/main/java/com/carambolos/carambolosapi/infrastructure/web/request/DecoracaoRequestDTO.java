@@ -1,0 +1,14 @@
+package com.carambolos.carambolosapi.infrastructure.web.request;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Size;
+
+@Schema(description = "DTO para criação ou atualização de uma decoração")
+public record DecoracaoRequestDTO(
+        @Schema(description = "Observações da decoração", example = "Tema Frozen, tons de azul")
+        @Size(max = 70)
+        String observacao,
+        String nome,
+        @Schema(description = "Categoria para exibição (pré-decoração)", example = "Vintage")
+        String categoria
+) {}

@@ -1,10 +1,14 @@
 package com.carambolos.carambolosapi;
 
+import com.carambolos.carambolosapi.main.security.EnderecoHasher;
+import com.carambolos.carambolosapi.infrastructure.persistence.jpa.EnderecoRepository;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.servers.Server;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
 import io.github.cdimascio.dotenv.Dotenv;
 
 @OpenAPIDefinition(
@@ -37,4 +41,14 @@ public class CarambolosApiApplication {
 		SpringApplication.run(CarambolosApiApplication.class, args);
 	}
 
+	@Bean
+	@SuppressWarnings("unused")
+	CommandLineRunner backfillEnderecoDedupHash(EnderecoRepository enderecoRepository) {
+		return args -> enderecoRepository.findAll().stream()
+				.filter(e -> e.getDedupHash() == null || e.getDedupHash().isBlank())
+				.forEach(e -> {
+					e.setDedupHash(EnderecoHasher.computeDedupHash(e));
+					enderecoRepository.save(e);
+				});
+	}
 }
