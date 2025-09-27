@@ -22,13 +22,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class UsuarioEntityServiceTest {
+class UsuarioUseCaseTest {
 
     @Mock
     private UsuarioRepository repository;
 
     @InjectMocks
-    private UsuarioUseCase service;
+    private UsuarioUseCase usuarioUseCase;
 
     @Test
     @DisplayName("Deve listar usuários ativos com sucessos")
@@ -37,7 +37,7 @@ class UsuarioEntityServiceTest {
 
         when(repository.findAllByIsAtivoTrue()).thenReturn(usuarioEntities);
 
-        List<Usuario> resultado = service.listar();
+        List<Usuario> resultado = usuarioUseCase.listar();
 
         assertEquals(2, resultado.size());
         assertTrue(resultado.stream().allMatch(Usuario::isAtivo));
@@ -48,7 +48,7 @@ class UsuarioEntityServiceTest {
     void NaoDeveListarSeNaoTiverUsuariosAtivos() {
         when(repository.findAllByIsAtivoTrue()).thenReturn(Collections.emptyList());
 
-        List<Usuario> resultado = service.listar();
+        List<Usuario> resultado = usuarioUseCase.listar();
 
         assertTrue(resultado.isEmpty());
     }
@@ -60,7 +60,7 @@ class UsuarioEntityServiceTest {
 
         when(repository.findByIdAndIsAtivoTrue(anyInt())).thenReturn(usuarioEntity);
 
-        Usuario resultado = service.buscarPorId(1);
+        Usuario resultado = usuarioUseCase.buscarPorId(1);
 
         assertEquals(usuarioEntity.getId(), resultado.getId());
     }
@@ -70,7 +70,7 @@ class UsuarioEntityServiceTest {
     void buscarPorIdQuandoAcionadoComIdInvalidoDeveRetornarException() {
         when(repository.findByIdAndIsAtivoTrue(anyInt())).thenReturn(null);
 
-        assertThrows(EntidadeNaoEncontradaException.class, () -> service.buscarPorId(1));
+        assertThrows(EntidadeNaoEncontradaException.class, () -> usuarioUseCase.buscarPorId(1));
     }
 
     @Test
@@ -88,7 +88,7 @@ class UsuarioEntityServiceTest {
         when(repository.findByIdAndIsAtivoTrue(id)).thenReturn(usuarioEntityExistente);
         when(repository.existsByContatoAndIdNotAndIsAtivoTrue(contato, id)).thenReturn(true);
 
-        assertThrows(EntidadeJaExisteException.class, () -> service.atualizar(id, usuario));
+        assertThrows(EntidadeJaExisteException.class, () -> usuarioUseCase.atualizar(id, usuario));
     }
 
     @Test
@@ -102,7 +102,7 @@ class UsuarioEntityServiceTest {
         when(repository.findByIdAndIsAtivoTrue(id)).thenReturn(usuarioEntityExistente);
         when(repository.save(usuarioEntityExistente)).thenReturn(usuarioEntityExistente);
 
-        service.deletar(id);
+        usuarioUseCase.deletar(id);
 
         assertFalse(usuarioEntityExistente.isAtivo());
         verify(repository).save(usuarioEntityExistente);
@@ -115,6 +115,6 @@ class UsuarioEntityServiceTest {
 
         when(repository.findByIdAndIsAtivoTrue(id)).thenReturn(null);
 
-        assertThrows(EntidadeNaoEncontradaException.class, () -> service.deletar(id));
+        assertThrows(EntidadeNaoEncontradaException.class, () -> usuarioUseCase.deletar(id));
     }
 }
