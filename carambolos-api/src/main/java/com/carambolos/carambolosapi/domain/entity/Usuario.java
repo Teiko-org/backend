@@ -1,36 +1,32 @@
 package com.carambolos.carambolosapi.domain.entity;
 
-import jakarta.persistence.*;
-
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "usuario")
 public class Usuario {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
     private String nome;
-
     private String contato;
-
     private String senha;
-
-    @Column(name = "data_nascimento")
     private LocalDate dataNascimento;
-
-    @Column(name = "genero")
     private String genero;
-
-    @Column(name = "imagem_url")
     private String imagemUrl;
-
-    @Column(name = "is_ativo")
     private boolean isAtivo = true;
-
-    @Column(name = "sys_admin")
     public Boolean sysAdmin;
+
+    public Usuario(Integer id, String nome, String contato, String senha, LocalDate dataNascimento, String genero, String imagemUrl, boolean isAtivo, Boolean sysAdmin) {
+        this.id = id;
+        this.nome = nome;
+        this.contato = contato;
+        this.senha = senha;
+        this.dataNascimento = dataNascimento;
+        this.genero = genero;
+        this.imagemUrl = imagemUrl;
+        this.isAtivo = isAtivo;
+        this.sysAdmin = sysAdmin;
+    }
+
+    public Usuario() {
+    }
 
     public Integer getId() {
         return id;
@@ -98,5 +94,9 @@ public class Usuario {
 
     public Boolean getSysAdmin() {
         return sysAdmin;
+    }
+
+    public void setSysAdmin(Boolean sysAdmin) {
+        this.sysAdmin = sysAdmin;
     }
 }

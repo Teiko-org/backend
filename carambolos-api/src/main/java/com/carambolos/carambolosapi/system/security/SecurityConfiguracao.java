@@ -1,4 +1,4 @@
-package com.carambolos.carambolosapi.main.security;
+package com.carambolos.carambolosapi.system.security;
 
 import com.carambolos.carambolosapi.application.usecases.AutenticacaoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +52,7 @@ public class SecurityConfiguracao {
             new AntPathRequestMatcher("/actuator/*"),
             new AntPathRequestMatcher("/usuarios/login", "POST"),
             new AntPathRequestMatcher("/usuarios", "POST"),
+            new AntPathRequestMatcher("/usuarios", "GET"),
             new AntPathRequestMatcher("/h2-console/**"),
             new AntPathRequestMatcher("/h2-console/**/**"),
             new AntPathRequestMatcher("/error/**"),

@@ -1,7 +1,7 @@
 package com.carambolos.carambolosapi.domain.entity;
 
 import jakarta.persistence.*;
-import com.carambolos.carambolosapi.main.security.CryptoAttributeConverter;
+import com.carambolos.carambolosapi.system.security.CryptoAttributeConverter;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Entity

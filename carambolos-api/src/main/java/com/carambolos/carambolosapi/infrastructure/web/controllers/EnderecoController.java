@@ -4,7 +4,6 @@ import com.carambolos.carambolosapi.infrastructure.web.request.EnderecoRequestDT
 import com.carambolos.carambolosapi.infrastructure.web.response.EnderecoResponseDTO;
 import com.carambolos.carambolosapi.domain.entity.Endereco;
 import com.carambolos.carambolosapi.application.usecases.EnderecoService;
-import com.carambolos.carambolosapi.application.usecases.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -27,9 +26,6 @@ public class EnderecoController {
 
     @Autowired
     private EnderecoService enderecoService;
-
-    @Autowired
-    private UsuarioService usuarioService;
 
     @Operation(summary = "Lista todos os endereços")
     @ApiResponses(value = {

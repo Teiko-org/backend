@@ -1,6 +1,5 @@
 package com.carambolos.carambolosapi.infrastructure.web.request;
 
-import com.carambolos.carambolosapi.domain.entity.Usuario;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -16,15 +15,6 @@ public class LoginRequestDTO {
     @Size(min = 6)
     @Schema(description = "Senha do usuário (mínimo 6 caracteres)", example = "gD8otDamss")
     private String senha;
-
-    public static Usuario toEntity(LoginRequestDTO loginDto) {
-        Usuario usuario = new Usuario();
-
-        usuario.setContato(loginDto.getContato());
-        usuario.setSenha(loginDto.getSenha());
-
-        return usuario;
-    }
 
     public @NotBlank(message = "contato não pode ser nulo") @Size(max = 14) String getContato() {
         return contato;

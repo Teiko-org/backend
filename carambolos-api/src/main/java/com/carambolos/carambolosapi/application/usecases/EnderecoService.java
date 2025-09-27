@@ -7,17 +7,17 @@ import com.carambolos.carambolosapi.domain.entity.Usuario;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.EnderecoRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import com.carambolos.carambolosapi.main.security.EnderecoHasher;
+import com.carambolos.carambolosapi.system.security.EnderecoHasher;
 
 @Service
 public class EnderecoService {
 
     private final EnderecoRepository enderecoRepository;
-    private final UsuarioService usuarioService;
+    private final UsuarioUseCase usuarioUseCase;
 
-    public EnderecoService(EnderecoRepository enderecoRepository, UsuarioService usuarioService) {
+    public EnderecoService(EnderecoRepository enderecoRepository, UsuarioUseCase usuarioUseCase) {
         this.enderecoRepository = enderecoRepository;
-        this.usuarioService = usuarioService;
+        this.usuarioUseCase = usuarioUseCase;
     }
 
     public List<Endereco> listar() {
@@ -43,7 +43,7 @@ public class EnderecoService {
                 throw new EntidadeJaExisteException("Endereço já cadastrado");
             }
 
-            Usuario usuarioFk = usuarioService.buscarPorId(endereco.getUsuario());
+            Usuario usuarioFk = usuarioUseCase.buscarPorId(endereco.getUsuario());
 
             if (!endereco.getUsuario().equals(usuarioFk.getId())) {
                 throw new EntidadeNaoEncontradaException("Usuariofk não existe no banco");

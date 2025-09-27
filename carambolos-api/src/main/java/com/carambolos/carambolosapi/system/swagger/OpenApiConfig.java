@@ -1,4 +1,4 @@
-package com.carambolos.carambolosapi.main.swagger;
+package com.carambolos.carambolosapi.system.swagger;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;

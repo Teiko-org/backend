@@ -1,4 +1,4 @@
-package com.carambolos.carambolosapi.main.security;
+package com.carambolos.carambolosapi.system.security;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
