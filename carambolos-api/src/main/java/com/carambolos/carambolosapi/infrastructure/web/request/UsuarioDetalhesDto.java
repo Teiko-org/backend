@@ -1,6 +1,6 @@
 package com.carambolos.carambolosapi.infrastructure.web.request;
 
-import com.carambolos.carambolosapi.domain.entity.Usuario;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.UsuarioEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -12,10 +12,10 @@ public class UsuarioDetalhesDto implements UserDetails {
     private final String contato;
     private final String senha;
 
-    public UsuarioDetalhesDto(Usuario usuario)   {
-        this.nome = usuario.getNome();
-        this.contato = usuario.getContato();
-        this.senha = usuario.getSenha();
+    public UsuarioDetalhesDto(UsuarioEntity usuarioEntity)   {
+        this.nome = usuarioEntity.getNome();
+        this.contato = usuarioEntity.getContato();
+        this.senha = usuarioEntity.getSenha();
     }
 
     public String getNome() {

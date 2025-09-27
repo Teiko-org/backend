@@ -1,14 +1,15 @@
 package com.carambolos.carambolosapi.infrastructure.web.controllers;
 
+import com.carambolos.carambolosapi.application.usecases.AzureStorageService;
+import com.carambolos.carambolosapi.application.usecases.UsuarioUseCase;
+import com.carambolos.carambolosapi.domain.entity.Usuario;
+import com.carambolos.carambolosapi.infrastructure.gateways.mapper.UsuarioMapper;
 import com.carambolos.carambolosapi.infrastructure.web.request.AlterarSenhaRequestDTO;
 import com.carambolos.carambolosapi.infrastructure.web.request.AtualizarUsuarioRequestDTO;
 import com.carambolos.carambolosapi.infrastructure.web.request.LoginRequestDTO;
 import com.carambolos.carambolosapi.infrastructure.web.request.UsuarioRequestDTO;
 import com.carambolos.carambolosapi.infrastructure.web.response.UsuarioResponseDTO;
 import com.carambolos.carambolosapi.infrastructure.web.response.UsuarioTokenDTO;
-import com.carambolos.carambolosapi.domain.entity.Usuario;
-import com.carambolos.carambolosapi.application.usecases.UsuarioService;
-import com.carambolos.carambolosapi.application.usecases.AzureStorageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -18,13 +19,10 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-
 
 import java.util.List;
 
@@ -33,11 +31,15 @@ import java.util.List;
 @Tag(name = "Usuário Controller", description = "Gerencia usuários do sistema")
 public class UsuarioController {
 
-    @Autowired
-    private UsuarioService usuarioService;
+    private final UsuarioUseCase usuarioUseCase;
+    private final AzureStorageService azureStorageService;
+    private final UsuarioMapper usuarioMapper;
 
-    @Autowired
-    private AzureStorageService azureStorageService;
+    public UsuarioController(UsuarioUseCase usuarioUseCase, AzureStorageService azureStorageService, UsuarioMapper usuarioMapper) {
+        this.usuarioUseCase = usuarioUseCase;
+        this.azureStorageService = azureStorageService;
+        this.usuarioMapper = usuarioMapper;
+    }
 
     @Operation(
             summary = "Listar todos os usuários",
@@ -51,14 +53,13 @@ public class UsuarioController {
                     content = @Content())
     })
     @GetMapping
-    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<List<UsuarioResponseDTO>> listar() {
-        List<Usuario> usuarios = usuarioService.listar();
+        List<Usuario> usuarios = usuarioUseCase.listar();
         if (usuarios.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
         List<UsuarioResponseDTO> usuariosResponse = usuarios.stream()
-                .map(UsuarioResponseDTO::toResponseDTO)
+                .map(UsuarioMapper::toResponseDTO)
                 .toList();
         return ResponseEntity.status(200).body(usuariosResponse);
     }
@@ -78,8 +79,8 @@ public class UsuarioController {
     @SecurityRequirement(name = "Bearer")
     public ResponseEntity<UsuarioResponseDTO> buscarPorId(
             @PathVariable Integer id) {
-        Usuario usuario = usuarioService.buscarPorId(id);
-        UsuarioResponseDTO usuarioResponse = UsuarioResponseDTO.toResponseDTO(usuario);
+        Usuario usuario = usuarioUseCase.buscarPorId(id);
+        UsuarioResponseDTO usuarioResponse = UsuarioMapper.toResponseDTO(usuario);
         return ResponseEntity.status(200).body(usuarioResponse);
     }
 
@@ -96,9 +97,9 @@ public class UsuarioController {
     })
     @PostMapping
     public ResponseEntity<UsuarioResponseDTO> cadastrar(@Valid @RequestBody UsuarioRequestDTO usuarioRequest) {
-        Usuario usuario = UsuarioRequestDTO.toEntity(usuarioRequest);
-        Usuario usuarioRegistrado = usuarioService.cadastrar(usuario);
-        UsuarioResponseDTO usuarioResponse = UsuarioResponseDTO.toResponseDTO(usuarioRegistrado);
+        Usuario usuario = UsuarioMapper.toDomain(usuarioRequest);
+        Usuario usuarioRegistrado = usuarioUseCase.cadastrar(usuario);
+        UsuarioResponseDTO usuarioResponse = UsuarioMapper.toResponseDTO(usuarioRegistrado);
         return ResponseEntity.status(201).body(usuarioResponse);
     }
 
@@ -117,10 +118,9 @@ public class UsuarioController {
             @RequestBody LoginRequestDTO loginRequestDTO,
             HttpServletResponse response
     ) {
-        final Usuario usuario = LoginRequestDTO.toEntity(loginRequestDTO);
-        UsuarioTokenDTO usuarioTokenDto = usuarioService.autenticar(usuario, response);
-
-        return ResponseEntity.status(200).body(usuarioTokenDto);
+        final Usuario usuario = UsuarioMapper.toDomain(loginRequestDTO);
+        UsuarioTokenDTO usuarioToken = usuarioUseCase.autenticar(usuario, response);
+        return ResponseEntity.status(200).body(usuarioToken);
     }
 
     @PostMapping("/logOut")
@@ -128,7 +128,7 @@ public class UsuarioController {
             HttpServletResponse response,
             @CookieValue(value = "authToken", required = false) String token
     ) {
-        usuarioService.logOut(response, token.replace("Bearer ", ""));
+        usuarioUseCase.logOut(response, token.replace("Bearer ", ""));
         return ResponseEntity.ok().build();
     }
 
@@ -148,9 +148,9 @@ public class UsuarioController {
     @PutMapping("/{id}")
     @SecurityRequirement(name = "Bearer")
     public ResponseEntity<UsuarioResponseDTO> atualizar(@PathVariable Integer id, @Valid @RequestBody UsuarioRequestDTO usuarioRequest) {
-        Usuario usuario = UsuarioRequestDTO.toEntity(usuarioRequest);
-        Usuario usuarioAtualizado = usuarioService.atualizar(id, usuario);
-        UsuarioResponseDTO usuarioResponse = UsuarioResponseDTO.toResponseDTO(usuarioAtualizado);
+        Usuario usuario = UsuarioMapper.toDomain(usuarioRequest);
+        Usuario usuarioAtualizado = usuarioUseCase.atualizar(id, usuario);
+        UsuarioResponseDTO usuarioResponse = UsuarioMapper.toResponseDTO(usuarioAtualizado);
         return ResponseEntity.status(200).body(usuarioResponse);
     }
 
@@ -170,9 +170,9 @@ public class UsuarioController {
     public ResponseEntity<UsuarioResponseDTO> atualizarDadosPessoais(
             @PathVariable Integer id,
             @Valid @RequestBody AtualizarUsuarioRequestDTO atualizarUsuarioRequest) {
-        Usuario usuario = AtualizarUsuarioRequestDTO.toEntity(atualizarUsuarioRequest);
-        Usuario usuarioAtualizado = usuarioService.atualizarDadosPessoais(id, usuario);
-        UsuarioResponseDTO usuarioResponse = UsuarioResponseDTO.toResponseDTO(usuarioAtualizado);
+        Usuario usuario = UsuarioMapper.toDomain(atualizarUsuarioRequest);
+        Usuario usuarioAtualizado = usuarioUseCase.atualizarDadosPessoais(id, usuario);
+        UsuarioResponseDTO usuarioResponse = UsuarioMapper.toResponseDTO(usuarioAtualizado);
         return ResponseEntity.status(200).body(usuarioResponse);
     }
 
@@ -191,7 +191,7 @@ public class UsuarioController {
     public ResponseEntity<Void> alterarSenha(
             @PathVariable Integer id,
             @Valid @RequestBody AlterarSenhaRequestDTO alterarSenhaRequest) {
-        usuarioService.alterarSenha(id, alterarSenhaRequest.getSenhaAtual(), alterarSenhaRequest.getNovaSenha());
+        usuarioUseCase.alterarSenha(id, alterarSenhaRequest.getSenhaAtual(), alterarSenhaRequest.getNovaSenha());
         return ResponseEntity.ok().build();
     }
 
@@ -208,7 +208,7 @@ public class UsuarioController {
     @DeleteMapping("/{id}")
     @SecurityRequirement(name = "Bearer")
     public ResponseEntity<Void> deletar(@PathVariable Integer id) {
-        usuarioService.deletar(id);
+        usuarioUseCase.deletar(id);
         return ResponseEntity.status(204).build();
     }
 
@@ -244,8 +244,8 @@ public class UsuarioController {
 
             String imageUrl = azureStorageService.upload(file);
 
-            Usuario usuarioAtualizado = usuarioService.atualizarImagemPerfil(id, imageUrl);
-            UsuarioResponseDTO usuarioResponse = UsuarioResponseDTO.toResponseDTO(usuarioAtualizado);
+            Usuario usuarioAtualizado = usuarioUseCase.atualizarImagemPerfil(id, imageUrl);
+            UsuarioResponseDTO usuarioResponse = UsuarioMapper.toResponseDTO(usuarioAtualizado);
 
             return ResponseEntity.ok(usuarioResponse);
 

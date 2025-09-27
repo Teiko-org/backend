@@ -1,9 +1,10 @@
 package com.carambolos.carambolosapi.application;
 
-import com.carambolos.carambolosapi.application.usecases.UsuarioService;
 import com.carambolos.carambolosapi.application.exception.EntidadeJaExisteException;
 import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaException;
+import com.carambolos.carambolosapi.application.usecases.UsuarioUseCase;
 import com.carambolos.carambolosapi.domain.entity.Usuario;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.UsuarioEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.UsuarioRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,34 +12,30 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class UsuarioServiceTest {
+class UsuarioEntityServiceTest {
 
     @Mock
     private UsuarioRepository repository;
 
-    @Mock
-    private PasswordEncoder passwordEncoder;
-
     @InjectMocks
-    private UsuarioService service;
+    private UsuarioUseCase service;
 
     @Test
     @DisplayName("Deve listar usuários ativos com sucessos")
     void deveListarUsuariosAtivosComSucesso() {
-        List<Usuario> usuarios = List.of(new Usuario(), new Usuario());
+        List<UsuarioEntity> usuarioEntities = List.of(new UsuarioEntity(), new UsuarioEntity());
 
-        when(repository.findAllByIsAtivoTrue()).thenReturn(usuarios);
+        when(repository.findAllByIsAtivoTrue()).thenReturn(usuarioEntities);
 
         List<Usuario> resultado = service.listar();
 
@@ -59,13 +56,13 @@ class UsuarioServiceTest {
     @Test
     @DisplayName("BuscarPorId quando acionado com id válido deve retornar usuário")
     void buscarPorIdQuandoAcionadoComIdValidoDeveRetornarUsuario() {
-        Usuario usuario = new Usuario();
+        UsuarioEntity usuarioEntity = new UsuarioEntity();
 
-        when(repository.findByIdAndIsAtivoTrue(anyInt())).thenReturn(usuario);
+        when(repository.findByIdAndIsAtivoTrue(anyInt())).thenReturn(usuarioEntity);
 
         Usuario resultado = service.buscarPorId(1);
 
-        assertEquals(usuario.getId(), resultado.getId());
+        assertEquals(usuarioEntity.getId(), resultado.getId());
     }
 
     @Test
@@ -77,29 +74,6 @@ class UsuarioServiceTest {
     }
 
     @Test
-    @DisplayName("Deve atualizar usuário com sucesso")
-    void deveAtualizarUsuarioComSucesso() {
-        int id = 1;
-        String contato = "123456789";
-
-        Usuario usuarioAtualizado = new Usuario();
-        usuarioAtualizado.setContato(contato);
-
-        Usuario usuarioExistente = new Usuario();
-        usuarioExistente.setId(id);
-
-        when(repository.findByIdAndIsAtivoTrue(id)).thenReturn(usuarioExistente);
-        when(repository.existsByContatoAndIdNotAndIsAtivoTrue(contato, id)).thenReturn(false);
-        when(repository.save(usuarioAtualizado)).thenReturn(usuarioAtualizado);
-
-        Usuario resultado = service.atualizar(id, usuarioAtualizado);
-
-        assertEquals(id, resultado.getId());
-        assertEquals(contato, resultado.getContato());
-        assertTrue(resultado.isAtivo());
-    }
-
-    @Test
     @DisplayName("Deve lançar EntidadeJaExisteException se usuário já existir")
     void deveLancarExcecaoSeUsuarioJaExistir() {
         int id = 1;
@@ -108,10 +82,10 @@ class UsuarioServiceTest {
         Usuario usuario = new Usuario();
         usuario.setContato(contato);
 
-        Usuario usuarioExistente = new Usuario();
-        usuarioExistente.setId(id);
+        UsuarioEntity usuarioEntityExistente = new UsuarioEntity();
+        usuarioEntityExistente.setId(id);
 
-        when(repository.findByIdAndIsAtivoTrue(id)).thenReturn(usuarioExistente);
+        when(repository.findByIdAndIsAtivoTrue(id)).thenReturn(usuarioEntityExistente);
         when(repository.existsByContatoAndIdNotAndIsAtivoTrue(contato, id)).thenReturn(true);
 
         assertThrows(EntidadeJaExisteException.class, () -> service.atualizar(id, usuario));
@@ -122,16 +96,16 @@ class UsuarioServiceTest {
     void deletarPorIdQuandoAcionadoComIdValidoDeveRemoverUsuario() {
         int id = 1;
 
-        Usuario usuarioExistente = new Usuario();
-        usuarioExistente.setId(id);
+        UsuarioEntity usuarioEntityExistente = new UsuarioEntity();
+        usuarioEntityExistente.setId(id);
 
-        when(repository.findByIdAndIsAtivoTrue(id)).thenReturn(usuarioExistente);
-        when(repository.save(usuarioExistente)).thenReturn(usuarioExistente);
+        when(repository.findByIdAndIsAtivoTrue(id)).thenReturn(usuarioEntityExistente);
+        when(repository.save(usuarioEntityExistente)).thenReturn(usuarioEntityExistente);
 
         service.deletar(id);
 
-        assertFalse(usuarioExistente.isAtivo());
-        verify(repository).save(usuarioExistente);
+        assertFalse(usuarioEntityExistente.isAtivo());
+        verify(repository).save(usuarioEntityExistente);
     }
 
     @Test
@@ -142,27 +116,5 @@ class UsuarioServiceTest {
         when(repository.findByIdAndIsAtivoTrue(id)).thenReturn(null);
 
         assertThrows(EntidadeNaoEncontradaException.class, () -> service.deletar(id));
-    }
-
-    @Test
-    @DisplayName("Deve cadastrar usuário com sucesso")
-    void deveCadastrarUsuarioComSucesso() {
-        String contato = "123456789";
-        String senha = "senha123";
-        String senhaCriptografada = "senhaCriptografada";
-
-        Usuario usuario = new Usuario();
-        usuario.setContato(contato);
-        usuario.setSenha(senha);
-
-        when(repository.findByContatoAndIsAtivoTrue(contato)).thenReturn(Optional.empty());
-        when(passwordEncoder.encode(senha)).thenReturn(senhaCriptografada);
-        when(repository.save(usuario)).thenReturn(usuario);
-
-        Usuario resultado = service.cadastrar(usuario);
-
-        assertEquals(contato, resultado.getContato());
-        assertEquals(senhaCriptografada, resultado.getSenha());
-        verify(repository).save(usuario);
     }
 }

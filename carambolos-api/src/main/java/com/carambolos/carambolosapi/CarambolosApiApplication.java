@@ -1,6 +1,6 @@
 package com.carambolos.carambolosapi;
 
-import com.carambolos.carambolosapi.main.security.EnderecoHasher;
+import com.carambolos.carambolosapi.system.security.EnderecoHasher;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.EnderecoRepository;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
