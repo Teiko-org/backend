@@ -277,7 +277,7 @@ public class RelatorioService {
                     Long count = entry.getValue();
                     String nome = usuarioEntities.stream()
                             .filter(u -> u.getId().equals(usuarioId))
-                            .map(com.carambolos.carambolosapi.infrastructure.persistence.entity.UsuarioEntity::getNome)
+                            .map(UsuarioEntity::getNome)
                             .findFirst()
                             .orElse("Usuário ID " + usuarioId);
                     doc.add(new Paragraph(i + ". " + nome + " - " + count + " pedidos"));
