@@ -1,6 +1,7 @@
 package com.carambolos.carambolosapi.application.usecases;
 
 import com.carambolos.carambolosapi.domain.entity.*;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.MassaEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.*;
 import com.lowagie.text.Document;
 import com.lowagie.text.Paragraph;
@@ -50,7 +51,7 @@ public class RelatorioService {
         List<PedidoFornada> pedidosFornada = pedidoFornadaRepository.findAll();
         List<Usuario> usuarios = usuarioRepository.findAll();
         List<Bolo> bolos = boloRepository.findAll();
-        List<Massa> massas = massaRepository.findAll();
+        List<MassaEntity> massaEntities = massaRepository.findAll();
         List<RecheioUnitario> recheios = recheioUnitarioRepository.findAll();
 
         Map<Integer, Long> contagemBolos = pedidosBolo.stream()
@@ -79,9 +80,9 @@ public class RelatorioService {
                     if (boloOpt.isEmpty()) return "Desconhecido";
                     Bolo bolo = boloOpt.get();
 
-                    String saborMassa = massas.stream()
+                    String saborMassa = massaEntities.stream()
                             .filter(m -> m.getId().equals(bolo.getMassa()))
-                            .map(Massa::getSabor)
+                            .map(MassaEntity::getSabor)
                             .findFirst()
                             .orElse("Massa desconhecida");
 
@@ -236,9 +237,9 @@ public class RelatorioService {
                 for (var entry : top3Massas) {
                     Integer massaId = entry.getKey();
                     Long count = entry.getValue();
-                    String nome = massas.stream()
+                    String nome = massaEntities.stream()
                             .filter(m -> m.getId().equals(massaId))
-                            .map(Massa::getSabor)
+                            .map(MassaEntity::getSabor)
                             .findFirst()
                             .orElse("Massa ID " + massaId);
                     doc.add(new Paragraph(i + ". " + nome + " (" + count + " pedidos)"));

@@ -2,6 +2,7 @@ package com.carambolos.carambolosapi.infrastructure.web.response;
 
 import com.carambolos.carambolosapi.domain.entity.*;
 import com.carambolos.carambolosapi.domain.enums.StatusEnum;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.MassaEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -192,10 +193,10 @@ public record ResumoPedidoMensagemResponseDTO (
             }
 
             if (bolo.getMassa() != null) {
-                Massa massa = massaRepository.findById(bolo.getMassa())
+                MassaEntity massaEntity = massaRepository.findById(bolo.getMassa())
                         .orElse(null);
-                if (massa != null) {
-                    descricao.append("\nMassa: ").append(massa.getSabor());
+                if (massaEntity != null) {
+                    descricao.append("\nMassa: ").append(massaEntity.getSabor());
                 }
             }
 

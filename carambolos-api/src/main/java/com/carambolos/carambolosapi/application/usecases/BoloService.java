@@ -374,49 +374,6 @@ public class BoloService {
         coberturaRepository.save(cobertura);
     }
 
-    public Massa cadastrarMassa(Massa massa) {
-        if (massaRepository.countBySaborAndIsAtivo(massa.getSabor(), true) > 0) {
-            throw new EntidadeJaExisteException("Massa com sabor %s já existente".formatted(massa.getSabor()));
-        }
-        return massaRepository.save(massa);
-    }
-
-    public Massa atualizarMassa(Massa massa, Integer id) {
-        if (!massaRepository.existsByIdAndIsAtivo(id, true)) {
-            throw new EntidadeNaoEncontradaException("Massa com id %d não existente".formatted(id));
-        }
-        if (massaRepository.countBySaborAndIdNotAndIsAtivo(massa.getSabor(), id, true) > 0) {
-            throw new EntidadeJaExisteException("Massa com saber %s ja existente".formatted(massa.getSabor()));
-        }
-        massa.setId(id);
-        return massaRepository.save(massa);
-    }
-
-    public List<Massa> listarMassas() {
-        return massaRepository.findAll().stream().filter(Massa::getAtivo).toList();
-    }
-
-    public Massa buscarMassaPorId(Integer id) {
-        Optional<Massa> possivelMassa = massaRepository.findById(id)
-                .filter(Massa::getAtivo);
-        if (possivelMassa.isEmpty()) {
-            throw new EntidadeNaoEncontradaException("Massa com id %d não encontrada".formatted(id));
-        }
-
-        return possivelMassa.get();
-    }
-
-    public void deletarMassa(Integer id) {
-        Optional<Massa> possivelMassa = massaRepository.findById(id)
-                .filter(Massa::getAtivo);
-        if (possivelMassa.isEmpty()) {
-            throw new EntidadeNaoEncontradaException("Massa com id %d não encontrada".formatted(id));
-        }
-        Massa massa = possivelMassa.get();
-        massa.setAtivo(false);
-        massaRepository.save(massa);
-    }
-
     private RecheioExclusivo verificarCampos(RecheioExclusivo recheioExclusivo, RecheioExclusivo recheioExistente) {
         if (recheioExclusivo.getNome() != null) {
             recheioExistente.setNome(recheioExclusivo.getNome());

@@ -6,7 +6,7 @@ import com.carambolos.carambolosapi.application.exception.EntidadeJaExisteExcept
 import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.domain.entity.Usuario;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.UsuarioRepository;
-import com.carambolos.carambolosapi.main.security.GerenciadorTokenJwt;
+import com.carambolos.carambolosapi.system.security.GerenciadorTokenJwt;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;

@@ -1,5 +1,6 @@
 package com.carambolos.carambolosapi.application.usecases;
 
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.MassaEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.*;
 import com.carambolos.carambolosapi.infrastructure.web.response.DetalhePedidoBoloDTO;
 import com.carambolos.carambolosapi.infrastructure.web.response.DetalhePedidoFornadaDTO;
@@ -174,7 +175,7 @@ public class ResumoPedidoService {
                     .orElseThrow(() -> new EntidadeNaoEncontradaException("Bolo com id %d não encontrado".formatted(pedido.getBoloId())));
 
             String massaNome = massaRepository.findById(bolo.getMassa())
-                    .map(Massa::getSabor)
+                    .map(MassaEntity::getSabor)
                     .orElse("Não especificada");
 
             String recheioNome = "Não especificado";

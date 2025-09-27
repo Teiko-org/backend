@@ -1,5 +1,6 @@
 package com.carambolos.carambolosapi.infrastructure.web.controllers;
 
+import com.carambolos.carambolosapi.application.usecases.MassaUseCase;
 import com.carambolos.carambolosapi.domain.entity.*;
 import com.carambolos.carambolosapi.domain.enums.FormatoEnum;
 import com.carambolos.carambolosapi.domain.enums.TamanhoEnum;
@@ -8,6 +9,7 @@ import com.carambolos.carambolosapi.domain.projection.RecheioExclusivoProjection
 import com.carambolos.carambolosapi.domain.projection.RecheioPedidoProjection;
 import com.carambolos.carambolosapi.application.usecases.BoloService;
 import com.carambolos.carambolosapi.application.usecases.PedidoBoloService;
+import com.carambolos.carambolosapi.infrastructure.gateways.mapper.MassaMapper;
 import com.carambolos.carambolosapi.infrastructure.web.request.*;
 import com.carambolos.carambolosapi.infrastructure.web.response.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,6 +33,13 @@ import static com.carambolos.carambolosapi.infrastructure.web.request.RecheioUni
 @Tag(name = "Bolo Controller", description = "Gerencia bolos, recheios, coberturas e massas")
 @SecurityRequirement(name = "Bearer")
 public class BoloController {
+    private final MassaUseCase massaUseCase;
+    private final MassaMapper massaMapper;
+
+    public BoloController(MassaUseCase massaUseCase, MassaMapper massaMapper) {
+        this.massaUseCase = massaUseCase;
+        this.massaMapper = massaMapper;
+    }
 
     @Autowired
     private BoloService boloService;
@@ -519,10 +528,10 @@ public class BoloController {
     public ResponseEntity<MassaResponseDTO> cadastrarMassa(
             @Valid @RequestBody MassaRequestDTO request
     ) {
-        Massa massa = MassaRequestDTO.toMassa(request);
-        boloService.cadastrarMassa(massa);
+        Massa massaDomain = massaMapper.toMassa(request);
+        Massa massaCadastrada =  massaUseCase.cadastrarMassa(massaDomain);
         return ResponseEntity.status(201).body(
-                MassaResponseDTO.toMassaResponse(massa)
+                massaMapper.toResponse(massaCadastrada)
         );
     }
 
@@ -541,10 +550,10 @@ public class BoloController {
             @PathVariable Integer id,
             @RequestBody MassaRequestDTO request
     ) {
-        Massa massa = MassaRequestDTO.toMassa(request);
-        Massa cadastrada = boloService.atualizarMassa(massa, id);
+        Massa massaEntity = massaMapper.toMassa(request);
+        Massa cadastrada = massaUseCase.atualizarMassa(massaEntity, id);
         return ResponseEntity.status(200).body(
-                MassaResponseDTO.toMassaResponse(cadastrada)
+                massaMapper.toResponse(cadastrada)
         );
     }
 
@@ -559,12 +568,12 @@ public class BoloController {
     })
     @GetMapping("/massa")
     public ResponseEntity<List<MassaResponseDTO>> listarMassas() {
-        List<Massa> massas = boloService.listarMassas();
-        if (massas.isEmpty()) {
+        List<Massa> massasDomain = massaUseCase.listarMassas();
+        if (massasDomain.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
         return ResponseEntity.status(200).body(
-                MassaResponseDTO.toMassaResponse(massas)
+                massaMapper.toResponse(massasDomain)
         );
     }
 
@@ -581,9 +590,9 @@ public class BoloController {
     public ResponseEntity<MassaResponseDTO> buscarMassaPorId(
             @PathVariable Integer id
     ) {
-        Massa massa = boloService.buscarMassaPorId(id);
+        Massa massaDomain = massaUseCase.buscarMassaPorId(id);
         return ResponseEntity.status(200).body(
-                MassaResponseDTO.toMassaResponse(massa)
+                massaMapper.toResponse(massaDomain)
         );
     }
 
@@ -600,7 +609,7 @@ public class BoloController {
     public ResponseEntity<Void> deletarMassa(
             @PathVariable Integer id
     ) {
-        boloService.deletarMassa(id);
+        massaUseCase.deletarMassa(id);
         return ResponseEntity.status(204).build();
     }
 

@@ -7,7 +7,7 @@ import com.carambolos.carambolosapi.domain.entity.Usuario;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.EnderecoRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import com.carambolos.carambolosapi.main.security.EnderecoHasher;
+import com.carambolos.carambolosapi.system.security.EnderecoHasher;
 
 @Service
 public class EnderecoService {
