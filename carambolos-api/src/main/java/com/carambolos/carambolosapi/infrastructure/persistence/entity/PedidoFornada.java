@@ -1,34 +1,34 @@
-package com.carambolos.carambolosapi.domain.entity;
+package com.carambolos.carambolosapi.infrastructure.persistence.entity;
 
 import com.carambolos.carambolosapi.domain.enums.TipoEntregaEnum;
 import com.carambolos.carambolosapi.system.security.CryptoAttributeConverter;
 import jakarta.persistence.*;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
-@Entity(name = "pedido_bolo")
-public class PedidoBolo {
+@Entity
+@Table(name = "pedido_fornada")
+@Schema(description = "Entidade que representa um pedido associado a uma fornada.")
+public class PedidoFornada {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "endereco_id")
-    private Integer enderecoId;
+    @Column(name = "fornada_da_vez_id")
+    private Integer fornadaDaVez;
 
-    @Column(name = "bolo_id")
-    private Integer boloId;
+    @Column(name = "endereco_id")
+    private Integer endereco;
 
     @Column(name = "usuario_id")
-    private Integer usuarioId;
+    private Integer usuario;
 
-    private String observacao;
+    private Integer quantidade;
 
     @Column(name = "data_previsao_entrega")
     private LocalDate dataPrevisaoEntrega;
-
-    @Column(name = "data_ultima_atualizacao")
-    private LocalDateTime dataUltimaAtualizacao;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_entrega")
@@ -45,6 +45,9 @@ public class PedidoBolo {
     @Column(name = "horario_retirada")
     private String horarioRetirada;
 
+    @Column(name = "observacoes")
+    private String observacoes;
+
     @Column(name = "is_ativo")
     private Boolean isAtivo = true;
 
@@ -56,36 +59,36 @@ public class PedidoBolo {
         this.id = id;
     }
 
-    public Integer getEnderecoId() {
-        return enderecoId;
+    public Integer getFornadaDaVez() {
+        return fornadaDaVez;
     }
 
-    public void setEnderecoId(Integer enderecoId) {
-        this.enderecoId = enderecoId;
+    public void setFornadaDaVez(Integer fornadaDaVez) {
+        this.fornadaDaVez = fornadaDaVez;
     }
 
-    public Integer getBoloId() {
-        return boloId;
+    public Integer getEndereco() {
+        return endereco;
     }
 
-    public void setBoloId(Integer boloId) {
-        this.boloId = boloId;
+    public void setEndereco(Integer endereco) {
+        this.endereco = endereco;
     }
 
-    public Integer getUsuarioId() {
-        return usuarioId;
+    public Integer getUsuario() {
+        return usuario;
     }
 
-    public void setUsuarioId(Integer usuarioId) {
-        this.usuarioId = usuarioId;
+    public void setUsuario(Integer usuario) {
+        this.usuario = usuario;
     }
 
-    public String getObservacao() {
-        return observacao;
+    public Integer getQuantidade() {
+        return quantidade;
     }
 
-    public void setObservacao(String observacao) {
-        this.observacao = observacao;
+    public void setQuantidade(Integer quantidade) {
+        this.quantidade = quantidade;
     }
 
     public LocalDate getDataPrevisaoEntrega() {
@@ -96,16 +99,12 @@ public class PedidoBolo {
         this.dataPrevisaoEntrega = dataPrevisaoEntrega;
     }
 
-    public LocalDateTime getDataUltimaAtualizacao() {
-        return dataUltimaAtualizacao;
-    }
-
-    public void setDataUltimaAtualizacao(LocalDateTime dataUltimaAtualizacao) {
-        this.dataUltimaAtualizacao = dataUltimaAtualizacao;
-    }
-
     public TipoEntregaEnum getTipoEntrega() {
         return tipoEntrega;
+    }
+
+    public void setTipoEntrega(TipoEntregaEnum tipoEntrega) {
+        this.tipoEntrega = tipoEntrega;
     }
 
     public String getNomeCliente() {
@@ -124,6 +123,14 @@ public class PedidoBolo {
         this.telefoneCliente = telefoneCliente;
     }
 
+    public String getHorario() {
+        return horarioRetirada;
+    }
+
+    public void setHorario(String horario) {
+        this.horarioRetirada = horario;
+    }
+
     public String getHorarioRetirada() {
         return horarioRetirada;
     }
@@ -132,11 +139,19 @@ public class PedidoBolo {
         this.horarioRetirada = horarioRetirada;
     }
 
-    public void setTipoEntrega(TipoEntregaEnum tipoEntrega) {
-        this.tipoEntrega = tipoEntrega;
+    public String getObservacoes() {
+        return observacoes;
+    }
+
+    public void setObservacoes(String observacoes) {
+        this.observacoes = observacoes;
     }
 
     public Boolean getAtivo() {
+        return isAtivo;
+    }
+
+    public Boolean isAtivo() {
         return isAtivo;
     }
 

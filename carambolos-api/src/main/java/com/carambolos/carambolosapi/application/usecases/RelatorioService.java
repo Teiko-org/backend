@@ -1,6 +1,8 @@
 package com.carambolos.carambolosapi.application.usecases;
 
 import com.carambolos.carambolosapi.domain.entity.*;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoFornada;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.*;
 import com.lowagie.text.Document;
 import com.lowagie.text.Paragraph;

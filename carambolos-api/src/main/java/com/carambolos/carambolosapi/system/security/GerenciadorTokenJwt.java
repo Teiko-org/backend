@@ -1,4 +1,4 @@
-package com.carambolos.carambolosapi.main.security;
+package com.carambolos.carambolosapi.system.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

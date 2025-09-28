@@ -2,6 +2,8 @@ package com.carambolos.carambolosapi.infrastructure.web.response;
 
 import com.carambolos.carambolosapi.domain.entity.*;
 import com.carambolos.carambolosapi.domain.enums.StatusEnum;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoFornada;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

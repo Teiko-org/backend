@@ -1,4 +1,4 @@
-package com.carambolos.carambolosapi.main.security;
+package com.carambolos.carambolosapi.system.security;
 
 import com.carambolos.carambolosapi.domain.entity.Endereco;
 
