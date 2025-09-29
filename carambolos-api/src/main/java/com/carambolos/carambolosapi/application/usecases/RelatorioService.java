@@ -3,6 +3,7 @@ package com.carambolos.carambolosapi.application.usecases;
 import com.carambolos.carambolosapi.domain.entity.*;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoFornada;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.UsuarioEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.*;
 import com.lowagie.text.Document;
 import com.lowagie.text.Paragraph;
@@ -50,7 +51,7 @@ public class RelatorioService {
     public byte[] gerarRelatorioInsights() {
         List<PedidoBolo> pedidosBolo = pedidoBoloRepository.findAll();
         List<PedidoFornada> pedidosFornada = pedidoFornadaRepository.findAll();
-        List<Usuario> usuarios = usuarioRepository.findAll();
+        List<UsuarioEntity> usuarioEntities = usuarioRepository.findAll();
         List<Bolo> bolos = boloRepository.findAll();
         List<Massa> massas = massaRepository.findAll();
         List<RecheioUnitario> recheios = recheioUnitarioRepository.findAll();
@@ -276,9 +277,9 @@ public class RelatorioService {
                 for (var entry : top3UsuariosBolo) {
                     Integer usuarioId = entry.getKey();
                     Long count = entry.getValue();
-                    String nome = usuarios.stream()
+                    String nome = usuarioEntities.stream()
                             .filter(u -> u.getId().equals(usuarioId))
-                            .map(Usuario::getNome)
+                            .map(UsuarioEntity::getNome)
                             .findFirst()
                             .orElse("Usuário ID " + usuarioId);
                     doc.add(new Paragraph(i + ". " + nome + " - " + count + " pedidos"));
@@ -295,9 +296,9 @@ public class RelatorioService {
                 for (var entry : top3UsuariosFornada) {
                     Integer usuarioId = entry.getKey();
                     Long count = entry.getValue();
-                    String nome = usuarios.stream()
+                    String nome = usuarioEntities.stream()
                             .filter(u -> u.getId().equals(usuarioId))
-                            .map(Usuario::getNome)
+                            .map(UsuarioEntity::getNome)
                             .findFirst()
                             .orElse("Usuário ID " + usuarioId);
                     doc.add(new Paragraph(i + ". " + nome + " - " + count + " pedidos"));

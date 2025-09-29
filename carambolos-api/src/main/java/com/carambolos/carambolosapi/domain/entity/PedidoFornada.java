@@ -1,5 +1,8 @@
 package com.carambolos.carambolosapi.domain.entity;
 import com.carambolos.carambolosapi.domain.enums.TipoEntregaEnum;
+import com.carambolos.carambolosapi.system.security.CryptoAttributeConverter;
+import jakarta.persistence.*;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 
 public class PedidoFornada {

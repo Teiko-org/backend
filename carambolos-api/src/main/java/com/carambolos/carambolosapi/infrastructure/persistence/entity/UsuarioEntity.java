@@ -1,34 +1,52 @@
-package com.carambolos.carambolosapi.infrastructure.web.response;
+package com.carambolos.carambolosapi.infrastructure.persistence.entity;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
 
 import java.time.LocalDate;
 
-@Schema(description = "DTO de resposta contendo informações do usuário")
-public class UsuarioResponseDTO {
-    @Schema(description = "ID do usuário", example = "1")
+@Entity
+@Table(name = "usuario")
+public class UsuarioEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Schema(description = "Nome do usuário", example = "Luciana Bernardes")
     private String nome;
 
-    @Schema(description = "Celular do usuário", example = "556826852415")
     private String contato;
 
-    @Schema(description = "Data de nascimento do usuário", example = "2000-05-20")
+    private String senha;
+
+    @Column(name = "data_nascimento")
     private LocalDate dataNascimento;
 
-    @Schema(description = "Gênero do usuário", example = "Feminino")
+    @Column(name = "genero")
     private String genero;
 
-    @Schema(description = "URL da imagem de perfil do usuário")
+    @Column(name = "imagem_url")
     private String imagemUrl;
 
-    private boolean isAtivo;
+    @Column(name = "is_ativo")
+    private boolean isAtivo = true;
 
-    private boolean isAdmin;
+    @Column(name = "sys_admin")
+    public Boolean sysAdmin;
 
+    public UsuarioEntity(Integer id, String nome, String contato, String senha, LocalDate dataNascimento, String genero, String imagemUrl, boolean isAtivo, Boolean sysAdmin) {
+        this.id = id;
+        this.nome = nome;
+        this.contato = contato;
+        this.senha = senha;
+        this.dataNascimento = dataNascimento;
+        this.genero = genero;
+        this.imagemUrl = imagemUrl;
+        this.isAtivo = isAtivo;
+        this.sysAdmin = sysAdmin;
+    }
 
+    public UsuarioEntity() {
+
+    }
 
     public Integer getId() {
         return id;
@@ -52,6 +70,14 @@ public class UsuarioResponseDTO {
 
     public void setContato(String contato) {
         this.contato = contato;
+    }
+
+    public String getSenha() {
+        return senha;
+    }
+
+    public void setSenha(String senha) {
+        this.senha = senha;
     }
 
     public LocalDate getDataNascimento() {
@@ -86,11 +112,7 @@ public class UsuarioResponseDTO {
         isAtivo = ativo;
     }
 
-    public boolean isAdmin() {
-        return isAdmin;
-    }
-
-    public void setAdmin(boolean admin) {
-        isAdmin = admin;
+    public Boolean getSysAdmin() {
+        return sysAdmin;
     }
 }
