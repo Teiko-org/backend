@@ -36,7 +36,6 @@ public class DashboardUseCase {
         return dashboardGateway.getFornadasMaisPedidas();
     }
 
-    @Deprecated
     public List<Map<String, Object>> getProdutosMaisPedidos() {
         return dashboardGateway.getProdutosMaisPedidos();
     }

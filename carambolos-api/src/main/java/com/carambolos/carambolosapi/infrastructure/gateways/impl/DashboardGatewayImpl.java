@@ -276,6 +276,7 @@ public class DashboardGatewayImpl implements DashboardGateway {
         }
     }
 
+    @Deprecated
     @Override
     public List<Map<String, Object>> getProdutosMaisPedidos() {
         try {
