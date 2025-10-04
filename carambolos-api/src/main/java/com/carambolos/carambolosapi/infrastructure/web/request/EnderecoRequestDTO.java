@@ -1,6 +1,5 @@
 package com.carambolos.carambolosapi.infrastructure.web.request;
 
-import com.carambolos.carambolosapi.domain.entity.Endereco;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
@@ -55,26 +54,6 @@ public class EnderecoRequestDTO {
     @Column(name = "usuario_id")
     @Schema(description = "ID do usuário associado ao endereço", example = "1")
     private Integer usuario;
-
-    public static Endereco toEntity(EnderecoRequestDTO requestDto) {
-        if (requestDto == null) {
-            return null;
-        }
-
-        Endereco endereco = new Endereco();
-        endereco.setCep(requestDto.getCep());
-        endereco.setNome(requestDto.getNome());
-        endereco.setEstado(requestDto.getEstado());
-        endereco.setCidade(requestDto.getCidade());
-        endereco.setBairro(requestDto.getBairro());
-        endereco.setLogradouro(requestDto.getLogradouro());
-        endereco.setNumero(requestDto.getNumero());
-        endereco.setComplemento(requestDto.getComplemento());
-        endereco.setReferencia(requestDto.getReferencia());
-        endereco.setUsuario(requestDto.getUsuario());
-
-        return endereco;
-    }
 
     public String getCep() {
         return cep;

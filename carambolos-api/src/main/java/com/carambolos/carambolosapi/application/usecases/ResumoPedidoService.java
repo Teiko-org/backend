@@ -2,6 +2,8 @@ package com.carambolos.carambolosapi.application.usecases;
 
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoFornada;
+import com.carambolos.carambolosapi.infrastructure.gateways.mapper.EnderecoMapper;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.EnderecoEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.*;
 import com.carambolos.carambolosapi.infrastructure.web.response.DetalhePedidoBoloDTO;
 import com.carambolos.carambolosapi.infrastructure.web.response.DetalhePedidoFornadaDTO;
@@ -34,6 +36,7 @@ public class ResumoPedidoService {
     private final MassaRepository massaRepository;
     private final CoberturaRepository coberturaRepository;
     private final EnderecoRepository enderecoRepository;
+    private final EnderecoMapper enderecoMapper;
 
     public ResumoPedidoService(
             ResumoPedidoRepository resumoPedidoRepository,
@@ -47,7 +50,8 @@ public class ResumoPedidoService {
             RecheioUnitarioRepository recheioUnitarioRepository,
             MassaRepository massaRepository,
             CoberturaRepository coberturaRepository,
-            EnderecoRepository enderecoRepository
+            EnderecoRepository enderecoRepository,
+            EnderecoMapper enderecoMapper
     ) {
         this.resumoPedidoRepository = resumoPedidoRepository;
         this.pedidoBoloRepository = pedidoBoloRepository;
@@ -61,6 +65,7 @@ public class ResumoPedidoService {
         this.massaRepository = massaRepository;
         this.coberturaRepository = coberturaRepository;
         this.enderecoRepository = enderecoRepository;
+        this.enderecoMapper = enderecoMapper;
     }
 
     public List<ResumoPedido> listarResumosPedidos() {
@@ -245,8 +250,8 @@ public class ResumoPedidoService {
             try {
                 if (pedido.getTipoEntrega() == TipoEntregaEnum.ENTREGA && pedido.getEnderecoId() != null) {
                     enderecoDTO = enderecoRepository.findById(pedido.getEnderecoId())
-                            .filter(Endereco::isAtivo)
-                            .map(EnderecoResponseDTO::toResponseDTO)
+                            .filter(EnderecoEntity::isAtivo)
+                            .map(e -> EnderecoMapper.toResponseDTO(enderecoMapper.toDomain(e)))
                             .orElse(null);
                 }
             } catch (Exception e) {
@@ -328,8 +333,8 @@ public class ResumoPedidoService {
             try {
                 if (pedidoFornada.getTipoEntrega() == TipoEntregaEnum.ENTREGA && pedidoFornada.getEndereco() != null) {
                     enderecoDTO = enderecoRepository.findById(pedidoFornada.getEndereco())
-                            .filter(Endereco::isAtivo)
-                            .map(EnderecoResponseDTO::toResponseDTO)
+                            .filter(EnderecoEntity::isAtivo)
+                            .map(e -> EnderecoMapper.toResponseDTO(enderecoMapper.toDomain(e)))
                             .orElse(null);
                 }
             } catch (Exception e) {

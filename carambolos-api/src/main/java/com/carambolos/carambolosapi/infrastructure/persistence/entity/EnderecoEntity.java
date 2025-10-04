@@ -1,21 +1,54 @@
-package com.carambolos.carambolosapi.domain.entity;
+package com.carambolos.carambolosapi.infrastructure.persistence.entity;
 
-public class Endereco {
+import com.carambolos.carambolosapi.system.security.CryptoAttributeConverter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
+
+@Entity
+@Schema(description = "Entidade que representa um endereço de um usuário.")
+@Table(name = "endereco")
+public class EnderecoEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
     private String nome;
+
+    @Convert(converter = CryptoAttributeConverter.class)
     private String cep;
+
+    @Convert(converter = CryptoAttributeConverter.class)
     private String estado;
+
+    @Convert(converter = CryptoAttributeConverter.class)
     private String cidade;
+
+    @Convert(converter = CryptoAttributeConverter.class)
     private String bairro;
+
+    @Convert(converter = CryptoAttributeConverter.class)
     private String logradouro;
+
+    @Convert(converter = CryptoAttributeConverter.class)
     private String numero;
+
+    @Convert(converter = CryptoAttributeConverter.class)
     private String complemento;
+
+    @Convert(converter = CryptoAttributeConverter.class)
     private String referencia;
+
+    @Column(name = "is_ativo")
     private boolean isAtivo = true;
+
+    @Column(name = "usuario_id")
     private Integer usuario;
+
+    @Column(name = "dedup_hash", length = 64)
     private String dedupHash;
 
-    public Endereco(int id, String nome, String cep, String estado, String cidade, String bairro, String logradouro, String numero, String complemento, String referencia, boolean isAtivo, Integer usuario, String dedupHash) {
+    public EnderecoEntity(int id, String nome, String cep, String estado, String cidade, String bairro, String logradouro, String numero, String complemento, String referencia, boolean isAtivo, Integer usuario, String dedupHash) {
         this.id = id;
         this.nome = nome;
         this.cep = cep;
@@ -31,9 +64,7 @@ public class Endereco {
         this.dedupHash = dedupHash;
     }
 
-    public Endereco() {
-
-    }
+    public EnderecoEntity() {}
 
     public int getId() {
         return id;
