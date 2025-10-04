@@ -1,6 +1,6 @@
 package com.carambolos.carambolosapi.infrastructure.web.response;
 
-import com.carambolos.carambolosapi.domain.entity.Cobertura;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.CoberturaEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
@@ -17,20 +17,5 @@ public record CoberturaResponseDTO(
         @Schema(description = "Descrição da cobertura", example = "Cobertura de morango com brilho")
         String descricao
 ) {
-    public static List<CoberturaResponseDTO> toResponse(List<Cobertura> coberturas) {
-        return coberturas.stream().map(CoberturaResponseDTO::toResponse).toList();
-    }
-    public static CoberturaResponseDTO toResponse(Cobertura cobertura) {
-        if (cobertura == null) {
-            return null;
-        }
 
-        CoberturaResponseDTO response = new CoberturaResponseDTO(
-                cobertura.getId(),
-                cobertura.getCor(),
-                cobertura.getDescricao()
-        );
-
-        return response;
-    }
 }
