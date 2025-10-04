@@ -90,7 +90,7 @@ public class EnderecoGatewayImpl implements EnderecoGateway {
         throw new EntidadeNaoEncontradaException("Endereço com Id %d não encontrado.".formatted(id));
     }
 
-    public Boolean existeEnderecoDuplicado(EnderecoEntity endereco) {
+    private Boolean existeEnderecoDuplicado(EnderecoEntity endereco) {
         if (endereco.getUsuario() == null) {
             return false;
         }
@@ -98,7 +98,7 @@ public class EnderecoGatewayImpl implements EnderecoGateway {
                 endereco.getUsuario(), endereco.getDedupHash(), true) > 0;
     }
 
-    public Boolean existeEnderecoDuplicadoParaAtualizacao(EnderecoEntity endereco, Integer id) {
+    private Boolean existeEnderecoDuplicadoParaAtualizacao(EnderecoEntity endereco, Integer id) {
         if (endereco.getUsuario() == null) {
             return false;
         }
@@ -106,5 +106,5 @@ public class EnderecoGatewayImpl implements EnderecoGateway {
                 endereco.getUsuario(), endereco.getDedupHash(), true, id) > 0;
     }
 
-    public void preencherDedupHash(EnderecoEntity endereco) { endereco.setDedupHash(EnderecoHasher.computeDedupHash(endereco)); }
+    private void preencherDedupHash(EnderecoEntity endereco) { endereco.setDedupHash(EnderecoHasher.computeDedupHash(endereco)); }
 }
