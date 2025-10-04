@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 @Component
-public class FornadaDaVezRepositoryGateway implements FornadaDaVezGateway {
+public class FornadaDaVezGatewayImpl implements FornadaDaVezGateway {
     private final FornadaDaVezRepository repository;
 
-    public FornadaDaVezRepositoryGateway(FornadaDaVezRepository repository) {
+    public FornadaDaVezGatewayImpl(FornadaDaVezRepository repository) {
         this.repository = repository;
     }
 

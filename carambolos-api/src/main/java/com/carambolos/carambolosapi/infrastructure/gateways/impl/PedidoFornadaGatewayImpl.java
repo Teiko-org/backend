@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class PedidoFornadaRepositoryGateway implements PedidoFornadaGateway {
+public class PedidoFornadaGatewayImpl implements PedidoFornadaGateway {
     private final PedidoFornadaRepository repository;
 
-    public PedidoFornadaRepositoryGateway(PedidoFornadaRepository repository) {
+    public PedidoFornadaGatewayImpl(PedidoFornadaRepository repository) {
         this.repository = repository;
     }
 
@@ -33,5 +33,3 @@ public class PedidoFornadaRepositoryGateway implements PedidoFornadaGateway {
         return repository.findAll().stream().map(PedidoFornadaEntityMapper::toDomain).toList();
     }
 }
-
-

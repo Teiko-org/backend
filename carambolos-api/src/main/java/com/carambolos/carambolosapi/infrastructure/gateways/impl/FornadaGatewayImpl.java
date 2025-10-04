@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class FornadaRepositoryGateway implements FornadaGateway {
+public class FornadaGatewayImpl implements FornadaGateway {
     private final FornadaRepository repository;
 
-    public FornadaRepositoryGateway(FornadaRepository repository) {
+    public FornadaGatewayImpl(FornadaRepository repository) {
         this.repository = repository;
     }
 
