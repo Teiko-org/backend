@@ -1,21 +1,19 @@
-package com.carambolos.carambolosapi.application.usecases;
+package com.carambolos.carambolosapi.infrastructure.gateways.impl;
 
+import com.carambolos.carambolosapi.application.gateways.DashboardGateway;
 import com.carambolos.carambolosapi.domain.entity.*;
 import com.carambolos.carambolosapi.domain.enums.StatusEnum;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.Fornada;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoFornada;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.*;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Service
-public class DashboardService {
-
+public class DashboardGatewayImpl implements DashboardGateway {
     private final PedidoBoloRepository pedidoBoloRepository;
     private final BoloRepository boloRepository;
     private final PedidoFornadaRepository pedidoFornadaRepository;
@@ -25,14 +23,7 @@ public class DashboardService {
     private final DecoracaoRepository decoracaoRepository;
     private final FornadaRepository fornadaRepository;
 
-    public DashboardService(PedidoBoloRepository pedidoBoloRepository,
-                            BoloRepository boloRepository,
-                            PedidoFornadaRepository pedidoFornadaRepository,
-                            ProdutoFornadaRepository produtoFornadaRepository,
-                            FornadaDaVezRepository fornadaDaVezRepository, 
-                            ResumoPedidoRepository resumoPedidoRepository, 
-                            DecoracaoRepository decoracaoRepository, 
-                            FornadaRepository fornadaRepository) {
+    public DashboardGatewayImpl(PedidoBoloRepository pedidoBoloRepository, BoloRepository boloRepository, PedidoFornadaRepository pedidoFornadaRepository, ProdutoFornadaRepository produtoFornadaRepository, FornadaDaVezRepository fornadaDaVezRepository, ResumoPedidoRepository resumoPedidoRepository, DecoracaoRepository decoracaoRepository, FornadaRepository fornadaRepository) {
         this.pedidoBoloRepository = pedidoBoloRepository;
         this.boloRepository = boloRepository;
         this.pedidoFornadaRepository = pedidoFornadaRepository;
@@ -43,6 +34,7 @@ public class DashboardService {
         this.fornadaRepository = fornadaRepository;
     }
 
+    @Override
     public long qtdClientesUnicos() {
         List<PedidoBolo> pedidosBolo = pedidoBoloRepository.findAll();
         List<PedidoFornada> pedidoFornadas = pedidoFornadaRepository.findAll();
@@ -68,6 +60,7 @@ public class DashboardService {
         return clientesUnicos.size();
     }
 
+    @Override
     public Map<String, Long> countPedidos() {
         long pedido = resumoPedidoRepository.count();
         long pedidoConcluido = resumoPedidoRepository.countByStatus(StatusEnum.CONCLUIDO);
@@ -86,6 +79,7 @@ public class DashboardService {
         return resultado;
     }
 
+    @Override
     public Map<String, Long> countPedidosBolos() {
         long pedidoBolo = resumoPedidoRepository.countByPedidoBoloIdIsNotNull();
         long pedidoBoloConcluido = resumoPedidoRepository.countByStatusAndPedidoBoloIdIsNotNull(StatusEnum.CONCLUIDO);
@@ -104,6 +98,7 @@ public class DashboardService {
         return resultado;
     }
 
+    @Override
     public Map<String, Long> countPedidosFornada() {
         long pedidoFornada = resumoPedidoRepository.countByPedidoFornadaIdIsNotNull();
         long pedidoFornadaConcluido = resumoPedidoRepository.countByStatusAndPedidoFornadaIdIsNotNull(StatusEnum.CONCLUIDO);
@@ -122,6 +117,7 @@ public class DashboardService {
         return resultado;
     }
 
+    @Override
     public List<Map<String, Object>> getBolosMaisPedidos() {
         try {
             List<PedidoBolo> pedidosBolo = pedidoBoloRepository.findAll();
@@ -141,7 +137,7 @@ public class DashboardService {
                             Long quantidade = entry.getValue();
 
                             Optional<Bolo> boloOpt = boloRepository.findById(boloId);
-                            
+
                             // Filtrar apenas bolos cadastrados (não pedidos de clientes)
                             if (boloOpt.isPresent()) {
                                 Bolo bolo = boloOpt.get();
@@ -194,6 +190,7 @@ public class DashboardService {
         }
     }
 
+    @Override
     public List<Map<String, Object>> getFornadasMaisPedidas() {
         try {
             List<PedidoFornada> pedidoFornadas = pedidoFornadaRepository.findAll();
@@ -283,6 +280,7 @@ public class DashboardService {
     }
 
     @Deprecated
+    @Override
     public List<Map<String, Object>> getProdutosMaisPedidos() {
         try {
             List<Map<String, Object>> todosProdutos = new ArrayList<>();
@@ -335,6 +333,7 @@ public class DashboardService {
         }
     }
 
+    @Override
     public List<Map<String, Object>> getProdutosCadastrados() {
         try {
             List<Map<String, Object>> produtosCadastrados = new ArrayList<>();
@@ -347,13 +346,13 @@ public class DashboardService {
                     if ("PERSONALIZADO".equals(bolo.getCategoria())) {
                         return; // Pular bolos que são pedidos de clientes
                     }
-                    
+
                     // Incluir todos os bolos cadastrados (ativos e inativos)
                     if (bolo.getAtivo() != null) {
-                        
+
                         Map<String, Object> boloMap = new HashMap<>();
                         boloMap.put("id", bolo.getId());
-                        
+
                         // Para bolos, o nome vem da decoração
                         String nomeBolo = "Bolo Personalizado";
                         if (bolo.getDecoracao() != null) {
@@ -368,7 +367,7 @@ public class DashboardService {
                         }
                         boloMap.put("nome", nomeBolo);
                         boloMap.put("categoria", bolo.getCategoria());
-                        
+
                         // Para bolos, não temos preço fixo - é calculado dinamicamente
                         boloMap.put("preco", 0.0);
                         boloMap.put("tipo", "BOLO");
@@ -408,6 +407,7 @@ public class DashboardService {
         }
     }
 
+    @Override
     public List<Map<String, Object>> getUltimosPedidos() {
         // Buscar por data mais recente (independente do status) e limitar para performance
         List<ResumoPedido> resumoPedidos = resumoPedidoRepository
@@ -449,71 +449,19 @@ public class DashboardService {
         return ultimosPedidos;
     }
 
-    public Map<String, Map<String, Long>> processarPedidosPorPeriodoComStatus(List<ResumoPedido> pedidos, String periodo) {
-        Map<String, Map<String, Long>> resultado = new HashMap<>();
-        if (periodo.equalsIgnoreCase("mes")) {
-             Map<String, List<ResumoPedido>> pedidosPorMes = pedidos.stream()
-                     .collect(Collectors.groupingBy(
-                             pedido -> {
-                                 int mes = pedido.getDataPedido().getMonthValue();
-                                 return String.format("%02d", mes);
-                             }
-                     ));
-            for (int i = 1; i <= 12 ; i++) {
-                String mesKey = String.format("%02d", i);
-                List<ResumoPedido> pedidosDoMes = pedidosPorMes.getOrDefault(mesKey, new ArrayList<>());
-
-                Map<String, Long> statusCount = new HashMap<>();
-                statusCount.put("cancelados",
-                        pedidosDoMes.stream()
-                                .filter(p -> p.getStatus() == StatusEnum.CANCELADO)
-                                .count());
-               statusCount.put("concluidos",
-                       pedidosDoMes.stream()
-                               .filter(p -> p.getStatus() == StatusEnum.CONCLUIDO)
-                               .count());
-            resultado.put(mesKey, statusCount);
-            }
-        } else if(periodo.equalsIgnoreCase("ano")) {
-            Map<String, List<ResumoPedido>> pedidosPorAno = pedidos.stream()
-                    .collect(Collectors.groupingBy(
-                            pedido -> String.valueOf(pedido.getDataPedido().getYear())
-                    ));
-            if (pedidosPorAno.isEmpty()) {
-                String anoAtual = String.valueOf(LocalDateTime.now().getYear());
-                Map<String, Long> statusCount = new HashMap<>();
-                statusCount.put("cancelados", 0L);
-                statusCount.put("concluidos", 0L);
-                resultado.put(anoAtual, statusCount);
-            } else {
-            pedidosPorAno.forEach((ano, pedidosDoAno) -> {
-                Map<String, Long> statusCount = new HashMap<>();
-                statusCount.put("cancelados",
-                        pedidosDoAno.stream()
-                                .filter(p -> p.getStatus() == StatusEnum.CANCELADO)
-                                .count());
-                statusCount.put("concluidos",
-                        pedidosDoAno.stream()
-                                .filter(p -> p.getStatus() == StatusEnum.CONCLUIDO)
-                                .count());
-                resultado.put(ano, statusCount);
-            });
-            }
-        }
-        return resultado;
-    }
-
+    @Override
     public Map<String, Map<String, Long>> countPedidosBolosPorPeriodo(String periodo) {
         List<ResumoPedido> pedidosBolo = resumoPedidoRepository.findByStatusInAndPedidoBoloIdIsNotNull(List.of(StatusEnum.CANCELADO, StatusEnum.CONCLUIDO));
         return processarPedidosPorPeriodoComStatus(pedidosBolo, periodo);
     }
 
+    @Override
     public Map<String, Map<String, Long>> countPedidosFornadaPorPeriodo(String periodo) {
         List<ResumoPedido> pedidosFornada = resumoPedidoRepository.findByStatusInAndPedidoFornadaIdIsNotNull(List.of(StatusEnum.CANCELADO, StatusEnum.CONCLUIDO));
         return processarPedidosPorPeriodoComStatus(pedidosFornada, periodo);
     }
 
-    // KPIs específicos para fornadas
+    @Override
     public Map<String, Object> getKPIFornada(Integer fornadaId) {
         try {
             System.out.println("[KPI] getKPIFornada fornadaId=" + fornadaId);
@@ -525,7 +473,7 @@ public class DashboardService {
                     System.out.println("[KPI] fdvId=" + fdv.getId() + " produtoFornadaId=" + fdv.getProdutoFornada() + " qtdAtual=" + fdv.getQuantidade());
                 }
             }
-            
+
             if (produtosFornada == null || produtosFornada.isEmpty()) {
                 return criarKPIVazio();
             }
@@ -538,18 +486,18 @@ public class DashboardService {
             for (FornadaDaVez fornadaDaVez : produtosFornada) {
                 // Buscar o produto da fornada
                 ProdutoFornada produto = produtoFornadaRepository.findById(fornadaDaVez.getProdutoFornada())
-                    .orElse(null);
+                        .orElse(null);
                 if (produto == null) continue;
 
                 // Buscar pedidos para este produto da fornada
                 List<PedidoFornada> pedidos = pedidoFornadaRepository.findAll().stream()
-                    .filter(p -> p.getFornadaDaVez() != null && p.getFornadaDaVez().equals(fornadaDaVez.getId()))
-                    .toList();
+                        .filter(p -> p.getFornadaDaVez() != null && p.getFornadaDaVez().equals(fornadaDaVez.getId()))
+                        .toList();
 
                 // Quantidade vendida (soma dos pedidos)
                 int qtdVendida = pedidos.stream()
-                    .mapToInt(PedidoFornada::getQuantidade)
-                    .sum();
+                        .mapToInt(PedidoFornada::getQuantidade)
+                        .sum();
                 quantidadeVendida += qtdVendida;
 
                 // Quantidade planejada original = quantidade restante atual + quantidade já vendida
@@ -574,8 +522,8 @@ public class DashboardService {
             kpi.put("totalDisponivel", totalDisponivel);
             kpi.put("totalVendido", totalVendido);
             kpi.put("valorPerdido", valorPerdido);
-            kpi.put("percentualVendido", quantidadeDisponivel > 0 ? 
-                (double) quantidadeVendida / quantidadeDisponivel * 100 : 0.0);
+            kpi.put("percentualVendido", quantidadeDisponivel > 0 ?
+                    (double) quantidadeVendida / quantidadeDisponivel * 100 : 0.0);
 
             return kpi;
         } catch (Exception e) {
@@ -584,6 +532,7 @@ public class DashboardService {
         }
     }
 
+    @Override
     public Map<String, Object> getKPIFornadaMaisRecente() {
         try {
             LocalDate hoje = LocalDate.now();
@@ -618,11 +567,12 @@ public class DashboardService {
         }
     }
 
+    @Override
     public Map<String, Object> getKPIFornadasPorMesAno(int ano, int mes) {
         try {
             List<Fornada> fornadas = fornadaRepository.findByDataInicioBetweenOrderByDataInicioAsc(
-                LocalDate.of(ano, mes, 1),
-                LocalDate.of(ano, mes, 1).plusMonths(1).minusDays(1)
+                    LocalDate.of(ano, mes, 1),
+                    LocalDate.of(ano, mes, 1).plusMonths(1).minusDays(1)
             );
 
             if (fornadas.isEmpty()) {
@@ -635,7 +585,7 @@ public class DashboardService {
 
             for (Fornada fornada : fornadas) {
                 Map<String, Object> kpiFornada = getKPIFornada(fornada.getId());
-                
+
                 quantidadeDisponivel += (Integer) kpiFornada.get("quantidadeDisponivel");
                 quantidadeVendida += (Integer) kpiFornada.get("quantidadeVendida");
                 totalDisponivel += (Double) kpiFornada.get("totalDisponivel");
@@ -650,8 +600,8 @@ public class DashboardService {
             kpi.put("totalDisponivel", totalDisponivel);
             kpi.put("totalVendido", totalVendido);
             kpi.put("valorPerdido", valorPerdido);
-            kpi.put("percentualVendido", quantidadeDisponivel > 0 ? 
-                (double) quantidadeVendida / quantidadeDisponivel * 100 : 0.0);
+            kpi.put("percentualVendido", quantidadeDisponivel > 0 ?
+                    (double) quantidadeVendida / quantidadeDisponivel * 100 : 0.0);
             kpi.put("mes", mes);
             kpi.put("ano", ano);
 
@@ -673,4 +623,57 @@ public class DashboardService {
         return kpi;
     }
 
+    private Map<String, Map<String, Long>> processarPedidosPorPeriodoComStatus(List<ResumoPedido> pedidos, String periodo) {
+        Map<String, Map<String, Long>> resultado = new HashMap<>();
+        if (periodo.equalsIgnoreCase("mes")) {
+            Map<String, List<ResumoPedido>> pedidosPorMes = pedidos.stream()
+                    .collect(Collectors.groupingBy(
+                            pedido -> {
+                                int mes = pedido.getDataPedido().getMonthValue();
+                                return String.format("%02d", mes);
+                            }
+                    ));
+            for (int i = 1; i <= 12 ; i++) {
+                String mesKey = String.format("%02d", i);
+                List<ResumoPedido> pedidosDoMes = pedidosPorMes.getOrDefault(mesKey, new ArrayList<>());
+
+                Map<String, Long> statusCount = new HashMap<>();
+                statusCount.put("cancelados",
+                        pedidosDoMes.stream()
+                                .filter(p -> p.getStatus() == StatusEnum.CANCELADO)
+                                .count());
+                statusCount.put("concluidos",
+                        pedidosDoMes.stream()
+                                .filter(p -> p.getStatus() == StatusEnum.CONCLUIDO)
+                                .count());
+                resultado.put(mesKey, statusCount);
+            }
+        } else if(periodo.equalsIgnoreCase("ano")) {
+            Map<String, List<ResumoPedido>> pedidosPorAno = pedidos.stream()
+                    .collect(Collectors.groupingBy(
+                            pedido -> String.valueOf(pedido.getDataPedido().getYear())
+                    ));
+            if (pedidosPorAno.isEmpty()) {
+                String anoAtual = String.valueOf(LocalDateTime.now().getYear());
+                Map<String, Long> statusCount = new HashMap<>();
+                statusCount.put("cancelados", 0L);
+                statusCount.put("concluidos", 0L);
+                resultado.put(anoAtual, statusCount);
+            } else {
+                pedidosPorAno.forEach((ano, pedidosDoAno) -> {
+                    Map<String, Long> statusCount = new HashMap<>();
+                    statusCount.put("cancelados",
+                            pedidosDoAno.stream()
+                                    .filter(p -> p.getStatus() == StatusEnum.CANCELADO)
+                                    .count());
+                    statusCount.put("concluidos",
+                            pedidosDoAno.stream()
+                                    .filter(p -> p.getStatus() == StatusEnum.CONCLUIDO)
+                                    .count());
+                    resultado.put(ano, statusCount);
+                });
+            }
+        }
+        return resultado;
+    }
 }

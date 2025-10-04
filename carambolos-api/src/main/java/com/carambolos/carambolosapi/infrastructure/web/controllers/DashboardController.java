@@ -1,6 +1,6 @@
 package com.carambolos.carambolosapi.infrastructure.web.controllers;
 
-import com.carambolos.carambolosapi.application.usecases.DashboardService;
+import com.carambolos.carambolosapi.application.usecases.DashboardUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -23,10 +23,10 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public class DashboardController {
 
-    private final DashboardService dashboardService;
+    private final DashboardUseCase dashboardUseCase;
 
-    public DashboardController(DashboardService dashboardService) {
-        this.dashboardService = dashboardService;
+    public DashboardController(DashboardUseCase dashboardUseCase) {
+        this.dashboardUseCase = dashboardUseCase;
     }
 
     @Operation(summary = "Conta a quantidade de clientes únicos que fizeram pedidos")
@@ -36,7 +36,7 @@ public class DashboardController {
     })
     @GetMapping("/qtdClientesUnicos")
     public ResponseEntity<Long> countClientes() {
-        long qtdClientes = dashboardService.qtdClientesUnicos();
+        long qtdClientes = dashboardUseCase.qtdClientesUnicos();
         if (qtdClientes == 0) {
             return ResponseEntity.status(204).build();
         }
@@ -49,7 +49,7 @@ public class DashboardController {
     })
     @GetMapping("/qtdPedidos")
     public ResponseEntity<Map<String, Long>> countPedidosTotal() {
-        Map<String, Long> qtd = dashboardService.countPedidos();
+        Map<String, Long> qtd = dashboardUseCase.countPedidos();
         return ResponseEntity.ok(qtd);
     }
 
@@ -60,7 +60,7 @@ public class DashboardController {
     })
     @GetMapping("/bolosMaisPedidos")
     public ResponseEntity<List<Map<String, Object>>> getBolosMaisPedidos() {
-        List<Map<String, Object>> bolosMaisPedidos = dashboardService.getBolosMaisPedidos();
+        List<Map<String, Object>> bolosMaisPedidos = dashboardUseCase.getBolosMaisPedidos();
         if (bolosMaisPedidos.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
@@ -74,7 +74,7 @@ public class DashboardController {
     })
     @GetMapping("/produtosFornadasMaisPedidos")
     public ResponseEntity<List<Map<String, Object>>> getFornadasMaisPedidas() {
-        List<Map<String, Object>> fornadasMaisPedidas = dashboardService.getFornadasMaisPedidas();
+        List<Map<String, Object>> fornadasMaisPedidas = dashboardUseCase.getFornadasMaisPedidas();
         if (fornadasMaisPedidas.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
@@ -89,7 +89,7 @@ public class DashboardController {
     @GetMapping("/produtosMaisPedidos")
     @SuppressWarnings("deprecation")
     public ResponseEntity<List<Map<String, Object>>> getProdutosMaisPedidos() {
-        List<Map<String, Object>> produtosMaisPedidos = dashboardService.getProdutosMaisPedidos();
+        List<Map<String, Object>> produtosMaisPedidos = dashboardUseCase.getProdutosMaisPedidos();
         if (produtosMaisPedidos.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
@@ -103,7 +103,7 @@ public class DashboardController {
     })
     @GetMapping("/produtosCadastrados")
     public ResponseEntity<List<Map<String, Object>>> getProdutosCadastrados() {
-        List<Map<String, Object>> produtosCadastrados = dashboardService.getProdutosCadastrados();
+        List<Map<String, Object>> produtosCadastrados = dashboardUseCase.getProdutosCadastrados();
         if (produtosCadastrados.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
@@ -117,7 +117,7 @@ public class DashboardController {
     })
     @GetMapping("/ultimosPedidos")
     public ResponseEntity<List<Map<String, Object>>> getUltimosPedidos() {
-        List<Map<String, Object>> ultimosPedidos = dashboardService.getUltimosPedidos();
+        List<Map<String, Object>> ultimosPedidos = dashboardUseCase.getUltimosPedidos();
         if (ultimosPedidos.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
@@ -131,7 +131,7 @@ public class DashboardController {
     })
     @GetMapping("/qtdPedidosBolo")
     public ResponseEntity<Map<String, Long>> countPedidosBolos() {
-        Map<String, Long> qtdPedidosBolo = dashboardService.countPedidosBolos();
+        Map<String, Long> qtdPedidosBolo = dashboardUseCase.countPedidosBolos();
         if (qtdPedidosBolo.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
@@ -145,7 +145,7 @@ public class DashboardController {
     })
     @GetMapping("/qtdPedidosFornada")
     public ResponseEntity<Map<String, Long>> countPedidosFornada() {
-        Map<String, Long> qtdPedidosFornada = dashboardService.countPedidosFornada();
+        Map<String, Long> qtdPedidosFornada = dashboardUseCase.countPedidosFornada();
         if (qtdPedidosFornada.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
@@ -161,7 +161,7 @@ public class DashboardController {
     public ResponseEntity<Map<String, Map<String, Long>>> countPedidosFornadaPorPeriodo(
             @RequestParam String periodo
     ) {
-        Map<String, Map<String, Long>> qtdPedidosFornadaConcluidosECancelados = dashboardService.countPedidosFornadaPorPeriodo(periodo);
+        Map<String, Map<String, Long>> qtdPedidosFornadaConcluidosECancelados = dashboardUseCase.countPedidosFornadaPorPeriodo(periodo);
         if (qtdPedidosFornadaConcluidosECancelados.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
@@ -177,14 +177,13 @@ public class DashboardController {
     public ResponseEntity<Map<String, Map<String, Long>>> countPedidosBolosPorPeriodo(
             @RequestParam String periodo
     ) {
-        Map<String, Map<String, Long>> qtdPedidosBoloConcluidosECancelados = dashboardService.countPedidosBolosPorPeriodo(periodo);
+        Map<String, Map<String, Long>> qtdPedidosBoloConcluidosECancelados = dashboardUseCase.countPedidosBolosPorPeriodo(periodo);
         if (qtdPedidosBoloConcluidosECancelados.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
         return ResponseEntity.ok(qtdPedidosBoloConcluidosECancelados);
     }
 
-    // KPIs específicos para fornadas
     @Operation(summary = "KPI de uma fornada específica")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "KPI da fornada retornado com sucesso"),
@@ -192,7 +191,7 @@ public class DashboardController {
     })
     @GetMapping("/kpi-fornada/{fornadaId}")
     public ResponseEntity<Map<String, Object>> getKPIFornada(@PathVariable Integer fornadaId) {
-        Map<String, Object> kpi = dashboardService.getKPIFornada(fornadaId);
+        Map<String, Object> kpi = dashboardUseCase.getKPIFornada(fornadaId);
         if (kpi.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
@@ -206,7 +205,7 @@ public class DashboardController {
     })
     @GetMapping(value = "/kpi-fornada-mais-recente", produces = "application/json")
     public ResponseEntity<Map<String, Object>> getKPIFornadaMaisRecente() {
-        Map<String, Object> kpi = dashboardService.getKPIFornadaMaisRecente();
+        Map<String, Object> kpi = dashboardUseCase.getKPIFornadaMaisRecente();
         if (kpi.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
@@ -223,7 +222,7 @@ public class DashboardController {
             @RequestParam Integer ano,
             @RequestParam Integer mes
     ) {
-        Map<String, Object> kpi = dashboardService.getKPIFornadasPorMesAno(ano, mes);
+        Map<String, Object> kpi = dashboardUseCase.getKPIFornadasPorMesAno(ano, mes);
         if (kpi.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
