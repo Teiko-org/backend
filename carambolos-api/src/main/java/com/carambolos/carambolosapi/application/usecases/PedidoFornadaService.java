@@ -1,5 +1,6 @@
 package com.carambolos.carambolosapi.application.usecases;
 
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.EnderecoEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.UsuarioEntity;
 import com.carambolos.carambolosapi.infrastructure.web.request.PedidoFornadaRequestDTO;
 import com.carambolos.carambolosapi.infrastructure.web.request.PedidoFornadaUpdateRequestDTO;
@@ -53,7 +54,7 @@ public class PedidoFornadaService {
 
         if (request.enderecoId() != null) {
             enderecoRepository.findById(request.enderecoId())
-                    .filter(Endereco::isAtivo)
+                    .filter(EnderecoEntity::isAtivo)
                     .orElseThrow(() -> new EntidadeNaoEncontradaException("Endereço com ID " + request.enderecoId() + " não encontrado."));
         }
 

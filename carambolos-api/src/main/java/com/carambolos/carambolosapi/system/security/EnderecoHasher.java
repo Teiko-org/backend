@@ -1,13 +1,13 @@
 package com.carambolos.carambolosapi.system.security;
 
-import com.carambolos.carambolosapi.domain.entity.Endereco;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.EnderecoEntity;
 
 import static java.util.Objects.requireNonNullElse;
 
 public final class EnderecoHasher {
     private EnderecoHasher() {}
 
-    public static String computeDedupHash(Endereco e) {
+    public static String computeDedupHash(EnderecoEntity e) {
         String base = String.join("|",
                 safe(e.getCep()),
                 safeLower(e.getLogradouro()),
