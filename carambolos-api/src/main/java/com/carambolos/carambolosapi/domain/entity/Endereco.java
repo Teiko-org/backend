@@ -1,62 +1,39 @@
 package com.carambolos.carambolosapi.domain.entity;
 
-import jakarta.persistence.*;
-import com.carambolos.carambolosapi.system.security.CryptoAttributeConverter;
-import io.swagger.v3.oas.annotations.media.Schema;
-
-@Entity
-@Schema(description = "Entidade que representa um endereço de um usuário.")
 public class Endereco {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Schema(description = "Identificador único do endereço", example = "1")
     private int id;
-
-    @Schema(description = "Nome do endereço (ex: Casa, Trabalho)", example = "Casa")
     private String nome;
-
-    @Schema(description = "CEP do endereço (apenas números)", example = "12345678")
-    @Convert(converter = CryptoAttributeConverter.class)
     private String cep;
-
-    @Schema(description = "Estado do endereço", example = "SP")
-    @Convert(converter = CryptoAttributeConverter.class)
     private String estado;
-
-    @Schema(description = "Cidade do endereço", example = "São Paulo")
-    @Convert(converter = CryptoAttributeConverter.class)
     private String cidade;
-
-    @Schema(description = "Bairro do endereço", example = "Centro")
-    @Convert(converter = CryptoAttributeConverter.class)
     private String bairro;
-
-    @Schema(description = "Logradouro do endereço (rua, avenida, etc.)", example = "Rua das Flores")
-    @Convert(converter = CryptoAttributeConverter.class)
     private String logradouro;
-
-    @Schema(description = "Número do endereço", example = "123")
-    @Convert(converter = CryptoAttributeConverter.class)
     private String numero;
-
-    @Schema(description = "Complemento do endereço", example = "Apartamento 202")
-    @Convert(converter = CryptoAttributeConverter.class)
     private String complemento;
-
-    @Schema(description = "Referência para localização", example = "Próximo à praça central")
-    @Convert(converter = CryptoAttributeConverter.class)
     private String referencia;
-
-    @Column(name = "is_ativo")
     private boolean isAtivo = true;
-
-    @Column(name = "usuario_id")
-    @Schema(description = "ID do usuário associado ao endereço", example = "5")
     private Integer usuario;
-
-    @Column(name = "dedup_hash", length = 64)
     private String dedupHash;
+
+    public Endereco(int id, String nome, String cep, String estado, String cidade, String bairro, String logradouro, String numero, String complemento, String referencia, boolean isAtivo, Integer usuario, String dedupHash) {
+        this.id = id;
+        this.nome = nome;
+        this.cep = cep;
+        this.estado = estado;
+        this.cidade = cidade;
+        this.bairro = bairro;
+        this.logradouro = logradouro;
+        this.numero = numero;
+        this.complemento = complemento;
+        this.referencia = referencia;
+        this.isAtivo = isAtivo;
+        this.usuario = usuario;
+        this.dedupHash = dedupHash;
+    }
+
+    public Endereco() {
+
+    }
 
     public int getId() {
         return id;

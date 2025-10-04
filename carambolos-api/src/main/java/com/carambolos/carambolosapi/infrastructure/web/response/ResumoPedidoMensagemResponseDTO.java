@@ -2,7 +2,9 @@ package com.carambolos.carambolosapi.infrastructure.web.response;
 
 import com.carambolos.carambolosapi.domain.entity.*;
 import com.carambolos.carambolosapi.domain.enums.StatusEnum;
-import com.carambolos.carambolosapi.infrastructure.persistence.entity.MassaEntity;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.EnderecoEntity;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoFornada;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -148,7 +150,7 @@ public record ResumoPedidoMensagemResponseDTO (
                     pedidoBolo.getTipoEntrega().name().equals("ENTREGA") &&
                     pedidoBolo.getEnderecoId() != null) {
 
-                Endereco endereco = enderecoRepository.findByIdAndIsAtivoTrue(pedidoBolo.getEnderecoId());
+                EnderecoEntity endereco = enderecoRepository.findByIdAndIsAtivoTrue(pedidoBolo.getEnderecoId());
                 if (endereco != null) {
                     mensagem.append("Endereço de entrega:\n");
                     mensagem.append(endereco.getLogradouro());
@@ -193,10 +195,10 @@ public record ResumoPedidoMensagemResponseDTO (
             }
 
             if (bolo.getMassa() != null) {
-                MassaEntity massaEntity = massaRepository.findById(bolo.getMassa())
+                Massa massa = massaRepository.findById(bolo.getMassa())
                         .orElse(null);
-                if (massaEntity != null) {
-                    descricao.append("\nMassa: ").append(massaEntity.getSabor());
+                if (massa != null) {
+                    descricao.append("\nMassa: ").append(massa.getSabor());
                 }
             }
 
@@ -288,7 +290,7 @@ public record ResumoPedidoMensagemResponseDTO (
                     pedidoFornada.getTipoEntrega().name().equals("ENTREGA") &&
                     pedidoFornada.getEndereco() != null) {
 
-                Endereco endereco = enderecoRepository.findByIdAndIsAtivoTrue(pedidoFornada.getEndereco());
+                EnderecoEntity endereco = enderecoRepository.findByIdAndIsAtivoTrue(pedidoFornada.getEndereco());
                 if (endereco != null) {
                     mensagem.append("Endereço de entrega:\n");
                     mensagem.append(endereco.getLogradouro());

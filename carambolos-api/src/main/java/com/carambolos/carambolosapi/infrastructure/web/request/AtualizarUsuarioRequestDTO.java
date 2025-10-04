@@ -1,6 +1,5 @@
 package com.carambolos.carambolosapi.infrastructure.web.request;
 
-import com.carambolos.carambolosapi.domain.entity.Usuario;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -24,18 +23,6 @@ public class AtualizarUsuarioRequestDTO {
 
     @Schema(description = "Gênero do usuário.", example = "Feminino")
     private String genero;
-
-    public static Usuario toEntity(AtualizarUsuarioRequestDTO requestDto) {
-        if(requestDto == null) {
-            return null;
-        }
-        Usuario usuario = new Usuario();
-        usuario.setNome(requestDto.getNome());
-        usuario.setContato(requestDto.getContato());
-        usuario.setDataNascimento(requestDto.getDataNascimento());
-        usuario.setGenero(requestDto.getGenero());
-        return usuario;
-    }
 
     public @NotBlank String getNome() {
         return nome;

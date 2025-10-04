@@ -4,14 +4,15 @@ import com.carambolos.carambolosapi.infrastructure.web.response.ProdutoFornadaDa
 import com.carambolos.carambolosapi.infrastructure.web.response.MesAnoResponse;
 import com.carambolos.carambolosapi.infrastructure.web.response.FornadaComItensResponse;
 import com.carambolos.carambolosapi.infrastructure.web.response.ProdutoFornadaResponseDTO;
-import com.carambolos.carambolosapi.domain.entity.Fornada;
-import com.carambolos.carambolosapi.domain.entity.FornadaDaVez;
-import com.carambolos.carambolosapi.domain.entity.PedidoFornada;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.Fornada;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoFornada;
+import com.carambolos.carambolosapi.infrastructure.gateways.mapperEntity.PedidoFornadaEntityMapper;
 import com.carambolos.carambolosapi.domain.entity.ProdutoFornada;
 import com.carambolos.carambolosapi.domain.projection.ProdutoFornadaDaVezProjection;
 import com.carambolos.carambolosapi.application.usecases.FornadaDaVezService;
-import com.carambolos.carambolosapi.application.usecases.FornadaService;
-import com.carambolos.carambolosapi.application.usecases.PedidoFornadaService;
+import com.carambolos.carambolosapi.application.usecases.FornadasUseCases;
+import com.carambolos.carambolosapi.application.usecases.PedidoFornadaUseCases;
 import com.carambolos.carambolosapi.application.usecases.ProdutoFornadaService;
 import com.carambolos.carambolosapi.infrastructure.web.request.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,22 +41,19 @@ import java.util.List;
 public class FornadaController {
 
     @Autowired
-    private final FornadaService fornadaService;
-
-    @Autowired
     private final FornadaDaVezService fornadaDaVezService;
 
-    @Autowired
-    private final PedidoFornadaService pedidoFornadaService;
+    private final FornadasUseCases fornadasUseCases;
+    private final PedidoFornadaUseCases pedidoFornadaUseCases;
 
     @Autowired
     private final ProdutoFornadaService produtoFornadaService;
 
-    public FornadaController(FornadaService fornadaService, FornadaDaVezService fornadaDaVezService, PedidoFornadaService pedidoFornadaService, ProdutoFornadaService produtoFornadaService) {
-        this.fornadaService = fornadaService;
+    public FornadaController(FornadaDaVezService fornadaDaVezService, ProdutoFornadaService produtoFornadaService, FornadasUseCases fornadasUseCases, PedidoFornadaUseCases pedidoFornadaUseCases) {
         this.fornadaDaVezService = fornadaDaVezService;
-        this.pedidoFornadaService = pedidoFornadaService;
         this.produtoFornadaService = produtoFornadaService;
+        this.fornadasUseCases = fornadasUseCases;
+        this.pedidoFornadaUseCases = pedidoFornadaUseCases;
     }
 
     // ------------ FORNADA -----------------
@@ -67,7 +65,14 @@ public class FornadaController {
     })
     @PostMapping
     public ResponseEntity<Fornada> criarFornada(@RequestBody @Valid FornadaRequestDTO request) {
-        return ResponseEntity.status(201).body(fornadaService.criarFornada(request));
+        var created = fornadasUseCases.criar(request.id(), request.dataInicio(), request.dataFim());
+        // manter resposta como Entity JPA no contrato atual
+        var response = new Fornada();
+        response.setId(created.getId());
+        response.setDataInicio(created.getDataInicio());
+        response.setDataFim(created.getDataFim());
+        response.setAtivo(Boolean.TRUE.equals(created.getAtivo()));
+        return ResponseEntity.status(201).body(response);
     }
 
     @Operation(summary = "Lista todas as fornadas")
@@ -77,7 +82,11 @@ public class FornadaController {
     })
     @GetMapping
     public ResponseEntity<List<Fornada>> listarFornadas() {
-        var list = fornadaService.listarFornada();
+        var list = fornadasUseCases.listarAtivas().stream().map(d -> {
+            var e = new Fornada();
+            e.setId(d.getId()); e.setDataInicio(d.getDataInicio()); e.setDataFim(d.getDataFim()); e.setAtivo(Boolean.TRUE.equals(d.getAtivo()));
+            return e;
+        }).toList();
         System.out.println("[BACK][FORNADAS][ATIVAS] total=" + (list != null ? list.size() : 0));
         if (list != null) list.forEach(f -> System.out.println("  id="+f.getId()+" ini="+f.getDataInicio()+" fim="+f.getDataFim()+" ativo="+f.isAtivo()));
         return ResponseEntity.status(200).body(list);
@@ -86,7 +95,11 @@ public class FornadaController {
     @Operation(summary = "Lista todas as fornadas (ativas e encerradas)")
     @GetMapping("/todas")
     public ResponseEntity<List<Fornada>> listarTodasFornadas() {
-        var list = fornadaService.listarTodasFornadas();
+        var list = fornadasUseCases.listarTodas().stream().map(d -> {
+            var e = new Fornada();
+            e.setId(d.getId()); e.setDataInicio(d.getDataInicio()); e.setDataFim(d.getDataFim()); e.setAtivo(Boolean.TRUE.equals(d.getAtivo()));
+            return e;
+        }).toList();
         System.out.println("[BACK][FORNADAS][TODAS] total=" + (list != null ? list.size() : 0));
         if (list != null) list.forEach(f -> System.out.println("  id="+f.getId()+" ini="+f.getDataInicio()+" fim="+f.getDataFim()+" ativo="+f.isAtivo()));
         return ResponseEntity.ok(list);
@@ -95,10 +108,10 @@ public class FornadaController {
     @Operation(summary = "Lista meses/anos que tiveram fornadas (para filtro)")
     @GetMapping("/meses-anos")
     public ResponseEntity<List<MesAnoResponse>> listarMesesAnosDisponiveis() {
-        var proj = fornadaService
-                .listarTodasFornadas() // incluir ativas e encerradas para o filtro
+        var proj = fornadasUseCases
+                .listarTodas() // incluir ativas e encerradas para o filtro
                 .stream()
-                .map(f -> new MesAnoResponse(f.getDataInicio().getYear(), f.getDataInicio().getMonthValue()))
+                .map(d -> new MesAnoResponse(d.getDataInicio().getYear(), d.getDataInicio().getMonthValue()))
                 .distinct()
                 .sorted((a, b) -> {
                     int byYear = b.ano().compareTo(a.ano());
@@ -116,7 +129,11 @@ public class FornadaController {
             @RequestParam("ano") Integer ano,
             @RequestParam("mes") Integer mes
     ) {
-        var fornadas = fornadaService.listarFornadasPorMesAno(ano, mes);
+        var fornadas = fornadasUseCases.listarPorMesAno(ano, mes).stream().map(d -> {
+            var e = new Fornada();
+            e.setId(d.getId()); e.setDataInicio(d.getDataInicio()); e.setDataFim(d.getDataFim()); e.setAtivo(Boolean.TRUE.equals(d.getAtivo()));
+            return e;
+        }).toList();
         List<FornadaComItensResponse> resposta = new ArrayList<>();
         for (Fornada f : fornadas) {
             var itens = fornadaDaVezService.buscarProdutosPorFornadaId(f.getId());
@@ -128,11 +145,17 @@ public class FornadaController {
     @Operation(summary = "Lista produtos da fornada mais recente (sem imagens)")
     @GetMapping("/mais-recente/produtos")
     public ResponseEntity<List<ProdutoFornadaDaVezResponse>> listarProdutosDaFornadaMaisRecente() {
-        var fornadaOpt = fornadaService.buscarFornadaMaisRecente();
-        if (fornadaOpt.isEmpty()) {
+        var fornadaList = fornadasUseCases.buscarMaisRecente();
+        if (fornadaList.isEmpty()) {
             return ResponseEntity.ok(List.of());
         }
-        var itens = fornadaDaVezService.buscarProdutosPorFornadaId(fornadaOpt.get().getId());
+        var d = fornadaList.get(0);
+        var e = new Fornada();
+        e.setId(d.getId());
+        e.setDataInicio(d.getDataInicio());
+        e.setDataFim(d.getDataFim());
+        e.setAtivo(Boolean.TRUE.equals(d.getAtivo()));
+        var itens = fornadaDaVezService.buscarProdutosPorFornadaId(e.getId());
         return ResponseEntity.ok(ProdutoFornadaDaVezResponse.toProdutoFornadaDaVezResonse(itens));
     }
 
@@ -143,7 +166,11 @@ public class FornadaController {
     })
     @GetMapping("/proxima")
     public ResponseEntity<Fornada> buscarProximaFornada() {
-        var fornadaOpt = fornadaService.buscarProximaFornada();
+        var fornadaOpt = fornadasUseCases.buscarProxima().map(d -> {
+            var e = new Fornada();
+            e.setId(d.getId()); e.setDataInicio(d.getDataInicio()); e.setDataFim(d.getDataFim()); e.setAtivo(Boolean.TRUE.equals(d.getAtivo()));
+            return e;
+        });
         if (fornadaOpt.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -157,7 +184,10 @@ public class FornadaController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<Fornada> buscarFornada(@PathVariable Integer id) {
-        return ResponseEntity.status(200).body(fornadaService.buscarFornada(id));
+        var d = fornadasUseCases.buscarPorId(id);
+        var e = new Fornada();
+        e.setId(d.getId()); e.setDataInicio(d.getDataInicio()); e.setDataFim(d.getDataFim()); e.setAtivo(Boolean.TRUE.equals(d.getAtivo()));
+        return ResponseEntity.status(200).body(e);
     }
 
     @Operation(summary = "Atualiza uma fornada existente")
@@ -170,8 +200,12 @@ public class FornadaController {
     })
     @PutMapping("/{id}")
     public ResponseEntity<Fornada> atualizarFornada(@PathVariable Integer id, @RequestBody @Valid FornadaRequestDTO request) {
-        fornadaService.atualizarFornada(id, request);
-        Fornada fornada = request.toEntity();
+        var updated = fornadasUseCases.atualizar(id, request.dataInicio(), request.dataFim());
+        var fornada = new Fornada();
+        fornada.setId(updated.getId());
+        fornada.setDataInicio(updated.getDataInicio());
+        fornada.setDataFim(updated.getDataFim());
+        fornada.setAtivo(Boolean.TRUE.equals(updated.getAtivo()));
         return ResponseEntity.status(200).body(fornada);
     }
 
@@ -182,7 +216,7 @@ public class FornadaController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluirFornada(@PathVariable Integer id) {
-        fornadaService.excluirFornada(id);
+        fornadasUseCases.encerrar(id);
         return ResponseEntity.status(204).build();
     }
 
@@ -336,19 +370,24 @@ public class FornadaController {
     public ResponseEntity<PedidoFornada> criarPedidoFornada(
             @RequestBody @Valid PedidoFornadaRequestDTO request
     ) {
-        return ResponseEntity.status(201).body(pedidoFornadaService.criarPedidoFornada(request));
+        var d = pedidoFornadaUseCases.criar(request);
+        return ResponseEntity.status(201).body(PedidoFornadaEntityMapper.toEntity(d));
     }
 
     @Operation(summary = "Lista todos os pedidos de fornada")
     @GetMapping("/pedidos")
     public ResponseEntity<List<PedidoFornada>> listarPedidos() {
-        return ResponseEntity.status(200).body(pedidoFornadaService.listarPedidosFornada());
+        var list = pedidoFornadaUseCases.listar().stream()
+                .map(PedidoFornadaEntityMapper::toEntity)
+                .toList();
+        return ResponseEntity.status(200).body(list);
     }
 
     @Operation(summary = "Busca um pedido de fornada por ID")
     @GetMapping("/pedidos/{id}")
     public ResponseEntity<PedidoFornada> buscarPedido(@PathVariable Integer id) {
-        return ResponseEntity.status(200).body(pedidoFornadaService.buscarPedidoFornada(id));
+        var d = pedidoFornadaUseCases.buscarPorId(id);
+        return ResponseEntity.status(200).body(PedidoFornadaEntityMapper.toEntity(d));
     }
 
     @Operation(summary = "Atualiza um pedido de fornada existente")
@@ -356,13 +395,14 @@ public class FornadaController {
     public ResponseEntity<PedidoFornada> atualizarPedidoFornada(
             @PathVariable Integer id,
             @RequestBody @Valid PedidoFornadaUpdateRequestDTO request) {
-        return ResponseEntity.status(200).body(pedidoFornadaService.atualizarPedidoFornada(id, request));
+        var d = pedidoFornadaUseCases.atualizar(id, request);
+        return ResponseEntity.status(200).body(PedidoFornadaEntityMapper.toEntity(d));
     }
 
     @Operation(summary = "Exclui um pedido de fornada por ID")
     @DeleteMapping("/pedidos/{id}")
     public ResponseEntity<Void> excluirPedidoFornada(@PathVariable Integer id) {
-        pedidoFornadaService.excluirPedidoFornada(id);
+        pedidoFornadaUseCases.excluir(id);
         return ResponseEntity.status(204).build();
     }
 }

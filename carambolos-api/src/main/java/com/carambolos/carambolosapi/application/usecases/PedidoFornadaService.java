@@ -1,5 +1,7 @@
 package com.carambolos.carambolosapi.application.usecases;
 
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.EnderecoEntity;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.UsuarioEntity;
 import com.carambolos.carambolosapi.infrastructure.web.request.PedidoFornadaRequestDTO;
 import com.carambolos.carambolosapi.infrastructure.web.request.PedidoFornadaUpdateRequestDTO;
 import com.carambolos.carambolosapi.application.exception.EntidadeImprocessavelException;
@@ -7,7 +9,6 @@ import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaE
 import com.carambolos.carambolosapi.domain.entity.Endereco;
 import com.carambolos.carambolosapi.domain.entity.FornadaDaVez;
 import com.carambolos.carambolosapi.domain.entity.PedidoFornada;
-import com.carambolos.carambolosapi.domain.entity.Usuario;
 import com.carambolos.carambolosapi.domain.enums.TipoEntregaEnum;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.EnderecoRepository;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.FornadaDaVezRepository;
@@ -53,13 +54,13 @@ public class PedidoFornadaService {
 
         if (request.enderecoId() != null) {
             enderecoRepository.findById(request.enderecoId())
-                    .filter(Endereco::isAtivo)
+                    .filter(EnderecoEntity::isAtivo)
                     .orElseThrow(() -> new EntidadeNaoEncontradaException("Endereço com ID " + request.enderecoId() + " não encontrado."));
         }
 
         if (request.usuarioId() != null) {
             usuarioRepository.findById(request.usuarioId())
-                    .filter(Usuario::isAtivo)
+                    .filter(UsuarioEntity::isAtivo)
                     .orElseThrow(() -> new EntidadeNaoEncontradaException("Usuário com ID " + request.usuarioId() + " não encontrado."));
         }
 

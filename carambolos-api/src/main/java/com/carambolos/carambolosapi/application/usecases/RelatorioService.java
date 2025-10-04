@@ -1,7 +1,9 @@
 package com.carambolos.carambolosapi.application.usecases;
 
 import com.carambolos.carambolosapi.domain.entity.*;
-import com.carambolos.carambolosapi.infrastructure.persistence.entity.MassaEntity;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoFornada;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.UsuarioEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.*;
 import com.lowagie.text.Document;
 import com.lowagie.text.Paragraph;
@@ -49,9 +51,9 @@ public class RelatorioService {
     public byte[] gerarRelatorioInsights() {
         List<PedidoBolo> pedidosBolo = pedidoBoloRepository.findAll();
         List<PedidoFornada> pedidosFornada = pedidoFornadaRepository.findAll();
-        List<Usuario> usuarios = usuarioRepository.findAll();
+        List<UsuarioEntity> usuarioEntities = usuarioRepository.findAll();
         List<Bolo> bolos = boloRepository.findAll();
-        List<MassaEntity> massaEntities = massaRepository.findAll();
+        List<Massa> massas = massaRepository.findAll();
         List<RecheioUnitario> recheios = recheioUnitarioRepository.findAll();
 
         Map<Integer, Long> contagemBolos = pedidosBolo.stream()
@@ -80,9 +82,9 @@ public class RelatorioService {
                     if (boloOpt.isEmpty()) return "Desconhecido";
                     Bolo bolo = boloOpt.get();
 
-                    String saborMassa = massaEntities.stream()
+                    String saborMassa = massas.stream()
                             .filter(m -> m.getId().equals(bolo.getMassa()))
-                            .map(MassaEntity::getSabor)
+                            .map(Massa::getSabor)
                             .findFirst()
                             .orElse("Massa desconhecida");
 
@@ -237,9 +239,9 @@ public class RelatorioService {
                 for (var entry : top3Massas) {
                     Integer massaId = entry.getKey();
                     Long count = entry.getValue();
-                    String nome = massaEntities.stream()
+                    String nome = massas.stream()
                             .filter(m -> m.getId().equals(massaId))
-                            .map(MassaEntity::getSabor)
+                            .map(Massa::getSabor)
                             .findFirst()
                             .orElse("Massa ID " + massaId);
                     doc.add(new Paragraph(i + ". " + nome + " (" + count + " pedidos)"));
@@ -275,9 +277,9 @@ public class RelatorioService {
                 for (var entry : top3UsuariosBolo) {
                     Integer usuarioId = entry.getKey();
                     Long count = entry.getValue();
-                    String nome = usuarios.stream()
+                    String nome = usuarioEntities.stream()
                             .filter(u -> u.getId().equals(usuarioId))
-                            .map(Usuario::getNome)
+                            .map(UsuarioEntity::getNome)
                             .findFirst()
                             .orElse("Usuário ID " + usuarioId);
                     doc.add(new Paragraph(i + ". " + nome + " - " + count + " pedidos"));
@@ -294,9 +296,9 @@ public class RelatorioService {
                 for (var entry : top3UsuariosFornada) {
                     Integer usuarioId = entry.getKey();
                     Long count = entry.getValue();
-                    String nome = usuarios.stream()
+                    String nome = usuarioEntities.stream()
                             .filter(u -> u.getId().equals(usuarioId))
-                            .map(Usuario::getNome)
+                            .map(UsuarioEntity::getNome)
                             .findFirst()
                             .orElse("Usuário ID " + usuarioId);
                     doc.add(new Paragraph(i + ". " + nome + " - " + count + " pedidos"));
