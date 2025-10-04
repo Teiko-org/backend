@@ -4,8 +4,8 @@ import com.carambolos.carambolosapi.infrastructure.web.request.FornadaDaVezReque
 import com.carambolos.carambolosapi.infrastructure.web.request.FornadaDaVezUpdateRequestDTO;
 import com.carambolos.carambolosapi.application.exception.EntidadeImprocessavelException;
 import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaException;
-import com.carambolos.carambolosapi.domain.entity.Fornada;
-import com.carambolos.carambolosapi.domain.entity.FornadaDaVez;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.Fornada;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
 import com.carambolos.carambolosapi.domain.entity.ProdutoFornada;
 import com.carambolos.carambolosapi.domain.projection.ProdutoFornadaDaVezProjection;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.FornadaDaVezRepository;
