@@ -39,12 +39,11 @@ public class MassaMapper {
     }
 
     public MassaResponseDTO toResponse(Massa massaDomain) {
-        MassaResponseDTO responseDto = new MassaResponseDTO();
-
-        responseDto.setId(massaDomain.getId());
-        responseDto.setSabor(massaDomain.getSabor());
-        responseDto.setValor(massaDomain.getValor());
-
+        MassaResponseDTO responseDto = new MassaResponseDTO(
+                massaDomain.getId(),
+                massaDomain.getSabor(),
+                massaDomain.getValor()
+        );
         return responseDto;
     }
 
