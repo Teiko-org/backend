@@ -6,9 +6,12 @@ import com.carambolos.carambolosapi.infrastructure.persistence.entity.MassaEntit
 import java.util.List;
 
 public interface MassaGateway {
-    Massa cadastrarMassa(Massa massa);
+    Massa save(Massa massa);
+    Boolean existsByIdAndIsAtivo(Integer id, Boolean isAtivo);
+    Integer countBySaborAndIdNotAndIsAtivo(String sabor, Integer id, Boolean isAtivo);
     Massa atualizarMassa(Massa massaEntity, Integer id);
     List<Massa> listarMassas();
-    Massa buscarMassaPorId(Integer id);
+    Massa findById(Integer id);
     void deletarMassa(Integer id);
+    int countBySaborAndIsAtivo(String sabor, Boolean isAtivo);
 }

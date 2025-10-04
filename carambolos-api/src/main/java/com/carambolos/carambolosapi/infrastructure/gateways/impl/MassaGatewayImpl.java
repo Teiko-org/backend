@@ -21,26 +21,28 @@ public class MassaGatewayImpl implements MassaGateway {
     }
 
     @Override
-    public Massa cadastrarMassa(Massa massa) {
-        if (repository.countBySaborAndIsAtivo(massa.getSabor(), true) > 0) {
-            throw new EntidadeJaExisteException("Massa com sabor %s já existente".formatted(massa.getSabor()));
-        }
-        MassaEntity massaEntity = mapper.toEntity(massa);
-        MassaEntity massaSalva = repository.save(massaEntity);
+    public Massa save(Massa massa) {
+        MassaEntity entity = mapper.toEntity(massa);
+        MassaEntity massaSalva = repository.save(entity);
         return mapper.toDomain(massaSalva);
     }
 
     @Override
+    public Boolean existsByIdAndIsAtivo(Integer id, Boolean isAtivo) {
+        return repository.existsByIdAndIsAtivo(id, isAtivo);
+    }
+
+    @Override
+    public Integer countBySaborAndIdNotAndIsAtivo(String sabor, Integer id, Boolean isAtivo) {
+        return repository.countBySaborAndIdNotAndIsAtivo(sabor, id, isAtivo);
+    }
+
+    @Override
     public Massa atualizarMassa(Massa massa, Integer id) {
-        if (!repository.existsByIdAndIsAtivo(id, true)) {
-            throw new EntidadeNaoEncontradaException("Massa com id %d não existente".formatted(id));
-        }
-        if (repository.countBySaborAndIdNotAndIsAtivo(massa.getSabor(), id, true) > 0) {
-            throw new EntidadeJaExisteException("Massa com saber %s ja existente".formatted(massa.getSabor()));
-        }
-        MassaEntity massaEntity = mapper.toEntity(massa);
-        massaEntity.setId(id);
-        MassaEntity massaSalva = repository.save(massaEntity);
+        MassaEntity entity = mapper.toEntity(massa);
+        entity.setId(id);
+        MassaEntity massaSalva = repository.save(entity);
+
         return mapper.toDomain(massaSalva);
     }
 
@@ -51,7 +53,7 @@ public class MassaGatewayImpl implements MassaGateway {
     }
 
     @Override
-    public Massa buscarMassaPorId(Integer id) {
+    public Massa findById(Integer id) {
         Optional<MassaEntity> possivelMassa = repository.findById(id)
                 .filter(MassaEntity::getAtivo);
 
@@ -72,5 +74,10 @@ public class MassaGatewayImpl implements MassaGateway {
         MassaEntity massaEntity = possivelMassa.get();
         massaEntity.setAtivo(false);
         repository.save(massaEntity);
+    }
+
+    @Override
+    public int countBySaborAndIsAtivo(String sabor, Boolean isAtivo) {
+        return repository.countBySaborAndIsAtivo(sabor, isAtivo);
     }
 }
