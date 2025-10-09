@@ -2,7 +2,7 @@ package com.carambolos.carambolosapi.infrastructure.gateways.impl;
 
 import com.carambolos.carambolosapi.application.gateways.FornadaGateway;
 import com.carambolos.carambolosapi.domain.entity.Fornada;
-import com.carambolos.carambolosapi.infrastructure.gateways.mapperEntity.FornadaEntityMapper;
+import com.carambolos.carambolosapi.infrastructure.gateways.mapper.FornadasMapper;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.FornadaRepository;
 import org.springframework.stereotype.Component;
 
@@ -20,8 +20,8 @@ public class FornadaGatewayImpl implements FornadaGateway {
 
     @Override
     public Fornada save(Fornada fornada) {
-        var saved = repository.save(FornadaEntityMapper.toEntity(fornada));
-        return FornadaEntityMapper.toDomain(saved);
+        var saved = repository.save(FornadasMapper.toEntity(fornada));
+        return FornadasMapper.toDomain(saved);
     }
 
     @Override
@@ -31,31 +31,31 @@ public class FornadaGatewayImpl implements FornadaGateway {
 
     @Override
     public List<Fornada> findAll() {
-        return repository.findAll().stream().map(FornadaEntityMapper::toDomain).toList();
+        return repository.findAll().stream().map(FornadasMapper::toDomain).toList();
     }
 
     @Override
     public List<Fornada> findAllAtivas() {
-        return repository.findAllByIsAtivoTrueOrderByDataInicioAsc().stream().map(FornadaEntityMapper::toDomain).toList();
+        return repository.findAllByIsAtivoTrueOrderByDataInicioAsc().stream().map(FornadasMapper::toDomain).toList();
     }
 
     @Override
     public List<Fornada> findByDataInicioBetweenOrderByDataInicioAsc(LocalDate inicio, LocalDate fim) {
-        return repository.findByDataInicioBetweenOrderByDataInicioAsc(inicio, fim).stream().map(FornadaEntityMapper::toDomain).toList();
+        return repository.findByDataInicioBetweenOrderByDataInicioAsc(inicio, fim).stream().map(FornadasMapper::toDomain).toList();
     }
 
     @Override
     public Optional<Fornada> findTop1ByAtivaTrueOrderByDataInicioDesc() {
-        return repository.findTop1ByIsAtivoTrueOrderByDataInicioDesc().map(FornadaEntityMapper::toDomain);
-    }
-
-    @Override
-    public List<Fornada> findAllByAtivaTrueOrderByDataInicioAsc() {
-        return repository.findAllByIsAtivoTrueOrderByDataInicioAsc().stream().map(FornadaEntityMapper::toDomain).toList();
+        return repository.findTop1ByIsAtivoTrueOrderByDataInicioDesc().map(FornadasMapper::toDomain);
     }
 
     @Override
     public Optional<Fornada> findById(Integer id) {
-        return repository.findById(id).map(FornadaEntityMapper::toDomain);
+        return repository.findById(id).map(FornadasMapper::toDomain);
+    }
+
+    @Override
+    public List<Fornada> findAllByAtivaTrueOrderByDataInicioAsc() {
+        return repository.findAllByIsAtivoTrueOrderByDataInicioAsc().stream().map(FornadasMapper::toDomain).toList();
     }
 }

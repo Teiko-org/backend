@@ -2,7 +2,7 @@ package com.carambolos.carambolosapi.infrastructure.gateways.impl;
 
 import com.carambolos.carambolosapi.application.gateways.PedidoFornadaGateway;
 import com.carambolos.carambolosapi.domain.entity.PedidoFornada;
-import com.carambolos.carambolosapi.infrastructure.gateways.mapperEntity.PedidoFornadaEntityMapper;
+import com.carambolos.carambolosapi.infrastructure.gateways.mapper.FornadasMapper;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.PedidoFornadaRepository;
 import org.springframework.stereotype.Component;
 
@@ -19,17 +19,17 @@ public class PedidoFornadaGatewayImpl implements PedidoFornadaGateway {
 
     @Override
     public PedidoFornada save(PedidoFornada pedidoFornada) {
-        var saved = repository.save(PedidoFornadaEntityMapper.toEntity(pedidoFornada));
-        return PedidoFornadaEntityMapper.toDomain(saved);
+        var saved = repository.save(FornadasMapper.toEntity(pedidoFornada));
+        return FornadasMapper.toDomain(saved);
     }
 
     @Override
     public Optional<PedidoFornada> findById(Integer id) {
-        return repository.findById(id).map(PedidoFornadaEntityMapper::toDomain);
+        return repository.findById(id).map(FornadasMapper::toDomain);
     }
 
     @Override
     public List<PedidoFornada> findAll() {
-        return repository.findAll().stream().map(PedidoFornadaEntityMapper::toDomain).toList();
+        return repository.findAll().stream().map(FornadasMapper::toDomain).toList();
     }
 }
