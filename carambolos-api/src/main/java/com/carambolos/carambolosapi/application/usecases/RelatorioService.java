@@ -2,6 +2,7 @@ package com.carambolos.carambolosapi.application.usecases;
 
 import com.carambolos.carambolosapi.domain.entity.*;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.MassaEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoFornada;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.UsuarioEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.*;
@@ -53,7 +54,7 @@ public class RelatorioService {
         List<PedidoFornada> pedidosFornada = pedidoFornadaRepository.findAll();
         List<UsuarioEntity> usuarioEntities = usuarioRepository.findAll();
         List<Bolo> bolos = boloRepository.findAll();
-        List<Massa> massas = massaRepository.findAll();
+        List<MassaEntity> massas = massaRepository.findAll();
         List<RecheioUnitario> recheios = recheioUnitarioRepository.findAll();
 
         Map<Integer, Long> contagemBolos = pedidosBolo.stream()
@@ -84,7 +85,7 @@ public class RelatorioService {
 
                     String saborMassa = massas.stream()
                             .filter(m -> m.getId().equals(bolo.getMassa()))
-                            .map(Massa::getSabor)
+                            .map(MassaEntity::getSabor)
                             .findFirst()
                             .orElse("Massa desconhecida");
 
@@ -241,7 +242,7 @@ public class RelatorioService {
                     Long count = entry.getValue();
                     String nome = massas.stream()
                             .filter(m -> m.getId().equals(massaId))
-                            .map(Massa::getSabor)
+                            .map(MassaEntity::getSabor)
                             .findFirst()
                             .orElse("Massa ID " + massaId);
                     doc.add(new Paragraph(i + ". " + nome + " (" + count + " pedidos)"));

@@ -5,13 +5,11 @@ import com.carambolos.carambolosapi.domain.projection.ProdutoFornadaDaVezProject
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.FornadasMapper;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.FornadaDaVezRepository;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-@Component
 public class FornadaDaVezGatewayImpl implements FornadaDaVezGateway {
     private final FornadaDaVezRepository repository;
 

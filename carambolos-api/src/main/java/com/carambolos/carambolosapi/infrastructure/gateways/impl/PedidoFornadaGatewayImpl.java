@@ -4,12 +4,10 @@ import com.carambolos.carambolosapi.application.gateways.PedidoFornadaGateway;
 import com.carambolos.carambolosapi.domain.entity.PedidoFornada;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.FornadasMapper;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.PedidoFornadaRepository;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
 
-@Component
 public class PedidoFornadaGatewayImpl implements PedidoFornadaGateway {
     private final PedidoFornadaRepository repository;
 

@@ -195,7 +195,7 @@ public record ResumoPedidoMensagemResponseDTO (
             }
 
             if (bolo.getMassa() != null) {
-                Massa massa = massaRepository.findById(bolo.getMassa())
+                com.carambolos.carambolosapi.infrastructure.persistence.entity.MassaEntity massa = massaRepository.findById(bolo.getMassa())
                         .orElse(null);
                 if (massa != null) {
                     descricao.append("\nMassa: ").append(massa.getSabor());
