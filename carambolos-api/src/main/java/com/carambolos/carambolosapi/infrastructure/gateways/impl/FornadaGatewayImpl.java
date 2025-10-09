@@ -4,13 +4,11 @@ import com.carambolos.carambolosapi.application.gateways.FornadaGateway;
 import com.carambolos.carambolosapi.domain.entity.Fornada;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.FornadasMapper;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.FornadaRepository;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-@Component
 public class FornadaGatewayImpl implements FornadaGateway {
     private final FornadaRepository repository;
 

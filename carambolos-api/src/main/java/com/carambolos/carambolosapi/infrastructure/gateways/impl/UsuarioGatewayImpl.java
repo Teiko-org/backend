@@ -56,6 +56,15 @@ public class UsuarioGatewayImpl implements UsuarioGateway {
     }
 
     @Override
+    public java.util.Optional<Usuario> findById(Integer id) {
+        UsuarioEntity usuarioExistente = usuarioRepository.findByIdAndIsAtivoTrue(id);
+        if (usuarioExistente != null) {
+            return java.util.Optional.of(usuarioMapper.toDomain(usuarioExistente));
+        }
+        return java.util.Optional.empty();
+    }
+
+    @Override
     public Usuario atualizar(Integer id, Usuario usuario) {
         UsuarioEntity usuarioExistente = usuarioRepository.findByIdAndIsAtivoTrue(id);
 
