@@ -34,3 +34,6 @@ build/
 .idea\
 .idea\
 workspace.xml
+
+### config ###
+*/dev.env
