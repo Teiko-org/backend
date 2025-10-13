@@ -1,5 +1,6 @@
 package com.carambolos.carambolosapi.application.usecases;
 
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.CoberturaEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoFornada;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.EnderecoMapper;
@@ -224,7 +225,7 @@ public class ResumoPedidoService {
             }
 
             String coberturaNome = coberturaRepository.findById(bolo.getCobertura())
-                    .map(Cobertura::getDescricao)
+                    .map(CoberturaEntity::getDescricao)
                     .orElse("Não especificada");
 
             String imagemUrl = "";

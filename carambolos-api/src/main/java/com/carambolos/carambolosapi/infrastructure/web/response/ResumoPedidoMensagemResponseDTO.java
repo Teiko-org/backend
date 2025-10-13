@@ -2,6 +2,7 @@ package com.carambolos.carambolosapi.infrastructure.web.response;
 
 import com.carambolos.carambolosapi.domain.entity.*;
 import com.carambolos.carambolosapi.domain.enums.StatusEnum;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.CoberturaEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.EnderecoEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoFornada;
@@ -187,10 +188,10 @@ public record ResumoPedidoMensagemResponseDTO (
             }
 
             if (bolo.getCobertura() != null) {
-                Cobertura cobertura = coberturaRepository.findById(bolo.getCobertura())
+                CoberturaEntity coberturaEntity = coberturaRepository.findById(bolo.getCobertura())
                         .orElse(null);
-                if (cobertura != null) {
-                    descricao.append("\nCobertura: ").append(cobertura.getDescricao());
+                if (coberturaEntity != null) {
+                    descricao.append("\nCobertura: ").append(coberturaEntity.getDescricao());
                 }
             }
 
