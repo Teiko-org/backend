@@ -5,6 +5,7 @@ import com.carambolos.carambolosapi.domain.enums.StatusEnum;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.EnderecoEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoFornada;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.RecheioUnitarioEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -216,7 +217,7 @@ public record ResumoPedidoMensagemResponseDTO (
                         }
                     } else {
                         if (recheioPedido.getRecheioUnitarioId1() != null) {
-                            RecheioUnitario recheio1 = recheioUnitarioRepository.findById(recheioPedido.getRecheioUnitarioId1())
+                            RecheioUnitarioEntity recheio1 = recheioUnitarioRepository.findById(recheioPedido.getRecheioUnitarioId1())
                                     .orElse(null);
                             if (recheio1 != null) {
                                 descricao.append(recheio1.getSabor());
@@ -224,7 +225,7 @@ public record ResumoPedidoMensagemResponseDTO (
                         }
 
                         if (recheioPedido.getRecheioUnitarioId2() != null) {
-                            RecheioUnitario recheio2 = recheioUnitarioRepository.findById(recheioPedido.getRecheioUnitarioId2())
+                            RecheioUnitarioEntity recheio2 = recheioUnitarioRepository.findById(recheioPedido.getRecheioUnitarioId2())
                                     .orElse(null);
                             if (recheio2 != null) {
                                 descricao.append(" e ").append(recheio2.getSabor());

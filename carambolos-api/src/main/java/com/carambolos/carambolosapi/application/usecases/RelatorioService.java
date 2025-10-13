@@ -1,10 +1,8 @@
 package com.carambolos.carambolosapi.application.usecases;
 
 import com.carambolos.carambolosapi.domain.entity.*;
-import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
-import com.carambolos.carambolosapi.infrastructure.persistence.entity.MassaEntity;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.*;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoFornada;
-import com.carambolos.carambolosapi.infrastructure.persistence.entity.UsuarioEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.*;
 import com.lowagie.text.Document;
 import com.lowagie.text.Paragraph;
@@ -55,7 +53,7 @@ public class RelatorioService {
         List<UsuarioEntity> usuarioEntities = usuarioRepository.findAll();
         List<Bolo> bolos = boloRepository.findAll();
         List<MassaEntity> massas = massaRepository.findAll();
-        List<RecheioUnitario> recheios = recheioUnitarioRepository.findAll();
+        List<RecheioUnitarioEntity> recheios = recheioUnitarioRepository.findAll();
 
         Map<Integer, Long> contagemBolos = pedidosBolo.stream()
                 .collect(Collectors.groupingBy(PedidoBolo::getBoloId, Collectors.counting()));
@@ -98,14 +96,14 @@ public class RelatorioService {
                             if (rp.getRecheioUnitarioId1() != null) {
                                 recheios.stream()
                                         .filter(r -> r.getId().equals(rp.getRecheioUnitarioId1()))
-                                        .map(RecheioUnitario::getSabor)
+                                        .map(RecheioUnitarioEntity::getSabor)
                                         .findFirst()
                                         .ifPresent(sabores::add);
                             }
                             if (rp.getRecheioUnitarioId2() != null) {
                                 recheios.stream()
                                         .filter(r -> r.getId().equals(rp.getRecheioUnitarioId2()))
-                                        .map(RecheioUnitario::getSabor)
+                                        .map(RecheioUnitarioEntity::getSabor)
                                         .findFirst()
                                         .ifPresent(sabores::add);
                             }
@@ -161,7 +159,7 @@ public class RelatorioService {
                 ? "Desconhecido"
                 : recheios.stream()
                 .filter(r -> r.getId().equals(top3Recheios.getFirst().getKey()))
-                .map(RecheioUnitario::getSabor)
+                .map(RecheioUnitarioEntity::getSabor)
                 .findFirst()
                 .orElse("Recheio ID " + top3Recheios.getFirst().getKey());
 
@@ -261,7 +259,7 @@ public class RelatorioService {
                     Long count = entry.getValue();
                     String nome = recheios.stream()
                             .filter(r -> r.getId().equals(recheioId))
-                            .map(RecheioUnitario::getSabor)
+                            .map(RecheioUnitarioEntity::getSabor)
                             .findFirst()
                             .orElse("Recheio ID " + recheioId);
                     doc.add(new Paragraph(i + ". " + nome + " (" + count + " vezes)"));

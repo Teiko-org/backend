@@ -1,6 +1,6 @@
 package com.carambolos.carambolosapi.infrastructure.web.response;
 
-import com.carambolos.carambolosapi.domain.entity.RecheioUnitario;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.RecheioUnitarioEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
@@ -19,17 +19,5 @@ public record RecheioUnitarioResponseDTO(
         @Schema(description = "Valor do recheio unitário", example = "5.75")
         Double valor
 ) {
-    public static RecheioUnitarioResponseDTO toRecheioUnitarioResponse(RecheioUnitario recheioUnitario) {
-        return new RecheioUnitarioResponseDTO(
-                recheioUnitario.getId(),
-                recheioUnitario.getSabor(),
-                recheioUnitario.getDescricao(),
-                recheioUnitario.getValor()
-        );
-    }
-    
-    public static List<RecheioUnitarioResponseDTO> toRecheioUnitarioResponse(List<RecheioUnitario> recheiosUnitarios) {
-        return recheiosUnitarios.stream().map(RecheioUnitarioResponseDTO::toRecheioUnitarioResponse).toList();
-    }
 
 }
