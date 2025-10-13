@@ -13,6 +13,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,12 +43,15 @@ public class EnderecoController {
             @ApiResponse(responseCode = "204", description = "Nenhum endereço encontrado", content = @Content())
     })
     @GetMapping
-    public ResponseEntity<List<EnderecoResponseDTO>> listar() {
-        List<Endereco> enderecos = enderecoUseCase.listar();
+    public ResponseEntity<Page<EnderecoResponseDTO>> listar(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Endereco> enderecos = enderecoUseCase.listar(pageable);
         if (enderecos.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
-        List<EnderecoResponseDTO> enderecosResponse = enderecos.stream().map(EnderecoMapper::toResponseDTO).toList();
+        Page<EnderecoResponseDTO> enderecosResponse = enderecos.map(EnderecoMapper::toResponseDTO);
         return ResponseEntity.status(200).body(enderecosResponse);
     }
 

@@ -10,6 +10,8 @@ import com.carambolos.carambolosapi.infrastructure.gateways.mapper.EnderecoMappe
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.EnderecoEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.EnderecoRepository;
 import com.carambolos.carambolosapi.system.security.EnderecoHasher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -25,8 +27,8 @@ public class EnderecoGatewayImpl implements EnderecoGateway {
     }
 
     @Override
-    public List<Endereco> listar() {
-        List<EnderecoEntity> enderecos = enderecoRepository.findAllByIsAtivoTrue();
+    public Page<Endereco> listar(Pageable pageable) {
+        Page<EnderecoEntity> enderecos = enderecoRepository.findAllByIsAtivoTrue(pageable);
         return enderecoMapper.toDomain(enderecos);
     }
 

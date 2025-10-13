@@ -4,6 +4,7 @@ import com.carambolos.carambolosapi.domain.entity.Endereco;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.EnderecoEntity;
 import com.carambolos.carambolosapi.infrastructure.web.request.EnderecoRequestDTO;
 import com.carambolos.carambolosapi.infrastructure.web.response.EnderecoResponseDTO;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -46,6 +47,10 @@ public class EnderecoMapper {
 
     public List<Endereco> toDomain(List<EnderecoEntity> enderecoEntity) {
         return enderecoEntity.stream().map(this::toDomain).toList();
+    }
+
+    public Page<Endereco> toDomain(Page<EnderecoEntity> page) {
+        return page.map(this::toDomain);
     }
 
     public static EnderecoResponseDTO toResponseDTO(Endereco endereco) {

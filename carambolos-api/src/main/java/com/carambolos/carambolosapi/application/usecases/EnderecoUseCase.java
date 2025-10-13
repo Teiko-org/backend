@@ -2,6 +2,8 @@ package com.carambolos.carambolosapi.application.usecases;
 
 import com.carambolos.carambolosapi.application.gateways.EnderecoGateway;
 import com.carambolos.carambolosapi.domain.entity.Endereco;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -12,8 +14,8 @@ public class EnderecoUseCase {
         this.enderecoGateway = enderecoGateway;
     }
 
-    public List<Endereco> listar() {
-        return enderecoGateway.listar();
+    public Page<Endereco> listar(Pageable pageable) {
+        return enderecoGateway.listar(pageable);
     }
 
     public List<Endereco> listarPorUsuario(Integer usuarioId) {
