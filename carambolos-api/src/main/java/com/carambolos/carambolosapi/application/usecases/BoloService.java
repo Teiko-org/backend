@@ -7,6 +7,7 @@ import com.carambolos.carambolosapi.domain.projection.RecheioExclusivoProjection
 import com.carambolos.carambolosapi.application.exception.EntidadeJaExisteException;
 import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.domain.projection.RecheioPedidoProjection;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.RecheioUnitarioEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.CoberturaEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,57 +134,6 @@ public class BoloService {
             return;
         }
         throw new EntidadeNaoEncontradaException("Bolo com id %d não encontrado".formatted(id));
-    }
-
-    public RecheioUnitario cadastrarRecheioUnitario(RecheioUnitario recheioUnitario) {
-        if (recheioUnitarioRepository.countBySaborIgnoreCaseAndIsAtivo(recheioUnitario.getSabor(), true) > 0) {
-            throw new EntidadeJaExisteException("Recheio com o sabor %s já existe".formatted(recheioUnitario.getSabor()));
-        }
-        return recheioUnitarioRepository.save(recheioUnitario);
-    }
-
-    public List<RecheioUnitario> listarRecheiosUnitarios() {
-        return recheioUnitarioRepository.findAll().stream().filter(RecheioUnitario::getAtivo).toList();
-    }
-
-    public RecheioUnitario buscarPorId(Integer id) {
-        return recheioUnitarioRepository.findById(id)
-                .filter(RecheioUnitario::getAtivo)
-                .orElseThrow(() -> new EntidadeNaoEncontradaException("Recheio com o id %d não encontrado".formatted(id)));
-    }
-
-    public RecheioUnitario atualizarRecheioUnitario(RecheioUnitario recheioUnitario, Integer id) {
-        RecheioUnitario recheioExistente = recheioUnitarioRepository.findById(id)
-                .orElseThrow(() -> new EntidadeNaoEncontradaException("Recheio com o id %d não encontrado".formatted(id)));
-
-        if (recheioUnitarioRepository.countBySaborIgnoreCaseAndIdNotAndIsAtivo(recheioUnitario.getSabor(), id, true) > 0) {
-            throw new EntidadeJaExisteException("Recheio com o sabor %s já existe".formatted(recheioUnitario.getSabor()));
-        }
-
-        if (recheioUnitario.getSabor() != null) {
-            recheioExistente.setSabor(recheioUnitario.getSabor());
-        }
-        if (recheioUnitario.getDescricao() != null) {
-            recheioExistente.setDescricao(recheioUnitario.getDescricao());
-        }
-        if (recheioUnitario.getValor() != null) {
-            recheioExistente.setValor(recheioUnitario.getValor());
-        }
-
-        recheioExistente.setId(id);
-
-        return recheioUnitarioRepository.save(recheioExistente);
-    }
-
-    public void deletarRecheioUnitario(Integer id) {
-        Optional<RecheioUnitario> possivelRecheio = recheioUnitarioRepository.findById(id)
-                .filter(RecheioUnitario::getAtivo);
-        if (possivelRecheio.isEmpty()) {
-            throw new EntidadeNaoEncontradaException("Recheio com id %d não existe".formatted(id));
-        }
-        RecheioUnitario recheio = possivelRecheio.get();
-        recheio.setAtivo(false);
-        recheioUnitarioRepository.save(recheio);
     }
 
     public RecheioExclusivoProjection cadastrarRecheioExclusivo(RecheioExclusivo recheioExclusivo) {

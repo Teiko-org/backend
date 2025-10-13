@@ -1,18 +1,15 @@
 package com.carambolos.carambolosapi.infrastructure.web.controllers;
 
-import com.carambolos.carambolosapi.application.usecases.CoberturaUseCase;
-import com.carambolos.carambolosapi.application.usecases.MassaUseCase;
+import com.carambolos.carambolosapi.application.usecases.*;
 import com.carambolos.carambolosapi.domain.entity.*;
 import com.carambolos.carambolosapi.domain.enums.FormatoEnum;
 import com.carambolos.carambolosapi.domain.enums.TamanhoEnum;
 import com.carambolos.carambolosapi.domain.projection.DetalheBoloProjection;
 import com.carambolos.carambolosapi.domain.projection.RecheioExclusivoProjection;
 import com.carambolos.carambolosapi.domain.projection.RecheioPedidoProjection;
-import com.carambolos.carambolosapi.application.usecases.BoloService;
-import com.carambolos.carambolosapi.application.usecases.PedidoBoloService;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.CoberturaMapper;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.MassaMapper;
-import com.carambolos.carambolosapi.infrastructure.persistence.entity.CoberturaEntity;
+import com.carambolos.carambolosapi.infrastructure.gateways.mapper.RecheioUnitarioMapper;
 import com.carambolos.carambolosapi.infrastructure.web.request.*;
 import com.carambolos.carambolosapi.infrastructure.web.response.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,10 +23,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-
-import static com.carambolos.carambolosapi.infrastructure.web.request.RecheioUnitarioRequestDTO.toRecheioUnitario;
 
 @RestController
 @RequestMapping("/bolos")
@@ -41,16 +35,24 @@ public class BoloController {
     private final MassaMapper massaMapper;
     private final CoberturaMapper coberturaMapper;
 
+
+    private final RecheioUnitarioUseCase recheioUnitarioUseCase;
+    private final RecheioUnitarioMapper recheioUnitarioMapper;
+
     public BoloController(
             MassaUseCase massaUseCase,
             CoberturaUseCase coberturaUseCase,
             MassaMapper massaMapper,
-            CoberturaMapper coberturaMapper
+            CoberturaMapper coberturaMapper,
+            RecheioUnitarioUseCase recheioUnitarioUseCase,
+            RecheioUnitarioMapper recheioUnitarioMapper
     ) {
         this.massaUseCase = massaUseCase;
         this.coberturaUseCase = coberturaUseCase;
         this.massaMapper = massaMapper;
         this.coberturaMapper = coberturaMapper;
+        this.recheioUnitarioUseCase = recheioUnitarioUseCase;
+        this.recheioUnitarioMapper = recheioUnitarioMapper;
     }
 
     @Autowired
@@ -172,10 +174,10 @@ public class BoloController {
     public ResponseEntity<RecheioUnitarioResponseDTO> cadastrarRecheioUnitario(
             @Valid @RequestBody RecheioUnitarioRequestDTO request
     ) {
-        RecheioUnitario recheioUnitario = toRecheioUnitario(request);
-        RecheioUnitario recheioSalvo = boloService.cadastrarRecheioUnitario(recheioUnitario);
+        RecheioUnitario recheioUnitario = recheioUnitarioMapper.toDomain(request);
+        RecheioUnitario recheioSalvo = recheioUnitarioUseCase.cadastrarRecheioUnitario(recheioUnitario);
         return ResponseEntity.status(201).body(
-                RecheioUnitarioResponseDTO.toRecheioUnitarioResponse(recheioSalvo)
+                recheioUnitarioMapper.toResponse(recheioSalvo)
         );
     }
 
@@ -190,9 +192,9 @@ public class BoloController {
     })
     @GetMapping("/recheio-unitario")
     public ResponseEntity<List<RecheioUnitarioResponseDTO>> listarRecheioUnitario() {
-        List<RecheioUnitario> recheiosUnitarios = boloService.listarRecheiosUnitarios();
+        List<RecheioUnitario> recheiosUnitarios = recheioUnitarioUseCase.listarRecheiosUnitarios();
         return ResponseEntity.status(200).body(
-                RecheioUnitarioResponseDTO.toRecheioUnitarioResponse(recheiosUnitarios)
+                recheioUnitarioMapper.toResponse(recheiosUnitarios)
         );
     }
 
@@ -209,9 +211,9 @@ public class BoloController {
     public ResponseEntity<RecheioUnitarioResponseDTO> buscarRecheioUnitarioPorId(
             @PathVariable Integer id
     ) {
-        RecheioUnitario recheioUnitario = boloService.buscarPorId(id);
+        RecheioUnitario recheioUnitario = recheioUnitarioUseCase.buscarPorId(id);
         return ResponseEntity.status(200).body(
-                RecheioUnitarioResponseDTO.toRecheioUnitarioResponse(recheioUnitario)
+                recheioUnitarioMapper.toResponse(recheioUnitario)
         );
     }
 
@@ -230,10 +232,10 @@ public class BoloController {
             @RequestBody RecheioUnitarioRequestDTO request,
             @PathVariable Integer id
     ) {
-        RecheioUnitario recheioUnitario = RecheioUnitarioRequestDTO.toRecheioUnitario(request);
-        RecheioUnitario recheioCadastrado = boloService.atualizarRecheioUnitario(recheioUnitario, id);
+        RecheioUnitario recheioUnitario = recheioUnitarioMapper.toDomain(request);
+        RecheioUnitario recheioCadastrado = recheioUnitarioUseCase.atualizarRecheioUnitario(recheioUnitario, id);
         return ResponseEntity.status(200).body(
-                RecheioUnitarioResponseDTO.toRecheioUnitarioResponse(recheioCadastrado)
+                recheioUnitarioMapper.toResponse(recheioCadastrado)
         );
     }
 
@@ -247,7 +249,7 @@ public class BoloController {
     public ResponseEntity<Void> deletarRecheioUnitario(
             @PathVariable Integer id
     ) {
-        boloService.deletarRecheioUnitario(id);
+        recheioUnitarioUseCase.deletarRecheioUnitario(id);
         return ResponseEntity.status(204).build();
     }
 

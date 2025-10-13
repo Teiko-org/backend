@@ -1,6 +1,6 @@
 package com.carambolos.carambolosapi.infrastructure.web.request;
 
-import com.carambolos.carambolosapi.domain.entity.RecheioUnitario;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.RecheioUnitarioEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -21,12 +21,4 @@ public record RecheioUnitarioRequestDTO(
         @Schema(description = "Valor do recheio unitário", example = "5.50", required = true)
         Double valor
 ) {
-    public static RecheioUnitario toRecheioUnitario(RecheioUnitarioRequestDTO request) {
-        RecheioUnitario recheioUnitario = new RecheioUnitario();
-        recheioUnitario.setSabor(request.sabor);
-        recheioUnitario.setDescricao(request.descricao);
-        recheioUnitario.setValor(request.valor);
-
-        return recheioUnitario;
-    }
 }
