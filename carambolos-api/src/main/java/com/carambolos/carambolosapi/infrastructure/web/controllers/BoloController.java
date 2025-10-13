@@ -1,15 +1,13 @@
 package com.carambolos.carambolosapi.infrastructure.web.controllers;
 
-import com.carambolos.carambolosapi.application.usecases.MassaUseCase;
-import com.carambolos.carambolosapi.application.usecases.RecheioUnitarioUseCase;
+import com.carambolos.carambolosapi.application.usecases.*;
 import com.carambolos.carambolosapi.domain.entity.*;
 import com.carambolos.carambolosapi.domain.enums.FormatoEnum;
 import com.carambolos.carambolosapi.domain.enums.TamanhoEnum;
 import com.carambolos.carambolosapi.domain.projection.DetalheBoloProjection;
 import com.carambolos.carambolosapi.domain.projection.RecheioExclusivoProjection;
 import com.carambolos.carambolosapi.domain.projection.RecheioPedidoProjection;
-import com.carambolos.carambolosapi.application.usecases.BoloService;
-import com.carambolos.carambolosapi.application.usecases.PedidoBoloService;
+import com.carambolos.carambolosapi.infrastructure.gateways.mapper.CoberturaMapper;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.MassaMapper;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.RecheioUnitarioMapper;
 import com.carambolos.carambolosapi.infrastructure.web.request.*;
@@ -33,15 +31,26 @@ import java.util.List;
 @SecurityRequirement(name = "Bearer")
 public class BoloController {
     private final MassaUseCase massaUseCase;
+    private final CoberturaUseCase coberturaUseCase;
     private final MassaMapper massaMapper;
+    private final CoberturaMapper coberturaMapper;
 
 
     private final RecheioUnitarioUseCase recheioUnitarioUseCase;
     private final RecheioUnitarioMapper recheioUnitarioMapper;
 
-    public BoloController(MassaUseCase massaUseCase, MassaMapper massaMapper, RecheioUnitarioUseCase recheioUnitarioUseCase, RecheioUnitarioMapper recheioUnitarioMapper) {
+    public BoloController(
+            MassaUseCase massaUseCase,
+            CoberturaUseCase coberturaUseCase,
+            MassaMapper massaMapper,
+            CoberturaMapper coberturaMapper,
+            RecheioUnitarioUseCase recheioUnitarioUseCase,
+            RecheioUnitarioMapper recheioUnitarioMapper
+    ) {
         this.massaUseCase = massaUseCase;
+        this.coberturaUseCase = coberturaUseCase;
         this.massaMapper = massaMapper;
+        this.coberturaMapper = coberturaMapper;
         this.recheioUnitarioUseCase = recheioUnitarioUseCase;
         this.recheioUnitarioMapper = recheioUnitarioMapper;
     }
@@ -441,9 +450,9 @@ public class BoloController {
     public ResponseEntity<CoberturaResponseDTO> cadastrarCobertura(
             @RequestBody CoberturaRequestDTO request
     ) {
-        Cobertura cobertura = CoberturaRequestDTO.toCobertura(request);
-        boloService.cadastrarCobertura(cobertura);
-        return ResponseEntity.status(201).body(CoberturaResponseDTO.toResponse(cobertura));
+        Cobertura cobertura = coberturaMapper.toDomain(request);
+        Cobertura coberturaSalva = coberturaUseCase.cadastrarCobertura(cobertura);
+        return ResponseEntity.status(201).body(coberturaMapper.toResponse(coberturaSalva));
     }
 
     @Operation(summary = "Atualizar cobertura", description = "Atualiza uma cobertura existente pelo ID")
@@ -461,9 +470,9 @@ public class BoloController {
             @PathVariable Integer id,
             @RequestBody CoberturaRequestDTO request
     ) {
-        Cobertura cobertura = CoberturaRequestDTO.toCobertura(request);
-        CoberturaResponseDTO response = CoberturaResponseDTO.toResponse(
-                boloService.atualizarCobertura(cobertura, id)
+        Cobertura cobertura = coberturaMapper.toDomain(request);
+        CoberturaResponseDTO response = coberturaMapper.toResponse(
+                coberturaUseCase.atualizarCobertura(cobertura, id)
         );
         return ResponseEntity.status(200).body(response);
     }
@@ -479,11 +488,11 @@ public class BoloController {
     })
     @GetMapping("/cobertura")
     public ResponseEntity<List<CoberturaResponseDTO>> listarCoberturas() {
-        List<Cobertura> coberturas = boloService.listarCoberturas();
+        List<Cobertura> coberturas = coberturaUseCase.listarCoberturas();
         if (coberturas.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
-        return ResponseEntity.status(200).body(CoberturaResponseDTO.toResponse(coberturas));
+        return ResponseEntity.status(200).body(coberturaMapper.toResponse(coberturas));
     }
 
     @Operation(summary = "Buscar cobertura por ID", description = "Retorna uma cobertura específica com base no ID")
@@ -499,8 +508,8 @@ public class BoloController {
     public ResponseEntity<CoberturaResponseDTO> buscarCoberturaPorId(
             @PathVariable Integer id
     ) {
-        Cobertura cobertura = boloService.buscarCoberturaPorId(id);
-        return ResponseEntity.status(200).body(CoberturaResponseDTO.toResponse(cobertura));
+        Cobertura coberturaEntity = coberturaUseCase.buscarCoberturaPorId(id);
+        return ResponseEntity.status(200).body(coberturaMapper.toResponse(coberturaEntity));
     }
 
     @Operation(summary = "Deletar cobertura", description = "Remove uma cobertura pelo ID")
@@ -516,7 +525,7 @@ public class BoloController {
     public ResponseEntity<Void> deletarCobertura(
             @PathVariable Integer id
     ) {
-        boloService.deletarCobertura(id);
+        coberturaUseCase.deletarCobertura(id);
         return ResponseEntity.status(204).build();
     }
 
@@ -534,7 +543,7 @@ public class BoloController {
             @Valid @RequestBody MassaRequestDTO request
     ) {
         Massa massaDomain = massaMapper.toMassa(request);
-        Massa massaCadastrada =  massaUseCase.cadastrarMassa(massaDomain);
+        Massa massaCadastrada = massaUseCase.cadastrarMassa(massaDomain);
         return ResponseEntity.status(201).body(
                 massaMapper.toResponse(massaCadastrada)
         );

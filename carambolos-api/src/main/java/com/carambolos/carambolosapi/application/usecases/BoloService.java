@@ -8,6 +8,7 @@ import com.carambolos.carambolosapi.application.exception.EntidadeJaExisteExcept
 import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.domain.projection.RecheioPedidoProjection;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.RecheioUnitarioEntity;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.CoberturaEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -259,71 +260,6 @@ public class BoloService {
         throw new EntidadeNaoEncontradaException("Recheio exclusivo com id %s não encontrado".formatted(id));
     }
 
-    public Cobertura cadastrarCobertura(Cobertura cobertura) {
-        String cor = cobertura.getCor();
-        String descricao = cobertura.getDescricao();
-        Integer coberturasExistentes = coberturaRepository.countByCorAndDescricaoIgnoreCaseAndIsAtivoTrue(cor, descricao);
-
-        if (coberturasExistentes > 0) {
-            throw new EntidadeJaExisteException("Cobertura com a cor %s e descricao %s ja existente".formatted(cor, descricao));
-        }
-
-        return coberturaRepository.save(cobertura);
-    }
-
-    public Cobertura atualizarCobertura(Cobertura novaCobertura, Integer id) {
-        Optional<Cobertura> possivelCobertura = coberturaRepository.findById(id)
-                .filter(Cobertura::getAtivo);
-        if (possivelCobertura.isPresent()) {
-            String cor = novaCobertura.getCor();
-            String descricao = novaCobertura.getDescricao();
-
-            Integer coberturasExistentes = coberturaRepository.countByCorAndDescricaoAndIdNotAndIsAtivoTrue(
-                    cor,
-                    descricao,
-                    id
-            );
-
-            if (coberturasExistentes > 0) {
-                throw new EntidadeJaExisteException("Cobertura com cor %s e descricao %s ja existe".formatted(cor, descricao));
-            }
-
-            Cobertura cobertura = possivelCobertura.get();
-            return coberturaRepository.save(
-                    verificarCampos(cobertura, novaCobertura)
-            );
-        }
-
-        throw new EntidadeNaoEncontradaException("Cobertura com id %d não encontrada".formatted(id));
-    }
-
-    public List<Cobertura> listarCoberturas() {
-        return coberturaRepository.findAll().stream().filter(Cobertura::getAtivo).toList();
-    }
-
-    public Cobertura buscarCoberturaPorId(Integer id) {
-        Optional<Cobertura> possivelCobertura = coberturaRepository.findById(id)
-                .filter(Cobertura::getAtivo);
-
-        if (possivelCobertura.isEmpty()) {
-            throw new EntidadeJaExisteException("Cobertura com id %d não encontrar".formatted(id));
-        }
-
-        return possivelCobertura.get();
-    }
-
-    public void deletarCobertura(Integer id) {
-        Optional<Cobertura> possivelCobertura = coberturaRepository.findById(id)
-                .filter(Cobertura::getAtivo);
-        if (possivelCobertura.isEmpty()) {
-            throw new EntidadeNaoEncontradaException("Cobertura com o id %d não encontrada".formatted(id));
-        }
-
-        Cobertura cobertura = possivelCobertura.get();
-        cobertura.setAtivo(false);
-        coberturaRepository.save(cobertura);
-    }
-
     private RecheioExclusivo verificarCampos(RecheioExclusivo recheioExclusivo, RecheioExclusivo recheioExistente) {
         if (recheioExclusivo.getNome() != null) {
             recheioExistente.setNome(recheioExclusivo.getNome());
@@ -346,17 +282,5 @@ public class BoloService {
         ) {
             throw new EntidadeImprocessavelException("Requisição apenas pode ter o recheio exclusivo nulo ou recheios unitarios nulos");
         }
-    }
-
-    private Cobertura verificarCampos(Cobertura cobertura, Cobertura novaCobertura) {
-        if (novaCobertura.getCor() == null) {
-            novaCobertura.setCor(cobertura.getCor());
-        }
-
-        if (novaCobertura.getDescricao() == null) {
-            novaCobertura.setDescricao(cobertura.getDescricao());
-        }
-        novaCobertura.setId(cobertura.getId());
-        return novaCobertura;
     }
 }
