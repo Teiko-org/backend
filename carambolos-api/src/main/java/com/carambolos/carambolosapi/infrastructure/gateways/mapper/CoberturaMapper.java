@@ -10,6 +10,9 @@ import java.util.List;
 public class CoberturaMapper {
     public CoberturaEntity toEntity(Cobertura cobertura) {
         CoberturaEntity entity = new CoberturaEntity();
+        if (cobertura.getId() != null) {
+            entity.setId(cobertura.getId());
+        }
         entity.setCor(cobertura.getCor());
         entity.setDescricao(cobertura.getDescricao());
         entity.setAtivo(cobertura.getAtivo());

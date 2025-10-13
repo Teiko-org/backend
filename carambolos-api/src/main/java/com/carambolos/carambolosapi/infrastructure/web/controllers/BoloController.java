@@ -448,9 +448,9 @@ public class BoloController {
     public ResponseEntity<CoberturaResponseDTO> cadastrarCobertura(
             @RequestBody CoberturaRequestDTO request
     ) {
-        Cobertura Cobertura = coberturaMapper.toDomain(request);
-        coberturaUseCase.cadastrarCobertura(Cobertura);
-        return ResponseEntity.status(201).body(coberturaMapper.toResponse(Cobertura));
+        Cobertura cobertura = coberturaMapper.toDomain(request);
+        Cobertura coberturaSalva = coberturaUseCase.cadastrarCobertura(cobertura);
+        return ResponseEntity.status(201).body(coberturaMapper.toResponse(coberturaSalva));
     }
 
     @Operation(summary = "Atualizar cobertura", description = "Atualiza uma cobertura existente pelo ID")
