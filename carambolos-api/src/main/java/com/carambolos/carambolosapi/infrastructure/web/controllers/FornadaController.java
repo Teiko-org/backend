@@ -7,13 +7,13 @@ import com.carambolos.carambolosapi.infrastructure.web.response.ProdutoFornadaRe
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.Fornada;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoFornada;
-import com.carambolos.carambolosapi.infrastructure.gateways.mapperEntity.PedidoFornadaEntityMapper;
+ 
 import com.carambolos.carambolosapi.domain.entity.ProdutoFornada;
 import com.carambolos.carambolosapi.domain.projection.ProdutoFornadaDaVezProjection;
-import com.carambolos.carambolosapi.application.usecases.FornadaDaVezService;
+import com.carambolos.carambolosapi.application.usecases.FornadaDaVezUseCases;
 import com.carambolos.carambolosapi.application.usecases.FornadasUseCases;
 import com.carambolos.carambolosapi.application.usecases.PedidoFornadaUseCases;
-import com.carambolos.carambolosapi.application.usecases.ProdutoFornadaService;
+import com.carambolos.carambolosapi.application.usecases.ProdutoFornadaUseCases;
 import com.carambolos.carambolosapi.infrastructure.web.request.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -41,15 +41,15 @@ import java.util.List;
 public class FornadaController {
 
     @Autowired
-    private final FornadaDaVezService fornadaDaVezService;
+    private final FornadaDaVezUseCases fornadaDaVezService;
 
     private final FornadasUseCases fornadasUseCases;
     private final PedidoFornadaUseCases pedidoFornadaUseCases;
 
     @Autowired
-    private final ProdutoFornadaService produtoFornadaService;
+    private final ProdutoFornadaUseCases produtoFornadaService;
 
-    public FornadaController(FornadaDaVezService fornadaDaVezService, ProdutoFornadaService produtoFornadaService, FornadasUseCases fornadasUseCases, PedidoFornadaUseCases pedidoFornadaUseCases) {
+    public FornadaController(FornadaDaVezUseCases fornadaDaVezService, ProdutoFornadaUseCases produtoFornadaService, FornadasUseCases fornadasUseCases, PedidoFornadaUseCases pedidoFornadaUseCases) {
         this.fornadaDaVezService = fornadaDaVezService;
         this.produtoFornadaService = produtoFornadaService;
         this.fornadasUseCases = fornadasUseCases;
@@ -87,8 +87,7 @@ public class FornadaController {
             e.setId(d.getId()); e.setDataInicio(d.getDataInicio()); e.setDataFim(d.getDataFim()); e.setAtivo(Boolean.TRUE.equals(d.getAtivo()));
             return e;
         }).toList();
-        System.out.println("[BACK][FORNADAS][ATIVAS] total=" + (list != null ? list.size() : 0));
-        if (list != null) list.forEach(f -> System.out.println("  id="+f.getId()+" ini="+f.getDataInicio()+" fim="+f.getDataFim()+" ativo="+f.isAtivo()));
+        
         return ResponseEntity.status(200).body(list);
     }
 
@@ -100,8 +99,7 @@ public class FornadaController {
             e.setId(d.getId()); e.setDataInicio(d.getDataInicio()); e.setDataFim(d.getDataFim()); e.setAtivo(Boolean.TRUE.equals(d.getAtivo()));
             return e;
         }).toList();
-        System.out.println("[BACK][FORNADAS][TODAS] total=" + (list != null ? list.size() : 0));
-        if (list != null) list.forEach(f -> System.out.println("  id="+f.getId()+" ini="+f.getDataInicio()+" fim="+f.getDataFim()+" ativo="+f.isAtivo()));
+        
         return ResponseEntity.ok(list);
     }
 
@@ -119,7 +117,7 @@ public class FornadaController {
                     return b.mes().compareTo(a.mes());
                 })
                 .toList();
-        System.out.println("[BACK][FORNADAS][MESES-ANOS] retornando " + proj.size() + " entradas");
+        
         return ResponseEntity.ok(proj);
     }
 
@@ -371,14 +369,14 @@ public class FornadaController {
             @RequestBody @Valid PedidoFornadaRequestDTO request
     ) {
         var d = pedidoFornadaUseCases.criar(request);
-        return ResponseEntity.status(201).body(PedidoFornadaEntityMapper.toEntity(d));
+        return ResponseEntity.status(201).body(com.carambolos.carambolosapi.infrastructure.gateways.mapper.FornadasMapper.toEntity(d));
     }
 
     @Operation(summary = "Lista todos os pedidos de fornada")
     @GetMapping("/pedidos")
     public ResponseEntity<List<PedidoFornada>> listarPedidos() {
         var list = pedidoFornadaUseCases.listar().stream()
-                .map(PedidoFornadaEntityMapper::toEntity)
+                .map(com.carambolos.carambolosapi.infrastructure.gateways.mapper.FornadasMapper::toEntity)
                 .toList();
         return ResponseEntity.status(200).body(list);
     }
@@ -387,7 +385,7 @@ public class FornadaController {
     @GetMapping("/pedidos/{id}")
     public ResponseEntity<PedidoFornada> buscarPedido(@PathVariable Integer id) {
         var d = pedidoFornadaUseCases.buscarPorId(id);
-        return ResponseEntity.status(200).body(PedidoFornadaEntityMapper.toEntity(d));
+        return ResponseEntity.status(200).body(com.carambolos.carambolosapi.infrastructure.gateways.mapper.FornadasMapper.toEntity(d));
     }
 
     @Operation(summary = "Atualiza um pedido de fornada existente")
@@ -396,7 +394,7 @@ public class FornadaController {
             @PathVariable Integer id,
             @RequestBody @Valid PedidoFornadaUpdateRequestDTO request) {
         var d = pedidoFornadaUseCases.atualizar(id, request);
-        return ResponseEntity.status(200).body(PedidoFornadaEntityMapper.toEntity(d));
+        return ResponseEntity.status(200).body(com.carambolos.carambolosapi.infrastructure.gateways.mapper.FornadasMapper.toEntity(d));
     }
 
     @Operation(summary = "Exclui um pedido de fornada por ID")

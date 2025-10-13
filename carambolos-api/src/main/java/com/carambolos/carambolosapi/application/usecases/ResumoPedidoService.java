@@ -182,7 +182,7 @@ public class ResumoPedidoService {
                     .orElseThrow(() -> new EntidadeNaoEncontradaException("Bolo com id %d não encontrado".formatted(pedido.getBoloId())));
 
             String massaNome = massaRepository.findById(bolo.getMassa())
-                    .map(Massa::getSabor)
+                    .map(com.carambolos.carambolosapi.infrastructure.persistence.entity.MassaEntity::getSabor)
                     .orElse("Não especificada");
 
             String recheioNome = "Não especificado";

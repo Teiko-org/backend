@@ -4,14 +4,14 @@ import com.carambolos.carambolosapi.application.exception.EntidadeImprocessavelE
 import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.application.gateways.FornadaDaVezGateway;
 import com.carambolos.carambolosapi.application.gateways.PedidoFornadaGateway;
-import com.carambolos.carambolosapi.domain.entity.Endereco;
+import com.carambolos.carambolosapi.application.gateways.EnderecoGateway;
+import com.carambolos.carambolosapi.application.gateways.UsuarioGateway;
 import com.carambolos.carambolosapi.domain.entity.PedidoFornada;
-import com.carambolos.carambolosapi.domain.entity.Usuario;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
 import com.carambolos.carambolosapi.domain.enums.TipoEntregaEnum;
 import com.carambolos.carambolosapi.infrastructure.web.request.PedidoFornadaRequestDTO;
 import com.carambolos.carambolosapi.infrastructure.web.request.PedidoFornadaUpdateRequestDTO;
-import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
-import com.carambolos.carambolosapi.infrastructure.gateways.mapperEntity.PedidoFornadaEntityMapper;
+import com.carambolos.carambolosapi.infrastructure.gateways.mapper.FornadasMapper;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -19,14 +19,14 @@ import java.util.List;
 public class PedidoFornadaUseCases {
     private final PedidoFornadaGateway pedidos;
     private final FornadaDaVezGateway fdv;
-    private final com.carambolos.carambolosapi.infrastructure.persistence.jpa.EnderecoRepository enderecos;
-    private final com.carambolos.carambolosapi.infrastructure.persistence.jpa.UsuarioRepository usuarios;
+    private final EnderecoGateway enderecos;
+    private final UsuarioGateway usuarios;
 
     public PedidoFornadaUseCases(
             PedidoFornadaGateway pedidos,
             FornadaDaVezGateway fdv,
-            com.carambolos.carambolosapi.infrastructure.persistence.jpa.EnderecoRepository enderecos,
-            com.carambolos.carambolosapi.infrastructure.persistence.jpa.UsuarioRepository usuarios
+            EnderecoGateway enderecos,
+            UsuarioGateway usuarios
     ) {
         this.pedidos = pedidos;
         this.fdv = fdv;
@@ -37,7 +37,7 @@ public class PedidoFornadaUseCases {
     @Transactional
     public PedidoFornada criar(PedidoFornadaRequestDTO request) {
         FornadaDaVez fornadaDaVez = fdv.findById(request.fornadaDaVezId())
-                .filter(FornadaDaVez::isAtivo)
+                .filter(fdv -> fdv.isAtivo())
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("FornadaDaVez com ID " + request.fornadaDaVezId() + " não encontrada."));
 
         if (fornadaDaVez.getQuantidade() < request.quantidade()) {
@@ -52,33 +52,29 @@ public class PedidoFornadaUseCases {
         }
 
         if (request.enderecoId() != null) {
-            enderecos.findById(request.enderecoId())
-                    .filter(Endereco::isAtivo)
-                    .orElseThrow(() -> new EntidadeNaoEncontradaException("Endereço com ID " + request.enderecoId() + " não encontrado."));
+            enderecos.buscarPorId(request.enderecoId());
         }
 
         if (request.usuarioId() != null) {
-            usuarios.findById(request.usuarioId())
-                    .filter(Usuario::isAtivo)
-                    .orElseThrow(() -> new EntidadeNaoEncontradaException("Usuário com ID " + request.usuarioId() + " não encontrado."));
+            usuarios.buscarPorId(request.usuarioId());
         }
 
         int novaQuantidade = fornadaDaVez.getQuantidade() - request.quantidade();
         fornadaDaVez.setQuantidade(novaQuantidade);
         fdv.save(fornadaDaVez);
 
-        PedidoFornada pedido = PedidoFornadaEntityMapper.toDomain(request.toEntity(request));
+        PedidoFornada pedido = FornadasMapper.toDomain(request.toEntity(request));
         return pedidos.save(pedido);
     }
 
     public PedidoFornada buscarPorId(Integer id) {
         return pedidos.findById(id)
-                .filter(PedidoFornada::getisAtivo)
+                .filter(pedido -> pedido.getisAtivo())
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("PedidoFornada com ID " + id + " não encontrado."));
     }
 
     public List<PedidoFornada> listar() {
-        return pedidos.findAll().stream().filter(PedidoFornada::getisAtivo).toList();
+        return pedidos.findAll().stream().filter(pedido -> pedido.getisAtivo()).toList();
     }
 
     @Transactional
@@ -103,7 +99,6 @@ public class PedidoFornadaUseCases {
             throw new IllegalArgumentException("A quantidade deve ser maior que zero.");
         }
 
-        // Ajustar estoque conforme a diferença
         try {
             int antigaQtd = pedido.getQuantidade() != null ? pedido.getQuantidade() : 0;
             int novaQtd = request.quantidade();
@@ -123,7 +118,7 @@ public class PedidoFornadaUseCases {
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
-            // logar
+
         }
 
         pedido.setQuantidade(request.quantidade());

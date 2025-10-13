@@ -1,4 +1,5 @@
 package com.carambolos.carambolosapi.application.usecases;
+
 import com.carambolos.carambolosapi.infrastructure.web.request.ProdutoFornadaRequestDTO;
 import com.carambolos.carambolosapi.application.exception.EntidadeJaExisteException;
 import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaException;
@@ -13,14 +14,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class ProdutoFornadaService {
+public class ProdutoFornadaUseCases {
 
     private final ProdutoFornadaRepository produtoFornadaRepository;
 
     @Autowired
     private AzureStorageService azureStorageService;
 
-    public ProdutoFornadaService(ProdutoFornadaRepository produtoFornadaRepository) {
+    public ProdutoFornadaUseCases(ProdutoFornadaRepository produtoFornadaRepository) {
         this.produtoFornadaRepository = produtoFornadaRepository;
     }
 
@@ -89,3 +90,5 @@ public class ProdutoFornadaService {
         }
     }
 }
+
+
