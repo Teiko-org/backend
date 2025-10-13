@@ -36,4 +36,4 @@ build/
 workspace.xml
 
 ### config ###
-*/dev.env
+/dev.env
