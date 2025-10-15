@@ -13,13 +13,13 @@ import org.springframework.context.annotation.Configuration;
 public class EnderecoConfig {
 
     @Bean
-    EnderecoUseCase createEnderecoCase(EnderecoGateway enderecoGateway) {
-        return new EnderecoUseCase(enderecoGateway);
+    EnderecoUseCase createEnderecoCase(EnderecoGateway enderecoGateway, UsuarioUseCase usuarioUseCase) {
+        return new EnderecoUseCase(enderecoGateway, usuarioUseCase);
     }
 
     @Bean
-    EnderecoGateway enderecoGateway(EnderecoRepository enderecoRepository, EnderecoMapper enderecoMapper, UsuarioUseCase usuarioUseCase) {
-        return new EnderecoGatewayImpl(enderecoRepository, enderecoMapper, usuarioUseCase);
+    EnderecoGateway enderecoGateway(EnderecoRepository enderecoRepository, EnderecoMapper enderecoMapper) {
+        return new EnderecoGatewayImpl(enderecoRepository, enderecoMapper);
     }
 
     @Bean
