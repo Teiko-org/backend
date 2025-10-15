@@ -14,9 +14,10 @@ public interface UsuarioGateway {
     Usuario atualizar(Integer id, Usuario usuario);
     Usuario atualizarDadosPessoais(Integer id, Usuario usuario);
     Usuario cadastrar(Usuario usuario);
-    UsuarioTokenDTO autenticar(Usuario usuario, HttpServletResponse httpServletResponse);
-    void logOut(HttpServletResponse response , String token);
-    void alterarSenha(Integer id, String senhaAtual, String novaSenha);
     void deletar(Integer id);
     Usuario atualizarImagemPerfil(Integer id, String imagemUrl);
+    boolean existePorContatoExcluindoId(String contato, Integer id);
+    boolean existePorContato(String contato);
+    Usuario buscarPorContato(String contato);
+    void atualizarSenha(Integer id, String novaSenha);
 }

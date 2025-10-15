@@ -98,6 +98,17 @@ public class UsuarioMapper {
         return tokenDto;
     }
 
+    public static UsuarioTokenDTO toTokenDTO(Usuario usuario, String token) {
+        UsuarioTokenDTO tokenDto = new UsuarioTokenDTO();
+
+        tokenDto.setUserId(usuario.getId());
+        tokenDto.setContato(usuario.getContato());
+        tokenDto.setNome(usuario.getNome());
+        tokenDto.setToken(token);
+        tokenDto.setAdmin(usuario.sysAdmin);
+        return tokenDto;
+    }
+
     public static Usuario toDomain(LoginRequestDTO loginDto) {
         Usuario usuario = new Usuario();
 
