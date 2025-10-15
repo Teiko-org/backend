@@ -1,8 +1,6 @@
 package com.carambolos.carambolosapi.application.gateways;
 
 import com.carambolos.carambolosapi.domain.entity.Usuario;
-import com.carambolos.carambolosapi.infrastructure.web.response.UsuarioTokenDTO;
-import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.List;
 import java.util.Optional;
