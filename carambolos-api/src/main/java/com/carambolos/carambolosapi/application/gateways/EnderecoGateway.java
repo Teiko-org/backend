@@ -13,4 +13,7 @@ public interface EnderecoGateway {
     Endereco cadastrar(Endereco endereco);
     Endereco atualizar(Integer id, Endereco endereco);
     void deletar(Integer id);
+    boolean existeEnderecoDuplicado(Endereco endereco);
+    boolean existeEnderecoDuplicadoParaAtualizacao(Endereco endereco, Integer id);
+
 }

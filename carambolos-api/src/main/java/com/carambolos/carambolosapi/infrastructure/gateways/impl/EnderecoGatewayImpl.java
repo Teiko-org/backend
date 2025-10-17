@@ -1,11 +1,7 @@
 package com.carambolos.carambolosapi.infrastructure.gateways.impl;
 
-import com.carambolos.carambolosapi.application.exception.EntidadeJaExisteException;
-import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.application.gateways.EnderecoGateway;
-import com.carambolos.carambolosapi.application.usecases.UsuarioUseCase;
 import com.carambolos.carambolosapi.domain.entity.Endereco;
-import com.carambolos.carambolosapi.domain.entity.Usuario;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.EnderecoMapper;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.EnderecoEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.EnderecoRepository;
@@ -18,12 +14,10 @@ import java.util.List;
 public class EnderecoGatewayImpl implements EnderecoGateway {
     private final EnderecoRepository enderecoRepository;
     private final EnderecoMapper enderecoMapper;
-    private final UsuarioUseCase usuarioUseCase;
 
-    public EnderecoGatewayImpl(EnderecoRepository enderecoRepository, EnderecoMapper enderecoMapper, UsuarioUseCase usuarioUseCase) {
+    public EnderecoGatewayImpl(EnderecoRepository enderecoRepository, EnderecoMapper enderecoMapper) {
         this.enderecoRepository = enderecoRepository;
         this.enderecoMapper = enderecoMapper;
-        this.usuarioUseCase = usuarioUseCase;
     }
 
     @Override
@@ -44,24 +38,13 @@ public class EnderecoGatewayImpl implements EnderecoGateway {
         if (enderecoExistente != null) {
             return enderecoMapper.toDomain(enderecoExistente);
         }
-        throw new EntidadeNaoEncontradaException("Endereço com Id %d não encontrado.".formatted(id));
+        return null;
     }
 
     @Override
     public Endereco cadastrar(Endereco endereco) {
         EnderecoEntity enderecoEntity = enderecoMapper.toEntity(endereco);
         preencherDedupHash(enderecoEntity);
-        if (enderecoEntity.getUsuario() != null) {
-            if (existeEnderecoDuplicado(enderecoEntity) && enderecoEntity.isAtivo()) {
-                throw new EntidadeJaExisteException("Endereço já cadastrado");
-            }
-
-            Usuario usuarioFk = usuarioUseCase.buscarPorId(enderecoEntity.getUsuario());
-
-            if (!enderecoEntity.getUsuario().equals(usuarioFk.getId())) {
-                throw new EntidadeNaoEncontradaException("Usuariofk não existe no banco");
-            }
-        }
         EnderecoEntity enderecoSalvo = enderecoRepository.save(enderecoEntity);
         return enderecoMapper.toDomain(enderecoSalvo);
     }
@@ -69,13 +52,7 @@ public class EnderecoGatewayImpl implements EnderecoGateway {
     @Override
     public Endereco atualizar(Integer id, Endereco endereco) {
         EnderecoEntity enderecoEntity = enderecoMapper.toEntity(endereco);
-        if (!enderecoRepository.existsByIdAndIsAtivoTrue(id)) {
-            throw new EntidadeNaoEncontradaException(("Endereço com Id %d não encontrado.".formatted(id)));
-        }
         preencherDedupHash(enderecoEntity);
-        if (existeEnderecoDuplicadoParaAtualizacao(enderecoEntity, id)) {
-            throw new EntidadeJaExisteException("Endereço já cadastrado");
-        }
         enderecoEntity.setId(id);
         EnderecoEntity enderecoSalvo = enderecoRepository.save(enderecoEntity);
         return enderecoMapper.toDomain(enderecoSalvo);
@@ -84,12 +61,22 @@ public class EnderecoGatewayImpl implements EnderecoGateway {
     @Override
     public void deletar(Integer id) {
         EnderecoEntity enderecoEntity = enderecoRepository.findByIdAndIsAtivoTrue(id);
-        if (enderecoEntity != null) {
-            enderecoEntity.setAtivo(false);
-            enderecoRepository.save(enderecoEntity);
-            return;
-        }
-        throw new EntidadeNaoEncontradaException("Endereço com Id %d não encontrado.".formatted(id));
+        enderecoEntity.setAtivo(false);
+        enderecoRepository.save(enderecoEntity);
+    }
+
+    @Override
+    public boolean existeEnderecoDuplicado(Endereco endereco) {
+        EnderecoEntity enderecoEntity = enderecoMapper.toEntity(endereco);
+        preencherDedupHash(enderecoEntity);
+        return existeEnderecoDuplicado(enderecoEntity);
+    }
+
+    @Override
+    public boolean existeEnderecoDuplicadoParaAtualizacao(Endereco endereco, Integer id) {
+        EnderecoEntity enderecoEntity = enderecoMapper.toEntity(endereco);
+        preencherDedupHash(enderecoEntity);
+        return existeEnderecoDuplicadoParaAtualizacao(enderecoEntity, id);
     }
 
     private Boolean existeEnderecoDuplicado(EnderecoEntity endereco) {
