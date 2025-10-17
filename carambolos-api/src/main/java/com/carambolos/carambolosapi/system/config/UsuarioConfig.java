@@ -16,13 +16,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class UsuarioConfig {
 
     @Bean
-    UsuarioUseCase createUserCase(UsuarioGateway usuarioGateway) {
-        return new UsuarioUseCase(usuarioGateway);
+    UsuarioUseCase createUserCase(UsuarioGateway usuarioGateway, PasswordEncoder passwordEncoder, GerenciadorTokenJwt gerenciadorTokenJwt, AuthenticationManager authenticationManager, TokenBlacklistService tokenBlacklistService) {
+        return new UsuarioUseCase(usuarioGateway, passwordEncoder, gerenciadorTokenJwt, authenticationManager, tokenBlacklistService);
     }
 
     @Bean
-    UsuarioGateway usuarioGateway(UsuarioRepository usuarioRepository, UsuarioMapper usuarioMapper,  PasswordEncoder passwordEncoder, GerenciadorTokenJwt gerenciadorTokenJwt, AuthenticationManager authenticationManager, TokenBlacklistService tokenBlacklistService) {
-        return new UsuarioGatewayImpl(usuarioRepository, usuarioMapper, passwordEncoder, gerenciadorTokenJwt, authenticationManager, tokenBlacklistService);
+    UsuarioGateway usuarioGateway(UsuarioRepository usuarioRepository, UsuarioMapper usuarioMapper) {
+        return new UsuarioGatewayImpl(usuarioRepository, usuarioMapper);
     }
 
     @Bean
