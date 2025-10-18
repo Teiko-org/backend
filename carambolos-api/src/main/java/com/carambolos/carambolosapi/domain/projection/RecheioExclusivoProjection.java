@@ -7,7 +7,6 @@ public class RecheioExclusivoProjection {
     private String sabor2;
     private Integer isAtivo;
 
-    // Aceita tipos genéricos vindos de consultas nativas (Long/BigInteger/String)
     public RecheioExclusivoProjection(Object id, String nome, String sabor1, String sabor2, Object isAtivo) {
         this.id = convertToInteger(id);
         this.nome = nome;
