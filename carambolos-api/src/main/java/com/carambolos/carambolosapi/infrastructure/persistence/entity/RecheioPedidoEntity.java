@@ -1,19 +1,38 @@
-package com.carambolos.carambolosapi.domain.entity;
+package com.carambolos.carambolosapi.infrastructure.persistence.entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 
-public class RecheioPedido {
+
+@Entity(name = "recheio_pedido")
+@Schema(description = "Entidade que representa o recheio de um pedido")
+public class RecheioPedidoEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "Identificador único do recheio do pedido", example = "1")
     private Integer id;
+
+    @Column(name = "recheio_unitario_id1")
+    @Schema(description = "ID do primeiro recheio unitário relacionado ao pedido", example = "10")
     private Integer recheioUnitarioId1;
+
+    @Column(name = "recheio_unitario_id2")
+    @Schema(description = "ID do segundo recheio unitário relacionado ao pedido", example = "11")
     private Integer recheioUnitarioId2;
+
+    @Column(name = "recheio_exclusivo")
+    @Schema(description = "ID do recheio exclusivo relacionado ao pedido", example = "5")
     private Integer recheioExclusivo;
+
+    @Column(name = "is_ativo")
+    @Schema(description = "Indica se o recheio do pedido está ativo", example = "true")
     private Boolean isAtivo = true;
 
-    public RecheioPedido() {
+    public RecheioPedidoEntity() {
     }
 
-    public RecheioPedido(Integer id, Integer recheioUnitarioId1, Integer recheioUnitarioId2, Integer recheioExclusivo, Boolean isAtivo) {
+    public RecheioPedidoEntity(Integer id, Integer recheioUnitarioId1, Integer recheioUnitarioId2, Integer recheioExclusivo, Boolean isAtivo) {
         this.id = id;
         this.recheioUnitarioId1 = recheioUnitarioId1;
         this.recheioUnitarioId2 = recheioUnitarioId2;

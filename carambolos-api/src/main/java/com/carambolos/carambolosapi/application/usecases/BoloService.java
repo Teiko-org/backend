@@ -7,8 +7,7 @@ import com.carambolos.carambolosapi.domain.projection.RecheioExclusivoProjection
 import com.carambolos.carambolosapi.application.exception.EntidadeJaExisteException;
 import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.domain.projection.RecheioPedidoProjection;
-import com.carambolos.carambolosapi.infrastructure.persistence.entity.RecheioUnitarioEntity;
-import com.carambolos.carambolosapi.infrastructure.persistence.entity.CoberturaEntity;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.RecheioPedidoEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -200,65 +199,7 @@ public class BoloService {
         throw new EntidadeNaoEncontradaException("Recheio exclusivo com id %s não encontrado".formatted(id));
     }
 
-    public RecheioPedidoProjection cadastrarRecheioPedido(RecheioPedido recheioPedido) {
-        verificarCampos(recheioPedido);
 
-        if (recheioPedido.getRecheioExclusivo() != null) {
-            RecheioPedido recheioSalvo = recheioPedidoRepository.save(recheioPedido);
-            return recheioPedidoRepository.buscarRecheioPedidoExclusivoPorId(recheioSalvo.getId());
-        }
-        RecheioPedido recheioSalvo = recheioPedidoRepository.save(recheioPedido);
-        return recheioPedidoRepository.buscarRecheioPedidoUnitariosPorId(recheioSalvo.getId());
-    }
-
-    public RecheioPedidoProjection atualizarRecheioPedido(RecheioPedido recheioPedido, Integer id) {
-        verificarCampos(recheioPedido);
-
-        if (recheioPedido.getRecheioExclusivo() != null) {
-            RecheioPedido recheioSalvo = recheioPedidoRepository.save(recheioPedido);
-            return recheioPedidoRepository.buscarRecheioPedidoExclusivoPorId(recheioSalvo.getId());
-        }
-        recheioPedido.setId(id);
-        RecheioPedido recheioSalvo = recheioPedidoRepository.save(recheioPedido);
-        return recheioPedidoRepository.buscarRecheioPedidoUnitariosPorId(recheioSalvo.getId());
-    }
-
-    public RecheioPedidoProjection buscarRecheioPedidoPorId(Integer id) {
-        if (!recheioPedidoRepository.existsById(id)) {
-            throw new EntidadeNaoEncontradaException("Recheio do pedido com id %d não encontrado".formatted(id));
-        }
-        Optional<RecheioPedido> possivelRecheio = recheioPedidoRepository.findById(id);
-
-        if (possivelRecheio.isPresent()) {
-            RecheioPedido recheioPedido = possivelRecheio.get();
-            verificarCampos(recheioPedido);
-            if (recheioPedido.getRecheioExclusivo() != null) {
-                return recheioPedidoRepository.buscarRecheioPedidoExclusivoPorId(recheioPedido.getId());
-            }
-            return recheioPedidoRepository.buscarRecheioPedidoUnitariosPorId(recheioPedido.getId());
-        }
-        throw new EntidadeImprocessavelException("Falha ao buscar recheio do pedido");
-    }
-
-    public List<RecheioPedidoProjection> listarRecheiosPedido() {
-        return recheioPedidoRepository.listarRecheiosPedido().stream()
-                .filter(recheioPedido -> Boolean.TRUE.equals(recheioPedido.getIsAtivo()))
-                .toList();
-    }
-
-    public void deletarRecheioPedido(Integer id) {
-        Optional<RecheioPedido> possivelRecheioPedido = recheioPedidoRepository.findById(id)
-                .filter(RecheioPedido::getAtivo);
-
-        if (possivelRecheioPedido.isPresent()) {
-            RecheioPedido recheioPedido = possivelRecheioPedido.get();
-            recheioPedido.setAtivo(false);
-            recheioPedidoRepository.save(recheioPedido);
-            return;
-        }
-
-        throw new EntidadeNaoEncontradaException("Recheio exclusivo com id %s não encontrado".formatted(id));
-    }
 
     private RecheioExclusivo verificarCampos(RecheioExclusivo recheioExclusivo, RecheioExclusivo recheioExistente) {
         if (recheioExclusivo.getNome() != null) {
@@ -273,14 +214,5 @@ public class BoloService {
         return recheioExistente;
     }
 
-    private void verificarCampos(RecheioPedido recheioPedido) {
-        if (recheioPedido.getRecheioUnitarioId1() != null && recheioPedido.getRecheioUnitarioId2() != null && recheioPedido.getRecheioExclusivo() != null) {
-            throw new EntidadeImprocessavelException("Requisição apenas pode ter o recheio exclusivo nulo ou recheios unitarios nulos");
-        } else if (
-                recheioPedido.getRecheioUnitarioId1() == null && recheioPedido.getRecheioUnitarioId2() != null ||
-                        recheioPedido.getRecheioUnitarioId1() != null && recheioPedido.getRecheioUnitarioId2() == null
-        ) {
-            throw new EntidadeImprocessavelException("Requisição apenas pode ter o recheio exclusivo nulo ou recheios unitarios nulos");
-        }
-    }
+
 }

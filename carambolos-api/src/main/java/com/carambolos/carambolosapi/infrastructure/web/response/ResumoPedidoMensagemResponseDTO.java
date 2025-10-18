@@ -2,11 +2,8 @@ package com.carambolos.carambolosapi.infrastructure.web.response;
 
 import com.carambolos.carambolosapi.domain.entity.*;
 import com.carambolos.carambolosapi.domain.enums.StatusEnum;
-import com.carambolos.carambolosapi.infrastructure.persistence.entity.CoberturaEntity;
-import com.carambolos.carambolosapi.infrastructure.persistence.entity.EnderecoEntity;
-import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.*;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoFornada;
-import com.carambolos.carambolosapi.infrastructure.persistence.entity.RecheioUnitarioEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -205,28 +202,28 @@ public record ResumoPedidoMensagemResponseDTO (
             }
 
             if (bolo.getRecheioPedido() != null) {
-                RecheioPedido recheioPedido = recheioPedidoRepository.findById(bolo.getRecheioPedido())
+                RecheioPedidoEntity recheioPedidoEntity = recheioPedidoRepository.findById(bolo.getRecheioPedido())
                         .orElse(null);
-                if (recheioPedido != null) {
+                if (recheioPedidoEntity != null) {
                     descricao.append("\nRecheio: ");
 
-                    if (recheioPedido.getRecheioExclusivo() != null) {
-                        RecheioExclusivo recheioExclusivo = recheioExclusivoRepository.findById(recheioPedido.getRecheioExclusivo())
+                    if (recheioPedidoEntity.getRecheioExclusivo() != null) {
+                        RecheioExclusivo recheioExclusivo = recheioExclusivoRepository.findById(recheioPedidoEntity.getRecheioExclusivo())
                                 .orElse(null);
                         if (recheioExclusivo != null) {
                             descricao.append(recheioExclusivo.getNome());
                         }
                     } else {
-                        if (recheioPedido.getRecheioUnitarioId1() != null) {
-                            RecheioUnitarioEntity recheio1 = recheioUnitarioRepository.findById(recheioPedido.getRecheioUnitarioId1())
+                        if (recheioPedidoEntity.getRecheioUnitarioId1() != null) {
+                            RecheioUnitarioEntity recheio1 = recheioUnitarioRepository.findById(recheioPedidoEntity.getRecheioUnitarioId1())
                                     .orElse(null);
                             if (recheio1 != null) {
                                 descricao.append(recheio1.getSabor());
                             }
                         }
 
-                        if (recheioPedido.getRecheioUnitarioId2() != null) {
-                            RecheioUnitarioEntity recheio2 = recheioUnitarioRepository.findById(recheioPedido.getRecheioUnitarioId2())
+                        if (recheioPedidoEntity.getRecheioUnitarioId2() != null) {
+                            RecheioUnitarioEntity recheio2 = recheioUnitarioRepository.findById(recheioPedidoEntity.getRecheioUnitarioId2())
                                     .orElse(null);
                             if (recheio2 != null) {
                                 descricao.append(" e ").append(recheio2.getSabor());
