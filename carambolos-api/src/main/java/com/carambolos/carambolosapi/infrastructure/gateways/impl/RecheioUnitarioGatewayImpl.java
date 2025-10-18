@@ -63,4 +63,9 @@ public class RecheioUnitarioGatewayImpl implements RecheioUnitarioGateway {
         recheio.setAtivo(false);
         save(recheio);
     }
+
+    @Override
+    public Boolean existsByIdAndIsAtivoTrue(Integer id) {
+        return repository.existsByIdAndIsAtivoTrue(id);
+    }
 }
