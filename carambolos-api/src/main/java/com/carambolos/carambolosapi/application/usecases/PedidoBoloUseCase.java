@@ -2,7 +2,11 @@ package com.carambolos.carambolosapi.application.usecases;
 
 import com.carambolos.carambolosapi.application.exception.EntidadeImprocessavelException;
 import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaException;
+import com.carambolos.carambolosapi.application.gateways.BoloGateway;
+import com.carambolos.carambolosapi.application.gateways.EnderecoGateway;
+import com.carambolos.carambolosapi.application.gateways.PedidoBoloGateway;
 import com.carambolos.carambolosapi.domain.entity.PedidoBolo;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoBoloEntity;
 import com.carambolos.carambolosapi.domain.enums.TipoEntregaEnum;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.BoloRepository;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.EnderecoRepository;
@@ -14,64 +18,64 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-public class PedidoBoloService {
+public class PedidoBoloUseCase {
+    private final PedidoBoloGateway pedidoBoloGateway;
+    private final BoloGateway boloGateway;
+    private final EnderecoGateway enderecoGateway;
 
-    @Autowired
-    private BoloRepository boloRepository;
-    @Autowired
-    PedidoBoloRepository pedidoBoloRepository;
-    @Autowired
-    private EnderecoRepository enderecoRepository;
+    public PedidoBoloUseCase(PedidoBoloGateway pedidoBoloGateway, BoloGateway boloGateway, EnderecoGateway enderecoGateway) {
+        this.pedidoBoloGateway = pedidoBoloGateway;
+        this.boloGateway = boloGateway;
+        this.enderecoGateway = enderecoGateway;
+    }
 
     public List<PedidoBolo> listarPedidos() {
-        return pedidoBoloRepository.findAll().stream().filter(PedidoBolo::getAtivo).toList();
+        return pedidoBoloGateway.findAll();
     }
 
     public PedidoBolo buscarPedidoPorId(Integer id) {
-        return pedidoBoloRepository.findById(id)
-                .filter(PedidoBolo::getAtivo)
-                .orElseThrow(() -> new EntidadeNaoEncontradaException("Pedido com o id %d não encontrado".formatted(id)));
+        return pedidoBoloGateway.findById(id);
     }
 
     public PedidoBolo cadastrarPedido(PedidoBolo pedidoBolo) {
-        if (!boloRepository.existsByIdAndIsAtivoTrue(pedidoBolo.getBoloId())) {
+        if (!boloGateway.existsByIdAndIsAtivoTrue(pedidoBolo.getBoloId())) {
             throw new EntidadeNaoEncontradaException("Bolo com id %d não encontrado".formatted(pedidoBolo.getBoloId()));
         }
         if (pedidoBolo.getTipoEntrega() == TipoEntregaEnum.ENTREGA && pedidoBolo.getEnderecoId() == null) {
             throw new EntidadeImprocessavelException("Tipo de entrega 'ENTREGA' requer um endereço válido.");
         }
-        if (pedidoBolo.getEnderecoId() != null && !enderecoRepository.existsByIdAndIsAtivoTrue(pedidoBolo.getEnderecoId())) {
+        if (pedidoBolo.getEnderecoId() != null && !enderecoGateway.existsByIdAndIsAtivoTrue(pedidoBolo.getEnderecoId())) {
             throw new EntidadeNaoEncontradaException("Endereço com id %d não encontrado".formatted(pedidoBolo.getEnderecoId()));
         }
 
         pedidoBolo.setDataUltimaAtualizacao(LocalDateTime.now());
 
-        return pedidoBoloRepository.save(pedidoBolo);
+        return pedidoBoloGateway.save(pedidoBolo);
     }
 
     public PedidoBolo atualizarPedido(PedidoBolo pedidoBolo, Integer id) {
-        if (!pedidoBoloRepository.existsByIdAndIsAtivoTrue(id)) {
+        if (!pedidoBoloGateway.existsByIdAndIsAtivoTrue(id)) {
             throw new EntidadeNaoEncontradaException("Pedido com id %d não encontrado".formatted(id));
         }
         if (pedidoBolo.getTipoEntrega() == TipoEntregaEnum.ENTREGA && pedidoBolo.getEnderecoId() == null) {
             throw new EntidadeImprocessavelException("Tipo de entrega 'ENTREGA' requer um endereço válido.");
         }
-        if (!boloRepository.existsByIdAndIsAtivoTrue(pedidoBolo.getBoloId())) {
+        if (!boloGateway.existsByIdAndIsAtivoTrue(pedidoBolo.getBoloId())) {
             throw new EntidadeNaoEncontradaException("Bolo com id %d não encontrado".formatted(pedidoBolo.getBoloId()));
         }
-        if (pedidoBolo.getEnderecoId() != null && !enderecoRepository.existsByIdAndIsAtivoTrue(pedidoBolo.getEnderecoId())) {
+        if (pedidoBolo.getEnderecoId() != null && !enderecoGateway.existsByIdAndIsAtivoTrue(pedidoBolo.getEnderecoId())) {
             throw new EntidadeNaoEncontradaException("Endereço com id %d não encontrado".formatted(pedidoBolo.getEnderecoId()));
         }
 
         pedidoBolo.setDataUltimaAtualizacao(LocalDateTime.now());
         pedidoBolo.setId(id);
 
-        return pedidoBoloRepository.save(pedidoBolo);
+        return pedidoBoloGateway.save(pedidoBolo);
     }
 
     public void deletarPedido(Integer id) {
-        PedidoBolo pedido = buscarPedidoPorId(id);
+        PedidoBolo pedido = pedidoBoloGateway.findById(id);
         pedido.setAtivo(false);
-        pedidoBoloRepository.save(pedido);
+        pedidoBoloGateway.save(pedido);
     }
 }

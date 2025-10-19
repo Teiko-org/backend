@@ -172,8 +172,8 @@ public class ResumoPedidoService {
                 throw new EntidadeImprocessavelException("O resumo de pedido #" + pedidoResumoId + " não está vinculado a um pedido de bolo");
             }
 
-            PedidoBolo pedido = pedidoBoloRepository.findById(resumoPedido.getPedidoBoloId())
-                    .filter(PedidoBolo::getAtivo)
+            PedidoBoloEntity pedido = pedidoBoloRepository.findById(resumoPedido.getPedidoBoloId())
+                    .filter(PedidoBoloEntity::getAtivo)
                     .orElseThrow(() -> new EntidadeNaoEncontradaException("Pedido com o id %d não encontrado".formatted(resumoPedido.getPedidoBoloId())));
 
             BoloEntity boloEntity = boloRepository.findById(pedido.getBoloId())

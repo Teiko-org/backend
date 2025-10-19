@@ -48,7 +48,7 @@ public class RelatorioService {
     }
 
     public byte[] gerarRelatorioInsights() {
-        List<PedidoBolo> pedidosBolo = pedidoBoloRepository.findAll();
+        List<PedidoBoloEntity> pedidosBolo = pedidoBoloRepository.findAll();
         List<PedidoFornada> pedidosFornada = pedidoFornadaRepository.findAll();
         List<UsuarioEntity> usuarioEntities = usuarioRepository.findAll();
         List<BoloEntity> boloEntities = boloRepository.findAll();
@@ -56,7 +56,7 @@ public class RelatorioService {
         List<RecheioUnitarioEntity> recheios = recheioUnitarioRepository.findAll();
 
         Map<Integer, Long> contagemBolos = pedidosBolo.stream()
-                .collect(Collectors.groupingBy(PedidoBolo::getBoloId, Collectors.counting()));
+                .collect(Collectors.groupingBy(PedidoBoloEntity::getBoloId, Collectors.counting()));
 
         List<Map.Entry<Integer, Long>> top3Bolos = contagemBolos.entrySet().stream()
                 .sorted(Map.Entry.<Integer, Long>comparingByValue().reversed())
@@ -164,7 +164,7 @@ public class RelatorioService {
                 .orElse("Recheio ID " + top3Recheios.getFirst().getKey());
 
         List<Map.Entry<Integer, Long>> top3UsuariosBolo = pedidosBolo.stream()
-                .collect(Collectors.groupingBy(PedidoBolo::getUsuarioId, Collectors.counting()))
+                .collect(Collectors.groupingBy(PedidoBoloEntity::getUsuarioId, Collectors.counting()))
                 .entrySet().stream()
                 .sorted(Map.Entry.<Integer, Long>comparingByValue().reversed())
                 .limit(3)

@@ -3,9 +3,8 @@ package com.carambolos.carambolosapi.infrastructure.gateways.impl;
 import com.carambolos.carambolosapi.application.gateways.DashboardGateway;
 import com.carambolos.carambolosapi.domain.entity.*;
 import com.carambolos.carambolosapi.domain.enums.StatusEnum;
-import com.carambolos.carambolosapi.infrastructure.persistence.entity.BoloEntity;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.*;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.Fornada;
-import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoFornada;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.*;
 
@@ -37,7 +36,7 @@ public class DashboardGatewayImpl implements DashboardGateway {
 
     @Override
     public long qtdClientesUnicos() {
-        List<PedidoBolo> pedidosBolo = pedidoBoloRepository.findAll();
+        List<PedidoBoloEntity> pedidosBolo = pedidoBoloRepository.findAll();
         List<PedidoFornada> pedidoFornadas = pedidoFornadaRepository.findAll();
 
         Set<String> clientesUnicos = new HashSet<>();
@@ -121,14 +120,14 @@ public class DashboardGatewayImpl implements DashboardGateway {
     @Override
     public List<Map<String, Object>> getBolosMaisPedidos() {
         try {
-            List<PedidoBolo> pedidosBolo = pedidoBoloRepository.findAll();
+            List<PedidoBoloEntity> pedidosBolo = pedidoBoloRepository.findAll();
             if (pedidosBolo.isEmpty()) {
                 return new ArrayList<>();
             }
 
             Map<Integer, Long> contagemBolos = pedidosBolo.stream()
                     .filter(p -> p.getBoloId() != null)
-                    .collect(Collectors.groupingBy(PedidoBolo::getBoloId, Collectors.counting()));
+                    .collect(Collectors.groupingBy(PedidoBoloEntity::getBoloId, Collectors.counting()));
 
             return contagemBolos.entrySet().stream()
                     .sorted(Map.Entry.<Integer, Long>comparingByValue().reversed())
@@ -425,12 +424,12 @@ public class DashboardGatewayImpl implements DashboardGateway {
             pedido.put("status", resumo.getStatus());
 
             if (resumo.getPedidoBoloId() != null) {
-                PedidoBolo pedidoBolo = pedidoBoloRepository.findById(resumo.getPedidoBoloId()).orElse(null);
+                PedidoBoloEntity pedidoBoloEntity = pedidoBoloRepository.findById(resumo.getPedidoBoloId()).orElse(null);
 
-                if (pedidoBolo != null) {
-                    pedido.put("nomeDoCliente", pedidoBolo.getNomeCliente());
-                    pedido.put("telefoneDoCliente", pedidoBolo.getTelefoneCliente());
-                    pedido.put("tipoDoPedido", pedidoBolo.getTipoEntrega());
+                if (pedidoBoloEntity != null) {
+                    pedido.put("nomeDoCliente", pedidoBoloEntity.getNomeCliente());
+                    pedido.put("telefoneDoCliente", pedidoBoloEntity.getTelefoneCliente());
+                    pedido.put("tipoDoPedido", pedidoBoloEntity.getTipoEntrega());
                     pedido.put("tipoProduto", "BOLO");
                     pedido.put("pedidoBoloId", resumo.getPedidoBoloId());
                 }

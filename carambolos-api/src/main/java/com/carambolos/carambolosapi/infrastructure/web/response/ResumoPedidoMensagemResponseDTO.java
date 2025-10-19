@@ -118,39 +118,39 @@ public record ResumoPedidoMensagemResponseDTO (
         }
 
         private void adicionarDetalhesPedidoBolo(StringBuilder mensagem, Integer pedidoBoloId, String valorTotal) {
-            PedidoBolo pedidoBolo = pedidoBoloRepository.findById(pedidoBoloId)
+            PedidoBoloEntity pedidoBoloEntity = pedidoBoloRepository.findById(pedidoBoloId)
                     .orElseThrow(() -> new RuntimeException("Pedido de bolo não encontrado"));
 
-            BoloEntity boloEntity = boloRepository.findById(pedidoBolo.getBoloId())
+            BoloEntity boloEntity = boloRepository.findById(pedidoBoloEntity.getBoloId())
                     .orElseThrow(() -> new RuntimeException("Bolo não encontrado"));
 
             String descricaoBolo = gerarDescricaoBolo(boloEntity);
             mensagem.append("1x ").append(descricaoBolo).append(" ").append(valorTotal).append("\n");
             mensagem.append("Total: ").append(valorTotal).append("\n");
 
-            mensagem.append("Cliente: ").append(pedidoBolo.getNomeCliente()).append("\n")
-                    .append("Telefone: ").append(pedidoBolo.getTelefoneCliente()).append("\n");
+            mensagem.append("Cliente: ").append(pedidoBoloEntity.getNomeCliente()).append("\n")
+                    .append("Telefone: ").append(pedidoBoloEntity.getTelefoneCliente()).append("\n");
 
             mensagem.append("Tipo: ")
-                    .append(pedidoBolo.getTipoEntrega() != null ? pedidoBolo.getTipoEntrega().name() : "ENTREGA")
+                    .append(pedidoBoloEntity.getTipoEntrega() != null ? pedidoBoloEntity.getTipoEntrega().name() : "ENTREGA")
                     .append("\n");
 
-            if (pedidoBolo.getDataPrevisaoEntrega() != null) {
+            if (pedidoBoloEntity.getDataPrevisaoEntrega() != null) {
                 mensagem.append("Previsão de entrega: ")
-                        .append(pedidoBolo.getDataPrevisaoEntrega().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
+                        .append(pedidoBoloEntity.getDataPrevisaoEntrega().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
                         .append("\n");
             }
 
-            if (pedidoBolo.getObservacao() != null && !pedidoBolo.getObservacao().isEmpty()) {
-                mensagem.append("Observações: ").append(pedidoBolo.getObservacao()).append("\n");
+            if (pedidoBoloEntity.getObservacao() != null && !pedidoBoloEntity.getObservacao().isEmpty()) {
+                mensagem.append("Observações: ").append(pedidoBoloEntity.getObservacao()).append("\n");
             }
 
             // Adicionar informações do endereço se for entrega
-            if (pedidoBolo.getTipoEntrega() != null &&
-                    pedidoBolo.getTipoEntrega().name().equals("ENTREGA") &&
-                    pedidoBolo.getEnderecoId() != null) {
+            if (pedidoBoloEntity.getTipoEntrega() != null &&
+                    pedidoBoloEntity.getTipoEntrega().name().equals("ENTREGA") &&
+                    pedidoBoloEntity.getEnderecoId() != null) {
 
-                EnderecoEntity endereco = enderecoRepository.findByIdAndIsAtivoTrue(pedidoBolo.getEnderecoId());
+                EnderecoEntity endereco = enderecoRepository.findByIdAndIsAtivoTrue(pedidoBoloEntity.getEnderecoId());
                 if (endereco != null) {
                     mensagem.append("Endereço de entrega:\n");
                     mensagem.append(endereco.getLogradouro());

@@ -79,6 +79,11 @@ public class EnderecoGatewayImpl implements EnderecoGateway {
         return existeEnderecoDuplicadoParaAtualizacao(enderecoEntity, id);
     }
 
+    @Override
+    public boolean existsByIdAndIsAtivoTrue(Integer id) {
+        return enderecoRepository.existsByIdAndIsAtivoTrue(id);
+    }
+
     private Boolean existeEnderecoDuplicado(EnderecoEntity endereco) {
         if (endereco.getUsuario() == null) {
             return false;

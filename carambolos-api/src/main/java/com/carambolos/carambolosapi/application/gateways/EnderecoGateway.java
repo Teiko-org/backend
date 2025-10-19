@@ -15,5 +15,5 @@ public interface EnderecoGateway {
     void deletar(Integer id);
     boolean existeEnderecoDuplicado(Endereco endereco);
     boolean existeEnderecoDuplicadoParaAtualizacao(Endereco endereco, Integer id);
-
+    boolean existsByIdAndIsAtivoTrue(Integer id);
 }

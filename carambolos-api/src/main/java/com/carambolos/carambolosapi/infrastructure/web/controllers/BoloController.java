@@ -8,7 +8,7 @@ import com.carambolos.carambolosapi.domain.projection.DetalheBoloProjection;
 import com.carambolos.carambolosapi.domain.projection.RecheioExclusivoProjection;
 import com.carambolos.carambolosapi.domain.projection.RecheioPedidoProjection;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.*;
-import com.carambolos.carambolosapi.infrastructure.persistence.entity.BoloEntity;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoBoloEntity;
 import com.carambolos.carambolosapi.infrastructure.web.request.*;
 import com.carambolos.carambolosapi.infrastructure.web.response.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,6 +41,8 @@ public class BoloController {
     private final RecheioPedidoMapper recheioPedidoMapper;
     private final BoloUseCase boloUseCase;
     private final BoloMapper boloMapper;
+    private final PedidoBoloUseCase pedidoBoloUseCase;
+    private final PedidoBoloMapper pedidoBoloMapper;
 
     public BoloController(
             MassaUseCase massaUseCase,
@@ -52,7 +54,7 @@ public class BoloController {
             RecheioPedidoUseCase recheioPedidoUseCase,
             RecheioPedidoMapper recheioPedidoMapper,
             RecheioExclusivoUseCase recheioExclusivoUseCase,
-            RecheioExclusivoMapper recheioExclusivoMapper, BoloUseCase boloUseCase, BoloMapper boloMapper
+            RecheioExclusivoMapper recheioExclusivoMapper, BoloUseCase boloUseCase, BoloMapper boloMapper, PedidoBoloUseCase pedidoBoloUseCase, PedidoBoloMapper pedidoBoloMapper
     ) {
         this.massaUseCase = massaUseCase;
         this.coberturaUseCase = coberturaUseCase;
@@ -66,10 +68,9 @@ public class BoloController {
         this.recheioExclusivoMapper = recheioExclusivoMapper;
         this.boloUseCase = boloUseCase;
         this.boloMapper = boloMapper;
+        this.pedidoBoloUseCase = pedidoBoloUseCase;
+        this.pedidoBoloMapper = pedidoBoloMapper;
     }
-
-    @Autowired
-    private PedidoBoloService pedidoBoloService;
 
     @Operation(summary = "Listar bolos", description = "Retorna todos os bolos cadastrados no sistema.")
     @ApiResponses(value = {
@@ -659,14 +660,15 @@ public class BoloController {
             @ApiResponse(responseCode = "204", description = "Nenhum pedido encontrado", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
+
     @GetMapping("/pedido")
     public ResponseEntity<List<PedidoBoloResponseDTO>> listarPedidos() {
-        List<PedidoBolo> pedidos = pedidoBoloService.listarPedidos();
+        List<PedidoBolo> pedidos = pedidoBoloUseCase.listarPedidos();
         if (pedidos.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
         return ResponseEntity.status(200).body(
-                PedidoBoloResponseDTO.toPedidoBoloResponse(pedidos)
+                pedidoBoloMapper.toPedidoBoloResponse(pedidos)
         );
     }
 
@@ -683,9 +685,9 @@ public class BoloController {
     public ResponseEntity<PedidoBoloResponseDTO> buscarPedidoPorId(
             @PathVariable Integer id
     ) {
-        PedidoBolo pedido = pedidoBoloService.buscarPedidoPorId(id);
+        PedidoBolo pedido = pedidoBoloUseCase.buscarPedidoPorId(id);
         return ResponseEntity.status(200).body(
-                PedidoBoloResponseDTO.toPedidoBoloResponse(pedido)
+                pedidoBoloMapper.toPedidoBoloResponse(pedido)
         );
     }
 
@@ -699,10 +701,10 @@ public class BoloController {
     public ResponseEntity<PedidoBoloResponseDTO> cadastrarPedido(
             @Valid @RequestBody PedidoBoloRequestDTO request
     ) {
-        PedidoBolo pedido = PedidoBoloRequestDTO.toPedidoBolo(request);
-        PedidoBolo pedidoSalvo = pedidoBoloService.cadastrarPedido(pedido);
+        PedidoBolo pedido = pedidoBoloMapper.toPedidoBolo(request);
+        PedidoBolo pedidoSalvo = pedidoBoloUseCase.cadastrarPedido(pedido);
         return ResponseEntity.status(201).body(
-                PedidoBoloResponseDTO.toPedidoBoloResponse(pedidoSalvo)
+                pedidoBoloMapper.toPedidoBoloResponse(pedidoSalvo)
         );
     }
 
@@ -721,10 +723,10 @@ public class BoloController {
             @PathVariable Integer id,
             @RequestBody PedidoBoloRequestDTO request
     ) {
-        PedidoBolo pedido = PedidoBoloRequestDTO.toPedidoBolo(request);
-        PedidoBolo pedidoAtualizado = pedidoBoloService.atualizarPedido(pedido, id);
+        PedidoBolo pedido = pedidoBoloMapper.toPedidoBolo(request);
+        PedidoBolo pedidoAtualizado = pedidoBoloUseCase.atualizarPedido(pedido, id);
         return ResponseEntity.status(200).body(
-                PedidoBoloResponseDTO.toPedidoBoloResponse(pedidoAtualizado)
+                pedidoBoloMapper.toPedidoBoloResponse(pedidoAtualizado)
         );
     }
 
@@ -738,7 +740,7 @@ public class BoloController {
     public ResponseEntity<Void> deletarPedido(
             @PathVariable Integer id
     ) {
-        pedidoBoloService.deletarPedido(id);
+        pedidoBoloUseCase.deletarPedido(id);
         return ResponseEntity.status(204).build();
     }
 
