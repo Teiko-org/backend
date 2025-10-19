@@ -1,6 +1,6 @@
 package com.carambolos.carambolosapi.infrastructure.persistence.jpa;
 
-import com.carambolos.carambolosapi.domain.entity.Bolo;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.BoloEntity;
 import com.carambolos.carambolosapi.domain.entity.ImagemDecoracao;
 import com.carambolos.carambolosapi.domain.projection.DetalheBoloProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,12 +10,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-public interface BoloRepository extends JpaRepository<Bolo, Integer> {
+public interface BoloRepository extends JpaRepository<BoloEntity, Integer> {
     Boolean existsByIdAndIsAtivoTrue(Integer id);
 
     Boolean existsByIdAndIdNotAndIsAtivoTrue(Integer id, Integer id2);
 
-    List<Bolo> findByCategoriaIn(List<String> categoria);
+    List<BoloEntity> findByCategoriaIn(List<String> categoria);
 
     @Query(value = """
             SELECT
@@ -30,7 +30,7 @@ public interface BoloRepository extends JpaRepository<Bolo, Integer> {
               (m.valor + COALESCE(ru1.valor + ru2.valor, reu1.valor + reu2.valor)) AS precoTotal,
               b.decoracao_id AS decoracaoId,
               b.is_ativo AS ativo
-            FROM bolo b
+            FROM boloEntity b
             JOIN massa m ON b.massa_id = m.id
             JOIN recheio_pedido rp ON b.recheio_pedido_id = rp.id
             JOIN coberturaEntity c on b.cobertura_id = c.id
@@ -45,7 +45,7 @@ public interface BoloRepository extends JpaRepository<Bolo, Integer> {
             LEFT JOIN recheio_unitario reu1 ON re.recheio_unitario_id1 = reu1.id
             LEFT JOIN recheio_unitario reu2 ON re.recheio_unitario_id2 = reu2.id
             
-            -- Filtrar apenas bolos cadastrados (excluir pedidos de clientes com categoria PERSONALIZADO)
+            -- Filtrar apenas boloEntities cadastrados (excluir pedidos de clientes com categoria PERSONALIZADO)
             WHERE b.categoria != 'PERSONALIZADO' AND b.is_ativo = 1
             """, nativeQuery = true)
     List<DetalheBoloProjection> listarDetalheBolo();
@@ -53,7 +53,7 @@ public interface BoloRepository extends JpaRepository<Bolo, Integer> {
     @Transactional
     @Modifying
     @Query(value = """
-            UPDATE bolo SET is_ativo = ?1 where id = ?2
+            UPDATE boloEntity SET is_ativo = ?1 where id = ?2
             """, nativeQuery = true)
     void atualizarStatusBolo(Integer status, Integer id);
 

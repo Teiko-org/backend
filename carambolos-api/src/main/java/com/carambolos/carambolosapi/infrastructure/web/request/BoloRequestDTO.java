@@ -1,6 +1,6 @@
 package com.carambolos.carambolosapi.infrastructure.web.request;
 
-import com.carambolos.carambolosapi.domain.entity.Bolo;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.BoloEntity;
 import com.carambolos.carambolosapi.domain.enums.FormatoEnum;
 import com.carambolos.carambolosapi.domain.enums.TamanhoEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -34,19 +34,5 @@ public record BoloRequestDTO(
         @Schema(description = "Categoria do bolo", example = "bolo de páscoa")
         String categoria
 ) {
-    @Schema(description = "Método para converter o DTO em uma entidade FornadaDaVez")
-    public static Bolo toBolo(BoloRequestDTO request) {
-        if (request == null) {
-            return null;
-        }
-        Bolo bolo = new Bolo();
-        bolo.setRecheioPedido(request.recheioPedidoId);
-        bolo.setMassa(request.massaId);
-        bolo.setCobertura(request.coberturaId);
-        bolo.setDecoracao(request.decoracaoId);
-        bolo.setFormato(request.formato);
-        bolo.setTamanho(request.tamanho);
-        bolo.setCategoria(request.categoria);
-        return bolo;
-    }
+
 }

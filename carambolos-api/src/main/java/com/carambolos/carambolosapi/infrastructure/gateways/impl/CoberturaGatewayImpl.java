@@ -52,4 +52,9 @@ public class CoberturaGatewayImpl implements CoberturaGateway {
         List<CoberturaEntity> entities = repository.findAll();
         return mapper.toDomain(entities);
     }
+
+    @Override
+    public Boolean existsByIdAndIsAtivoTrue(Integer id) {
+        return repository.existsByIdAndIsAtivoTrue(id);
+    }
 }

@@ -3,6 +3,7 @@ package com.carambolos.carambolosapi.infrastructure.gateways.impl;
 import com.carambolos.carambolosapi.application.gateways.DashboardGateway;
 import com.carambolos.carambolosapi.domain.entity.*;
 import com.carambolos.carambolosapi.domain.enums.StatusEnum;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.BoloEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.Fornada;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoFornada;
@@ -136,12 +137,12 @@ public class DashboardGatewayImpl implements DashboardGateway {
                             Integer boloId = entry.getKey();
                             Long quantidade = entry.getValue();
 
-                            Optional<Bolo> boloOpt = boloRepository.findById(boloId);
+                            Optional<BoloEntity> boloOpt = boloRepository.findById(boloId);
 
                             // Filtrar apenas bolos cadastrados (não pedidos de clientes)
                             if (boloOpt.isPresent()) {
-                                Bolo bolo = boloOpt.get();
-                                if ("PERSONALIZADO".equals(bolo.getCategoria())) {
+                                BoloEntity boloEntity = boloOpt.get();
+                                if ("PERSONALIZADO".equals(boloEntity.getCategoria())) {
                                     return null; // Pular bolos que são pedidos de clientes
                                 }
                             }
@@ -162,10 +163,10 @@ public class DashboardGatewayImpl implements DashboardGateway {
 
                             String nomeBolo = "Bolo Desconhecido";
                             if (boloOpt.isPresent()) {
-                                Bolo bolo = boloOpt.get();
+                                BoloEntity boloEntity = boloOpt.get();
 
-                                nomeBolo = bolo.getDecoracao() != null ?
-                                        decoracaoRepository.findById(bolo.getDecoracao())
+                                nomeBolo = boloEntity.getDecoracao() != null ?
+                                        decoracaoRepository.findById(boloEntity.getDecoracao())
                                                 .map(Decoracao::getNome)
                                                 .orElse("Sem Decoração")
                                         : "Sem Decoração";
@@ -340,8 +341,8 @@ public class DashboardGatewayImpl implements DashboardGateway {
 
             // Adicionar bolos cadastrados (excluindo pedidos de clientes com categoria PERSONALIZADO)
             try {
-                List<Bolo> bolos = boloRepository.findAll();
-                bolos.forEach(bolo -> {
+                List<BoloEntity> boloEntities = boloRepository.findAll();
+                boloEntities.forEach(bolo -> {
                     // Filtrar bolos que são pedidos de clientes (categoria PERSONALIZADO)
                     if ("PERSONALIZADO".equals(bolo.getCategoria())) {
                         return; // Pular bolos que são pedidos de clientes

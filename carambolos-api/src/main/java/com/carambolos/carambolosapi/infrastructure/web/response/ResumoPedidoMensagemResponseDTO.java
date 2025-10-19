@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 public record ResumoPedidoMensagemResponseDTO (
         Integer id,
@@ -120,10 +121,10 @@ public record ResumoPedidoMensagemResponseDTO (
             PedidoBolo pedidoBolo = pedidoBoloRepository.findById(pedidoBoloId)
                     .orElseThrow(() -> new RuntimeException("Pedido de bolo não encontrado"));
 
-            Bolo bolo = boloRepository.findById(pedidoBolo.getBoloId())
+            BoloEntity boloEntity = boloRepository.findById(pedidoBolo.getBoloId())
                     .orElseThrow(() -> new RuntimeException("Bolo não encontrado"));
 
-            String descricaoBolo = gerarDescricaoBolo(bolo);
+            String descricaoBolo = gerarDescricaoBolo(boloEntity);
             mensagem.append("1x ").append(descricaoBolo).append(" ").append(valorTotal).append("\n");
             mensagem.append("Total: ").append(valorTotal).append("\n");
 
@@ -170,48 +171,47 @@ public record ResumoPedidoMensagemResponseDTO (
             }
         }
 
-        private String gerarDescricaoBolo(Bolo bolo) {
+        private String gerarDescricaoBolo(BoloEntity boloEntity) {
             StringBuilder descricao = new StringBuilder("Bolo");
 
-            if (bolo.getTamanho() != null) {
-                descricao.append("\nTamanho: ").append(bolo.getTamanho());
+            if (boloEntity.getTamanho() != null) {
+                descricao.append("\nTamanho: ").append(boloEntity.getTamanho());
             }
 
-            if (bolo.getFormato() != null) {
-                descricao.append("\nFormato: ").append(bolo.getFormato());
+            if (boloEntity.getFormato() != null) {
+                descricao.append("\nFormato: ").append(boloEntity.getFormato());
             }
 
-            if (bolo.getCategoria() != null && !bolo.getCategoria().isEmpty()) {
-                descricao.append("\nCategoria: ").append(bolo.getCategoria());
+            if (boloEntity.getCategoria() != null && !boloEntity.getCategoria().isEmpty()) {
+                descricao.append("\nCategoria: ").append(boloEntity.getCategoria());
             }
 
-            if (bolo.getCobertura() != null) {
-                CoberturaEntity coberturaEntity = coberturaRepository.findById(bolo.getCobertura())
+            if (boloEntity.getCobertura() != null) {
+                CoberturaEntity coberturaEntity = coberturaRepository.findById(boloEntity.getCobertura())
                         .orElse(null);
                 if (coberturaEntity != null) {
                     descricao.append("\nCobertura: ").append(coberturaEntity.getDescricao());
                 }
             }
 
-            if (bolo.getMassa() != null) {
-                com.carambolos.carambolosapi.infrastructure.persistence.entity.MassaEntity massa = massaRepository.findById(bolo.getMassa())
+            if (boloEntity.getMassa() != null) {
+                com.carambolos.carambolosapi.infrastructure.persistence.entity.MassaEntity massa = massaRepository.findById(boloEntity.getMassa())
                         .orElse(null);
                 if (massa != null) {
                     descricao.append("\nMassa: ").append(massa.getSabor());
                 }
             }
 
-            if (bolo.getRecheioPedido() != null) {
-                RecheioPedidoEntity recheioPedidoEntity = recheioPedidoRepository.findById(bolo.getRecheioPedido())
+            if (boloEntity.getRecheioPedido() != null) {
+                RecheioPedidoEntity recheioPedidoEntity = recheioPedidoRepository.findById(boloEntity.getRecheioPedido())
                         .orElse(null);
                 if (recheioPedidoEntity != null) {
                     descricao.append("\nRecheio: ");
 
                     if (recheioPedidoEntity.getRecheioExclusivo() != null) {
-                        RecheioExclusivo recheioExclusivo = recheioExclusivoRepository.findById(recheioPedidoEntity.getRecheioExclusivo())
-                                .orElse(null);
-                        if (recheioExclusivoEntity != null) {
-                            descricao.append(recheioExclusivoEntity.getNome());
+                        Optional<RecheioExclusivoEntity> recheioExclusivo = recheioExclusivoRepository.findById(recheioPedidoEntity.getRecheioExclusivo());
+                        if (recheioExclusivo.isPresent()) {
+                            descricao.append(recheioExclusivo.get().getNome());
                         }
                     } else {
                         if (recheioPedidoEntity.getRecheioUnitarioId1() != null) {

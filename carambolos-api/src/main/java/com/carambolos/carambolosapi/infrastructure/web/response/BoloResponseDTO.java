@@ -1,6 +1,6 @@
 package com.carambolos.carambolosapi.infrastructure.web.response;
 
-import com.carambolos.carambolosapi.domain.entity.Bolo;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.BoloEntity;
 import com.carambolos.carambolosapi.domain.enums.FormatoEnum;
 import com.carambolos.carambolosapi.domain.enums.TamanhoEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -28,16 +28,5 @@ public record BoloResponseDTO(
         @Schema(description = "Tamanho do bolo em cm", example = "12")
         TamanhoEnum tamanho
 ) {
-    @Schema(description = "Método para converter a entidade Bolo em um DTO de resposta")
-    public static BoloResponseDTO toBoloResponse(Bolo bolo) {
-        return new BoloResponseDTO(
-                bolo.getId(),
-                bolo.getRecheioPedido(),
-                bolo.getMassa(),
-                bolo.getCobertura(),
-                bolo.getDecoracao(),
-                bolo.getFormato(),
-                bolo.getTamanho()
-        );
-    }
+
 }
