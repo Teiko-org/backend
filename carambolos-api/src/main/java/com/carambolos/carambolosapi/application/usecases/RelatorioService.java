@@ -89,9 +89,9 @@ public class RelatorioService {
 
                     String saborRecheio = "";
                     if (bolo.getRecheioPedido() != null) {
-                        Optional<RecheioPedido> recheioPedidoOpt = recheioPedidoRepository.findById(bolo.getRecheioPedido());
+                        Optional<RecheioPedidoEntity> recheioPedidoOpt = recheioPedidoRepository.findById(bolo.getRecheioPedido());
                         if (recheioPedidoOpt.isPresent()) {
-                            RecheioPedido rp = recheioPedidoOpt.get();
+                            RecheioPedidoEntity rp = recheioPedidoOpt.get();
                             List<String> sabores = new ArrayList<>();
                             if (rp.getRecheioUnitarioId1() != null) {
                                 recheios.stream()

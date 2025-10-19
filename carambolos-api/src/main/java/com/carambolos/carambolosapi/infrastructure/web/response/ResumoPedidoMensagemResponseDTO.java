@@ -202,28 +202,28 @@ public record ResumoPedidoMensagemResponseDTO (
             }
 
             if (bolo.getRecheioPedido() != null) {
-                RecheioPedido recheioPedido = recheioPedidoRepository.findById(bolo.getRecheioPedido())
+                RecheioPedidoEntity recheioPedidoEntity = recheioPedidoRepository.findById(bolo.getRecheioPedido())
                         .orElse(null);
-                if (recheioPedido != null) {
+                if (recheioPedidoEntity != null) {
                     descricao.append("\nRecheio: ");
 
-                    if (recheioPedido.getRecheioExclusivo() != null) {
-                        RecheioExclusivoEntity recheioExclusivoEntity = recheioExclusivoRepository.findById(recheioPedido.getRecheioExclusivo())
+                    if (recheioPedidoEntity.getRecheioExclusivo() != null) {
+                        RecheioExclusivo recheioExclusivo = recheioExclusivoRepository.findById(recheioPedidoEntity.getRecheioExclusivo())
                                 .orElse(null);
                         if (recheioExclusivoEntity != null) {
                             descricao.append(recheioExclusivoEntity.getNome());
                         }
                     } else {
-                        if (recheioPedido.getRecheioUnitarioId1() != null) {
-                            RecheioUnitarioEntity recheio1 = recheioUnitarioRepository.findById(recheioPedido.getRecheioUnitarioId1())
+                        if (recheioPedidoEntity.getRecheioUnitarioId1() != null) {
+                            RecheioUnitarioEntity recheio1 = recheioUnitarioRepository.findById(recheioPedidoEntity.getRecheioUnitarioId1())
                                     .orElse(null);
                             if (recheio1 != null) {
                                 descricao.append(recheio1.getSabor());
                             }
                         }
 
-                        if (recheioPedido.getRecheioUnitarioId2() != null) {
-                            RecheioUnitarioEntity recheio2 = recheioUnitarioRepository.findById(recheioPedido.getRecheioUnitarioId2())
+                        if (recheioPedidoEntity.getRecheioUnitarioId2() != null) {
+                            RecheioUnitarioEntity recheio2 = recheioUnitarioRepository.findById(recheioPedidoEntity.getRecheioUnitarioId2())
                                     .orElse(null);
                             if (recheio2 != null) {
                                 descricao.append(" e ").append(recheio2.getSabor());

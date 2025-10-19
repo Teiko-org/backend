@@ -9,6 +9,9 @@ import com.carambolos.carambolosapi.domain.projection.RecheioExclusivoProjection
 import com.carambolos.carambolosapi.domain.projection.RecheioPedidoProjection;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.CoberturaMapper;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.MassaMapper;
+import com.carambolos.carambolosapi.infrastructure.gateways.mapper.RecheioPedidoMapper;
+import com.carambolos.carambolosapi.infrastructure.gateways.mapper.RecheioUnitarioMapper;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.RecheioPedidoEntity;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.RecheioExclusivoMapper;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.RecheioUnitarioMapper;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.RecheioExclusivoEntity;
@@ -41,6 +44,10 @@ public class BoloController {
     private final RecheioExclusivoUseCase recheioExclusivoUseCase;
     private final RecheioExclusivoMapper recheioExclusivoMapper;
 
+
+    private final RecheioPedidoUseCase recheioPedidoUseCase;
+    private final RecheioPedidoMapper recheioPedidoMapper;
+
     public BoloController(
             MassaUseCase massaUseCase,
             CoberturaUseCase coberturaUseCase,
@@ -48,6 +55,8 @@ public class BoloController {
             CoberturaMapper coberturaMapper,
             RecheioUnitarioUseCase recheioUnitarioUseCase,
             RecheioUnitarioMapper recheioUnitarioMapper,
+            RecheioPedidoUseCase recheioPedidoUseCase,
+            RecheioPedidoMapper recheioPedidoMapper
             RecheioExclusivoUseCase recheioExclusivoUseCase,
             RecheioExclusivoMapper recheioExclusivoMapper
     ) {
@@ -57,6 +66,8 @@ public class BoloController {
         this.coberturaMapper = coberturaMapper;
         this.recheioUnitarioUseCase = recheioUnitarioUseCase;
         this.recheioUnitarioMapper = recheioUnitarioMapper;
+        this.recheioPedidoUseCase = recheioPedidoUseCase;
+        this.recheioPedidoMapper = recheioPedidoMapper;
         this.recheioExclusivoUseCase = recheioExclusivoUseCase;
         this.recheioExclusivoMapper = recheioExclusivoMapper;
     }
@@ -364,9 +375,9 @@ public class BoloController {
     public ResponseEntity<RecheioPedidoResponseDTO> cadastrarRecheioPedido(
             @RequestBody RecheioPedidoRequestDTO request
     ) {
-        RecheioPedido recheioPedido = RecheioPedidoRequestDTO.toRecheioPedido(request);
-        RecheioPedidoProjection projection = boloService.cadastrarRecheioPedido(recheioPedido);
-        RecheioPedidoResponseDTO response = RecheioPedidoResponseDTO.toResponse(projection);
+        RecheioPedido recheioPedido = recheioPedidoMapper.toRecheioPedido(request);
+        RecheioPedidoProjection projection = recheioPedidoUseCase.cadastrarRecheioPedido(recheioPedido);
+        RecheioPedidoResponseDTO response = recheioPedidoMapper.toResponse(projection);
         return ResponseEntity.status(201).body(response);
     }
 
@@ -385,8 +396,8 @@ public class BoloController {
             @PathVariable Integer id,
             @RequestBody RecheioPedidoRequestDTO request
     ) {
-        RecheioPedido recheioPedido = RecheioPedidoRequestDTO.toRecheioPedido(request);
-        RecheioPedidoResponseDTO response = RecheioPedidoResponseDTO.toResponse(boloService.atualizarRecheioPedido(recheioPedido, id));
+        RecheioPedido recheioPedido = recheioPedidoMapper.toRecheioPedido(request);
+        RecheioPedidoResponseDTO response = recheioPedidoMapper.toResponse(recheioPedidoUseCase.atualizarRecheioPedido(recheioPedido, id));
         return ResponseEntity.status(200).body(response);
     }
 
@@ -403,8 +414,8 @@ public class BoloController {
     public ResponseEntity<RecheioPedidoResponseDTO> buscarRecheioPedidoPorId(
             @PathVariable Integer id
     ) {
-        RecheioPedidoProjection projection = boloService.buscarRecheioPedidoPorId(id);
-        return ResponseEntity.status(200).body(RecheioPedidoResponseDTO.toResponse(projection));
+        RecheioPedidoProjection projection = recheioPedidoUseCase.buscarRecheioPedidoPorId(id);
+        return ResponseEntity.status(200).body(recheioPedidoMapper.toResponse(projection));
     }
 
     @Operation(summary = "Listar todos os recheios de pedido", description = "Lista todos os recheios de pedido cadastrados")
@@ -418,8 +429,8 @@ public class BoloController {
     })
     @GetMapping("/recheio-pedido")
     public ResponseEntity<List<RecheioPedidoResponseDTO>> listarRecheiosPedido() {
-        List<RecheioPedidoResponseDTO> response = RecheioPedidoResponseDTO.toResponse(
-                boloService.listarRecheiosPedido()
+        List<RecheioPedidoResponseDTO> response = recheioPedidoMapper.toResponse(
+                recheioPedidoUseCase.listarRecheiosPedido()
         );
 
         if (response.isEmpty()) {
@@ -439,7 +450,7 @@ public class BoloController {
     public ResponseEntity<Void> deletarRecheioPedido(
             @PathVariable Integer id
     ) {
-        boloService.deletarRecheioPedido(id);
+        recheioPedidoUseCase.deletarRecheioPedido(id);
         return ResponseEntity.status(204).build();
     }
 
