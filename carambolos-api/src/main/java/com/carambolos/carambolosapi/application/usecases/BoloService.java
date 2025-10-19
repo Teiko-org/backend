@@ -8,6 +8,7 @@ import com.carambolos.carambolosapi.application.exception.EntidadeJaExisteExcept
 import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.domain.projection.RecheioPedidoProjection;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.RecheioPedidoEntity;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.RecheioExclusivoEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -135,84 +136,13 @@ public class BoloService {
         throw new EntidadeNaoEncontradaException("Bolo com id %d não encontrado".formatted(id));
     }
 
-    public RecheioExclusivoProjection cadastrarRecheioExclusivo(RecheioExclusivo recheioExclusivo) {
-        int id1 = recheioExclusivo.getRecheioUnitarioId1();
-        int id2 = recheioExclusivo.getRecheioUnitarioId2();
-
-        boolean recheiosExistem = recheioUnitarioRepository.existsByIdAndIsAtivoTrue(id1) && recheioUnitarioRepository.existsByIdAndIsAtivoTrue(id2);
-        if (!recheiosExistem) {
-            throw new EntidadeNaoEncontradaException("Um ou mais recheios cadastrados não existem");
-        }
-
-        Integer recheiosExistentes1 = recheioExclusivoRepository.countByRecheioUnitarioIds(id1, id2);
-        Integer recheiosExistentes2 = recheioExclusivoRepository.countByRecheioUnitarioIds(id2, id1);
-
-        if (recheiosExistentes1 > 0 || recheiosExistentes2 > 0) {
-            throw new EntidadeJaExisteException("Recheio exclusivo já existente");
-        }
-
-        RecheioExclusivo recheioSalvo = recheioExclusivoRepository.save(recheioExclusivo);
-        return recheioExclusivoRepository.buscarRecheioExclusivoPorId(recheioSalvo.getId());
-    }
-
-    public RecheioExclusivoProjection buscarRecheioExclusivoPorId(Integer id) {
-        return recheioExclusivoRepository.buscarRecheioExclusivoPorId(id);
-    }
-
-    public List<RecheioExclusivoProjection> listarRecheiosExclusivos() {
-        return recheioExclusivoRepository.listarRecheiosExclusivos().stream()
-                .filter(recheioExclusivo -> recheioExclusivo.getIsAtivo() != null && recheioExclusivo.getIsAtivo() == 1)
-                .toList();
-    }
-
-    public RecheioExclusivoProjection editarRecheioExclusivo(RecheioExclusivo recheioExclusivo, Integer id) {
-        RecheioExclusivo recheioExistente = recheioExclusivoRepository.findById(id)
-                .filter(RecheioExclusivo::getAtivo)
-                .orElseThrow(() -> new EntidadeNaoEncontradaException("Recheio com o id %d não encontrado".formatted(id)));
-
-        Integer id1 = recheioExclusivo.getRecheioUnitarioId1();
-        Integer id2 = recheioExclusivo.getRecheioUnitarioId2();
-        Integer recheiosExistentes1 = recheioExclusivoRepository.countByRecheioUnitarioIds(id1, id2);
-        Integer recheiosExistentes2 = recheioExclusivoRepository.countByRecheioUnitarioIds(id2, id1);
-
-        if (recheiosExistentes1 > 0 || recheiosExistentes2 > 0) {
-            throw new EntidadeJaExisteException("Recheio exclusivo já existente");
-        }
-
-        recheioExistente = verificarCampos(recheioExclusivo, recheioExistente);
-        recheioExistente.setId(id);
-        recheioExclusivoRepository.save(recheioExistente);
-
-        return buscarRecheioExclusivoPorId(id);
-    }
-
-    public void excluirRecheioExclusivo(Integer id) {
-        Optional<RecheioExclusivo> possivelRecheio = recheioExclusivoRepository.findById(id)
-                .filter(RecheioExclusivo::getAtivo);
-        if (possivelRecheio.isPresent()) {
-            RecheioExclusivo recheio = possivelRecheio.get();
-            recheio.setAtivo(false);
-            recheioExclusivoRepository.save(recheio);
-            return;
-        }
-
-        throw new EntidadeNaoEncontradaException("Recheio exclusivo com id %s não encontrado".formatted(id));
-    }
 
 
 
-    private RecheioExclusivo verificarCampos(RecheioExclusivo recheioExclusivo, RecheioExclusivo recheioExistente) {
-        if (recheioExclusivo.getNome() != null) {
-            recheioExistente.setNome(recheioExclusivo.getNome());
-        }
-        if (recheioExclusivo.getRecheioUnitarioId1() != null) {
-            recheioExistente.setRecheioUnitarioId1(recheioExclusivo.getRecheioUnitarioId1());
-        }
-        if (recheioExclusivo.getRecheioUnitarioId2() != null) {
-            recheioExistente.setRecheioUnitarioId2(recheioExclusivo.getRecheioUnitarioId2());
-        }
-        return recheioExistente;
-    }
+
+
+
+
 
 
 }

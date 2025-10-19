@@ -1,6 +1,6 @@
 package com.carambolos.carambolosapi.infrastructure.web.request;
 
-import com.carambolos.carambolosapi.domain.entity.RecheioExclusivo;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.RecheioExclusivoEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 
@@ -17,11 +17,5 @@ public record RecheioExclusivoRequestDTO(
         @Schema(description = "ID do segundo recheio unitário", example = "2")
         Integer idRecheioUnitario2
 ) {
-    public static RecheioExclusivo toRecheioExclusivo(RecheioExclusivoRequestDTO request) {
-        RecheioExclusivo recheioExclusivo = new RecheioExclusivo();
-        recheioExclusivo.setRecheioUnitarioId1(request.idRecheioUnitario1);
-        recheioExclusivo.setRecheioUnitarioId2(request.idRecheioUnitario2);
-        recheioExclusivo.setNome(request.nome);
-        return recheioExclusivo;
-    }
+
 }

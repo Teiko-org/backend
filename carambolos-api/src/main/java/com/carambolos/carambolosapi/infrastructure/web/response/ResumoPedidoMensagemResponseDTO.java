@@ -210,8 +210,8 @@ public record ResumoPedidoMensagemResponseDTO (
                     if (recheioPedidoEntity.getRecheioExclusivo() != null) {
                         RecheioExclusivo recheioExclusivo = recheioExclusivoRepository.findById(recheioPedidoEntity.getRecheioExclusivo())
                                 .orElse(null);
-                        if (recheioExclusivo != null) {
-                            descricao.append(recheioExclusivo.getNome());
+                        if (recheioExclusivoEntity != null) {
+                            descricao.append(recheioExclusivoEntity.getNome());
                         }
                     } else {
                         if (recheioPedidoEntity.getRecheioUnitarioId1() != null) {

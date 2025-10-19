@@ -1,13 +1,13 @@
 package com.carambolos.carambolosapi.infrastructure.persistence.jpa;
 
 import com.carambolos.carambolosapi.domain.projection.RecheioExclusivoProjection;
-import com.carambolos.carambolosapi.domain.entity.RecheioExclusivo;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.RecheioExclusivoEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface RecheioExclusivoRepository extends JpaRepository<RecheioExclusivo, Integer> {
+public interface RecheioExclusivoRepository extends JpaRepository<RecheioExclusivoEntity, Integer> {
     @Query(value = """
             select count(1) from recheio_exclusivo re
             where re.recheio_unitario_id1 = ?1 and re.recheio_unitario_id2 = ?2

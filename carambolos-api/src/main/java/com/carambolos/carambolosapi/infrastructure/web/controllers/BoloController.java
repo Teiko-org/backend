@@ -12,6 +12,9 @@ import com.carambolos.carambolosapi.infrastructure.gateways.mapper.MassaMapper;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.RecheioPedidoMapper;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.RecheioUnitarioMapper;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.RecheioPedidoEntity;
+import com.carambolos.carambolosapi.infrastructure.gateways.mapper.RecheioExclusivoMapper;
+import com.carambolos.carambolosapi.infrastructure.gateways.mapper.RecheioUnitarioMapper;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.RecheioExclusivoEntity;
 import com.carambolos.carambolosapi.infrastructure.web.request.*;
 import com.carambolos.carambolosapi.infrastructure.web.response.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,6 +41,8 @@ public class BoloController {
     private final CoberturaMapper coberturaMapper;
     private final RecheioUnitarioUseCase recheioUnitarioUseCase;
     private final RecheioUnitarioMapper recheioUnitarioMapper;
+    private final RecheioExclusivoUseCase recheioExclusivoUseCase;
+    private final RecheioExclusivoMapper recheioExclusivoMapper;
 
 
     private final RecheioPedidoUseCase recheioPedidoUseCase;
@@ -52,6 +57,8 @@ public class BoloController {
             RecheioUnitarioMapper recheioUnitarioMapper,
             RecheioPedidoUseCase recheioPedidoUseCase,
             RecheioPedidoMapper recheioPedidoMapper
+            RecheioExclusivoUseCase recheioExclusivoUseCase,
+            RecheioExclusivoMapper recheioExclusivoMapper
     ) {
         this.massaUseCase = massaUseCase;
         this.coberturaUseCase = coberturaUseCase;
@@ -61,6 +68,8 @@ public class BoloController {
         this.recheioUnitarioMapper = recheioUnitarioMapper;
         this.recheioPedidoUseCase = recheioPedidoUseCase;
         this.recheioPedidoMapper = recheioPedidoMapper;
+        this.recheioExclusivoUseCase = recheioExclusivoUseCase;
+        this.recheioExclusivoMapper = recheioExclusivoMapper;
     }
 
     @Autowired
@@ -274,10 +283,10 @@ public class BoloController {
     public ResponseEntity<RecheioExclusivoResponseDTO> cadastrarRecheioExclusivo(
             @RequestBody RecheioExclusivoRequestDTO request
     ) {
-        RecheioExclusivo recheioExclusivo = RecheioExclusivoRequestDTO.toRecheioExclusivo(request);
-        RecheioExclusivoProjection recheioSalvo = boloService.cadastrarRecheioExclusivo(recheioExclusivo);
+        RecheioExclusivo recheioExclusivo = recheioExclusivoMapper.toRecheioExclusivo(request);
+        RecheioExclusivoProjection recheioSalvo = recheioExclusivoUseCase.cadastrarRecheioExclusivo(recheioExclusivo);
         return ResponseEntity.status(200).body(
-                RecheioExclusivoResponseDTO.toRecheioExclusivoResponse(recheioSalvo)
+                recheioExclusivoMapper.toRecheioExclusivoResponse(recheioSalvo)
         );
     }
 
@@ -294,9 +303,9 @@ public class BoloController {
     public ResponseEntity<RecheioExclusivoResponseDTO> buscarRecheioExclusivoPorId(
             @PathVariable Integer id
     ) {
-        RecheioExclusivoProjection projection = boloService.buscarRecheioExclusivoPorId(id);
+        RecheioExclusivoProjection projection = recheioExclusivoUseCase.buscarRecheioExclusivoPorId(id);
         return ResponseEntity.status(200).body(
-                RecheioExclusivoResponseDTO.toRecheioExclusivoResponse(projection)
+                recheioExclusivoMapper.toRecheioExclusivoResponse(projection)
         );
     }
 
@@ -311,9 +320,9 @@ public class BoloController {
     })
     @GetMapping("/recheio-exclusivo")
     public ResponseEntity<List<RecheioExclusivoResponseDTO>> listarRecheiosExclusivos() {
-        List<RecheioExclusivoProjection> recheiosEncontrados = boloService.listarRecheiosExclusivos();
+        List<RecheioExclusivoProjection> recheiosEncontrados = recheioExclusivoUseCase.listarRecheiosExclusivos();
         return ResponseEntity.status(200).body(
-                RecheioExclusivoResponseDTO.toRecheioExclusivoResponse(recheiosEncontrados)
+                recheioExclusivoMapper.toRecheioExclusivoResponse(recheiosEncontrados)
         );
     }
 
@@ -332,10 +341,10 @@ public class BoloController {
             @PathVariable Integer id,
             @RequestBody RecheioExclusivoRequestDTO request
     ) {
-        RecheioExclusivo recheioExclusivo = RecheioExclusivoRequestDTO.toRecheioExclusivo(request);
-        RecheioExclusivoProjection recheioSalvo = boloService.editarRecheioExclusivo(recheioExclusivo, id);
+        RecheioExclusivo recheioExclusivoEntity = recheioExclusivoMapper.toRecheioExclusivo(request);
+        RecheioExclusivoProjection recheioSalvo = recheioExclusivoUseCase.editarRecheioExclusivo(recheioExclusivoEntity, id);
         return ResponseEntity.status(200).body(
-                RecheioExclusivoResponseDTO.toRecheioExclusivoResponse(recheioSalvo)
+                recheioExclusivoMapper.toRecheioExclusivoResponse(recheioSalvo)
         );
     }
 
@@ -349,7 +358,7 @@ public class BoloController {
     public ResponseEntity<Void> excluirRecheioExclusivo(
             @PathVariable Integer id
     ) {
-        boloService.excluirRecheioExclusivo(id);
+        recheioExclusivoUseCase.excluirRecheioExclusivo(id);
         return ResponseEntity.status(204).build();
     }
 

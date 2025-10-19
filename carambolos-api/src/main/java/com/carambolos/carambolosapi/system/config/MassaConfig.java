@@ -12,17 +12,17 @@ import org.springframework.context.annotation.Configuration;
 public class MassaConfig {
 
     @Bean
-    MassaUseCase createUseCase(MassaGateway massaGateway) {
+    MassaUseCase createMassaUseCase(MassaGateway massaGateway) {
         return new MassaUseCase(massaGateway);
     }
 
     @Bean
-    MassaGateway createGateway(MassaRepository repository, MassaMapper mapper) {
+    MassaGateway createMassaGateway(MassaRepository repository, MassaMapper mapper) {
         return new MassaGatewayImpl(repository, mapper);
     }
 
     @Bean
-    MassaMapper createMapper() {
+    MassaMapper createMassaMapper() {
         return new MassaMapper();
     }
 }
