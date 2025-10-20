@@ -10,4 +10,5 @@ public interface CoberturaGateway {
     Cobertura findById(Integer id);
     int countByCorAndDescricaoAndIdNotAndIsAtivoTrue(String cor, String descricao, Integer id);
     List<Cobertura> findAll();
+    Boolean existsByIdAndIsAtivoTrue(Integer id);
 }

@@ -56,4 +56,9 @@ public class RecheioPedidoGatewayImpl implements RecheioPedidoGateway {
                 .filter(recheioPedido -> Boolean.TRUE.equals(recheioPedido.getIsAtivo()))
                 .toList();
     }
+
+    @Override
+    public Boolean existsByIdAndIsAtivoTrue(Integer id) {
+        return repository.existsByIdAndIsAtivoTrue(id);
+    }
 }

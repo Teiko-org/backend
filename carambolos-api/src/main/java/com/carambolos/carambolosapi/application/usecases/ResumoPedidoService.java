@@ -1,10 +1,8 @@
 package com.carambolos.carambolosapi.application.usecases;
 
-import com.carambolos.carambolosapi.infrastructure.persistence.entity.CoberturaEntity;
-import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
-import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoFornada;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.*;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.EnderecoMapper;
-import com.carambolos.carambolosapi.infrastructure.persistence.entity.EnderecoEntity;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoFornada;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.*;
 import com.carambolos.carambolosapi.infrastructure.web.response.DetalhePedidoBoloDTO;
 import com.carambolos.carambolosapi.infrastructure.web.response.DetalhePedidoFornadaDTO;
@@ -174,20 +172,20 @@ public class ResumoPedidoService {
                 throw new EntidadeImprocessavelException("O resumo de pedido #" + pedidoResumoId + " não está vinculado a um pedido de bolo");
             }
 
-            PedidoBolo pedido = pedidoBoloRepository.findById(resumoPedido.getPedidoBoloId())
-                    .filter(PedidoBolo::getAtivo)
+            PedidoBoloEntity pedido = pedidoBoloRepository.findById(resumoPedido.getPedidoBoloId())
+                    .filter(PedidoBoloEntity::getAtivo)
                     .orElseThrow(() -> new EntidadeNaoEncontradaException("Pedido com o id %d não encontrado".formatted(resumoPedido.getPedidoBoloId())));
 
-            Bolo bolo = boloRepository.findById(pedido.getBoloId())
+            BoloEntity boloEntity = boloRepository.findById(pedido.getBoloId())
                     .orElseThrow(() -> new EntidadeNaoEncontradaException("Bolo com id %d não encontrado".formatted(pedido.getBoloId())));
 
-            String massaNome = massaRepository.findById(bolo.getMassa())
+            String massaNome = massaRepository.findById(boloEntity.getMassa())
                     .map(com.carambolos.carambolosapi.infrastructure.persistence.entity.MassaEntity::getSabor)
                     .orElse("Não especificada");
 
             String recheioNome = "Não especificado";
             try {
-                recheioNome = recheioPedidoRepository.findById(bolo.getRecheioPedido())
+                recheioNome = recheioPedidoRepository.findById(boloEntity.getRecheioPedido())
                         .map(recheioPedido -> {
                             StringBuilder nomes = new StringBuilder();
 
@@ -224,14 +222,14 @@ public class ResumoPedidoService {
                 recheioNome = "Erro ao carregar recheio";
             }
 
-            String coberturaNome = coberturaRepository.findById(bolo.getCobertura())
+            String coberturaNome = coberturaRepository.findById(boloEntity.getCobertura())
                     .map(CoberturaEntity::getDescricao)
                     .orElse("Não especificada");
 
             String imagemUrl = "";
             String[] imagensDecoracao = new String[]{};
             try {
-                List<ImagemDecoracao> imagens = boloRepository.findAllImagensByDecoracao(bolo.getDecoracao());
+                List<ImagemDecoracao> imagens = boloRepository.findAllImagensByDecoracao(boloEntity.getDecoracao());
                 if (imagens != null && !imagens.isEmpty()) {
                     // Usar a primeira imagem como imagem principal
                     imagemUrl = imagens.get(0).getUrl();
@@ -278,8 +276,8 @@ public class ResumoPedidoService {
 
             return DetalhePedidoBoloDTO.toDetalhePedidoResponse(
                     pedido.getId(),
-                    bolo.getTamanho(),
-                    bolo.getFormato(),
+                    boloEntity.getTamanho(),
+                    boloEntity.getFormato(),
                     massaNome,
                     recheioNome,
                     coberturaNome,

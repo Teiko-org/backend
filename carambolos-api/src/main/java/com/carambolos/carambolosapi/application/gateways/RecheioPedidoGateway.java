@@ -12,4 +12,5 @@ public interface RecheioPedidoGateway {
     Boolean existsById(Integer id);
     RecheioPedido findById(Integer id);
     List<RecheioPedidoProjection> listarRecheiosPedido();
+    Boolean existsByIdAndIsAtivoTrue(Integer id);
 }

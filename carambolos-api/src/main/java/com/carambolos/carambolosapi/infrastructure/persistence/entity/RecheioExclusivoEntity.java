@@ -27,6 +27,17 @@ public class RecheioExclusivoEntity {
     @Schema(description = "Indica se o recheio exclusivo está ativo", example = "true")
     private Boolean isAtivo = true;
 
+    public RecheioExclusivoEntity() {
+    }
+
+    public RecheioExclusivoEntity(Integer id, Integer recheioUnitarioId1, Integer recheioUnitarioId2, String nome, Boolean isAtivo) {
+        this.id = id;
+        this.recheioUnitarioId1 = recheioUnitarioId1;
+        this.recheioUnitarioId2 = recheioUnitarioId2;
+        this.nome = nome;
+        this.isAtivo = isAtivo;
+    }
+
     public Integer getId() {
         return id;
     }
