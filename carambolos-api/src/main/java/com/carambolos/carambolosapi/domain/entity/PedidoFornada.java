@@ -1,55 +1,23 @@
 package com.carambolos.carambolosapi.domain.entity;
-
 import com.carambolos.carambolosapi.domain.enums.TipoEntregaEnum;
-import com.carambolos.carambolosapi.main.security.CryptoAttributeConverter;
+import com.carambolos.carambolosapi.system.security.CryptoAttributeConverter;
 import jakarta.persistence.*;
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "pedido_fornada")
-@Schema(description = "Entidade que representa um pedido associado a uma fornada.")
 public class PedidoFornada {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
-    @Column(name = "fornada_da_vez_id")
     private Integer fornadaDaVez;
-
-    @Column(name = "endereco_id")
     private Integer endereco;
-
-    @Column(name = "usuario_id")
     private Integer usuario;
-
     private Integer quantidade;
-
-    @Column(name = "data_previsao_entrega")
     private LocalDate dataPrevisaoEntrega;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "tipo_entrega")
     private TipoEntregaEnum tipoEntrega;
-
-    @Column(name = "nome_cliente")
-    @Convert(converter = CryptoAttributeConverter.class)
     private String nomeCliente;
-
-    @Column(name = "telefone_cliente")
-    @Convert(converter = CryptoAttributeConverter.class)
     private String telefoneCliente;
-
-    @Column(name = "horario_retirada")
     private String horarioRetirada;
-
-    @Column(name = "observacoes")
     private String observacoes;
-
-    @Column(name = "is_ativo")
-    private Boolean isAtivo = true;
+    private Boolean isAtivo;
 
     public Integer getId() {
         return id;
@@ -123,14 +91,6 @@ public class PedidoFornada {
         this.telefoneCliente = telefoneCliente;
     }
 
-    public String getHorario() {
-        return horarioRetirada;
-    }
-
-    public void setHorario(String horario) {
-        this.horarioRetirada = horario;
-    }
-
     public String getHorarioRetirada() {
         return horarioRetirada;
     }
@@ -147,15 +107,11 @@ public class PedidoFornada {
         this.observacoes = observacoes;
     }
 
-    public Boolean getAtivo() {
+    public Boolean getisAtivo() {
         return isAtivo;
     }
 
-    public Boolean isAtivo() {
-        return isAtivo;
-    }
-
-    public void setAtivo(Boolean ativo) {
-        isAtivo = ativo;
+    public void setisAtivo(Boolean isAtivo) {
+        this.isAtivo = isAtivo;
     }
 }

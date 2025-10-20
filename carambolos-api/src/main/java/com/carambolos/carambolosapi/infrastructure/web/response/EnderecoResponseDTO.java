@@ -40,28 +40,6 @@ public class EnderecoResponseDTO {
     @Schema(description = "ID do usuário associado ao endereço", example = "5")
     private Integer usuario;
 
-    public static EnderecoResponseDTO toResponseDTO(Endereco endereco) {
-        if (endereco == null) {
-            return null;
-        }
-
-        EnderecoResponseDTO responseDto = new EnderecoResponseDTO();
-        responseDto.setId(endereco.getId());
-        responseDto.setCep(endereco.getCep());
-        responseDto.setNome(endereco.getNome());
-        responseDto.setEstado(endereco.getEstado());
-        responseDto.setCidade(endereco.getCidade());
-        responseDto.setBairro(endereco.getBairro());
-        responseDto.setLogradouro(endereco.getLogradouro());
-        responseDto.setNumero(endereco.getNumero());
-        responseDto.setComplemento(endereco.getComplemento());
-        responseDto.setReferencia(endereco.getReferencia());
-        responseDto.setAtivo(endereco.isAtivo());
-        responseDto.setUsuario(endereco.getUsuario());
-
-        return responseDto;
-    }
-
     public int getId() {
         return id;
     }

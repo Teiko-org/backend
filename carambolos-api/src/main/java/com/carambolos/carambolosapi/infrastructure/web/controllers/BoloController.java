@@ -1,13 +1,14 @@
 package com.carambolos.carambolosapi.infrastructure.web.controllers;
 
+import com.carambolos.carambolosapi.application.usecases.*;
 import com.carambolos.carambolosapi.domain.entity.*;
 import com.carambolos.carambolosapi.domain.enums.FormatoEnum;
 import com.carambolos.carambolosapi.domain.enums.TamanhoEnum;
 import com.carambolos.carambolosapi.domain.projection.DetalheBoloProjection;
 import com.carambolos.carambolosapi.domain.projection.RecheioExclusivoProjection;
 import com.carambolos.carambolosapi.domain.projection.RecheioPedidoProjection;
-import com.carambolos.carambolosapi.application.usecases.BoloService;
-import com.carambolos.carambolosapi.application.usecases.PedidoBoloService;
+import com.carambolos.carambolosapi.infrastructure.gateways.mapper.*;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoBoloEntity;
 import com.carambolos.carambolosapi.infrastructure.web.request.*;
 import com.carambolos.carambolosapi.infrastructure.web.response.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,22 +22,55 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-
-import static com.carambolos.carambolosapi.infrastructure.web.request.RecheioUnitarioRequestDTO.toRecheioUnitario;
 
 @RestController
 @RequestMapping("/bolos")
 @Tag(name = "Bolo Controller", description = "Gerencia bolos, recheios, coberturas e massas")
 @SecurityRequirement(name = "Bearer")
 public class BoloController {
+    private final MassaUseCase massaUseCase;
+    private final CoberturaUseCase coberturaUseCase;
+    private final MassaMapper massaMapper;
+    private final CoberturaMapper coberturaMapper;
+    private final RecheioUnitarioUseCase recheioUnitarioUseCase;
+    private final RecheioUnitarioMapper recheioUnitarioMapper;
+    private final RecheioExclusivoUseCase recheioExclusivoUseCase;
+    private final RecheioExclusivoMapper recheioExclusivoMapper;
+    private final RecheioPedidoUseCase recheioPedidoUseCase;
+    private final RecheioPedidoMapper recheioPedidoMapper;
+    private final BoloUseCase boloUseCase;
+    private final BoloMapper boloMapper;
+    private final PedidoBoloUseCase pedidoBoloUseCase;
+    private final PedidoBoloMapper pedidoBoloMapper;
 
-    @Autowired
-    private BoloService boloService;
-
-    @Autowired
-    private PedidoBoloService pedidoBoloService;
+    public BoloController(
+            MassaUseCase massaUseCase,
+            CoberturaUseCase coberturaUseCase,
+            MassaMapper massaMapper,
+            CoberturaMapper coberturaMapper,
+            RecheioUnitarioUseCase recheioUnitarioUseCase,
+            RecheioUnitarioMapper recheioUnitarioMapper,
+            RecheioPedidoUseCase recheioPedidoUseCase,
+            RecheioPedidoMapper recheioPedidoMapper,
+            RecheioExclusivoUseCase recheioExclusivoUseCase,
+            RecheioExclusivoMapper recheioExclusivoMapper, BoloUseCase boloUseCase, BoloMapper boloMapper, PedidoBoloUseCase pedidoBoloUseCase, PedidoBoloMapper pedidoBoloMapper
+    ) {
+        this.massaUseCase = massaUseCase;
+        this.coberturaUseCase = coberturaUseCase;
+        this.massaMapper = massaMapper;
+        this.coberturaMapper = coberturaMapper;
+        this.recheioUnitarioUseCase = recheioUnitarioUseCase;
+        this.recheioUnitarioMapper = recheioUnitarioMapper;
+        this.recheioPedidoUseCase = recheioPedidoUseCase;
+        this.recheioPedidoMapper = recheioPedidoMapper;
+        this.recheioExclusivoUseCase = recheioExclusivoUseCase;
+        this.recheioExclusivoMapper = recheioExclusivoMapper;
+        this.boloUseCase = boloUseCase;
+        this.boloMapper = boloMapper;
+        this.pedidoBoloUseCase = pedidoBoloUseCase;
+        this.pedidoBoloMapper = pedidoBoloMapper;
+    }
 
     @Operation(summary = "Listar bolos", description = "Retorna todos os bolos cadastrados no sistema.")
     @ApiResponses(value = {
@@ -48,19 +82,19 @@ public class BoloController {
             @ApiResponse(responseCode = "500", description = "Erro interno no servidor.")
     })
     @GetMapping
-    public ResponseEntity<List<Bolo>> listarBolos(
+    public ResponseEntity<List<BoloResponseDTO>> listarBolos(
             @RequestParam(defaultValue = "") List<String> categorias
     ) {
-        List<Bolo> bolos = boloService.listarBolos(categorias);
+        List<Bolo> bolos = boloUseCase.listarBolos(categorias);
         if (bolos.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
-        return ResponseEntity.status(200).body(bolos);
+        return ResponseEntity.status(200).body(boloMapper.toBoloResponse(bolos));
     }
 
     @GetMapping("/detalhe")
     public ResponseEntity<List<DetalheBoloProjection>> listarDetalheBolos() {
-        return ResponseEntity.ok().body(boloService.listarDetalhesBolos());
+        return ResponseEntity.ok().body(boloUseCase.listarDetalhesBolos());
     }
 
     @Operation(summary = "Buscar bolo por ID", description = "Busca um bolo pelo seu ID")
@@ -74,8 +108,8 @@ public class BoloController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<BoloResponseDTO> buscarPorId(@PathVariable Integer id) {
-        Bolo bolo = boloService.buscarBoloPorId(id);
-        BoloResponseDTO response = BoloResponseDTO.toBoloResponse(bolo);
+        Bolo boloEntity = boloUseCase.buscarBoloPorId(id);
+        BoloResponseDTO response = boloMapper.toBoloResponse(boloEntity);
         return ResponseEntity.status(200).body(response);
     }
 
@@ -89,9 +123,9 @@ public class BoloController {
     })
     @PostMapping
     public ResponseEntity<BoloResponseDTO> cadastrarBolo(@Valid @RequestBody BoloRequestDTO request) {
-        Bolo bolo = BoloRequestDTO.toBolo(request);
-        Bolo boloSalvo = boloService.cadastrarBolo(bolo);
-        BoloResponseDTO response = BoloResponseDTO.toBoloResponse(boloSalvo);
+        Bolo bolo = boloMapper.toBolo(request);
+        Bolo boloSalvo = boloUseCase.cadastrarBolo(bolo);
+        BoloResponseDTO response = boloMapper.toBoloResponse(boloSalvo);
         return ResponseEntity.status(201).body(response);
     }
 
@@ -110,9 +144,9 @@ public class BoloController {
             @PathVariable Integer id,
             @Valid @RequestBody BoloRequestDTO request
     ) {
-        Bolo bolo = BoloRequestDTO.toBolo(request);
-        Bolo boloAtualizado = boloService.atualizarBolo(bolo, id);
-        BoloResponseDTO response = BoloResponseDTO.toBoloResponse(boloAtualizado);
+        Bolo bolo = boloMapper.toBolo(request);
+        Bolo boloAtualizado = boloUseCase.atualizarBolo(bolo, id);
+        BoloResponseDTO response = boloMapper.toBoloResponse(boloAtualizado);
         return ResponseEntity.status(200).body(response);
     }
 
@@ -124,7 +158,7 @@ public class BoloController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarBolo(@PathVariable Integer id) {
-        boloService.deletarBolo(id);
+        boloUseCase.deletarBolo(id);
         return ResponseEntity.status(204).build();
     }
 
@@ -134,7 +168,7 @@ public class BoloController {
             @RequestBody StatusRequestDTO status,
             @PathVariable Integer id
     ) {
-        boloService.atualizarStatusBolo(status.isAtivo(), id);
+        boloUseCase.atualizarStatusBolo(status.isAtivo(), id);
         return ResponseEntity.ok().build();
     }
 
@@ -151,10 +185,10 @@ public class BoloController {
     public ResponseEntity<RecheioUnitarioResponseDTO> cadastrarRecheioUnitario(
             @Valid @RequestBody RecheioUnitarioRequestDTO request
     ) {
-        RecheioUnitario recheioUnitario = toRecheioUnitario(request);
-        RecheioUnitario recheioSalvo = boloService.cadastrarRecheioUnitario(recheioUnitario);
+        RecheioUnitario recheioUnitario = recheioUnitarioMapper.toDomain(request);
+        RecheioUnitario recheioSalvo = recheioUnitarioUseCase.cadastrarRecheioUnitario(recheioUnitario);
         return ResponseEntity.status(201).body(
-                RecheioUnitarioResponseDTO.toRecheioUnitarioResponse(recheioSalvo)
+                recheioUnitarioMapper.toResponse(recheioSalvo)
         );
     }
 
@@ -169,9 +203,9 @@ public class BoloController {
     })
     @GetMapping("/recheio-unitario")
     public ResponseEntity<List<RecheioUnitarioResponseDTO>> listarRecheioUnitario() {
-        List<RecheioUnitario> recheiosUnitarios = boloService.listarRecheiosUnitarios();
+        List<RecheioUnitario> recheiosUnitarios = recheioUnitarioUseCase.listarRecheiosUnitarios();
         return ResponseEntity.status(200).body(
-                RecheioUnitarioResponseDTO.toRecheioUnitarioResponse(recheiosUnitarios)
+                recheioUnitarioMapper.toResponse(recheiosUnitarios)
         );
     }
 
@@ -188,9 +222,9 @@ public class BoloController {
     public ResponseEntity<RecheioUnitarioResponseDTO> buscarRecheioUnitarioPorId(
             @PathVariable Integer id
     ) {
-        RecheioUnitario recheioUnitario = boloService.buscarPorId(id);
+        RecheioUnitario recheioUnitario = recheioUnitarioUseCase.buscarPorId(id);
         return ResponseEntity.status(200).body(
-                RecheioUnitarioResponseDTO.toRecheioUnitarioResponse(recheioUnitario)
+                recheioUnitarioMapper.toResponse(recheioUnitario)
         );
     }
 
@@ -209,10 +243,10 @@ public class BoloController {
             @RequestBody RecheioUnitarioRequestDTO request,
             @PathVariable Integer id
     ) {
-        RecheioUnitario recheioUnitario = RecheioUnitarioRequestDTO.toRecheioUnitario(request);
-        RecheioUnitario recheioCadastrado = boloService.atualizarRecheioUnitario(recheioUnitario, id);
+        RecheioUnitario recheioUnitario = recheioUnitarioMapper.toDomain(request);
+        RecheioUnitario recheioCadastrado = recheioUnitarioUseCase.atualizarRecheioUnitario(recheioUnitario, id);
         return ResponseEntity.status(200).body(
-                RecheioUnitarioResponseDTO.toRecheioUnitarioResponse(recheioCadastrado)
+                recheioUnitarioMapper.toResponse(recheioCadastrado)
         );
     }
 
@@ -226,7 +260,7 @@ public class BoloController {
     public ResponseEntity<Void> deletarRecheioUnitario(
             @PathVariable Integer id
     ) {
-        boloService.deletarRecheioUnitario(id);
+        recheioUnitarioUseCase.deletarRecheioUnitario(id);
         return ResponseEntity.status(204).build();
     }
 
@@ -243,10 +277,10 @@ public class BoloController {
     public ResponseEntity<RecheioExclusivoResponseDTO> cadastrarRecheioExclusivo(
             @RequestBody RecheioExclusivoRequestDTO request
     ) {
-        RecheioExclusivo recheioExclusivo = RecheioExclusivoRequestDTO.toRecheioExclusivo(request);
-        RecheioExclusivoProjection recheioSalvo = boloService.cadastrarRecheioExclusivo(recheioExclusivo);
+        RecheioExclusivo recheioExclusivo = recheioExclusivoMapper.toRecheioExclusivo(request);
+        RecheioExclusivoProjection recheioSalvo = recheioExclusivoUseCase.cadastrarRecheioExclusivo(recheioExclusivo);
         return ResponseEntity.status(200).body(
-                RecheioExclusivoResponseDTO.toRecheioExclusivoResponse(recheioSalvo)
+                recheioExclusivoMapper.toRecheioExclusivoResponse(recheioSalvo)
         );
     }
 
@@ -263,9 +297,9 @@ public class BoloController {
     public ResponseEntity<RecheioExclusivoResponseDTO> buscarRecheioExclusivoPorId(
             @PathVariable Integer id
     ) {
-        RecheioExclusivoProjection projection = boloService.buscarRecheioExclusivoPorId(id);
+        RecheioExclusivoProjection projection = recheioExclusivoUseCase.buscarRecheioExclusivoPorId(id);
         return ResponseEntity.status(200).body(
-                RecheioExclusivoResponseDTO.toRecheioExclusivoResponse(projection)
+                recheioExclusivoMapper.toRecheioExclusivoResponse(projection)
         );
     }
 
@@ -280,9 +314,9 @@ public class BoloController {
     })
     @GetMapping("/recheio-exclusivo")
     public ResponseEntity<List<RecheioExclusivoResponseDTO>> listarRecheiosExclusivos() {
-        List<RecheioExclusivoProjection> recheiosEncontrados = boloService.listarRecheiosExclusivos();
+        List<RecheioExclusivoProjection> recheiosEncontrados = recheioExclusivoUseCase.listarRecheiosExclusivos();
         return ResponseEntity.status(200).body(
-                RecheioExclusivoResponseDTO.toRecheioExclusivoResponse(recheiosEncontrados)
+                recheioExclusivoMapper.toRecheioExclusivoResponse(recheiosEncontrados)
         );
     }
 
@@ -301,10 +335,10 @@ public class BoloController {
             @PathVariable Integer id,
             @RequestBody RecheioExclusivoRequestDTO request
     ) {
-        RecheioExclusivo recheioExclusivo = RecheioExclusivoRequestDTO.toRecheioExclusivo(request);
-        RecheioExclusivoProjection recheioSalvo = boloService.editarRecheioExclusivo(recheioExclusivo, id);
+        RecheioExclusivo recheioExclusivoEntity = recheioExclusivoMapper.toRecheioExclusivo(request);
+        RecheioExclusivoProjection recheioSalvo = recheioExclusivoUseCase.editarRecheioExclusivo(recheioExclusivoEntity, id);
         return ResponseEntity.status(200).body(
-                RecheioExclusivoResponseDTO.toRecheioExclusivoResponse(recheioSalvo)
+                recheioExclusivoMapper.toRecheioExclusivoResponse(recheioSalvo)
         );
     }
 
@@ -318,7 +352,7 @@ public class BoloController {
     public ResponseEntity<Void> excluirRecheioExclusivo(
             @PathVariable Integer id
     ) {
-        boloService.excluirRecheioExclusivo(id);
+        recheioExclusivoUseCase.excluirRecheioExclusivo(id);
         return ResponseEntity.status(204).build();
     }
 
@@ -335,9 +369,9 @@ public class BoloController {
     public ResponseEntity<RecheioPedidoResponseDTO> cadastrarRecheioPedido(
             @RequestBody RecheioPedidoRequestDTO request
     ) {
-        RecheioPedido recheioPedido = RecheioPedidoRequestDTO.toRecheioPedido(request);
-        RecheioPedidoProjection projection = boloService.cadastrarRecheioPedido(recheioPedido);
-        RecheioPedidoResponseDTO response = RecheioPedidoResponseDTO.toResponse(projection);
+        RecheioPedido recheioPedido = recheioPedidoMapper.toRecheioPedido(request);
+        RecheioPedidoProjection projection = recheioPedidoUseCase.cadastrarRecheioPedido(recheioPedido);
+        RecheioPedidoResponseDTO response = recheioPedidoMapper.toResponse(projection);
         return ResponseEntity.status(201).body(response);
     }
 
@@ -356,8 +390,8 @@ public class BoloController {
             @PathVariable Integer id,
             @RequestBody RecheioPedidoRequestDTO request
     ) {
-        RecheioPedido recheioPedido = RecheioPedidoRequestDTO.toRecheioPedido(request);
-        RecheioPedidoResponseDTO response = RecheioPedidoResponseDTO.toResponse(boloService.atualizarRecheioPedido(recheioPedido, id));
+        RecheioPedido recheioPedido = recheioPedidoMapper.toRecheioPedido(request);
+        RecheioPedidoResponseDTO response = recheioPedidoMapper.toResponse(recheioPedidoUseCase.atualizarRecheioPedido(recheioPedido, id));
         return ResponseEntity.status(200).body(response);
     }
 
@@ -374,8 +408,8 @@ public class BoloController {
     public ResponseEntity<RecheioPedidoResponseDTO> buscarRecheioPedidoPorId(
             @PathVariable Integer id
     ) {
-        RecheioPedidoProjection projection = boloService.buscarRecheioPedidoPorId(id);
-        return ResponseEntity.status(200).body(RecheioPedidoResponseDTO.toResponse(projection));
+        RecheioPedidoProjection projection = recheioPedidoUseCase.buscarRecheioPedidoPorId(id);
+        return ResponseEntity.status(200).body(recheioPedidoMapper.toResponse(projection));
     }
 
     @Operation(summary = "Listar todos os recheios de pedido", description = "Lista todos os recheios de pedido cadastrados")
@@ -389,8 +423,8 @@ public class BoloController {
     })
     @GetMapping("/recheio-pedido")
     public ResponseEntity<List<RecheioPedidoResponseDTO>> listarRecheiosPedido() {
-        List<RecheioPedidoResponseDTO> response = RecheioPedidoResponseDTO.toResponse(
-                boloService.listarRecheiosPedido()
+        List<RecheioPedidoResponseDTO> response = recheioPedidoMapper.toResponse(
+                recheioPedidoUseCase.listarRecheiosPedido()
         );
 
         if (response.isEmpty()) {
@@ -410,7 +444,7 @@ public class BoloController {
     public ResponseEntity<Void> deletarRecheioPedido(
             @PathVariable Integer id
     ) {
-        boloService.deletarRecheioPedido(id);
+        recheioPedidoUseCase.deletarRecheioPedido(id);
         return ResponseEntity.status(204).build();
     }
 
@@ -427,9 +461,9 @@ public class BoloController {
     public ResponseEntity<CoberturaResponseDTO> cadastrarCobertura(
             @RequestBody CoberturaRequestDTO request
     ) {
-        Cobertura cobertura = CoberturaRequestDTO.toCobertura(request);
-        boloService.cadastrarCobertura(cobertura);
-        return ResponseEntity.status(201).body(CoberturaResponseDTO.toResponse(cobertura));
+        Cobertura cobertura = coberturaMapper.toDomain(request);
+        Cobertura coberturaSalva = coberturaUseCase.cadastrarCobertura(cobertura);
+        return ResponseEntity.status(201).body(coberturaMapper.toResponse(coberturaSalva));
     }
 
     @Operation(summary = "Atualizar cobertura", description = "Atualiza uma cobertura existente pelo ID")
@@ -447,9 +481,9 @@ public class BoloController {
             @PathVariable Integer id,
             @RequestBody CoberturaRequestDTO request
     ) {
-        Cobertura cobertura = CoberturaRequestDTO.toCobertura(request);
-        CoberturaResponseDTO response = CoberturaResponseDTO.toResponse(
-                boloService.atualizarCobertura(cobertura, id)
+        Cobertura cobertura = coberturaMapper.toDomain(request);
+        CoberturaResponseDTO response = coberturaMapper.toResponse(
+                coberturaUseCase.atualizarCobertura(cobertura, id)
         );
         return ResponseEntity.status(200).body(response);
     }
@@ -465,11 +499,11 @@ public class BoloController {
     })
     @GetMapping("/cobertura")
     public ResponseEntity<List<CoberturaResponseDTO>> listarCoberturas() {
-        List<Cobertura> coberturas = boloService.listarCoberturas();
+        List<Cobertura> coberturas = coberturaUseCase.listarCoberturas();
         if (coberturas.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
-        return ResponseEntity.status(200).body(CoberturaResponseDTO.toResponse(coberturas));
+        return ResponseEntity.status(200).body(coberturaMapper.toResponse(coberturas));
     }
 
     @Operation(summary = "Buscar cobertura por ID", description = "Retorna uma cobertura específica com base no ID")
@@ -485,8 +519,8 @@ public class BoloController {
     public ResponseEntity<CoberturaResponseDTO> buscarCoberturaPorId(
             @PathVariable Integer id
     ) {
-        Cobertura cobertura = boloService.buscarCoberturaPorId(id);
-        return ResponseEntity.status(200).body(CoberturaResponseDTO.toResponse(cobertura));
+        Cobertura coberturaEntity = coberturaUseCase.buscarCoberturaPorId(id);
+        return ResponseEntity.status(200).body(coberturaMapper.toResponse(coberturaEntity));
     }
 
     @Operation(summary = "Deletar cobertura", description = "Remove uma cobertura pelo ID")
@@ -502,7 +536,7 @@ public class BoloController {
     public ResponseEntity<Void> deletarCobertura(
             @PathVariable Integer id
     ) {
-        boloService.deletarCobertura(id);
+        coberturaUseCase.deletarCobertura(id);
         return ResponseEntity.status(204).build();
     }
 
@@ -519,10 +553,10 @@ public class BoloController {
     public ResponseEntity<MassaResponseDTO> cadastrarMassa(
             @Valid @RequestBody MassaRequestDTO request
     ) {
-        Massa massa = MassaRequestDTO.toMassa(request);
-        boloService.cadastrarMassa(massa);
+        Massa massaDomain = massaMapper.toMassa(request);
+        Massa massaCadastrada = massaUseCase.cadastrarMassa(massaDomain);
         return ResponseEntity.status(201).body(
-                MassaResponseDTO.toMassaResponse(massa)
+                massaMapper.toResponse(massaCadastrada)
         );
     }
 
@@ -541,10 +575,10 @@ public class BoloController {
             @PathVariable Integer id,
             @RequestBody MassaRequestDTO request
     ) {
-        Massa massa = MassaRequestDTO.toMassa(request);
-        Massa cadastrada = boloService.atualizarMassa(massa, id);
+        Massa massaEntity = massaMapper.toMassa(request);
+        Massa cadastrada = massaUseCase.atualizarMassa(massaEntity, id);
         return ResponseEntity.status(200).body(
-                MassaResponseDTO.toMassaResponse(cadastrada)
+                massaMapper.toResponse(cadastrada)
         );
     }
 
@@ -559,12 +593,12 @@ public class BoloController {
     })
     @GetMapping("/massa")
     public ResponseEntity<List<MassaResponseDTO>> listarMassas() {
-        List<Massa> massas = boloService.listarMassas();
-        if (massas.isEmpty()) {
+        List<Massa> massasDomain = massaUseCase.listarMassas();
+        if (massasDomain.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
         return ResponseEntity.status(200).body(
-                MassaResponseDTO.toMassaResponse(massas)
+                massaMapper.toResponse(massasDomain)
         );
     }
 
@@ -581,9 +615,9 @@ public class BoloController {
     public ResponseEntity<MassaResponseDTO> buscarMassaPorId(
             @PathVariable Integer id
     ) {
-        Massa massa = boloService.buscarMassaPorId(id);
+        Massa massaDomain = massaUseCase.buscarMassaPorId(id);
         return ResponseEntity.status(200).body(
-                MassaResponseDTO.toMassaResponse(massa)
+                massaMapper.toResponse(massaDomain)
         );
     }
 
@@ -600,7 +634,7 @@ public class BoloController {
     public ResponseEntity<Void> deletarMassa(
             @PathVariable Integer id
     ) {
-        boloService.deletarMassa(id);
+        massaUseCase.deletarMassa(id);
         return ResponseEntity.status(204).build();
     }
 
@@ -626,14 +660,15 @@ public class BoloController {
             @ApiResponse(responseCode = "204", description = "Nenhum pedido encontrado", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
+
     @GetMapping("/pedido")
     public ResponseEntity<List<PedidoBoloResponseDTO>> listarPedidos() {
-        List<PedidoBolo> pedidos = pedidoBoloService.listarPedidos();
+        List<PedidoBolo> pedidos = pedidoBoloUseCase.listarPedidos();
         if (pedidos.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
         return ResponseEntity.status(200).body(
-                PedidoBoloResponseDTO.toPedidoBoloResponse(pedidos)
+                pedidoBoloMapper.toPedidoBoloResponse(pedidos)
         );
     }
 
@@ -650,9 +685,9 @@ public class BoloController {
     public ResponseEntity<PedidoBoloResponseDTO> buscarPedidoPorId(
             @PathVariable Integer id
     ) {
-        PedidoBolo pedido = pedidoBoloService.buscarPedidoPorId(id);
+        PedidoBolo pedido = pedidoBoloUseCase.buscarPedidoPorId(id);
         return ResponseEntity.status(200).body(
-                PedidoBoloResponseDTO.toPedidoBoloResponse(pedido)
+                pedidoBoloMapper.toPedidoBoloResponse(pedido)
         );
     }
 
@@ -666,10 +701,10 @@ public class BoloController {
     public ResponseEntity<PedidoBoloResponseDTO> cadastrarPedido(
             @Valid @RequestBody PedidoBoloRequestDTO request
     ) {
-        PedidoBolo pedido = PedidoBoloRequestDTO.toPedidoBolo(request);
-        PedidoBolo pedidoSalvo = pedidoBoloService.cadastrarPedido(pedido);
+        PedidoBolo pedido = pedidoBoloMapper.toPedidoBolo(request);
+        PedidoBolo pedidoSalvo = pedidoBoloUseCase.cadastrarPedido(pedido);
         return ResponseEntity.status(201).body(
-                PedidoBoloResponseDTO.toPedidoBoloResponse(pedidoSalvo)
+                pedidoBoloMapper.toPedidoBoloResponse(pedidoSalvo)
         );
     }
 
@@ -688,10 +723,10 @@ public class BoloController {
             @PathVariable Integer id,
             @RequestBody PedidoBoloRequestDTO request
     ) {
-        PedidoBolo pedido = PedidoBoloRequestDTO.toPedidoBolo(request);
-        PedidoBolo pedidoAtualizado = pedidoBoloService.atualizarPedido(pedido, id);
+        PedidoBolo pedido = pedidoBoloMapper.toPedidoBolo(request);
+        PedidoBolo pedidoAtualizado = pedidoBoloUseCase.atualizarPedido(pedido, id);
         return ResponseEntity.status(200).body(
-                PedidoBoloResponseDTO.toPedidoBoloResponse(pedidoAtualizado)
+                pedidoBoloMapper.toPedidoBoloResponse(pedidoAtualizado)
         );
     }
 
@@ -705,7 +740,7 @@ public class BoloController {
     public ResponseEntity<Void> deletarPedido(
             @PathVariable Integer id
     ) {
-        pedidoBoloService.deletarPedido(id);
+        pedidoBoloUseCase.deletarPedido(id);
         return ResponseEntity.status(204).build();
     }
 

@@ -1,6 +1,6 @@
 package com.carambolos.carambolosapi.infrastructure.web.request;
 
-import com.carambolos.carambolosapi.domain.entity.PedidoFornada;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoFornada;
 import com.carambolos.carambolosapi.domain.enums.TipoEntregaEnum;
 import io.micrometer.common.lang.Nullable;
 import io.swagger.v3.oas.annotations.media.Schema;

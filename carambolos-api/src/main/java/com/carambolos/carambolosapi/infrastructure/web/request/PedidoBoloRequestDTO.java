@@ -1,10 +1,11 @@
 package com.carambolos.carambolosapi.infrastructure.web.request;
 
-import com.carambolos.carambolosapi.domain.entity.PedidoBolo;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoBoloEntity;
 import com.carambolos.carambolosapi.domain.enums.TipoEntregaEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,6 +30,7 @@ public record PedidoBoloRequestDTO(
 
         @Schema(description = "Data da última atualização", example = "2023-12-01T15:00:00")
         @NotNull
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
         LocalDateTime dataUltimaAtualizacao,
 
         @Schema(description = "Tipo de entrega", example = "RETIRADA", allowableValues = "RETIRADA, ENTREGA")
@@ -45,21 +47,5 @@ public record PedidoBoloRequestDTO(
         @Schema(description = "Horário de retirada (apenas para tipo RETIRADA)", example = "17:00")
         String horarioRetirada
 ) {
-    public static PedidoBolo toPedidoBolo(PedidoBoloRequestDTO request) {
-        if (request == null) {
-            return null;
-        }
-        PedidoBolo pedidoBolo = new PedidoBolo();
-        pedidoBolo.setEnderecoId(request.enderecoId);
-        pedidoBolo.setBoloId(request.boloId);
-        pedidoBolo.setUsuarioId(request.usuarioId);
-        pedidoBolo.setObservacao(request.observacao);
-        pedidoBolo.setDataPrevisaoEntrega(request.dataPrevisaoEntrega);
-        pedidoBolo.setDataUltimaAtualizacao(request.dataUltimaAtualizacao);
-        pedidoBolo.setTipoEntrega(request.tipoEntrega);
-        pedidoBolo.setNomeCliente(request.nomeCliente);
-        pedidoBolo.setTelefoneCliente(request.telefoneCliente);
-        pedidoBolo.setHorarioRetirada(request.horarioRetirada);
-        return pedidoBolo;
-    }
+
 }

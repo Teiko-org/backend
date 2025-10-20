@@ -1,6 +1,6 @@
 package com.carambolos.carambolosapi.infrastructure.persistence.jpa;
 
-import com.carambolos.carambolosapi.domain.entity.Fornada;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.Fornada;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;

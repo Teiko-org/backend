@@ -1,6 +1,6 @@
 package com.carambolos.carambolosapi.infrastructure.web.request;
 
-import com.carambolos.carambolosapi.domain.entity.FornadaDaVez;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

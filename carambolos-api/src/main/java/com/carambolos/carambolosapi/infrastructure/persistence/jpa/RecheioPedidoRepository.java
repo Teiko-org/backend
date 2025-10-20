@@ -1,13 +1,13 @@
 package com.carambolos.carambolosapi.infrastructure.persistence.jpa;
 
-import com.carambolos.carambolosapi.domain.entity.RecheioPedido;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.RecheioPedidoEntity;
 import com.carambolos.carambolosapi.domain.projection.RecheioPedidoProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface RecheioPedidoRepository extends JpaRepository<RecheioPedido, Integer> {
+public interface RecheioPedidoRepository extends JpaRepository<RecheioPedidoEntity, Integer> {
     @Query(value = """
             select
             rp.id,

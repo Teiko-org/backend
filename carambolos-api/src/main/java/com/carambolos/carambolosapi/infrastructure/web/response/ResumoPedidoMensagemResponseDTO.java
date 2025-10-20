@@ -2,12 +2,15 @@ package com.carambolos.carambolosapi.infrastructure.web.response;
 
 import com.carambolos.carambolosapi.domain.entity.*;
 import com.carambolos.carambolosapi.domain.enums.StatusEnum;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.*;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoFornada;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 public record ResumoPedidoMensagemResponseDTO (
         Integer id,
@@ -115,39 +118,39 @@ public record ResumoPedidoMensagemResponseDTO (
         }
 
         private void adicionarDetalhesPedidoBolo(StringBuilder mensagem, Integer pedidoBoloId, String valorTotal) {
-            PedidoBolo pedidoBolo = pedidoBoloRepository.findById(pedidoBoloId)
+            PedidoBoloEntity pedidoBoloEntity = pedidoBoloRepository.findById(pedidoBoloId)
                     .orElseThrow(() -> new RuntimeException("Pedido de bolo não encontrado"));
 
-            Bolo bolo = boloRepository.findById(pedidoBolo.getBoloId())
+            BoloEntity boloEntity = boloRepository.findById(pedidoBoloEntity.getBoloId())
                     .orElseThrow(() -> new RuntimeException("Bolo não encontrado"));
 
-            String descricaoBolo = gerarDescricaoBolo(bolo);
+            String descricaoBolo = gerarDescricaoBolo(boloEntity);
             mensagem.append("1x ").append(descricaoBolo).append(" ").append(valorTotal).append("\n");
             mensagem.append("Total: ").append(valorTotal).append("\n");
 
-            mensagem.append("Cliente: ").append(pedidoBolo.getNomeCliente()).append("\n")
-                    .append("Telefone: ").append(pedidoBolo.getTelefoneCliente()).append("\n");
+            mensagem.append("Cliente: ").append(pedidoBoloEntity.getNomeCliente()).append("\n")
+                    .append("Telefone: ").append(pedidoBoloEntity.getTelefoneCliente()).append("\n");
 
             mensagem.append("Tipo: ")
-                    .append(pedidoBolo.getTipoEntrega() != null ? pedidoBolo.getTipoEntrega().name() : "ENTREGA")
+                    .append(pedidoBoloEntity.getTipoEntrega() != null ? pedidoBoloEntity.getTipoEntrega().name() : "ENTREGA")
                     .append("\n");
 
-            if (pedidoBolo.getDataPrevisaoEntrega() != null) {
+            if (pedidoBoloEntity.getDataPrevisaoEntrega() != null) {
                 mensagem.append("Previsão de entrega: ")
-                        .append(pedidoBolo.getDataPrevisaoEntrega().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
+                        .append(pedidoBoloEntity.getDataPrevisaoEntrega().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
                         .append("\n");
             }
 
-            if (pedidoBolo.getObservacao() != null && !pedidoBolo.getObservacao().isEmpty()) {
-                mensagem.append("Observações: ").append(pedidoBolo.getObservacao()).append("\n");
+            if (pedidoBoloEntity.getObservacao() != null && !pedidoBoloEntity.getObservacao().isEmpty()) {
+                mensagem.append("Observações: ").append(pedidoBoloEntity.getObservacao()).append("\n");
             }
 
             // Adicionar informações do endereço se for entrega
-            if (pedidoBolo.getTipoEntrega() != null &&
-                    pedidoBolo.getTipoEntrega().name().equals("ENTREGA") &&
-                    pedidoBolo.getEnderecoId() != null) {
+            if (pedidoBoloEntity.getTipoEntrega() != null &&
+                    pedidoBoloEntity.getTipoEntrega().name().equals("ENTREGA") &&
+                    pedidoBoloEntity.getEnderecoId() != null) {
 
-                Endereco endereco = enderecoRepository.findByIdAndIsAtivoTrue(pedidoBolo.getEnderecoId());
+                EnderecoEntity endereco = enderecoRepository.findByIdAndIsAtivoTrue(pedidoBoloEntity.getEnderecoId());
                 if (endereco != null) {
                     mensagem.append("Endereço de entrega:\n");
                     mensagem.append(endereco.getLogradouro());
@@ -168,60 +171,59 @@ public record ResumoPedidoMensagemResponseDTO (
             }
         }
 
-        private String gerarDescricaoBolo(Bolo bolo) {
+        private String gerarDescricaoBolo(BoloEntity boloEntity) {
             StringBuilder descricao = new StringBuilder("Bolo");
 
-            if (bolo.getTamanho() != null) {
-                descricao.append("\nTamanho: ").append(bolo.getTamanho());
+            if (boloEntity.getTamanho() != null) {
+                descricao.append("\nTamanho: ").append(boloEntity.getTamanho());
             }
 
-            if (bolo.getFormato() != null) {
-                descricao.append("\nFormato: ").append(bolo.getFormato());
+            if (boloEntity.getFormato() != null) {
+                descricao.append("\nFormato: ").append(boloEntity.getFormato());
             }
 
-            if (bolo.getCategoria() != null && !bolo.getCategoria().isEmpty()) {
-                descricao.append("\nCategoria: ").append(bolo.getCategoria());
+            if (boloEntity.getCategoria() != null && !boloEntity.getCategoria().isEmpty()) {
+                descricao.append("\nCategoria: ").append(boloEntity.getCategoria());
             }
 
-            if (bolo.getCobertura() != null) {
-                Cobertura cobertura = coberturaRepository.findById(bolo.getCobertura())
+            if (boloEntity.getCobertura() != null) {
+                CoberturaEntity coberturaEntity = coberturaRepository.findById(boloEntity.getCobertura())
                         .orElse(null);
-                if (cobertura != null) {
-                    descricao.append("\nCobertura: ").append(cobertura.getDescricao());
+                if (coberturaEntity != null) {
+                    descricao.append("\nCobertura: ").append(coberturaEntity.getDescricao());
                 }
             }
 
-            if (bolo.getMassa() != null) {
-                Massa massa = massaRepository.findById(bolo.getMassa())
+            if (boloEntity.getMassa() != null) {
+                com.carambolos.carambolosapi.infrastructure.persistence.entity.MassaEntity massa = massaRepository.findById(boloEntity.getMassa())
                         .orElse(null);
                 if (massa != null) {
                     descricao.append("\nMassa: ").append(massa.getSabor());
                 }
             }
 
-            if (bolo.getRecheioPedido() != null) {
-                RecheioPedido recheioPedido = recheioPedidoRepository.findById(bolo.getRecheioPedido())
+            if (boloEntity.getRecheioPedido() != null) {
+                RecheioPedidoEntity recheioPedidoEntity = recheioPedidoRepository.findById(boloEntity.getRecheioPedido())
                         .orElse(null);
-                if (recheioPedido != null) {
+                if (recheioPedidoEntity != null) {
                     descricao.append("\nRecheio: ");
 
-                    if (recheioPedido.getRecheioExclusivo() != null) {
-                        RecheioExclusivo recheioExclusivo = recheioExclusivoRepository.findById(recheioPedido.getRecheioExclusivo())
-                                .orElse(null);
-                        if (recheioExclusivo != null) {
-                            descricao.append(recheioExclusivo.getNome());
+                    if (recheioPedidoEntity.getRecheioExclusivo() != null) {
+                        Optional<RecheioExclusivoEntity> recheioExclusivo = recheioExclusivoRepository.findById(recheioPedidoEntity.getRecheioExclusivo());
+                        if (recheioExclusivo.isPresent()) {
+                            descricao.append(recheioExclusivo.get().getNome());
                         }
                     } else {
-                        if (recheioPedido.getRecheioUnitarioId1() != null) {
-                            RecheioUnitario recheio1 = recheioUnitarioRepository.findById(recheioPedido.getRecheioUnitarioId1())
+                        if (recheioPedidoEntity.getRecheioUnitarioId1() != null) {
+                            RecheioUnitarioEntity recheio1 = recheioUnitarioRepository.findById(recheioPedidoEntity.getRecheioUnitarioId1())
                                     .orElse(null);
                             if (recheio1 != null) {
                                 descricao.append(recheio1.getSabor());
                             }
                         }
 
-                        if (recheioPedido.getRecheioUnitarioId2() != null) {
-                            RecheioUnitario recheio2 = recheioUnitarioRepository.findById(recheioPedido.getRecheioUnitarioId2())
+                        if (recheioPedidoEntity.getRecheioUnitarioId2() != null) {
+                            RecheioUnitarioEntity recheio2 = recheioUnitarioRepository.findById(recheioPedidoEntity.getRecheioUnitarioId2())
                                     .orElse(null);
                             if (recheio2 != null) {
                                 descricao.append(" e ").append(recheio2.getSabor());
@@ -287,7 +289,7 @@ public record ResumoPedidoMensagemResponseDTO (
                     pedidoFornada.getTipoEntrega().name().equals("ENTREGA") &&
                     pedidoFornada.getEndereco() != null) {
 
-                Endereco endereco = enderecoRepository.findByIdAndIsAtivoTrue(pedidoFornada.getEndereco());
+                EnderecoEntity endereco = enderecoRepository.findByIdAndIsAtivoTrue(pedidoFornada.getEndereco());
                 if (endereco != null) {
                     mensagem.append("Endereço de entrega:\n");
                     mensagem.append(endereco.getLogradouro());

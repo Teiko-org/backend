@@ -1,27 +1,17 @@
 package com.carambolos.carambolosapi.domain.entity;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.*;
-
-
-@Entity
-@Schema(description = "Entidade que representa uma massa")
 public class Massa {
+    private Integer id;
+    private String sabor;
+    private Double valor;
+    private Boolean isAtivo = true;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Schema(description = "Identificador único da massa", example = "1")
-    public Integer id;
-
-    @Schema(description = "Sabor da massa", example = "Chocolate")
-    public String sabor;
-
-    @Schema(description = "Valor da massa", example = "15.50")
-    public Double valor;
-
-    @Column(name = "is_ativo")
-    @Schema(description = "Indica se a massa está ativa", example = "true")
-    public Boolean isAtivo = true;
+    public Massa(Integer id, String sabor, Double valor, Boolean isAtivo) {
+        this.id = id;
+        this.sabor = sabor;
+        this.valor = valor;
+        this.isAtivo = isAtivo;
+    }
 
     public Integer getId() {
         return id;

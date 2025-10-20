@@ -1,6 +1,8 @@
 package com.carambolos.carambolosapi.application.usecases;
 
 import com.carambolos.carambolosapi.domain.entity.*;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.*;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoFornada;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.*;
 import com.lowagie.text.Document;
 import com.lowagie.text.Paragraph;
@@ -46,15 +48,15 @@ public class RelatorioService {
     }
 
     public byte[] gerarRelatorioInsights() {
-        List<PedidoBolo> pedidosBolo = pedidoBoloRepository.findAll();
+        List<PedidoBoloEntity> pedidosBolo = pedidoBoloRepository.findAll();
         List<PedidoFornada> pedidosFornada = pedidoFornadaRepository.findAll();
-        List<Usuario> usuarios = usuarioRepository.findAll();
-        List<Bolo> bolos = boloRepository.findAll();
-        List<Massa> massas = massaRepository.findAll();
-        List<RecheioUnitario> recheios = recheioUnitarioRepository.findAll();
+        List<UsuarioEntity> usuarioEntities = usuarioRepository.findAll();
+        List<BoloEntity> boloEntities = boloRepository.findAll();
+        List<MassaEntity> massas = massaRepository.findAll();
+        List<RecheioUnitarioEntity> recheios = recheioUnitarioRepository.findAll();
 
         Map<Integer, Long> contagemBolos = pedidosBolo.stream()
-                .collect(Collectors.groupingBy(PedidoBolo::getBoloId, Collectors.counting()));
+                .collect(Collectors.groupingBy(PedidoBoloEntity::getBoloId, Collectors.counting()));
 
         List<Map.Entry<Integer, Long>> top3Bolos = contagemBolos.entrySet().stream()
                 .sorted(Map.Entry.<Integer, Long>comparingByValue().reversed())
@@ -75,33 +77,33 @@ public class RelatorioService {
 
         Map<String, Long> combinacoesBolo = pedidosBolo.stream()
                 .map(p -> {
-                    Optional<Bolo> boloOpt = bolos.stream().filter(b -> b.getId().equals(p.getBoloId())).findFirst();
+                    Optional<BoloEntity> boloOpt = boloEntities.stream().filter(b -> b.getId().equals(p.getBoloId())).findFirst();
                     if (boloOpt.isEmpty()) return "Desconhecido";
-                    Bolo bolo = boloOpt.get();
+                    BoloEntity boloEntity = boloOpt.get();
 
                     String saborMassa = massas.stream()
-                            .filter(m -> m.getId().equals(bolo.getMassa()))
-                            .map(Massa::getSabor)
+                            .filter(m -> m.getId().equals(boloEntity.getMassa()))
+                            .map(MassaEntity::getSabor)
                             .findFirst()
                             .orElse("Massa desconhecida");
 
                     String saborRecheio = "";
-                    if (bolo.getRecheioPedido() != null) {
-                        Optional<RecheioPedido> recheioPedidoOpt = recheioPedidoRepository.findById(bolo.getRecheioPedido());
+                    if (boloEntity.getRecheioPedido() != null) {
+                        Optional<RecheioPedidoEntity> recheioPedidoOpt = recheioPedidoRepository.findById(boloEntity.getRecheioPedido());
                         if (recheioPedidoOpt.isPresent()) {
-                            RecheioPedido rp = recheioPedidoOpt.get();
+                            RecheioPedidoEntity rp = recheioPedidoOpt.get();
                             List<String> sabores = new ArrayList<>();
                             if (rp.getRecheioUnitarioId1() != null) {
                                 recheios.stream()
                                         .filter(r -> r.getId().equals(rp.getRecheioUnitarioId1()))
-                                        .map(RecheioUnitario::getSabor)
+                                        .map(RecheioUnitarioEntity::getSabor)
                                         .findFirst()
                                         .ifPresent(sabores::add);
                             }
                             if (rp.getRecheioUnitarioId2() != null) {
                                 recheios.stream()
                                         .filter(r -> r.getId().equals(rp.getRecheioUnitarioId2()))
-                                        .map(RecheioUnitario::getSabor)
+                                        .map(RecheioUnitarioEntity::getSabor)
                                         .findFirst()
                                         .ifPresent(sabores::add);
                             }
@@ -113,7 +115,7 @@ public class RelatorioService {
                         saborRecheio = "Recheio desconhecido";
                     }
 
-                    return bolo.getFormato() + " - " + bolo.getTamanho() + " - " + saborMassa + " - " + saborRecheio;
+                    return boloEntity.getFormato() + " - " + boloEntity.getTamanho() + " - " + saborMassa + " - " + saborRecheio;
                 })
                 .collect(Collectors.groupingBy(c -> c, Collectors.counting()));
 
@@ -121,10 +123,10 @@ public class RelatorioService {
                 .max(Map.Entry.comparingByValue());
 
         Map<Integer, Long> contagemMassas = pedidosBolo.stream()
-                .map(p -> bolos.stream()
+                .map(p -> boloEntities.stream()
                         .filter(bolo -> bolo.getId().equals(p.getBoloId()))
                         .findFirst()
-                        .map(Bolo::getMassa)
+                        .map(BoloEntity::getMassa)
                         .orElse(null))
                 .filter(Objects::nonNull)
                 .collect(Collectors.groupingBy(id -> id, Collectors.counting()));
@@ -135,10 +137,10 @@ public class RelatorioService {
                 .toList();
 
         Map<Integer, Long> contagemRecheios = pedidosBolo.stream()
-                .map(p -> bolos.stream()
+                .map(p -> boloEntities.stream()
                         .filter(bolo -> bolo.getId().equals(p.getBoloId()))
                         .findFirst()
-                        .map(Bolo::getRecheioPedido)
+                        .map(BoloEntity::getRecheioPedido)
                         .orElse(null))
                 .filter(Objects::nonNull)
                 .map(recheioPedidoRepository::findById)
@@ -157,12 +159,12 @@ public class RelatorioService {
                 ? "Desconhecido"
                 : recheios.stream()
                 .filter(r -> r.getId().equals(top3Recheios.getFirst().getKey()))
-                .map(RecheioUnitario::getSabor)
+                .map(RecheioUnitarioEntity::getSabor)
                 .findFirst()
                 .orElse("Recheio ID " + top3Recheios.getFirst().getKey());
 
         List<Map.Entry<Integer, Long>> top3UsuariosBolo = pedidosBolo.stream()
-                .collect(Collectors.groupingBy(PedidoBolo::getUsuarioId, Collectors.counting()))
+                .collect(Collectors.groupingBy(PedidoBoloEntity::getUsuarioId, Collectors.counting()))
                 .entrySet().stream()
                 .sorted(Map.Entry.<Integer, Long>comparingByValue().reversed())
                 .limit(3)
@@ -191,7 +193,7 @@ public class RelatorioService {
                 for (var entry : top3Bolos) {
                     Integer boloId = entry.getKey();
                     Long count = entry.getValue();
-                    Optional<Bolo> bolo = bolos.stream().filter(b -> b.getId().equals(boloId)).findFirst();
+                    Optional<BoloEntity> bolo = boloEntities.stream().filter(b -> b.getId().equals(boloId)).findFirst();
                     String boloNome = bolo.map(b -> b.getFormato() + " - " + b.getTamanho())
                             .orElse("Bolo ID " + boloId);
                     doc.add(new Paragraph(i + ". " + boloNome + " (" + count + " pedidos)"));
@@ -238,7 +240,7 @@ public class RelatorioService {
                     Long count = entry.getValue();
                     String nome = massas.stream()
                             .filter(m -> m.getId().equals(massaId))
-                            .map(Massa::getSabor)
+                            .map(MassaEntity::getSabor)
                             .findFirst()
                             .orElse("Massa ID " + massaId);
                     doc.add(new Paragraph(i + ". " + nome + " (" + count + " pedidos)"));
@@ -257,7 +259,7 @@ public class RelatorioService {
                     Long count = entry.getValue();
                     String nome = recheios.stream()
                             .filter(r -> r.getId().equals(recheioId))
-                            .map(RecheioUnitario::getSabor)
+                            .map(RecheioUnitarioEntity::getSabor)
                             .findFirst()
                             .orElse("Recheio ID " + recheioId);
                     doc.add(new Paragraph(i + ". " + nome + " (" + count + " vezes)"));
@@ -274,9 +276,9 @@ public class RelatorioService {
                 for (var entry : top3UsuariosBolo) {
                     Integer usuarioId = entry.getKey();
                     Long count = entry.getValue();
-                    String nome = usuarios.stream()
+                    String nome = usuarioEntities.stream()
                             .filter(u -> u.getId().equals(usuarioId))
-                            .map(Usuario::getNome)
+                            .map(UsuarioEntity::getNome)
                             .findFirst()
                             .orElse("Usuário ID " + usuarioId);
                     doc.add(new Paragraph(i + ". " + nome + " - " + count + " pedidos"));
@@ -293,9 +295,9 @@ public class RelatorioService {
                 for (var entry : top3UsuariosFornada) {
                     Integer usuarioId = entry.getKey();
                     Long count = entry.getValue();
-                    String nome = usuarios.stream()
+                    String nome = usuarioEntities.stream()
                             .filter(u -> u.getId().equals(usuarioId))
-                            .map(Usuario::getNome)
+                            .map(UsuarioEntity::getNome)
                             .findFirst()
                             .orElse("Usuário ID " + usuarioId);
                     doc.add(new Paragraph(i + ". " + nome + " - " + count + " pedidos"));

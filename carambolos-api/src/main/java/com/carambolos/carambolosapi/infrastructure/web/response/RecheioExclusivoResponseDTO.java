@@ -21,16 +21,4 @@ public record RecheioExclusivoResponseDTO(
         @Schema(description = "Sabor do segundo recheio unitário", example = "Beijinho")
         String sabor2
 ) {
-    public static List<RecheioExclusivoResponseDTO> toRecheioExclusivoResponse(List<RecheioExclusivoProjection> projections) {
-        return projections.stream().map(RecheioExclusivoResponseDTO::toRecheioExclusivoResponse).toList();
-    }
-    public static RecheioExclusivoResponseDTO toRecheioExclusivoResponse(RecheioExclusivoProjection projection) {
-        return new RecheioExclusivoResponseDTO(
-                projection.getId(),
-                projection.getNome(),
-                projection.getSabor1(),
-                projection.getSabor2()
-        );
-    }
-
 }

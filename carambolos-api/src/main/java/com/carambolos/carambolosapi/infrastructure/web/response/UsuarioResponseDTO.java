@@ -1,6 +1,5 @@
 package com.carambolos.carambolosapi.infrastructure.web.response;
 
-import com.carambolos.carambolosapi.domain.entity.Usuario;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
@@ -29,24 +28,7 @@ public class UsuarioResponseDTO {
 
     private boolean isAdmin;
 
-    public static UsuarioResponseDTO toResponseDTO(Usuario usuario) {
-        UsuarioResponseDTO responseDto = new UsuarioResponseDTO();
 
-        responseDto.setId(usuario.getId());
-        responseDto.setNome(usuario.getNome());
-        responseDto.setContato(usuario.getContato());
-        responseDto.setDataNascimento(usuario.getDataNascimento());
-        responseDto.setGenero(usuario.getGenero());
-        responseDto.setImagemUrl(usuario.getImagemUrl());
-        responseDto.setAtivo(usuario.isAtivo());
-        if (usuario.getSysAdmin() == null) {
-            responseDto.setAdmin(false);
-        } else {
-            responseDto.setAdmin(usuario.getSysAdmin());
-        }
-
-        return responseDto;
-    }
 
     public Integer getId() {
         return id;

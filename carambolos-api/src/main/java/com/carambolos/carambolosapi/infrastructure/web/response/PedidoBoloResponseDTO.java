@@ -1,6 +1,6 @@
 package com.carambolos.carambolosapi.infrastructure.web.response;
 
-import com.carambolos.carambolosapi.domain.entity.PedidoBolo;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoBoloEntity;
 import com.carambolos.carambolosapi.domain.enums.TipoEntregaEnum;
 
 import java.time.LocalDate;
@@ -19,22 +19,5 @@ public record PedidoBoloResponseDTO(
         String nomeCliente,
         String telefoneCliente
 ) {
-    public static PedidoBoloResponseDTO toPedidoBoloResponse(PedidoBolo pedido) {
-        return new PedidoBoloResponseDTO(
-                pedido.getId(),
-                pedido.getEnderecoId(),
-                pedido.getBoloId(),
-                pedido.getUsuarioId(),
-                pedido.getObservacao(),
-                pedido.getDataPrevisaoEntrega(),
-                pedido.getDataUltimaAtualizacao(),
-                pedido.getTipoEntrega(),
-                pedido.getNomeCliente(),
-                pedido.getTelefoneCliente()
-        );
-    }
 
-    public static List<PedidoBoloResponseDTO> toPedidoBoloResponse(List<PedidoBolo> pedidos) {
-        return pedidos.stream().map(PedidoBoloResponseDTO::toPedidoBoloResponse).toList();
-    }
 }
