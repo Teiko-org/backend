@@ -30,4 +30,9 @@ public class PedidoFornadaGatewayImpl implements PedidoFornadaGateway {
     public List<PedidoFornada> findAll() {
         return repository.findAll().stream().map(FornadasMapper::toDomain).toList();
     }
+
+    @Override
+    public boolean existsByIdAndIsAtivoTrue(Integer id) {
+        return repository.existsByIdAndIsAtivoTrue(id);
+    }
 }

@@ -152,7 +152,7 @@ public class DashboardGatewayImpl implements DashboardGateway {
                                         try {
                                             return resumoPedidoRepository
                                                     .findTop1ByPedidoBoloIdAndIsAtivoTrueOrderByDataPedidoDesc(p.getId())
-                                                    .map(ResumoPedido::getValor)
+                                                    .map(ResumoPedidoEntity::getValor)
                                                     .orElse(0.0);
                                         } catch (Exception e) {
                                             return 0.0;
@@ -410,12 +410,12 @@ public class DashboardGatewayImpl implements DashboardGateway {
     @Override
     public List<Map<String, Object>> getUltimosPedidos() {
         // Buscar por data mais recente (independente do status) e limitar para performance
-        List<ResumoPedido> resumoPedidos = resumoPedidoRepository
+        List<ResumoPedidoEntity> resumoPedidoEntities = resumoPedidoRepository
                 .findAllByOrderByDataPedidoDesc();
 
         List<Map<String, Object>> ultimosPedidos = new ArrayList<>();
 
-        for (ResumoPedido resumo : resumoPedidos.stream().limit(50).toList()) {
+        for (ResumoPedidoEntity resumo : resumoPedidoEntities.stream().limit(50).toList()) {
             Map<String, Object> pedido = new HashMap<>();
 
             pedido.put("id", resumo.getId());
@@ -451,13 +451,13 @@ public class DashboardGatewayImpl implements DashboardGateway {
 
     @Override
     public Map<String, Map<String, Long>> countPedidosBolosPorPeriodo(String periodo) {
-        List<ResumoPedido> pedidosBolo = resumoPedidoRepository.findByStatusInAndPedidoBoloIdIsNotNull(List.of(StatusEnum.CANCELADO, StatusEnum.CONCLUIDO));
+        List<ResumoPedidoEntity> pedidosBolo = resumoPedidoRepository.findByStatusInAndPedidoBoloIdIsNotNull(List.of(StatusEnum.CANCELADO, StatusEnum.CONCLUIDO));
         return processarPedidosPorPeriodoComStatus(pedidosBolo, periodo);
     }
 
     @Override
     public Map<String, Map<String, Long>> countPedidosFornadaPorPeriodo(String periodo) {
-        List<ResumoPedido> pedidosFornada = resumoPedidoRepository.findByStatusInAndPedidoFornadaIdIsNotNull(List.of(StatusEnum.CANCELADO, StatusEnum.CONCLUIDO));
+        List<ResumoPedidoEntity> pedidosFornada = resumoPedidoRepository.findByStatusInAndPedidoFornadaIdIsNotNull(List.of(StatusEnum.CANCELADO, StatusEnum.CONCLUIDO));
         return processarPedidosPorPeriodoComStatus(pedidosFornada, periodo);
     }
 
@@ -623,10 +623,10 @@ public class DashboardGatewayImpl implements DashboardGateway {
         return kpi;
     }
 
-    private Map<String, Map<String, Long>> processarPedidosPorPeriodoComStatus(List<ResumoPedido> pedidos, String periodo) {
+    private Map<String, Map<String, Long>> processarPedidosPorPeriodoComStatus(List<ResumoPedidoEntity> pedidos, String periodo) {
         Map<String, Map<String, Long>> resultado = new HashMap<>();
         if (periodo.equalsIgnoreCase("mes")) {
-            Map<String, List<ResumoPedido>> pedidosPorMes = pedidos.stream()
+            Map<String, List<ResumoPedidoEntity>> pedidosPorMes = pedidos.stream()
                     .collect(Collectors.groupingBy(
                             pedido -> {
                                 int mes = pedido.getDataPedido().getMonthValue();
@@ -635,7 +635,7 @@ public class DashboardGatewayImpl implements DashboardGateway {
                     ));
             for (int i = 1; i <= 12 ; i++) {
                 String mesKey = String.format("%02d", i);
-                List<ResumoPedido> pedidosDoMes = pedidosPorMes.getOrDefault(mesKey, new ArrayList<>());
+                List<ResumoPedidoEntity> pedidosDoMes = pedidosPorMes.getOrDefault(mesKey, new ArrayList<>());
 
                 Map<String, Long> statusCount = new HashMap<>();
                 statusCount.put("cancelados",
@@ -649,7 +649,7 @@ public class DashboardGatewayImpl implements DashboardGateway {
                 resultado.put(mesKey, statusCount);
             }
         } else if(periodo.equalsIgnoreCase("ano")) {
-            Map<String, List<ResumoPedido>> pedidosPorAno = pedidos.stream()
+            Map<String, List<ResumoPedidoEntity>> pedidosPorAno = pedidos.stream()
                     .collect(Collectors.groupingBy(
                             pedido -> String.valueOf(pedido.getDataPedido().getYear())
                     ));

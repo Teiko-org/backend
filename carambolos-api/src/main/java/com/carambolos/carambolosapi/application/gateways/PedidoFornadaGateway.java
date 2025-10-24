@@ -9,4 +9,5 @@ public interface PedidoFornadaGateway {
     PedidoFornada save(PedidoFornada pedidoFornada);
     Optional<PedidoFornada> findById(Integer id);
     List<PedidoFornada> findAll();
+    boolean existsByIdAndIsAtivoTrue(Integer id);
 }

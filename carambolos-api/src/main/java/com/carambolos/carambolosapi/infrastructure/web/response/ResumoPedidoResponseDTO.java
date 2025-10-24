@@ -1,6 +1,6 @@
 package com.carambolos.carambolosapi.infrastructure.web.response;
 
-import com.carambolos.carambolosapi.domain.entity.ResumoPedido;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.ResumoPedidoEntity;
 import com.carambolos.carambolosapi.domain.enums.StatusEnum;
 
 import java.time.LocalDateTime;
@@ -16,7 +16,7 @@ public record ResumoPedidoResponseDTO (
         Integer pedidoBoloId
 )
 {
-    public static ResumoPedidoResponseDTO toResumoPedidoResponse(ResumoPedido pedido) {
+    public static ResumoPedidoResponseDTO toResumoPedidoResponse(ResumoPedidoEntity pedido) {
         return new ResumoPedidoResponseDTO(
                 pedido.getId(),
                 pedido.getStatus(),
@@ -28,8 +28,8 @@ public record ResumoPedidoResponseDTO (
         );
     }
 
-    public static List<ResumoPedidoResponseDTO> toResumoPedidoResponse(List<ResumoPedido> resumoPedidos) {
-        return resumoPedidos.stream()
+    public static List<ResumoPedidoResponseDTO> toResumoPedidoResponse(List<ResumoPedidoEntity> resumoPedidoEntities) {
+        return resumoPedidoEntities.stream()
                 .map(ResumoPedidoResponseDTO::toResumoPedidoResponse)
                 .toList();
     }

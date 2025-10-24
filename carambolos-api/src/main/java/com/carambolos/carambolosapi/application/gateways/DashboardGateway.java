@@ -1,7 +1,5 @@
 package com.carambolos.carambolosapi.application.gateways;
 
-import com.carambolos.carambolosapi.domain.entity.ResumoPedido;
-
 import java.util.List;
 import java.util.Map;
 

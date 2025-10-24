@@ -1,6 +1,6 @@
 package com.carambolos.carambolosapi.application.usecases;
 
-import com.carambolos.carambolosapi.domain.entity.ResumoPedido;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.ResumoPedidoEntity;
 import com.carambolos.carambolosapi.domain.entity.ProdutoFornada;
 import com.carambolos.carambolosapi.domain.enums.StatusEnum;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.EnderecoMapper;
@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class ResumoPedidoServiceTest {
+class ResumoPedidoEntityServiceTest {
 
     @Mock private ResumoPedidoRepository resumoPedidoRepository;
     @Mock private PedidoBoloRepository pedidoBoloRepository;
@@ -48,7 +48,7 @@ class ResumoPedidoServiceTest {
 
     @Test
     void listarResumosPedidos_deveRetornarSomenteAtivos() {
-        when(resumoPedidoRepository.findAllByIsAtivoTrue()).thenReturn(List.of(new ResumoPedido()))
+        when(resumoPedidoRepository.findAllByIsAtivoTrue()).thenReturn(List.of(new ResumoPedidoEntity()))
                 .thenReturn(List.of());
 
         var list1 = service.listarResumosPedidos();
@@ -79,14 +79,14 @@ class ResumoPedidoServiceTest {
     @Test
     void buscarResumosPedidosPorStatus_ok() {
         when(resumoPedidoRepository.findByStatusAndIsAtivoTrue(StatusEnum.PENDENTE))
-                .thenReturn(List.of(new ResumoPedido()));
+                .thenReturn(List.of(new ResumoPedidoEntity()));
         var list = service.buscarResumosPedidosPorStatus(StatusEnum.PENDENTE);
         assertEquals(1, list.size());
     }
 
     @Test
     void cadastrarResumoPedido_comPedidoFornada_calculaValorUsandoQuantidade() {
-        ResumoPedido input = new ResumoPedido();
+        ResumoPedidoEntity input = new ResumoPedidoEntity();
         input.setPedidoFornadaId(77);
 
         PedidoFornada pedidoFornada = new PedidoFornada();
@@ -118,12 +118,12 @@ class ResumoPedidoServiceTest {
     @Test
     void atualizarResumoPedido_quandoNaoExiste_deveLancar() {
         when(resumoPedidoRepository.existsByIdAndIsAtivoTrue(9)).thenReturn(false);
-        assertThrows(RuntimeException.class, () -> service.atualizarResumoPedido(9, new ResumoPedido()));
+        assertThrows(RuntimeException.class, () -> service.atualizarResumoPedido(9, new ResumoPedidoEntity()));
     }
 
     @Test
     void deletarResumoPedido_deveMarcarComoInativo() {
-        ResumoPedido rp = new ResumoPedido();
+        ResumoPedidoEntity rp = new ResumoPedidoEntity();
         rp.setAtivo(true);
         when(resumoPedidoRepository.findByIdAndIsAtivoTrue(5)).thenReturn(Optional.of(rp));
         when(resumoPedidoRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -134,7 +134,7 @@ class ResumoPedidoServiceTest {
 
     @Test
     void alterarStatus_quandoCancela_deveReporQuantidadeNaFornadaDaVez() {
-        ResumoPedido rp = new ResumoPedido();
+        ResumoPedidoEntity rp = new ResumoPedidoEntity();
         rp.setPedidoFornadaId(77);
         rp.setStatus(StatusEnum.PENDENTE);
 

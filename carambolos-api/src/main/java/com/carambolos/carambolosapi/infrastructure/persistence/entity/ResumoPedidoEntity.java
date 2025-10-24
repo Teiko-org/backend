@@ -1,24 +1,40 @@
-package com.carambolos.carambolosapi.domain.entity;
+package com.carambolos.carambolosapi.infrastructure.persistence.entity;
 
 import com.carambolos.carambolosapi.domain.enums.StatusEnum;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
-public class ResumoPedido {
+@Entity(name = "resumo_pedido")
+public class ResumoPedidoEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @Enumerated(EnumType.STRING)
     private StatusEnum status;
+
     private Double valor;
+
+    @Column(name = "data_pedido")
     private LocalDateTime dataPedido;
+
+    @Column(name = "data_entrega")
     private LocalDateTime dataEntrega;
+
+    @Column(name = "pedido_fornada_id")
     private Integer pedidoFornadaId;
+
+    @Column(name = "pedido_bolo_id")
     private Integer pedidoBoloId;
+
+    @Column(name = "is_ativo")
     private Boolean isAtivo = true;
 
-    public ResumoPedido() {
+    public ResumoPedidoEntity() {
     }
 
-    public ResumoPedido(
+    public ResumoPedidoEntity(
             Integer id,
             StatusEnum status,
             Double valor,

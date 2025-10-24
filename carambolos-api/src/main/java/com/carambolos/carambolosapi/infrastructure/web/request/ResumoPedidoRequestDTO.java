@@ -1,6 +1,6 @@
 package com.carambolos.carambolosapi.infrastructure.web.request;
 
-import com.carambolos.carambolosapi.domain.entity.ResumoPedido;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.ResumoPedidoEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
@@ -14,17 +14,17 @@ public record ResumoPedidoRequestDTO (
         Integer pedidoBoloId
 
 ) {
-    public static ResumoPedido toResumoPedido(ResumoPedidoRequestDTO request) {
+    public static ResumoPedidoEntity toResumoPedido(ResumoPedidoRequestDTO request) {
         if (request == null) {
             return null;
         }
 
-        ResumoPedido resumoPedido = new ResumoPedido();
-        resumoPedido.setDataEntrega(request.dataEntrega);
-        resumoPedido.setPedidoFornadaId(request.pedidoFornadaId);
-        resumoPedido.setPedidoBoloId(request.pedidoBoloId);
+        ResumoPedidoEntity resumoPedidoEntity = new ResumoPedidoEntity();
+        resumoPedidoEntity.setDataEntrega(request.dataEntrega);
+        resumoPedidoEntity.setPedidoFornadaId(request.pedidoFornadaId);
+        resumoPedidoEntity.setPedidoBoloId(request.pedidoBoloId);
 
-        return resumoPedido;
+        return resumoPedidoEntity;
     }
 
 }

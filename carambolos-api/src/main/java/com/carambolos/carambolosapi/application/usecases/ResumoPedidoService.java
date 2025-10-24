@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-@SuppressWarnings("unused")
 public class ResumoPedidoService {
 
     private final ResumoPedidoRepository resumoPedidoRepository;
@@ -67,74 +66,32 @@ public class ResumoPedidoService {
         this.enderecoMapper = enderecoMapper;
     }
 
-    public List<ResumoPedido> listarResumosPedidos() {
-        return resumoPedidoRepository.findAllByIsAtivoTrue();
-    }
 
-    public ResumoPedido buscarResumoPedidoPorId(Integer id) {
-        return resumoPedidoRepository.findByIdAndIsAtivoTrue(id)
-                .orElseThrow(() -> new RuntimeException("Resumo de pedido não encontrado"));
-    }
-
-    //LocalDateTime?
-    public List<ResumoPedido> buscarResumosPedidosPorDataPedido(LocalDate dataPedido) {
-        LocalDateTime comecoData = dataPedido.atStartOfDay();
-        LocalDateTime fimData = dataPedido.atTime(23, 59, 59);
-        return resumoPedidoRepository.findByDataPedidoBetweenAndIsAtivoTrue(comecoData, fimData);
-    }
-
-    public List<ResumoPedido> buscarResumosPedidosPorStatus(StatusEnum status) {
-        return resumoPedidoRepository.findByStatusAndIsAtivoTrue(status);
-    }
-
-    public ResumoPedido cadastrarResumoPedido(ResumoPedido resumoPedido) {
-        validarReferencias(resumoPedido);
-
-        resumoPedido.setDataPedido(LocalDateTime.now());
-        resumoPedido.setStatus(StatusEnum.PENDENTE);
-
-        if (resumoPedido.getPedidoFornadaId() != null) {
-            resumoPedido.setValor(calcularValorPedidoFornada(resumoPedido.getPedidoFornadaId()));
-        } else if (resumoPedido.getPedidoBoloId() != null) {
-            resumoPedido.setValor(calcularValorPedidoBolo(resumoPedido.getPedidoBoloId()));
-        }
-
-        return resumoPedidoRepository.save(resumoPedido);
-    }
-
-    public ResumoPedido atualizarResumoPedido(Integer id, ResumoPedido resumoPedido) {
-        if (!resumoPedidoRepository.existsByIdAndIsAtivoTrue(id)) {
-            throw new EntidadeNaoEncontradaException("Resumo de pedido não encontrado");
-        }
-        validarReferencias(resumoPedido);
-        resumoPedido.setId(id);
-        return resumoPedidoRepository.save(resumoPedido);
-    }
 
     public void deletarResumoPedido(Integer id) {
-        ResumoPedido resumoPedido = buscarResumoPedidoPorId(id);
-        resumoPedido.setAtivo(false);
-        resumoPedidoRepository.save(resumoPedido);
+        ResumoPedidoEntity resumoPedidoEntity = buscarResumoPedidoPorId(id);
+        resumoPedidoEntity.setAtivo(false);
+        resumoPedidoRepository.save(resumoPedidoEntity);
     }
 
-    public List<ResumoPedido> listarResumosPedidosBolo() {
+    public List<ResumoPedidoEntity> listarResumosPedidosBolo() {
         return resumoPedidoRepository.findByPedidoBoloIdIsNotNullAndIsAtivoTrue();
     }
 
-    public List<ResumoPedido> listarResumosPedidosFornada() {
+    public List<ResumoPedidoEntity> listarResumosPedidosFornada() {
         return resumoPedidoRepository.findByPedidoFornadaIdIsNotNullAndIsAtivoTrue();
     }
 
-    public ResumoPedido alterarStatus(Integer id, StatusEnum novoStatus) {
-        ResumoPedido resumoPedido = buscarResumoPedidoPorId(id);
-        StatusEnum statusAtual = resumoPedido.getStatus();
+    public ResumoPedidoEntity alterarStatus(Integer id, StatusEnum novoStatus) {
+        ResumoPedidoEntity resumoPedidoEntity = buscarResumoPedidoPorId(id);
+        StatusEnum statusAtual = resumoPedidoEntity.getStatus();
         if (!isTransicaoStatusValida(statusAtual, novoStatus)) {
             throw new EntidadeImprocessavelException("Não é possível alterar o status de %s para %s".formatted(statusAtual, novoStatus));
         }
 
         try {
-            if (resumoPedido.getPedidoFornadaId() != null) {
-                var pedidoFornadaOpt = pedidoFornadaRepository.findById(resumoPedido.getPedidoFornadaId());
+            if (resumoPedidoEntity.getPedidoFornadaId() != null) {
+                var pedidoFornadaOpt = pedidoFornadaRepository.findById(resumoPedidoEntity.getPedidoFornadaId());
                 if (pedidoFornadaOpt.isPresent()) {
                     var pedidoFornada = pedidoFornadaOpt.get();
                     var fdvOpt = fornadaDaVezRepository.findById(pedidoFornada.getFornadaDaVez());
@@ -158,23 +115,23 @@ public class ResumoPedidoService {
             System.err.println("[ESTOQUE] Falha ao ajustar estoque ao alterar status do pedido fornada: " + e.getMessage());
         }
 
-        resumoPedido.setStatus(novoStatus);
-        return resumoPedidoRepository.save(resumoPedido);
+        resumoPedidoEntity.setStatus(novoStatus);
+        return resumoPedidoRepository.save(resumoPedidoEntity);
     }
 
     public DetalhePedidoBoloDTO obterDetalhePedidoBolo(Integer pedidoResumoId) {
         try {
-            ResumoPedido resumoPedido = resumoPedidoRepository
+            ResumoPedidoEntity resumoPedidoEntity = resumoPedidoRepository
                     .findTop1ByPedidoBoloIdAndIsAtivoTrueOrderByDataPedidoDesc(pedidoResumoId)
                     .orElseThrow(() -> new EntidadeNaoEncontradaException("Resumo de pedido (bolo) não encontrado"));
 
-            if (resumoPedido.getPedidoBoloId() == null) {
+            if (resumoPedidoEntity.getPedidoBoloId() == null) {
                 throw new EntidadeImprocessavelException("O resumo de pedido #" + pedidoResumoId + " não está vinculado a um pedido de bolo");
             }
 
-            PedidoBoloEntity pedido = pedidoBoloRepository.findById(resumoPedido.getPedidoBoloId())
+            PedidoBoloEntity pedido = pedidoBoloRepository.findById(resumoPedidoEntity.getPedidoBoloId())
                     .filter(PedidoBoloEntity::getAtivo)
-                    .orElseThrow(() -> new EntidadeNaoEncontradaException("Pedido com o id %d não encontrado".formatted(resumoPedido.getPedidoBoloId())));
+                    .orElseThrow(() -> new EntidadeNaoEncontradaException("Pedido com o id %d não encontrado".formatted(resumoPedidoEntity.getPedidoBoloId())));
 
             BoloEntity boloEntity = boloRepository.findById(pedido.getBoloId())
                     .orElseThrow(() -> new EntidadeNaoEncontradaException("Bolo com id %d não encontrado".formatted(pedido.getBoloId())));
@@ -286,7 +243,7 @@ public class ResumoPedidoService {
                     adicionais,
                     pedido.getObservacao(),
                     pedido.getTipoEntrega(),
-                    resumoPedido.getDataPedido(),
+                    resumoPedidoEntity.getDataPedido(),
                     pedido.getNomeCliente(),
                     pedido.getTelefoneCliente(),
                     pedido.getHorarioRetirada(),
@@ -301,17 +258,17 @@ public class ResumoPedidoService {
 
     public DetalhePedidoFornadaDTO obterDetalhePedidoFornada(Integer pedidoResumoId) {
         try {
-            ResumoPedido resumoPedido = resumoPedidoRepository
+            ResumoPedidoEntity resumoPedidoEntity = resumoPedidoRepository
                     .findTop1ByPedidoFornadaIdAndIsAtivoTrueOrderByDataPedidoDesc(pedidoResumoId)
                     .orElseThrow(() -> new EntidadeNaoEncontradaException("Resumo de pedido (fornada) não encontrado"));
 
-            if (resumoPedido.getPedidoFornadaId() == null) {
+            if (resumoPedidoEntity.getPedidoFornadaId() == null) {
                 throw new EntidadeImprocessavelException("O resumo de pedido #" + pedidoResumoId + " não está vinculado a um pedido de fornada");
             }
 
-            PedidoFornada pedidoFornada = pedidoFornadaRepository.findById(resumoPedido.getPedidoFornadaId())
+            PedidoFornada pedidoFornada = pedidoFornadaRepository.findById(resumoPedidoEntity.getPedidoFornadaId())
                     .filter(PedidoFornada::isAtivo)
-                    .orElseThrow(() -> new EntidadeNaoEncontradaException("Pedido de fornada com ID " + resumoPedido.getPedidoFornadaId() + " não encontrado."));
+                    .orElseThrow(() -> new EntidadeNaoEncontradaException("Pedido de fornada com ID " + resumoPedidoEntity.getPedidoFornadaId() + " não encontrado."));
 
             FornadaDaVez fornadaDaVez = fornadaDaVezRepository.findById(pedidoFornada.getFornadaDaVez())
                     .orElseThrow(() -> new EntidadeNaoEncontradaException("FornadaDaVez com ID " + pedidoFornada.getFornadaDaVez() + " não encontrada."));
@@ -348,7 +305,7 @@ public class ResumoPedidoService {
                     pedidoFornada.getNomeCliente(),
                     pedidoFornada.getTelefoneCliente(),
                     pedidoFornada.getObservacoes(),
-                    resumoPedido.getDataPedido(),
+                    resumoPedidoEntity.getDataPedido(),
                     enderecoDTO
             );
         } catch (Exception e) {
@@ -377,125 +334,11 @@ public class ResumoPedidoService {
         return sb.toString();
     }
 
-    private void validarReferencias(ResumoPedido resumoPedido) {
-        if (resumoPedido.getPedidoBoloId() == null && resumoPedido.getPedidoFornadaId() == null) {
-            throw new IllegalArgumentException("O resumo de pedido deve estar vinculado a um pedido de bolo ou pedido de fornada");
-        }
-
-        if (resumoPedido.getPedidoBoloId() != null) {
-            validarPedidoBolo(resumoPedido.getPedidoBoloId());
-        }
-
-        if(resumoPedido.getPedidoFornadaId() != null) {
-            validarPedidoFornada(resumoPedido.getPedidoFornadaId());
-        }
-    }
-
-    private void validarPedidoBolo(Integer pedidoBoloId) {
-        if (!pedidoBoloRepository.existsByIdAndIsAtivoTrue(pedidoBoloId)) {
-            throw new EntidadeNaoEncontradaException("Pedido de bolo com ID %d não encontrado".formatted(pedidoBoloId));
-        }
-    }
-
-    private void validarPedidoFornada(Integer pedidoFornadaId) {
-        if (!pedidoFornadaRepository.existsByIdAndIsAtivoTrue(pedidoFornadaId)) {
-            throw new EntidadeNaoEncontradaException("Pedido de fornada com ID %d não encontrado".formatted(pedidoFornadaId));
-        }
-    }
-
     private boolean isTransicaoStatusValida(StatusEnum statusAtual, StatusEnum novoStatus) {
         if (statusAtual == novoStatus) {
             return false;
         }
 
         return true;
-    }
-
-    private Double calcularValorPedidoFornada(Integer pedidoFornadaId) {
-        var pedidoFornada = pedidoFornadaRepository.findById(pedidoFornadaId)
-                .orElseThrow(() -> new EntidadeNaoEncontradaException("Pedido fornada não encontrado"));
-
-        var fornadaDaVez = fornadaDaVezRepository.findById(pedidoFornada.getFornadaDaVez())
-                .orElseThrow(() -> new EntidadeNaoEncontradaException("Fornada da vez não encontrada"));
-
-        var produtoFornada = produtoFornadaRepository.findById(fornadaDaVez.getProdutoFornada())
-                .orElseThrow(() -> new EntidadeNaoEncontradaException("Produto da fornada não encontrado"));
-
-        Double valorProduto = produtoFornada.getValor();
-        return valorProduto * pedidoFornada.getQuantidade();
-    }
-
-    private Double calcularValorPedidoBolo(Integer pedidoBoloId) {
-        var pedidoBolo = pedidoBoloRepository.findById(pedidoBoloId)
-                .orElseThrow(() -> new EntidadeNaoEncontradaException("Pedido bolo não encontrado"));
-
-        var bolo = boloRepository.findById(pedidoBolo.getBoloId())
-                .orElseThrow(() -> new EntidadeNaoEncontradaException("Bolo não encontrado"));
-
-        Double valorTamanho = 0.0;
-        if (bolo.getTamanho() != null) {
-            switch (bolo.getTamanho()) {
-                case TAMANHO_5 -> valorTamanho = 50.0;
-                case TAMANHO_7 -> valorTamanho = 100.0;
-                case TAMANHO_12 -> valorTamanho = 150.0;
-                case TAMANHO_15 -> valorTamanho = 200.0;
-                case TAMANHO_17 -> valorTamanho = 250.0;
-            }
-        }
-
-        Double valorRecheio = 0.0;
-        if (bolo.getRecheioPedido() != null) {
-            var recheioPedido = recheioPedidoRepository.findById(bolo.getRecheioPedido())
-                    .orElseThrow(() -> new EntidadeNaoEncontradaException("Recheio do bolo não encontrado"));
-
-            if (recheioPedido.getRecheioExclusivo() != null) {
-                var recheioExclusivo = recheioExclusivoRepository.findById(recheioPedido.getRecheioExclusivo())
-                        .orElseThrow(() -> new EntidadeNaoEncontradaException("Recheio exclusivo não encontrado"));
-
-                if (recheioExclusivo.getRecheioUnitarioId1() != null) {
-                    var recheioUnitario1 = recheioUnitarioRepository.findById(recheioExclusivo.getRecheioUnitarioId1())
-                            .orElse(null);
-                    if (recheioUnitario1 != null && recheioUnitario1.getValor() != null) {
-                        valorRecheio += recheioUnitario1.getValor();
-                    }
-                }
-
-                if (recheioExclusivo.getRecheioUnitarioId2() != null) {
-                    var recheioUnitario2 = recheioUnitarioRepository.findById(recheioExclusivo.getRecheioUnitarioId2())
-                            .orElse(null);
-                    if (recheioUnitario2 != null && recheioUnitario2.getValor() != null) {
-                        valorRecheio += recheioUnitario2.getValor();
-                    }
-                }
-            } else {
-                if (recheioPedido.getRecheioUnitarioId1() != null) {
-                    var recheioUnitario1 = recheioUnitarioRepository.findById(recheioPedido.getRecheioUnitarioId1())
-                            .orElse(null);
-                    if (recheioUnitario1 != null && recheioUnitario1.getValor() != null) {
-                        valorRecheio += recheioUnitario1.getValor();
-                    }
-                }
-
-                if (recheioPedido.getRecheioUnitarioId2() != null) {
-                    var recheioUnitario2 = recheioUnitarioRepository.findById(recheioPedido.getRecheioUnitarioId2())
-                            .orElse(null);
-                    if (recheioUnitario2 != null && recheioUnitario2.getValor() != null) {
-                        valorRecheio += recheioUnitario2.getValor();
-                    }
-                }
-            }
-        }
-
-        Double valorMassa = 0.0;
-        if (bolo.getMassa() != null) {
-            var massa = massaRepository.findById(bolo.getMassa())
-                    .orElse(null);
-            if (massa != null && massa.getValor() != null) {
-                valorMassa = massa.getValor();
-            }
-        }
-
-        Double valorTotal = valorTamanho + valorRecheio + valorMassa;
-        return valorTotal;
     }
 }

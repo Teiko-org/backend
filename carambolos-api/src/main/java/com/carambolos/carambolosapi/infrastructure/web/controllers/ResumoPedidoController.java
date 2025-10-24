@@ -5,7 +5,7 @@ import com.carambolos.carambolosapi.infrastructure.web.response.DetalhePedidoBol
 import com.carambolos.carambolosapi.infrastructure.web.response.DetalhePedidoFornadaDTO;
 import com.carambolos.carambolosapi.infrastructure.web.response.ResumoPedidoMensagemResponseDTO;
 import com.carambolos.carambolosapi.infrastructure.web.response.ResumoPedidoResponseDTO;
-import com.carambolos.carambolosapi.domain.entity.ResumoPedido;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.ResumoPedidoEntity;
 import com.carambolos.carambolosapi.domain.enums.StatusEnum;
 import com.carambolos.carambolosapi.application.usecases.ResumoPedidoService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,7 +44,7 @@ public class ResumoPedidoController {
     })
     @GetMapping
     public ResponseEntity<List<ResumoPedidoResponseDTO>> listarResumosPedidos() {
-        List<ResumoPedido> resumosPedidos = resumoPedidoService.listarResumosPedidos();
+        List<ResumoPedidoEntity> resumosPedidos = resumoPedidoService.listarResumosPedidos();
         if (resumosPedidos.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
@@ -62,8 +62,8 @@ public class ResumoPedidoController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<ResumoPedidoResponseDTO> buscarResumoPedidoPorId(@PathVariable Integer id) {
-        ResumoPedido resumoPedido = resumoPedidoService.buscarResumoPedidoPorId(id);
-        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumoPedido));
+        ResumoPedidoEntity resumoPedidoEntity = resumoPedidoService.buscarResumoPedidoPorId(id);
+        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumoPedidoEntity));
     }
 
     @Operation(summary = "Buscar resumos por data de pedido", description = "Retorna resumos de pedidos para uma data de pedido específica")
@@ -79,7 +79,7 @@ public class ResumoPedidoController {
     public ResponseEntity<List<ResumoPedidoResponseDTO>> buscarResumosPedidosPorDataPedido(
             @PathVariable LocalDate dataPedido
     ) {
-        List<ResumoPedido> resumosPedidos = resumoPedidoService.buscarResumosPedidosPorDataPedido(dataPedido);
+        List<ResumoPedidoEntity> resumosPedidos = resumoPedidoService.buscarResumosPedidosPorDataPedido(dataPedido);
         if (resumosPedidos.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
@@ -99,7 +99,7 @@ public class ResumoPedidoController {
     public ResponseEntity<List<ResumoPedidoResponseDTO>> buscarResumosPorStatus(
             @PathVariable StatusEnum status
     ) {
-        List<ResumoPedido> resumosPedidos = resumoPedidoService.buscarResumosPedidosPorStatus(status);
+        List<ResumoPedidoEntity> resumosPedidos = resumoPedidoService.buscarResumosPedidosPorStatus(status);
         if (resumosPedidos.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
@@ -119,8 +119,8 @@ public class ResumoPedidoController {
     public ResponseEntity<ResumoPedidoMensagemResponseDTO> cadastrarResumoPedido(
             @Valid @RequestBody ResumoPedidoRequestDTO request
     ) {
-        ResumoPedido resumoPedido = ResumoPedidoRequestDTO.toResumoPedido(request);
-        ResumoPedido resumoSalvo = resumoPedidoService.cadastrarResumoPedido(resumoPedido);
+        ResumoPedidoEntity resumoPedidoEntity = ResumoPedidoRequestDTO.toResumoPedido(request);
+        ResumoPedidoEntity resumoSalvo = resumoPedidoService.cadastrarResumoPedido(resumoPedidoEntity);
         return ResponseEntity.status(201).body(ResumoPedidoMensagemResponseDTO.toResumoPedidoMensagemResponse(resumoSalvo));
     }
 
@@ -140,8 +140,8 @@ public class ResumoPedidoController {
             @PathVariable Integer id,
             @Valid @RequestBody ResumoPedidoRequestDTO request
     ) {
-        ResumoPedido resumoPedido = ResumoPedidoRequestDTO.toResumoPedido(request);
-        ResumoPedido resumoAtualizado = resumoPedidoService.atualizarResumoPedido(id, resumoPedido);
+        ResumoPedidoEntity resumoPedidoEntity = ResumoPedidoRequestDTO.toResumoPedido(request);
+        ResumoPedidoEntity resumoAtualizado = resumoPedidoService.atualizarResumoPedido(id, resumoPedidoEntity);
         return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumoAtualizado));
     }
 
@@ -174,8 +174,8 @@ public class ResumoPedidoController {
     public ResponseEntity<ResumoPedidoResponseDTO> marcarPedidoComoPago(
             @PathVariable Integer id
     ) {
-        ResumoPedido resumoPedido = resumoPedidoService.alterarStatus(id, StatusEnum.PAGO);
-        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumoPedido));
+        ResumoPedidoEntity resumoPedidoEntity = resumoPedidoService.alterarStatus(id, StatusEnum.PAGO);
+        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumoPedidoEntity));
     }
 
     @Operation(summary = "Marcar resumo de pedido como concluído", description = "Atualiza o status do resumo de pedido para 'CONCLUIDO'")
@@ -193,8 +193,8 @@ public class ResumoPedidoController {
     public ResponseEntity<ResumoPedidoResponseDTO> marcarPedidoComoConcluido(
             @PathVariable Integer id
     ) {
-        ResumoPedido resumoPedido = resumoPedidoService.alterarStatus(id, StatusEnum.CONCLUIDO);
-        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumoPedido));
+        ResumoPedidoEntity resumoPedidoEntity = resumoPedidoService.alterarStatus(id, StatusEnum.CONCLUIDO);
+        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumoPedidoEntity));
     }
 
     @Operation(summary = "Marcar resumo de pedido como cancelado", description = "Atualiza o status do resumo de pedido para 'PENDENTE'")
@@ -212,8 +212,8 @@ public class ResumoPedidoController {
     public ResponseEntity<ResumoPedidoResponseDTO> marcarPedidoComoPendente(
             @PathVariable Integer id
     ) {
-        ResumoPedido resumoPedido = resumoPedidoService.alterarStatus(id, StatusEnum.PENDENTE);
-        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumoPedido));
+        ResumoPedidoEntity resumoPedidoEntity = resumoPedidoService.alterarStatus(id, StatusEnum.PENDENTE);
+        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumoPedidoEntity));
     }
 
     @Operation(summary = "Marcar resumo de pedido como cancelado", description = "Atualiza o status do resumo de pedido para 'CANCELADO'")
@@ -231,8 +231,8 @@ public class ResumoPedidoController {
     public ResponseEntity<ResumoPedidoResponseDTO> marcarPedidoComoCancelado(
             @PathVariable Integer id
     ) {
-        ResumoPedido resumoPedido = resumoPedidoService.alterarStatus(id, StatusEnum.CANCELADO);
-        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumoPedido));
+        ResumoPedidoEntity resumoPedidoEntity = resumoPedidoService.alterarStatus(id, StatusEnum.CANCELADO);
+        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumoPedidoEntity));
     }
 
     @Operation(summary = "Buscar resumos de pedidos de bolo", description = "Retorna todos os resumos de pedidos que possuem pedido de bolo associado")
@@ -246,7 +246,7 @@ public class ResumoPedidoController {
     })
     @GetMapping("/pedido-bolo")
     public ResponseEntity<List<ResumoPedidoResponseDTO>> listarResumosPedidosBolo() {
-        List<ResumoPedido> resumosPedidos = resumoPedidoService.listarResumosPedidosBolo();
+        List<ResumoPedidoEntity> resumosPedidos = resumoPedidoService.listarResumosPedidosBolo();
         if (resumosPedidos.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
@@ -264,7 +264,7 @@ public class ResumoPedidoController {
     })
     @GetMapping("/pedido-fornada")
     public ResponseEntity<List<ResumoPedidoResponseDTO>> listarResumosPedidosFornada() {
-        List<ResumoPedido> resumosPedidos = resumoPedidoService.listarResumosPedidosFornada();
+        List<ResumoPedidoEntity> resumosPedidos = resumoPedidoService.listarResumosPedidosFornada();
         if (resumosPedidos.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
