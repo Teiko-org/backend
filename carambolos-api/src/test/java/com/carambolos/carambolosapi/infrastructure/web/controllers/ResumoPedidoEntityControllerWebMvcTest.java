@@ -1,6 +1,5 @@
 package com.carambolos.carambolosapi.infrastructure.web.controllers;
 
-import com.carambolos.carambolosapi.application.usecases.ResumoPedidoService;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.ResumoPedidoEntity;
 import com.carambolos.carambolosapi.domain.enums.StatusEnum;
 import org.junit.jupiter.api.Test;

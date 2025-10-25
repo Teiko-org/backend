@@ -1,5 +1,8 @@
 package com.carambolos.carambolosapi.infrastructure.web.controllers;
 
+import com.carambolos.carambolosapi.application.usecases.ResumoPedidoUseCase;
+import com.carambolos.carambolosapi.domain.entity.ResumoPedido;
+import com.carambolos.carambolosapi.infrastructure.gateways.mapper.ResumoPedidoMapper;
 import com.carambolos.carambolosapi.infrastructure.web.request.ResumoPedidoRequestDTO;
 import com.carambolos.carambolosapi.infrastructure.web.response.DetalhePedidoBoloDTO;
 import com.carambolos.carambolosapi.infrastructure.web.response.DetalhePedidoFornadaDTO;
@@ -7,7 +10,6 @@ import com.carambolos.carambolosapi.infrastructure.web.response.ResumoPedidoMens
 import com.carambolos.carambolosapi.infrastructure.web.response.ResumoPedidoResponseDTO;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.ResumoPedidoEntity;
 import com.carambolos.carambolosapi.domain.enums.StatusEnum;
-import com.carambolos.carambolosapi.application.usecases.ResumoPedidoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -30,8 +32,13 @@ import java.util.List;
 @SecurityRequirement(name = "Bearer")
 public class ResumoPedidoController {
 
-    @Autowired
-    private ResumoPedidoService resumoPedidoService;
+    private final ResumoPedidoUseCase resumoPedidoUseCase;
+    private final ResumoPedidoMapper resumoPedidoMapper;
+
+    public ResumoPedidoController(ResumoPedidoUseCase resumoPedidoUseCase, ResumoPedidoMapper resumoPedidoMapper) {
+        this.resumoPedidoUseCase = resumoPedidoUseCase;
+        this.resumoPedidoMapper = resumoPedidoMapper;
+    }
 
     @Operation(summary = "Listar resumos de pedidos", description = "Retorna todos os resumos de pedidos ativos")
     @ApiResponses(value = {
@@ -44,11 +51,11 @@ public class ResumoPedidoController {
     })
     @GetMapping
     public ResponseEntity<List<ResumoPedidoResponseDTO>> listarResumosPedidos() {
-        List<ResumoPedidoEntity> resumosPedidos = resumoPedidoService.listarResumosPedidos();
+        List<ResumoPedido> resumosPedidos = resumoPedidoUseCase.listarResumosPedidos();
         if (resumosPedidos.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
-        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumosPedidos));
+        return ResponseEntity.status(200).body(resumoPedidoMapper.toResumoPedidoResponse(resumosPedidos));
     }
 
     @Operation(summary = "Buscar resumo de pedido por ID", description = "Retorna um resumo de pedido específico com base no ID")
@@ -62,8 +69,8 @@ public class ResumoPedidoController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<ResumoPedidoResponseDTO> buscarResumoPedidoPorId(@PathVariable Integer id) {
-        ResumoPedidoEntity resumoPedidoEntity = resumoPedidoService.buscarResumoPedidoPorId(id);
-        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumoPedidoEntity));
+        ResumoPedido resumoPedido = resumoPedidoUseCase.buscarResumoPedidoPorId(id);
+        return ResponseEntity.status(200).body(resumoPedidoMapper.toResumoPedidoResponse(resumoPedido));
     }
 
     @Operation(summary = "Buscar resumos por data de pedido", description = "Retorna resumos de pedidos para uma data de pedido específica")
@@ -79,11 +86,11 @@ public class ResumoPedidoController {
     public ResponseEntity<List<ResumoPedidoResponseDTO>> buscarResumosPedidosPorDataPedido(
             @PathVariable LocalDate dataPedido
     ) {
-        List<ResumoPedidoEntity> resumosPedidos = resumoPedidoService.buscarResumosPedidosPorDataPedido(dataPedido);
+        List<ResumoPedido> resumosPedidos = resumoPedidoUseCase.buscarResumosPedidosPorDataPedido(dataPedido);
         if (resumosPedidos.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
-        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumosPedidos));
+        return ResponseEntity.status(200).body(resumoPedidoMapper.toResumoPedidoResponse(resumosPedidos));
     }
 
     @Operation(summary = "Buscar resumos por status", description = "Retorna resumos de pedidos com um status específico")
@@ -99,11 +106,11 @@ public class ResumoPedidoController {
     public ResponseEntity<List<ResumoPedidoResponseDTO>> buscarResumosPorStatus(
             @PathVariable StatusEnum status
     ) {
-        List<ResumoPedidoEntity> resumosPedidos = resumoPedidoService.buscarResumosPedidosPorStatus(status);
+        List<ResumoPedido> resumosPedidos = resumoPedidoUseCase.buscarResumosPedidosPorStatus(status);
         if (resumosPedidos.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
-        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumosPedidos));
+        return ResponseEntity.status(200).body(resumoPedidoMapper.toResumoPedidoResponse(resumosPedidos));
     }
 
     @Operation(summary = "Cadastrar resumo de pedido", description = "Cadastra um novo resumo de pedido")
@@ -119,8 +126,8 @@ public class ResumoPedidoController {
     public ResponseEntity<ResumoPedidoMensagemResponseDTO> cadastrarResumoPedido(
             @Valid @RequestBody ResumoPedidoRequestDTO request
     ) {
-        ResumoPedidoEntity resumoPedidoEntity = ResumoPedidoRequestDTO.toResumoPedido(request);
-        ResumoPedidoEntity resumoSalvo = resumoPedidoService.cadastrarResumoPedido(resumoPedidoEntity);
+        ResumoPedido resumoPedido = resumoPedidoMapper.toResumoPedido(request);
+        ResumoPedido resumoSalvo = resumoPedidoUseCase.cadastrarResumoPedido(resumoPedido);
         return ResponseEntity.status(201).body(ResumoPedidoMensagemResponseDTO.toResumoPedidoMensagemResponse(resumoSalvo));
     }
 
@@ -140,9 +147,9 @@ public class ResumoPedidoController {
             @PathVariable Integer id,
             @Valid @RequestBody ResumoPedidoRequestDTO request
     ) {
-        ResumoPedidoEntity resumoPedidoEntity = ResumoPedidoRequestDTO.toResumoPedido(request);
-        ResumoPedidoEntity resumoAtualizado = resumoPedidoService.atualizarResumoPedido(id, resumoPedidoEntity);
-        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumoAtualizado));
+        ResumoPedido resumoPedidoEntity = resumoPedidoMapper.toResumoPedido(request);
+        ResumoPedido resumoAtualizado = resumoPedidoUseCase.atualizarResumoPedido(id, resumoPedidoEntity);
+        return ResponseEntity.status(200).body(resumoPedidoMapper.toResumoPedidoResponse(resumoAtualizado));
     }
 
     @Operation(summary = "Deletar resumo de pedido", description = "Remove um resumo de pedido pelo ID (desativa)")
@@ -155,7 +162,7 @@ public class ResumoPedidoController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarResumoPedido(@PathVariable Integer id) {
-        resumoPedidoService.deletarResumoPedido(id);
+        resumoPedidoUseCase.deletarResumoPedido(id);
         return ResponseEntity.status(204).build();
     }
 
@@ -174,8 +181,8 @@ public class ResumoPedidoController {
     public ResponseEntity<ResumoPedidoResponseDTO> marcarPedidoComoPago(
             @PathVariable Integer id
     ) {
-        ResumoPedidoEntity resumoPedidoEntity = resumoPedidoService.alterarStatus(id, StatusEnum.PAGO);
-        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumoPedidoEntity));
+        ResumoPedido resumoPedidoEntity = resumoPedidoUseCase.alterarStatus(id, StatusEnum.PAGO);
+        return ResponseEntity.status(200).body(resumoPedidoMapper.toResumoPedidoResponse(resumoPedidoEntity));
     }
 
     @Operation(summary = "Marcar resumo de pedido como concluído", description = "Atualiza o status do resumo de pedido para 'CONCLUIDO'")
@@ -193,8 +200,8 @@ public class ResumoPedidoController {
     public ResponseEntity<ResumoPedidoResponseDTO> marcarPedidoComoConcluido(
             @PathVariable Integer id
     ) {
-        ResumoPedidoEntity resumoPedidoEntity = resumoPedidoService.alterarStatus(id, StatusEnum.CONCLUIDO);
-        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumoPedidoEntity));
+        ResumoPedido resumoPedidoEntity = resumoPedidoUseCase.alterarStatus(id, StatusEnum.CONCLUIDO);
+        return ResponseEntity.status(200).body(resumoPedidoMapper.toResumoPedidoResponse(resumoPedidoEntity));
     }
 
     @Operation(summary = "Marcar resumo de pedido como cancelado", description = "Atualiza o status do resumo de pedido para 'PENDENTE'")
@@ -212,8 +219,8 @@ public class ResumoPedidoController {
     public ResponseEntity<ResumoPedidoResponseDTO> marcarPedidoComoPendente(
             @PathVariable Integer id
     ) {
-        ResumoPedidoEntity resumoPedidoEntity = resumoPedidoService.alterarStatus(id, StatusEnum.PENDENTE);
-        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumoPedidoEntity));
+        ResumoPedido resumoPedidoEntity = resumoPedidoUseCase.alterarStatus(id, StatusEnum.PENDENTE);
+        return ResponseEntity.status(200).body(resumoPedidoMapper.toResumoPedidoResponse(resumoPedidoEntity));
     }
 
     @Operation(summary = "Marcar resumo de pedido como cancelado", description = "Atualiza o status do resumo de pedido para 'CANCELADO'")
@@ -231,8 +238,8 @@ public class ResumoPedidoController {
     public ResponseEntity<ResumoPedidoResponseDTO> marcarPedidoComoCancelado(
             @PathVariable Integer id
     ) {
-        ResumoPedidoEntity resumoPedidoEntity = resumoPedidoService.alterarStatus(id, StatusEnum.CANCELADO);
-        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumoPedidoEntity));
+        ResumoPedido resumoPedidoEntity = resumoPedidoUseCase.alterarStatus(id, StatusEnum.CANCELADO);
+        return ResponseEntity.status(200).body(resumoPedidoMapper.toResumoPedidoResponse(resumoPedidoEntity));
     }
 
     @Operation(summary = "Buscar resumos de pedidos de bolo", description = "Retorna todos os resumos de pedidos que possuem pedido de bolo associado")
@@ -246,11 +253,11 @@ public class ResumoPedidoController {
     })
     @GetMapping("/pedido-bolo")
     public ResponseEntity<List<ResumoPedidoResponseDTO>> listarResumosPedidosBolo() {
-        List<ResumoPedidoEntity> resumosPedidos = resumoPedidoService.listarResumosPedidosBolo();
+        List<ResumoPedido> resumosPedidos = resumoPedidoUseCase.listarResumosPedidosBolo();
         if (resumosPedidos.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
-        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumosPedidos));
+        return ResponseEntity.status(200).body(resumoPedidoMapper.toResumoPedidoResponse(resumosPedidos));
     }
 
     @Operation(summary = "Buscar resumos de pedidos de fornada", description = "Retorna todos os resumos de pedidos que possuem pedido de fornada associado")
@@ -264,14 +271,14 @@ public class ResumoPedidoController {
     })
     @GetMapping("/pedido-fornada")
     public ResponseEntity<List<ResumoPedidoResponseDTO>> listarResumosPedidosFornada() {
-        List<ResumoPedidoEntity> resumosPedidos = resumoPedidoService.listarResumosPedidosFornada();
+        List<ResumoPedido> resumosPedidos = resumoPedidoUseCase.listarResumosPedidosFornada();
         if (resumosPedidos.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
-        return ResponseEntity.status(200).body(ResumoPedidoResponseDTO.toResumoPedidoResponse(resumosPedidos));
+        return ResponseEntity.status(200).body(resumoPedidoMapper.toResumoPedidoResponse(resumosPedidos));
     }
 
-    @Operation(summary = "Detalhe de um pedido fornada específico", description = "Busca detalhe de um pedido fornada específico")
+    @Operation(summary = "Detalhe de um pedido bolo específico", description = "Busca detalhe de um pedido bolo específico")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Detalhe do pedido retornado com sucesso", content = @Content()),
             @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content()),
@@ -279,11 +286,11 @@ public class ResumoPedidoController {
     })
     @GetMapping("/pedido-bolo/detalhe/{id}")
     public ResponseEntity<DetalhePedidoBoloDTO> obterDetalhePedidoBolo(@PathVariable Integer id) {
-        DetalhePedidoBoloDTO detalhe = resumoPedidoService.obterDetalhePedidoBolo(id);
+        DetalhePedidoBoloDTO detalhe = resumoPedidoUseCase.obterDetalhePedidoBolo(id);
         return ResponseEntity.ok(detalhe);
     }
 
-    @Operation(summary = "Detalhe de um pedido bolo específico", description = "Busca detalhe de um pedido de bolo específico")
+    @Operation(summary = "Detalhe de um pedido fornada específico", description = "Busca detalhe de um pedido de fornada específico")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Detalhe do pedido retornado com sucesso", content = @Content()),
             @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content()),
@@ -291,14 +298,14 @@ public class ResumoPedidoController {
     })
     @GetMapping("/pedido-fornada/detalhe/{id}")
     public ResponseEntity<DetalhePedidoFornadaDTO> obterDetalhePedidoFornada(@PathVariable Integer id) {
-        DetalhePedidoFornadaDTO detalhe = resumoPedidoService.obterDetalhePedidoFornada(id);
+        DetalhePedidoFornadaDTO detalhe = resumoPedidoUseCase.obterDetalhePedidoFornada(id);
         return ResponseEntity.ok(detalhe);
     }
 
     @Operation(summary = "Gerar mensagem consolidada de múltiplos resumos", description = "Concatena as mensagens de WhatsApp de vários resumos de pedido")
     @PostMapping("/mensagens")
     public ResponseEntity<String> gerarMensagensConsolidadas(@RequestBody MensagensResumoRequestDTO request) {
-        String mensagem = resumoPedidoService.gerarMensagensConsolidadas(request.idsResumo());
+        String mensagem = resumoPedidoUseCase.gerarMensagensConsolidadas(request.idsResumo());
         return ResponseEntity.ok(mensagem);
     }
 }

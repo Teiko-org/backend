@@ -14,17 +14,5 @@ public record ResumoPedidoRequestDTO (
         Integer pedidoBoloId
 
 ) {
-    public static ResumoPedidoEntity toResumoPedido(ResumoPedidoRequestDTO request) {
-        if (request == null) {
-            return null;
-        }
-
-        ResumoPedidoEntity resumoPedidoEntity = new ResumoPedidoEntity();
-        resumoPedidoEntity.setDataEntrega(request.dataEntrega);
-        resumoPedidoEntity.setPedidoFornadaId(request.pedidoFornadaId);
-        resumoPedidoEntity.setPedidoBoloId(request.pedidoBoloId);
-
-        return resumoPedidoEntity;
-    }
 
 }

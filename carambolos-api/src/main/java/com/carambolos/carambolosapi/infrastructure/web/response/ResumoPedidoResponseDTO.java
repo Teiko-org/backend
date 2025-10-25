@@ -16,21 +16,5 @@ public record ResumoPedidoResponseDTO (
         Integer pedidoBoloId
 )
 {
-    public static ResumoPedidoResponseDTO toResumoPedidoResponse(ResumoPedidoEntity pedido) {
-        return new ResumoPedidoResponseDTO(
-                pedido.getId(),
-                pedido.getStatus(),
-                pedido.getValor(),
-                pedido.getDataPedido(),
-                pedido.getDataEntrega(),
-                pedido.getPedidoFornadaId(),
-                pedido.getPedidoBoloId()
-        );
-    }
 
-    public static List<ResumoPedidoResponseDTO> toResumoPedidoResponse(List<ResumoPedidoEntity> resumoPedidoEntities) {
-        return resumoPedidoEntities.stream()
-                .map(ResumoPedidoResponseDTO::toResumoPedidoResponse)
-                .toList();
-    }
 }

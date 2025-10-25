@@ -9,6 +9,7 @@ import com.carambolos.carambolosapi.infrastructure.persistence.entity.RecheioPed
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.RecheioPedidoRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public class RecheioPedidoGatewayImpl implements RecheioPedidoGateway {
     private final RecheioPedidoRepository repository;
@@ -60,5 +61,10 @@ public class RecheioPedidoGatewayImpl implements RecheioPedidoGateway {
     @Override
     public Boolean existsByIdAndIsAtivoTrue(Integer id) {
         return repository.existsByIdAndIsAtivoTrue(id);
+    }
+
+    @Override
+    public Optional<RecheioPedidoEntity> findEntityById(Integer id) {
+        return repository.findById(id);
     }
 }

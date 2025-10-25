@@ -13,4 +13,8 @@ public interface ResumoPedidoGateway {
     List<ResumoPedido> findByStatusAndIsAtivoTrue(StatusEnum status);
     ResumoPedido save(ResumoPedido resumoPedido);
     boolean existsByIdAndIsAtivoTrue(Integer id);
+    List<ResumoPedido> findByPedidoBoloIdIsNotNullAndIsAtivoTrue();
+    List<ResumoPedido> findByPedidoFornadaIdIsNotNullAndIsAtivoTrue();
+    ResumoPedido findTop1ByPedidoBoloIdAndIsAtivoTrueOrderByDataPedidoDesc(Integer id);
+    ResumoPedido findTop1ByPedidoFornadaIdAndIsAtivoTrueOrderByDataPedidoDesc(Integer id);
 }

@@ -2,6 +2,8 @@ package com.carambolos.carambolosapi.infrastructure.gateways.mapper;
 
 import com.carambolos.carambolosapi.domain.entity.ResumoPedido;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.ResumoPedidoEntity;
+import com.carambolos.carambolosapi.infrastructure.web.request.ResumoPedidoRequestDTO;
+import com.carambolos.carambolosapi.infrastructure.web.response.ResumoPedidoResponseDTO;
 
 import java.util.List;
 
@@ -37,5 +39,36 @@ public class ResumoPedidoMapper {
                 resumoPedido.getPedidoBoloId(),
                 resumoPedido.getAtivo()
         );
+    }
+
+    public ResumoPedidoResponseDTO toResumoPedidoResponse(ResumoPedido pedido) {
+        return new ResumoPedidoResponseDTO(
+                pedido.getId(),
+                pedido.getStatus(),
+                pedido.getValor(),
+                pedido.getDataPedido(),
+                pedido.getDataEntrega(),
+                pedido.getPedidoFornadaId(),
+                pedido.getPedidoBoloId()
+        );
+    }
+
+    public List<ResumoPedidoResponseDTO> toResumoPedidoResponse(List<ResumoPedido> resumoPedidoEntities) {
+        return resumoPedidoEntities.stream()
+                .map(this::toResumoPedidoResponse)
+                .toList();
+    }
+
+    public ResumoPedido toResumoPedido(ResumoPedidoRequestDTO request) {
+        if (request == null) {
+            return null;
+        }
+
+        ResumoPedido resumoPedido = new ResumoPedido();
+        resumoPedido.setDataEntrega(request.dataEntrega());
+        resumoPedido.setPedidoFornadaId(request.pedidoFornadaId());
+        resumoPedido.setPedidoBoloId(request.pedidoBoloId());
+
+        return resumoPedido;
     }
 }

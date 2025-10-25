@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 
 public class EnderecoGatewayImpl implements EnderecoGateway {
     private final EnderecoRepository enderecoRepository;
@@ -82,6 +83,11 @@ public class EnderecoGatewayImpl implements EnderecoGateway {
     @Override
     public boolean existsByIdAndIsAtivoTrue(Integer id) {
         return enderecoRepository.existsByIdAndIsAtivoTrue(id);
+    }
+
+    @Override
+    public Optional<EnderecoEntity> findEntityById(Integer id) {
+        return enderecoRepository.findById(id);
     }
 
     private Boolean existeEnderecoDuplicado(EnderecoEntity endereco) {

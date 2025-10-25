@@ -57,4 +57,11 @@ public class CoberturaGatewayImpl implements CoberturaGateway {
     public Boolean existsByIdAndIsAtivoTrue(Integer id) {
         return repository.existsByIdAndIsAtivoTrue(id);
     }
+
+    @Override
+    public String findNomeById(Integer id) {
+        return repository.findById(id)
+                .map(CoberturaEntity::getDescricao)
+                .orElse("Não especificada");
+    }
 }

@@ -29,10 +29,7 @@ public record ResumoPedidoMensagemResponseDTO (
         mensagemHelper = helper;
     }
 
-
-
-
-    public static ResumoPedidoMensagemResponseDTO toResumoPedidoMensagemResponse(ResumoPedidoEntity pedido) {
+    public static ResumoPedidoMensagemResponseDTO toResumoPedidoMensagemResponse(ResumoPedido pedido) {
         if (mensagemHelper == null) {
             throw new IllegalStateException("MensagemHelper não foi inicializado");
         }
@@ -84,7 +81,7 @@ public record ResumoPedidoMensagemResponseDTO (
             this.enderecoRepository = enderecoRepository;
         }
 
-        public String gerarMensagemWhatsapp(ResumoPedidoEntity pedido) {
+        public String gerarMensagemWhatsapp(ResumoPedido pedido) {
             String linkSite = "https://carambolos.com.br";
             String numeroPedido = "#" + pedido.getId();
             String valorFormatado = String.format("R$ %.2f", pedido.getValor()).replace(".", ",");
