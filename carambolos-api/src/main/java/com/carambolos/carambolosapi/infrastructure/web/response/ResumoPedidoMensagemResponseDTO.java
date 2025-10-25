@@ -29,9 +29,6 @@ public record ResumoPedidoMensagemResponseDTO (
         mensagemHelper = helper;
     }
 
-
-
-
     public static ResumoPedidoMensagemResponseDTO toResumoPedidoMensagemResponse(ResumoPedido pedido) {
         if (mensagemHelper == null) {
             throw new IllegalStateException("MensagemHelper não foi inicializado");

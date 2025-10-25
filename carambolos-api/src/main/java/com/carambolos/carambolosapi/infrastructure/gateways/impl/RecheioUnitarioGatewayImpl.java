@@ -68,4 +68,9 @@ public class RecheioUnitarioGatewayImpl implements RecheioUnitarioGateway {
     public Boolean existsByIdAndIsAtivoTrue(Integer id) {
         return repository.existsByIdAndIsAtivoTrue(id);
     }
+
+    @Override
+    public Optional<RecheioUnitarioEntity> findEntityById(Integer id) {
+        return repository.findById(id);
+    }
 }
