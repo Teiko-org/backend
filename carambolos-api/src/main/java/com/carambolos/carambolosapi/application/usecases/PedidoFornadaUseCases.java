@@ -4,6 +4,7 @@ import com.carambolos.carambolosapi.application.exception.EntidadeImprocessavelE
 import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.application.gateways.FornadaDaVezGateway;
 import com.carambolos.carambolosapi.application.gateways.PedidoFornadaGateway;
+import com.carambolos.carambolosapi.application.gateways.PedidoEventosGateway;
 import com.carambolos.carambolosapi.application.gateways.EnderecoGateway;
 import com.carambolos.carambolosapi.application.gateways.UsuarioGateway;
 import com.carambolos.carambolosapi.domain.entity.PedidoFornada;
@@ -13,6 +14,10 @@ import com.carambolos.carambolosapi.infrastructure.web.request.PedidoFornadaRequ
 import com.carambolos.carambolosapi.infrastructure.web.request.PedidoFornadaUpdateRequestDTO;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.FornadasMapper;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+import com.carambolos.carambolosapi.infrastructure.messaging.dto.PedidoEvento;
+import java.time.OffsetDateTime;
 
 import java.util.List;
 
@@ -21,17 +26,20 @@ public class PedidoFornadaUseCases {
     private final FornadaDaVezGateway fdv;
     private final EnderecoGateway enderecos;
     private final UsuarioGateway usuarios;
+    private final PedidoEventosGateway eventos;
 
     public PedidoFornadaUseCases(
             PedidoFornadaGateway pedidos,
             FornadaDaVezGateway fdv,
             EnderecoGateway enderecos,
-            UsuarioGateway usuarios
+            UsuarioGateway usuarios,
+            PedidoEventosGateway eventos
     ) {
         this.pedidos = pedidos;
         this.fdv = fdv;
         this.enderecos = enderecos;
         this.usuarios = usuarios;
+        this.eventos = eventos;
     }
 
     @Transactional
@@ -64,7 +72,26 @@ public class PedidoFornadaUseCases {
         fdv.save(fornadaDaVez);
 
         PedidoFornada pedido = FornadasMapper.toDomain(request.toEntity(request));
-        return pedidos.save(pedido);
+        pedido = pedidos.save(pedido);
+
+        // Publica após commit da transação (garantindo persistência antes do evento)
+        PedidoFornada pedidoFinal = pedido;
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                try {
+                    PedidoEvento evt = new PedidoEvento();
+                    evt.setEvento("PEDIDO_CRIADO");
+                    evt.setPedidoId(pedidoFinal.getId());
+                    evt.setClienteId(pedidoFinal.getUsuario());
+                    evt.setDataEvento(OffsetDateTime.now());
+                    evt.setOrigem("api");
+                    eventos.publicarPedidoCriado(evt);
+                } catch (Exception ignored) {}
+            }
+        });
+
+        return pedido;
     }
 
     public PedidoFornada buscarPorId(Integer id) {

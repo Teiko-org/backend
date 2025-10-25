@@ -3,6 +3,7 @@ package com.carambolos.carambolosapi.system.config;
 import com.carambolos.carambolosapi.application.gateways.FornadaDaVezGateway;
 import com.carambolos.carambolosapi.application.gateways.PedidoFornadaGateway;
 import com.carambolos.carambolosapi.application.usecases.PedidoFornadaUseCases;
+import com.carambolos.carambolosapi.application.gateways.PedidoEventosGateway;
 import com.carambolos.carambolosapi.application.gateways.ProdutoFornadaGateway;
  
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.ProdutoFornadaRepository;
@@ -22,9 +23,10 @@ public class PedidoFornadaConfig {
             PedidoFornadaGateway pedidos,
             FornadaDaVezGateway fdv,
             EnderecoGateway end,
-            UsuarioGateway usu
+            UsuarioGateway usu,
+            PedidoEventosGateway eventos
     ) {
-        return new PedidoFornadaUseCases(pedidos, fdv, end, usu);
+        return new PedidoFornadaUseCases(pedidos, fdv, end, usu, eventos);
     }
 
     @Bean
