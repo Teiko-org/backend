@@ -104,7 +104,7 @@ Usamos criptografia AES‑256‑GCM para campos sensíveis (ex.: nome, telefone,
      ```
   2. Usar na sessão atual:
      ```powershell
-     $env:CRYPTO_SECRET_B64 = "<COLE_AQUI_O_BASE64>"
+     $env:CRYPTO_SECRET_B64 = "<COLE AQUI O BASE64>"
      ```
   3. Validar (deve imprimir 32):
      ```powershell
@@ -118,7 +118,7 @@ Usamos criptografia AES‑256‑GCM para campos sensíveis (ex.: nome, telefone,
      ```
   2. Usar na sessão atual:
      ```bash
-     export CRYPTO_SECRET_B64="<COLE_AQUI_O_BASE64>"
+     export CRYPTO_SECRET_B64="<COLE AQUI O BASE64>"
      ```
   3. Validar (deve imprimir 32):
      ```bash
@@ -398,6 +398,40 @@ e depois `sudo systemctl restart carambolos-api`.
 ### Troubleshooting (CRYPTO_SECRET_B64)
 - Erro: "CRYPTO_SECRET_B64 não definido": variável ausente — defina conforme acima.
 - Erro ao descriptografar: verifique se o Base64 tem 32 bytes após decodificar e se é a mesma chave usada para cifrar dados existentes.
+
+---
+
+## 🧵 Execução: API + Worker (RabbitMQ)
+
+O consumidor de filas está sob o profile Spring `worker`. Assim, rodamos a API e o Worker como processos separados.
+
+### Local (Maven)
+
+```bash
+# Terminal 1: API (sem profile worker)
+./mvnw spring-boot:run
+
+# Terminal 2: Worker (apenas listeners)
+./mvnw spring-boot:run -Dspring-boot.run.profiles=worker
+```
+
+- Necessário ter RabbitMQ acessível (veja docker-compose em `infra/aws-ec2`).
+- Variáveis de ambiente de Rabbit podem ser definidas via `application.properties` ou ambiente (`RABBITMQ_HOST`, etc.).
+
+### Docker Compose (API + Worker)
+
+No diretório `infra/aws-ec2`:
+
+```bash
+# Sobe MySQL, RabbitMQ, API e Worker
+docker compose -f docker-compose.backend.yml up -d --build
+
+# Ver logs
+docker compose -f docker-compose.backend.yml logs -f api
+docker compose -f docker-compose.backend.yml logs -f worker
+```
+
+A API expõe a porta `8080`. O worker não expõe portas; ele apenas consome filas.
 
 ## 👥 Contribuição
 
