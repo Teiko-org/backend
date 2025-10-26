@@ -7,6 +7,8 @@ import com.carambolos.carambolosapi.domain.entity.ImagemProdutoFornada;
 import com.carambolos.carambolosapi.domain.entity.ProdutoFornada;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.ProdutoFornadaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,12 +48,12 @@ public class ProdutoFornadaUseCases {
         return produtoFornadaRepository.save(produtoFornada);
     }
 
-    public List<ProdutoFornada> listarProdutosFornada(List<String> categorias) {
-        List<ProdutoFornada> produtos;
+    public Page<ProdutoFornada> listarProdutosFornada(Pageable pageable, List<String> categorias) {
+        Page<ProdutoFornada> produtos;
         if (!categorias.isEmpty()) {
-            produtos = produtoFornadaRepository.findByCategoriaIn(categorias).stream().filter(ProdutoFornada::isAtivo).toList();
+            produtos = produtoFornadaRepository.findByCategoriaInAndIsAtivoTrue(pageable, categorias);
         } else {
-            produtos = produtoFornadaRepository.findAll().stream().filter(ProdutoFornada::isAtivo).toList();
+            produtos = produtoFornadaRepository.findByIsAtivoTrue(pageable);
         }
         return produtos;
     }

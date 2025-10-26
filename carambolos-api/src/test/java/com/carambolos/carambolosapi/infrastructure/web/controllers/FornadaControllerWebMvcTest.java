@@ -13,6 +13,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -85,8 +89,14 @@ class FornadaControllerWebMvcTest {
         pf.setId(1);
         pf.setProduto("Cookie");
         pf.setValor(5.0);
-        when(produtoFornadaService.listarProdutosFornada(List.of())).thenReturn(List.of(pf));
-        mockMvc.perform(get("/fornadas/produto-fornada"))
+
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<ProdutoFornada> page = new PageImpl<>(List.of(pf));
+        when(produtoFornadaService.listarProdutosFornada(pageable, List.of())).thenReturn(page);
+
+        mockMvc.perform(get("/fornadas/produto-fornada")
+                        .param("page", "0")
+                        .param("size", "10"))
                 .andExpect(status().isOk());
     }
 }

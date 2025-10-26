@@ -24,6 +24,9 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -250,10 +253,13 @@ public class FornadaController {
             @ApiResponse(responseCode = "404", description = "Nenhum produto encontrado", content = @Content())
     })
     @GetMapping("/produto-fornada")
-    public ResponseEntity<List<ProdutoFornada>> listarProdutoFornada(
-            @RequestParam(defaultValue = "") List<String> categorias
+    public ResponseEntity<Page<ProdutoFornada>> listarProdutoFornada(
+            @RequestParam(defaultValue = "") List<String> categorias,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
     ) {
-        return ResponseEntity.status(200).body(produtoFornadaService.listarProdutosFornada(categorias));
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.status(200).body(produtoFornadaService.listarProdutosFornada(pageable, categorias));
     }
 
     @Operation(summary = "Busca um produto da fornada por ID")
