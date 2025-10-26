@@ -3,9 +3,10 @@ package com.carambolos.carambolosapi.infrastructure.web.response;
 import com.carambolos.carambolosapi.domain.enums.StatusEnum;
 import com.carambolos.carambolosapi.domain.entity.ResumoPedido;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.*;
-import com.carambolos.carambolosapi.infrastructure.persistence.entity.ProdutoFornada;
+import com.carambolos.carambolosapi.domain.entity.ProdutoFornada;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoFornada;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.*;
+import com.carambolos.carambolosapi.infrastructure.gateways.mapper.FornadasMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -315,7 +316,8 @@ public record ResumoPedidoMensagemResponseDTO (
             if (fornadaDaVez == null || fornadaDaVez.getFornada() == null) return "Fornada Especial";
 
             Integer produtoFornadaId = fornadaDaVez.getProdutoFornada();
-            ProdutoFornada produto = produtoFornadaRepository.findById(produtoFornadaId).orElse(null);
+            var produtoEntity = produtoFornadaRepository.findById(produtoFornadaId).orElse(null);
+            ProdutoFornada produto = produtoEntity != null ? FornadasMapper.toDomain(produtoEntity) : null;
 
             if (produto != null && produto.getProduto() != null) {
                 return "Produto da Fornada: " + produto.getProduto() + " - " + produto.getDescricao();

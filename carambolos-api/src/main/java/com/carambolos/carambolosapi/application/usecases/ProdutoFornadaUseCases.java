@@ -7,6 +7,9 @@ import com.carambolos.carambolosapi.domain.entity.ImagemProdutoFornada;
 import com.carambolos.carambolosapi.domain.entity.ProdutoFornada;
 import com.carambolos.carambolosapi.application.gateways.ProdutoFornadaGateway;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,14 +49,28 @@ public class ProdutoFornadaUseCases {
         return produtoFornadaGateway.save(produtoFornada);
     }
 
-    public List<ProdutoFornada> listarProdutosFornada(List<String> categorias) {
-        List<ProdutoFornada> produtos;
+    public Page<ProdutoFornada> listarProdutosFornada(Pageable pageable, List<String> categorias) {
+        List<ProdutoFornada> produtosFiltrados;
         if (!categorias.isEmpty()) {
-            produtos = produtoFornadaGateway.findByCategoriaIn(categorias).stream().filter(ProdutoFornada::isAtivo).toList();
+            produtosFiltrados = produtoFornadaGateway.findByCategoriaIn(categorias).stream()
+                    .filter(ProdutoFornada::isAtivo)
+                    .toList();
         } else {
-            produtos = produtoFornadaGateway.findAll().stream().filter(ProdutoFornada::isAtivo).toList();
+            produtosFiltrados = produtoFornadaGateway.findAll().stream()
+                    .filter(ProdutoFornada::isAtivo)
+                    .toList();
         }
-        return produtos;
+        
+        // Implementar paginação manualmente
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), produtosFiltrados.size());
+        List<ProdutoFornada> produtosPaginados = produtosFiltrados.subList(start, end);
+        
+        return new org.springframework.data.domain.PageImpl<>(
+                produtosPaginados, 
+                pageable, 
+                produtosFiltrados.size()
+        );
     }
 
     public ProdutoFornada buscarProdutoFornada(Integer id) {

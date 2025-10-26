@@ -213,7 +213,7 @@ public class RelatorioService {
                     Long count = entry.getValue();
 
                     String produtoNome = produtoFornadaRepository.findById(produtoId)
-                            .map(ProdutoFornada::getProduto)
+                            .map(entity -> entity.getProduto())
                             .orElse("Produto ID " + produtoId);
 
                     doc.add(new Paragraph(i + ". " + produtoNome + " (" + count + " pedidos)"));

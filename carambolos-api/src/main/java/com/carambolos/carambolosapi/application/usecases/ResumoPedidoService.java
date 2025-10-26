@@ -322,7 +322,7 @@ public class ResumoPedidoService {
             try {
                 if (fornadaDaVez.getProdutoFornada() != null) {
                     produtoFornada = produtoFornadaRepository.findById(fornadaDaVez.getProdutoFornada())
-                            .map(ProdutoFornada::getProduto)
+                            .map(entity -> entity.getProduto())
                             .orElse("Produto não especificado");
                 }
             } catch (Exception e) {
