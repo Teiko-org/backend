@@ -6,12 +6,14 @@ import com.carambolos.carambolosapi.application.usecases.PedidoFornadaUseCases;
 import com.carambolos.carambolosapi.application.usecases.ProdutoFornadaUseCases;
 import com.carambolos.carambolosapi.domain.entity.Fornada;
 import com.carambolos.carambolosapi.domain.entity.ProdutoFornada;
+import com.carambolos.carambolosapi.system.security.JwtBlacklistFilter;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
 import com.carambolos.carambolosapi.infrastructure.web.request.FornadaRequestDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -25,6 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(FornadaController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class FornadaControllerWebMvcTest {
 
     @Autowired private MockMvc mockMvc;
@@ -34,6 +37,7 @@ class FornadaControllerWebMvcTest {
     @MockBean private FornadaDaVezUseCases fornadaDaVezService;
     @MockBean private ProdutoFornadaUseCases produtoFornadaService;
     @MockBean private PedidoFornadaUseCases pedidoFornadaUseCases;
+    @MockBean private JwtBlacklistFilter jwtBlacklistFilter;
 
     @Test
     void listarFornadas_ok() throws Exception {

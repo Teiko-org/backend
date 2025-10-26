@@ -1,6 +1,6 @@
 package com.carambolos.carambolosapi.infrastructure.persistence.jpa;
 
-import com.carambolos.carambolosapi.domain.entity.ProdutoFornada;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.ProdutoFornada;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

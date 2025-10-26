@@ -3,9 +3,11 @@ package com.carambolos.carambolosapi.infrastructure.web.controllers;
 import com.carambolos.carambolosapi.application.usecases.ResumoPedidoService;
 import com.carambolos.carambolosapi.domain.entity.ResumoPedido;
 import com.carambolos.carambolosapi.domain.enums.StatusEnum;
+import com.carambolos.carambolosapi.system.security.JwtBlacklistFilter;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -18,6 +20,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ResumoPedidoController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class ResumoPedidoControllerWebMvcTest {
 
     @Autowired
@@ -25,6 +28,9 @@ class ResumoPedidoControllerWebMvcTest {
 
     @MockBean
     private ResumoPedidoService resumoPedidoService;
+
+    @MockBean
+    private JwtBlacklistFilter jwtBlacklistFilter;
 
     @Test
     void listarResumosPedidos_quandoVazio_retorna204() throws Exception {

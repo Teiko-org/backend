@@ -5,7 +5,7 @@ import com.carambolos.carambolosapi.application.exception.EntidadeJaExisteExcept
 import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.domain.entity.ImagemProdutoFornada;
 import com.carambolos.carambolosapi.domain.entity.ProdutoFornada;
-import com.carambolos.carambolosapi.infrastructure.persistence.jpa.ProdutoFornadaRepository;
+import com.carambolos.carambolosapi.application.gateways.ProdutoFornadaGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,13 +16,13 @@ import java.util.List;
 @Service
 public class ProdutoFornadaUseCases {
 
-    private final ProdutoFornadaRepository produtoFornadaRepository;
+    private final ProdutoFornadaGateway produtoFornadaGateway;
 
     @Autowired
     private AzureStorageService azureStorageService;
 
-    public ProdutoFornadaUseCases(ProdutoFornadaRepository produtoFornadaRepository) {
-        this.produtoFornadaRepository = produtoFornadaRepository;
+    public ProdutoFornadaUseCases(ProdutoFornadaGateway produtoFornadaGateway) {
+        this.produtoFornadaGateway = produtoFornadaGateway;
     }
 
     public ProdutoFornada criarProdutoFornada(String produto, String descricao, Double valor, String categoria, MultipartFile[] arquivos) {
@@ -43,21 +43,21 @@ public class ProdutoFornadaUseCases {
         }
         produtoFornada.setImagens(imagens);
 
-        return produtoFornadaRepository.save(produtoFornada);
+        return produtoFornadaGateway.save(produtoFornada);
     }
 
     public List<ProdutoFornada> listarProdutosFornada(List<String> categorias) {
         List<ProdutoFornada> produtos;
         if (!categorias.isEmpty()) {
-            produtos = produtoFornadaRepository.findByCategoriaIn(categorias).stream().filter(ProdutoFornada::isAtivo).toList();
+            produtos = produtoFornadaGateway.findByCategoriaIn(categorias).stream().filter(ProdutoFornada::isAtivo).toList();
         } else {
-            produtos = produtoFornadaRepository.findAll().stream().filter(ProdutoFornada::isAtivo).toList();
+            produtos = produtoFornadaGateway.findAll().stream().filter(ProdutoFornada::isAtivo).toList();
         }
         return produtos;
     }
 
     public ProdutoFornada buscarProdutoFornada(Integer id) {
-        return produtoFornadaRepository.findById(id)
+        return produtoFornadaGateway.findById(id)
                 .filter(ProdutoFornada::isAtivo)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("ProdutoFornada com ID " + id + " não encontrado."));
     }
@@ -65,11 +65,11 @@ public class ProdutoFornadaUseCases {
     public void excluirProdutoFornada(Integer id) {
         ProdutoFornada produtoFornada = buscarProdutoFornada(id);
         produtoFornada.setAtivo(false);
-        produtoFornadaRepository.save(produtoFornada);
+        produtoFornadaGateway.save(produtoFornada);
     }
 
     public ProdutoFornada atualizarProdutoFornada(Integer id, ProdutoFornadaRequestDTO request) {
-        if (produtoFornadaRepository.existsByProdutoAndIsAtivoTrueAndIdNot(request.produto(), id)) {
+        if (produtoFornadaGateway.existsByProdutoAndIsAtivoTrueAndIdNot(request.produto(), id)) {
             throw new EntidadeJaExisteException("Já existe um ProdutoFornada ativo com o nome informado: " + request.produto());
         }
 
@@ -78,13 +78,13 @@ public class ProdutoFornadaUseCases {
         produtoFornada.setProduto(request.produto());
         produtoFornada.setDescricao(request.descricao());
         produtoFornada.setValor(request.valor());
-        return produtoFornadaRepository.save(produtoFornada);
+        return produtoFornadaGateway.save(produtoFornada);
     }
 
     public void atualizarStatusProdutoFornada(Boolean status, Integer id) {
-        Integer statusInt = status ? 1 : 0;
-        if (produtoFornadaRepository.existsById(id)) {
-            produtoFornadaRepository.updateStatus(statusInt, id);
+        var exists = produtoFornadaGateway.findById(id).isPresent();
+        if (exists) {
+            produtoFornadaGateway.updateStatus(status, id);
         } else {
             throw new EntidadeNaoEncontradaException("Produto fornada com id %d não encontrado".formatted(id));
         }
