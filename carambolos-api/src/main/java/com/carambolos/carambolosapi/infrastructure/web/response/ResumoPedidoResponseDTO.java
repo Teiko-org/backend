@@ -2,6 +2,7 @@ package com.carambolos.carambolosapi.infrastructure.web.response;
 
 import com.carambolos.carambolosapi.domain.entity.ResumoPedido;
 import com.carambolos.carambolosapi.domain.enums.StatusEnum;
+import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,5 +33,9 @@ public record ResumoPedidoResponseDTO (
         return resumoPedidos.stream()
                 .map(ResumoPedidoResponseDTO::toResumoPedidoResponse)
                 .toList();
+    }
+
+    public static Page<ResumoPedidoResponseDTO> toResumoPedidoResponse(Page<ResumoPedido> page) {
+        return page.map(ResumoPedidoResponseDTO::toResumoPedidoResponse);
     }
 }

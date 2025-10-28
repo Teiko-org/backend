@@ -2,6 +2,8 @@ package com.carambolos.carambolosapi.infrastructure.persistence.jpa;
 
 import com.carambolos.carambolosapi.domain.entity.ResumoPedido;
 import com.carambolos.carambolosapi.domain.enums.StatusEnum;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
@@ -9,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ResumoPedidoRepository extends JpaRepository<ResumoPedido, Integer> {
-   List<ResumoPedido> findAllByIsAtivoTrue();
+   Page<ResumoPedido> findAllByIsAtivoTrue(Pageable pageable);
    Optional<ResumoPedido> findByIdAndIsAtivoTrue(Integer id);
    List<ResumoPedido> findByDataEntregaAndIsAtivoTrue(LocalDateTime dataEntrega);
    List<ResumoPedido> findByDataPedidoBetweenAndIsAtivoTrue(LocalDateTime dataInicio, LocalDateTime dataFim);
