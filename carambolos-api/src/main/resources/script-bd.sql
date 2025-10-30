@@ -25,20 +25,18 @@ CREATE TABLE IF NOT EXISTS teiko.usuario (
 CREATE TABLE IF NOT EXISTS teiko.endereco (
   id INT NOT NULL AUTO_INCREMENT,
   nome VARCHAR(20) NULL,
-  cep VARCHAR(128) NOT NULL,
-  estado VARCHAR(256) NOT NULL,
-  cidade VARCHAR(256) NOT NULL,
-  bairro VARCHAR(256) NOT NULL,
-  logradouro VARCHAR(256) NOT NULL,
-  numero VARCHAR(128) NOT NULL,
-  complemento VARCHAR(256) NULL,
-  referencia VARCHAR(256) NULL,
+  cep CHAR(8) NOT NULL,
+  estado VARCHAR(20) NOT NULL,
+  cidade VARCHAR(100) NOT NULL,
+  bairro VARCHAR(100) NOT NULL,
+  logradouro VARCHAR(100) NOT NULL,
+  numero VARCHAR(6) NOT NULL,
+  complemento VARCHAR(20) NULL,
+  referencia VARCHAR(70) NULL,
   usuario_id INT NULL,
-  dedup_hash VARCHAR(64) NULL,
   is_ativo TINYINT NULL,
   PRIMARY KEY (id),
   INDEX fk_endereco_usuario1_idx (usuario_id ASC) VISIBLE,
-  INDEX dedup_hash_idx (dedup_hash ASC) VISIBLE,
   INDEX cep_idx (cep ASC) VISIBLE,
   CONSTRAINT fk_endereco_usuario1
     FOREIGN KEY (usuario_id)
@@ -118,8 +116,8 @@ CREATE TABLE IF NOT EXISTS teiko.pedido_fornada (
   data_previsao_entrega DATE NOT NULL,
   is_ativo TINYINT NULL,
   tipo_entrega VARCHAR(15) NOT NULL DEFAULT 'ENTREGA',
-  nome_cliente VARCHAR(256) NOT NULL,
-  telefone_cliente VARCHAR(256) NOT NULL,
+  nome_cliente VARCHAR(100) NOT NULL,
+  telefone_cliente VARCHAR(20) NOT NULL,
   horario_retirada VARCHAR(10) NULL,
   observacoes VARCHAR(500) NULL,
   PRIMARY KEY (id),
@@ -166,7 +164,6 @@ CREATE TABLE IF NOT EXISTS teiko.decoracao (
   id INT NOT NULL AUTO_INCREMENT,
   observacao VARCHAR(70),
   nome varchar(70),
-  categoria varchar(70),
   is_ativo TINYINT NULL,
   PRIMARY KEY (id)
 );
@@ -189,8 +186,8 @@ CREATE TABLE IF NOT EXISTS teiko.imagem_decoracao (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS teiko.recheio_unitario (
   id INT NOT NULL AUTO_INCREMENT,
-  sabor VARCHAR(255) NOT NULL,
-  descricao VARCHAR(255) NULL,
+  sabor VARCHAR(50) NOT NULL,
+  descricao VARCHAR(70) NULL,
   valor DOUBLE NOT NULL,
   is_ativo TINYINT NULL,
   PRIMARY KEY (id)
@@ -203,7 +200,7 @@ CREATE TABLE IF NOT EXISTS teiko.recheio_exclusivo (
   id INT NOT NULL AUTO_INCREMENT,
   recheio_unitario_id1 INT NOT NULL,
   recheio_unitario_id2 INT NOT NULL,
-  nome VARCHAR(255) NOT NULL,
+  nome VARCHAR(50) NOT NULL,
   is_ativo TINYINT NULL,
   PRIMARY KEY (id, recheio_unitario_id1, recheio_unitario_id2),
   INDEX recheio_unitario1_idx (recheio_unitario_id1 ASC) VISIBLE,
@@ -283,8 +280,8 @@ CREATE TABLE IF NOT EXISTS teiko.pedido_bolo (
   data_previsao_entrega DATE NOT NULL,
   data_ultima_atualizacao DATETIME NOT NULL,
   tipo_entrega VARCHAR(15) NOT NULL DEFAULT 'ENTREGA',
-  nome_cliente VARCHAR(256) NOT NULL,
-  telefone_cliente VARCHAR(256) NOT NULL,
+  nome_cliente VARCHAR(100) NOT NULL,
+  telefone_cliente VARCHAR(20) NOT NULL,
   is_ativo TINYINT NULL,
   PRIMARY KEY (id),
   INDEX fk_pedido_bolo_usuario1_idx (usuario_id ASC) VISIBLE,
@@ -324,23 +321,10 @@ CREATE TABLE IF NOT EXISTS teiko.resumo_pedido (
     REFERENCES teiko.pedido_bolo (id)
 );
 
--- -----------------------------------------------------
--- JWT Token Blacklist
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS jwt_token_blacklist (
-    id INT NOT NULL AUTO_INCREMENT,
-    token VARCHAR(500) NOT NULL,
-    blacklisted_at DATETIME NOT NULL,
-    PRIMARY KEY (id),
-    INDEX token_idx (token ASC) VISIBLE
-);
+alter table recheio_unitario modify column sabor varchar(255);
+alter table recheio_unitario modify column descricao varchar(255);
+alter table recheio_exclusivo modify column nome varchar(255);
 
--- Alterações nas colunas para suportar textos maiores
-ALTER TABLE teiko.recheio_unitario MODIFY COLUMN sabor VARCHAR(255);
-ALTER TABLE teiko.recheio_unitario MODIFY COLUMN descricao VARCHAR(255);
-ALTER TABLE teiko.recheio_exclusivo MODIFY COLUMN nome VARCHAR(255);
-
--- Inserção de dados na tabela recheio_unitario
 INSERT INTO teiko.recheio_unitario (sabor, descricao, valor, is_ativo) VALUES
     ('creamcheese_frosting', 'Creamcheese Frosting', 10.00, 1),
     ('devil_s_cake_ganache_meio_amargo', 'Devil''s Cake (Ganache meio-amargo)', 10.00, 1),
@@ -361,73 +345,125 @@ INSERT INTO teiko.recheio_unitario (sabor, descricao, valor, is_ativo) VALUES
     ('sara_brigadeiro_de_maracuja_e_ganache_meio_amargo', 'Sara (Brigadeiro de maracujá e Ganache meio-amargo)', 10.00, 1),
     ('tiramissu_creamcheese_frosting_e_nuvem_de_cacau', 'Tiramissu (Creamcheese frosting e nuvem de cacau)', 10.00, 1),
     ('joao_donato_ganache_meio_amargo_e_cupuacu', 'João Donato (Ganache meio-amargo e cupuaçu)', 10.00, 1);
-
--- Inserção de dados na tabela massa
+    
 INSERT INTO teiko.massa (sabor, valor, is_ativo) VALUES
     ('cacau', 5.00, 1),
     ('cacau_expresso', 5.00, 1),
     ('baunilha', 5.00, 1),
     ('red_velvet', 5.00, 1);
+    
+select * from teiko.usuario;
 
--- Inserção de dados na tabela cobertura
+-- =====================================================
+
+
+
 INSERT INTO teiko.cobertura (cor, descricao, is_ativo) VALUES
-    ('Branco', 'Cobertura cremosa de baunilha', 1),
-    ('Preto', 'Cobertura de chocolate meio amargo', 1),
-    ('Rosa', 'Cobertura de morango com brilho', 1);
+  ('Branco', 'Cobertura cremosa de baunilha', 1),
+  ('Preto', 'Cobertura de chocolate meio amargo', 1),
+  ('Rosa', 'Cobertura de morango com brilho', 1);
 
--- Inserção de dados na tabela decoracao
+
 INSERT INTO teiko.decoracao (observacao, nome, is_ativo) VALUES
-    ('Decoração com flores naturais', 'Flores Silvestres', 1),
-    ('Decoração com tema de festa junina', 'Festa Junina', 1),
-    ('Decoração com tema de aniversário infantil', 'Aniversário Infantil', 1);
+  ('Decoração com flores naturais', 'Flores Silvestres', 1),
+  ('Decoração com tema de festa junina', 'Festa Junina', 1),
+  ('Decoração com tema de aniversário infantil', 'Aniversário Infantil', 1);
 
--- Inserção de dados na tabela imagem_decoracao
+
 INSERT INTO teiko.imagem_decoracao (decoracao_id, url) VALUES
-    (1, ''),
-    (2, 'https://carambolostorage.blob.core.windows.net/teiko-s3/9a0b4e7d-e30b-4814-9760-edf789a7aaeb_TOMATE.pnga'),
-    (3, 'https://carambolostorage.blob.core.windows.net/teiko-s3/9a0b4e7d-e30b-4814-9760-edf789a7aaeb_TOMATE.png');
+  (1, ''),
+  (2, 'https://carambolostorage.blob.core.windows.net/teiko-s3/9a0b4e7d-e30b-4814-9760-edf789a7aaeb_TOMATE.pnga'),
+  (3, 'https://carambolostorage.blob.core.windows.net/teiko-s3/9a0b4e7d-e30b-4814-9760-edf789a7aaeb_TOMATE.png');
 
--- Inserção de dados na tabela usuario (necessário para as chaves estrangeiras)
-INSERT INTO teiko.usuario (nome, senha, contato, data_nascimento, genero, imagem_url, sys_admin, is_ativo) VALUES
-    ('João Silva', 'senha123', '11987654321', '1990-01-01', 'M', NULL, 0, 1),
-    ('Maria Oliveira', 'senha456', '11912345678', '1985-05-15', 'F', NULL, 0, 1),
-    ('Carlos Souza', 'senha789', '11998765432', '1992-08-20', 'M', NULL, 0, 1);
 
--- Inserção de dados na tabela endereco (necessário para as chaves estrangeiras)
-INSERT INTO teiko.endereco (nome, cep, estado, cidade, bairro, logradouro, numero, complemento, referencia, usuario_id, is_ativo) VALUES
-    ('Casa', '01234567', 'SP', 'São Paulo', 'Centro', 'Rua das Flores', '123', 'Apto 1', 'Próximo ao metrô', 1, 1),
-    ('Trabalho', '04567890', 'SP', 'São Paulo', 'Vila Madalena', 'Av. Paulista', '456', 'Sala 10', 'Edifício comercial', 2, 1),
-    ('Casa', '07890123', 'SP', 'São Paulo', 'Pinheiros', 'Rua Augusta', '789', NULL, 'Próximo à padaria', 3, 1);
-
--- Inserção de dados na tabela recheio_exclusivo (usando IDs corretos)
 INSERT INTO teiko.recheio_exclusivo (recheio_unitario_id1, recheio_unitario_id2, nome, is_ativo) VALUES
-    (1, 2, 'Creamcheese Frosting com Devil`s Cake (Ganache meio-amargo)', 1),
-    (1, 3, 'Creamcheese Frosting com Zanza (Ganache meio-amargo e redução de frutas vermelhas)', 1),
-    (3, 2, 'Zanza (Ganache meio-amargo e redução de frutas vermelhas) com Devil`s Cake (Ganache meio-amargo)', 1);
+  (39, 40, 'Creamcheese Frosting com Devil`s Cake (Ganache meio-amargo)', 1),
+  (39, 41, 'Creamcheese Frosting com Zanza (Ganache meio-amargo e redução de frutas vermelhas)', 1),
+  (41, 40, 'Zanza (Ganache meio-amargo e redução de frutas vermelhas) com Devil`s Cake (Ganache meio-amargo)', 1);
 
--- Inserção de dados na tabela recheio_pedido
+
 INSERT INTO teiko.recheio_pedido (recheio_unitario_id1, recheio_unitario_id2, recheio_exclusivo, is_ativo) VALUES
-    (1, 2, NULL, 1),
-    (NULL, NULL, 1, 1),
-    (3, 4, NULL, 1);
+  (39, 40, NULL, 1),
+  (NULL, NULL, 4, 1),
+  (41, 42, NULL, 1);
 
--- Inserção de dados na tabela bolo
 INSERT INTO teiko.bolo (recheio_pedido_id, massa_id, cobertura_id, decoracao_id, formato, tamanho, categoria, is_ativo) VALUES
-    (1, 1, 1, 1, 'CIRCULO', 'TAMANHO_5', 'Aniversário', 1),
-    (2, 2, 2, 2, 'CORACAO', 'TAMANHO_7', 'Casamento', 1),
-    (3, 3, 3, 3, 'CIRCULO', 'TAMANHO_12', 'Festa Junina', 1);
+  (1, 1, 1, 1, 'CIRCULO', 'TAMANHO_5', 'Aniversário', 1),
+  (2, 2, 2, 2, 'CORACAO', 'TAMANHO_7', 'Casamento', 1),
+  (3, 3, 3, 3, 'CIRCULO', 'TAMANHO_12', 'Festa Junina', 1);
 
--- Inserção de dados na tabela pedido_bolo
+
 INSERT INTO teiko.pedido_bolo (endereco_id, bolo_id, usuario_id, observacao, data_previsao_entrega, data_ultima_atualizacao, tipo_entrega, nome_cliente, telefone_cliente, is_ativo) VALUES
-    (1, 1, 1, 'Sem cobertura de chocolate', '2025-06-15', NOW(), 'ENTREGA', 'João Silva', '11987654321', 1),
-    (NULL, 2, 1, 'Com tema de casamento', '2025-06-20', NOW(), 'RETIRADA', 'Maria Oliveira', '11912345678', 1),
-    (1, 3, NULL, 'Com tema de festa junina', '2025-06-25', NOW(), 'ENTREGA', 'Carlos Souza', '11998765432', 1);
+  (1, 1, 1, 'Sem cobertura de chocolate', '2025-06-15', NOW(), 'ENTREGA', 'João Silva', '11987654321', 1),
+  (null, 2, 1, 'Com tema de casamento', '2025-06-20', NOW(), 'RETIRADA', 'Maria Oliveira', '11912345678', 1),
+  (1, 3, null, 'Com tema de festa junina', '2025-06-25', NOW(), 'ENTREGA', 'Carlos Souza', '11998765432', 1);
 
--- Inserção de dados na tabela resumo_pedido
+select * from teiko.pedido_bolo;
+
 INSERT INTO teiko.resumo_pedido (status, valor, data_pedido, data_entrega, pedido_fornada_id, pedido_bolo_id, is_ativo) VALUES
-    ('PENDENTE', 100.00, NOW(), '2025-06-15', NULL, 1, 1),
-    ('PAGO', 150.00, NOW(), '2025-06-20', NULL, 2, 1),
-    ('CONCLUIDO', 120.00, NOW(), '2025-06-25', NULL, 3, 1);
+  ('PENDENTE', 100.00, NOW(), '2025-06-15', NULL, 7, 1),
+  ('PAGO', 150.00, NOW(), '2025-06-20', NULL, 8, 1),
+  ('CONCLUIDO', 120.00, NOW(), '2025-06-25', NULL, 9, 1);
+    
+    update bolo set categoria ='Carambolo';
+    select * from produto_fornada;
+    
+    
+    ALTER TABLE teiko.endereco 
+  MODIFY COLUMN cep VARCHAR(128) NOT NULL,
+  MODIFY COLUMN estado VARCHAR(256) NOT NULL,
+  MODIFY COLUMN cidade VARCHAR(256) NOT NULL,
+  MODIFY COLUMN bairro VARCHAR(256) NOT NULL,
+  MODIFY COLUMN logradouro VARCHAR(256) NOT NULL,
+  MODIFY COLUMN numero VARCHAR(128) NOT NULL,
+  MODIFY COLUMN complemento VARCHAR(256) NULL,
+  MODIFY COLUMN referencia VARCHAR(256) NULL;
 
--- Atualização da categoria dos bolos
-UPDATE teiko.bolo SET categoria = 'Carambolo';
+ALTER TABLE teiko.pedido_bolo 
+  MODIFY COLUMN nome_cliente VARCHAR(256) NOT NULL,
+  MODIFY COLUMN telefone_cliente VARCHAR(256) NOT NULL;
+
+ALTER TABLE teiko.pedido_fornada 
+  MODIFY COLUMN nome_cliente VARCHAR(256) NOT NULL,
+  MODIFY COLUMN telefone_cliente VARCHAR(256) NOT NULL;
+  
+  ALTER TABLE teiko.endereco 
+  ADD COLUMN dedup_hash VARCHAR(64) NULL,
+  ADD INDEX dedup_hash_idx (dedup_hash ASC),
+  MODIFY COLUMN cep VARCHAR(128) NOT NULL,
+  MODIFY COLUMN estado VARCHAR(256) NOT NULL,
+  MODIFY COLUMN cidade VARCHAR(256) NOT NULL,
+  MODIFY COLUMN bairro VARCHAR(256) NOT NULL,
+  MODIFY COLUMN logradouro VARCHAR(256) NOT NULL,
+  MODIFY COLUMN numero VARCHAR(128) NOT NULL,
+  MODIFY COLUMN complemento VARCHAR(256) NULL,
+  MODIFY COLUMN referencia VARCHAR(256) NULL;
+
+ALTER TABLE teiko.pedido_bolo 
+  MODIFY COLUMN nome_cliente VARCHAR(256) NOT NULL,
+  MODIFY COLUMN telefone_cliente VARCHAR(256) NOT NULL;
+
+ALTER TABLE teiko.pedido_fornada 
+  MODIFY COLUMN nome_cliente VARCHAR(256) NOT NULL,
+  MODIFY COLUMN telefone_cliente VARCHAR(256) NOT NULL;
+  
+  -- Endereços mais recentes (campos devem parecer Base64)
+SELECT id, cep, estado, cidade, bairro, logradouro, numero, complemento, referencia
+FROM teiko.endereco
+ORDER BY id DESC
+LIMIT 5;
+
+-- Pedido de bolo mais recente (nome/telefone cifrados)
+SELECT id, nome_cliente, telefone_cliente
+FROM teiko.pedido_bolo
+ORDER BY id DESC
+LIMIT 5;
+
+SELECT id, cep
+FROM teiko.endereco
+WHERE cep REGEXP '^[A-Za-z0-9+/=]{24,}$'
+ORDER BY id DESC
+LIMIT 10;
+
+insert into teiko.usuario(id, nome, senha, contato, sys_admin)
+values (10, "Murilo", "henpaaySad98!", "5511912345671", 1);
