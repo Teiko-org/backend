@@ -1,8 +1,10 @@
 package com.carambolos.carambolosapi.application.usecases;
 
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.*;
-import com.carambolos.carambolosapi.infrastructure.gateways.mapper.EnderecoMapper;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoFornada;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.ProdutoFornada;
+import com.carambolos.carambolosapi.infrastructure.gateways.mapper.EnderecoMapper;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.ProdutoFornada;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.*;
 import com.carambolos.carambolosapi.infrastructure.web.response.DetalhePedidoBoloDTO;
 import com.carambolos.carambolosapi.infrastructure.web.response.DetalhePedidoFornadaDTO;
@@ -322,7 +324,7 @@ public class ResumoPedidoService {
             try {
                 if (fornadaDaVez.getProdutoFornada() != null) {
                     produtoFornada = produtoFornadaRepository.findById(fornadaDaVez.getProdutoFornada())
-                            .map(ProdutoFornada::getProduto)
+                            .map(entity -> entity.getProduto())
                             .orElse("Produto não especificado");
                 }
             } catch (Exception e) {

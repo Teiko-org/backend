@@ -2,16 +2,19 @@ package com.carambolos.carambolosapi.application;
 
 import com.carambolos.carambolosapi.application.exception.EntidadeJaExisteException;
 import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaException;
+import com.carambolos.carambolosapi.application.gateways.UsuarioGateway;
+import com.carambolos.carambolosapi.application.usecases.TokenBlacklistService;
 import com.carambolos.carambolosapi.application.usecases.UsuarioUseCase;
 import com.carambolos.carambolosapi.domain.entity.Usuario;
-import com.carambolos.carambolosapi.infrastructure.persistence.entity.UsuarioEntity;
-import com.carambolos.carambolosapi.infrastructure.persistence.jpa.UsuarioRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import com.carambolos.carambolosapi.system.security.GerenciadorTokenJwt;
 
 import java.util.Collections;
 import java.util.List;
@@ -24,18 +27,25 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class UsuarioUseCaseTest {
 
-    @Mock
-    private UsuarioRepository repository;
+    @Mock private UsuarioGateway usuarioGateway;
+    @Mock private PasswordEncoder passwordEncoder;
+    @Mock private GerenciadorTokenJwt gerenciadorTokenJwt;
+    @Mock private AuthenticationManager authenticationManager;
+    @Mock private TokenBlacklistService tokenBlacklistService;
 
-    @InjectMocks
     private UsuarioUseCase usuarioUseCase;
+
+    @BeforeEach
+    void setup() {
+        usuarioUseCase = new UsuarioUseCase(usuarioGateway, passwordEncoder, gerenciadorTokenJwt, authenticationManager, tokenBlacklistService);
+    }
 
     @Test
     @DisplayName("Deve listar usuários ativos com sucessos")
     void deveListarUsuariosAtivosComSucesso() {
-        List<UsuarioEntity> usuarioEntities = List.of(new UsuarioEntity(), new UsuarioEntity());
+        List<Usuario> usuarios = List.of(new Usuario(), new Usuario());
 
-        when(repository.findAllByIsAtivoTrue()).thenReturn(usuarioEntities);
+        when(usuarioGateway.listar()).thenReturn(usuarios);
 
         List<Usuario> resultado = usuarioUseCase.listar();
 
@@ -46,7 +56,7 @@ class UsuarioUseCaseTest {
     @Test
     @DisplayName("Não deve listar se não tiver usuários ativos")
     void NaoDeveListarSeNaoTiverUsuariosAtivos() {
-        when(repository.findAllByIsAtivoTrue()).thenReturn(Collections.emptyList());
+        when(usuarioGateway.listar()).thenReturn(Collections.emptyList());
 
         List<Usuario> resultado = usuarioUseCase.listar();
 
@@ -56,9 +66,9 @@ class UsuarioUseCaseTest {
     @Test
     @DisplayName("BuscarPorId quando acionado com id válido deve retornar usuário")
     void buscarPorIdQuandoAcionadoComIdValidoDeveRetornarUsuario() {
-        UsuarioEntity usuarioEntity = new UsuarioEntity();
+        Usuario usuarioEntity = new Usuario();
 
-        when(repository.findByIdAndIsAtivoTrue(anyInt())).thenReturn(usuarioEntity);
+        when(usuarioGateway.buscarPorId(anyInt())).thenReturn(usuarioEntity);
 
         Usuario resultado = usuarioUseCase.buscarPorId(1);
 
@@ -68,7 +78,7 @@ class UsuarioUseCaseTest {
     @Test
     @DisplayName("BuscarPorId quando acionado com id inválido deve retornar exception")
     void buscarPorIdQuandoAcionadoComIdInvalidoDeveRetornarException() {
-        when(repository.findByIdAndIsAtivoTrue(anyInt())).thenReturn(null);
+        when(usuarioGateway.buscarPorId(anyInt())).thenReturn(null);
 
         assertThrows(EntidadeNaoEncontradaException.class, () -> usuarioUseCase.buscarPorId(1));
     }
@@ -82,11 +92,9 @@ class UsuarioUseCaseTest {
         Usuario usuario = new Usuario();
         usuario.setContato(contato);
 
-        UsuarioEntity usuarioEntityExistente = new UsuarioEntity();
-        usuarioEntityExistente.setId(id);
-
-        when(repository.findByIdAndIsAtivoTrue(id)).thenReturn(usuarioEntityExistente);
-        when(repository.existsByContatoAndIdNotAndIsAtivoTrue(contato, id)).thenReturn(true);
+        Usuario usuarioExistente = new Usuario();
+        when(usuarioGateway.buscarPorId(id)).thenReturn(usuarioExistente);
+        when(usuarioGateway.existePorContatoExcluindoId(contato, id)).thenReturn(true);
 
         assertThrows(EntidadeJaExisteException.class, () -> usuarioUseCase.atualizar(id, usuario));
     }
@@ -96,16 +104,12 @@ class UsuarioUseCaseTest {
     void deletarPorIdQuandoAcionadoComIdValidoDeveRemoverUsuario() {
         int id = 1;
 
-        UsuarioEntity usuarioEntityExistente = new UsuarioEntity();
-        usuarioEntityExistente.setId(id);
-
-        when(repository.findByIdAndIsAtivoTrue(id)).thenReturn(usuarioEntityExistente);
-        when(repository.save(usuarioEntityExistente)).thenReturn(usuarioEntityExistente);
+        Usuario usuarioExistente = new Usuario();
+        when(usuarioGateway.buscarPorId(id)).thenReturn(usuarioExistente);
 
         usuarioUseCase.deletar(id);
 
-        assertFalse(usuarioEntityExistente.isAtivo());
-        verify(repository).save(usuarioEntityExistente);
+        verify(usuarioGateway).deletar(id);
     }
 
     @Test
@@ -113,7 +117,7 @@ class UsuarioUseCaseTest {
     void deveLancarExcecaoQuandoUsuarioNaoExistir() {
         int id = 1;
 
-        when(repository.findByIdAndIsAtivoTrue(id)).thenReturn(null);
+        when(usuarioGateway.buscarPorId(id)).thenReturn(null);
 
         assertThrows(EntidadeNaoEncontradaException.class, () -> usuarioUseCase.deletar(id));
     }

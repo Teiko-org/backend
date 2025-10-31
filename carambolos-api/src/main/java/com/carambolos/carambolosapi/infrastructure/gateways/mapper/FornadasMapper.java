@@ -74,6 +74,63 @@ public final class FornadasMapper {
             com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez d) {
         return d; // mesma estrutura (persistence)
     }
+
+    // ProdutoFornada (domain <-> persistence)
+    public static com.carambolos.carambolosapi.domain.entity.ProdutoFornada toDomain(
+            com.carambolos.carambolosapi.infrastructure.persistence.entity.ProdutoFornada e) {
+        if (e == null) return null;
+        var d = new com.carambolos.carambolosapi.domain.entity.ProdutoFornada();
+        d.setId(e.getId());
+        d.setProduto(e.getProduto());
+        d.setDescricao(e.getDescricao());
+        d.setValor(e.getValor());
+        d.setCategoria(e.getCategoria());
+        d.setAtivo(e.isAtivo());
+        if (e.getImagens() != null) {
+            d.setImagens(e.getImagens().stream().map(FornadasMapper::toDomain).toList());
+        }
+        return d;
+    }
+
+    public static com.carambolos.carambolosapi.infrastructure.persistence.entity.ProdutoFornada toEntity(
+            com.carambolos.carambolosapi.domain.entity.ProdutoFornada d) {
+        if (d == null) return null;
+        var e = new com.carambolos.carambolosapi.infrastructure.persistence.entity.ProdutoFornada();
+        e.setId(d.getId());
+        e.setProduto(d.getProduto());
+        e.setDescricao(d.getDescricao());
+        e.setValor(d.getValor());
+        e.setCategoria(d.getCategoria());
+        e.setAtivo(Boolean.TRUE.equals(d.getAtivo()));
+        if (d.getImagens() != null) {
+            e.setImagens(d.getImagens().stream().map(img -> {
+                var ent = FornadasMapper.toEntity(img);
+                ent.setProdutoFornada(e);
+                return ent;
+            }).toList());
+        }
+        return e;
+    }
+
+    // ImagemProdutoFornada (domain <-> persistence)
+    public static com.carambolos.carambolosapi.domain.entity.ImagemProdutoFornada toDomain(
+            com.carambolos.carambolosapi.infrastructure.persistence.entity.ImagemProdutoFornada e) {
+        if (e == null) return null;
+        var d = new com.carambolos.carambolosapi.domain.entity.ImagemProdutoFornada();
+        d.setId(e.getId());
+        d.setUrl(e.getUrl());
+        // relação setada no ProdutoFornada
+        return d;
+    }
+
+    public static com.carambolos.carambolosapi.infrastructure.persistence.entity.ImagemProdutoFornada toEntity(
+            com.carambolos.carambolosapi.domain.entity.ImagemProdutoFornada d) {
+        if (d == null) return null;
+        var e = new com.carambolos.carambolosapi.infrastructure.persistence.entity.ImagemProdutoFornada();
+        e.setId(d.getId());
+        e.setUrl(d.getUrl());
+        return e;
+    }
 }
 
 

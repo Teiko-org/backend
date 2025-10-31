@@ -1,12 +1,15 @@
 package com.carambolos.carambolosapi.infrastructure.gateways.impl;
 
 import com.carambolos.carambolosapi.application.gateways.DashboardGateway;
-import com.carambolos.carambolosapi.domain.entity.*;
 import com.carambolos.carambolosapi.domain.enums.StatusEnum;
+import com.carambolos.carambolosapi.domain.entity.Decoracao;
+import com.carambolos.carambolosapi.domain.entity.ResumoPedido;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.*;
+import com.carambolos.carambolosapi.domain.entity.ProdutoFornada;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.Fornada;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoFornada;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.*;
+import com.carambolos.carambolosapi.infrastructure.gateways.mapper.FornadasMapper;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -224,8 +227,9 @@ public class DashboardGatewayImpl implements DashboardGateway {
                     quantidadePorProduto.merge(produtoId, qtdPedida, Integer::sum);
 
                     if (!produtoMap.containsKey(produtoId)) {
-                        ProdutoFornada produto = produtoFornadaRepository.findById(produtoId).orElse(null);
-                        if (produto != null) {
+                        var produtoEntity = produtoFornadaRepository.findById(produtoId).orElse(null);
+                        if (produtoEntity != null) {
+                            ProdutoFornada produto = FornadasMapper.toDomain(produtoEntity);
                             produtoMap.put(produtoId, produto);
                             Double valorTotal = qtdPedida * produto.getValor();
                             valorTotalPorProduto.put(produtoId, valorTotal);
@@ -381,7 +385,9 @@ public class DashboardGatewayImpl implements DashboardGateway {
 
             // Adicionar produtos de fornada cadastrados
             try {
-                List<ProdutoFornada> produtosFornada = produtoFornadaRepository.findAll();
+                List<ProdutoFornada> produtosFornada = produtoFornadaRepository.findAll().stream()
+                        .map(FornadasMapper::toDomain)
+                        .toList();
                 produtosFornada.forEach(produto -> {
                     // Incluir todos os produtos de fornada (ativos e inativos)
                     if (produto.getAtivo() != null) {
@@ -485,8 +491,9 @@ public class DashboardGatewayImpl implements DashboardGateway {
 
             for (FornadaDaVez fornadaDaVez : produtosFornada) {
                 // Buscar o produto da fornada
-                ProdutoFornada produto = produtoFornadaRepository.findById(fornadaDaVez.getProdutoFornada())
+                var produtoEntity = produtoFornadaRepository.findById(fornadaDaVez.getProdutoFornada())
                         .orElse(null);
+                ProdutoFornada produto = produtoEntity != null ? FornadasMapper.toDomain(produtoEntity) : null;
                 if (produto == null) continue;
 
                 // Buscar pedidos para este produto da fornada

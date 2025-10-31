@@ -1,6 +1,6 @@
 package com.carambolos.carambolosapi.infrastructure.persistence.jpa;
 
-import com.carambolos.carambolosapi.domain.entity.ProdutoFornada;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.ProdutoFornada;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
