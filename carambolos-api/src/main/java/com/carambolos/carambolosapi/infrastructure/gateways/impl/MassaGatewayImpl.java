@@ -80,4 +80,11 @@ public class MassaGatewayImpl implements MassaGateway {
     public int countBySaborAndIsAtivo(String sabor, Boolean isAtivo) {
         return repository.countBySaborAndIsAtivo(sabor, isAtivo);
     }
+
+    @Override
+    public String getMassaAtivaPorSabor(Integer massaId) {
+        return repository.findById(massaId)
+                .map(com.carambolos.carambolosapi.infrastructure.persistence.entity.MassaEntity::getSabor)
+                .orElse("Não especificada");
+    }
 }

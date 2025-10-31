@@ -3,6 +3,7 @@ package com.carambolos.carambolosapi.infrastructure.gateways.impl;
 import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.application.gateways.BoloGateway;
 import com.carambolos.carambolosapi.domain.entity.Bolo;
+import com.carambolos.carambolosapi.domain.entity.ImagemDecoracao;
 import com.carambolos.carambolosapi.domain.projection.DetalheBoloProjection;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.BoloMapper;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.BoloEntity;
@@ -78,5 +79,10 @@ public class BoloGatewayImpl implements BoloGateway {
     @Override
     public void atualizarStatusBolo(Integer status, Integer id) {
         repository.atualizarStatusBolo(status, id);
+    }
+
+    @Override
+    public List<ImagemDecoracao> findAllImagensByDecoracao(Integer boloId) {
+        return repository.findAllImagensByDecoracao(boloId);
     }
 }

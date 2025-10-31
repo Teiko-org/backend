@@ -14,4 +14,6 @@ public interface MassaGateway {
     Massa findById(Integer id);
     void deletarMassa(Integer id);
     int countBySaborAndIsAtivo(String sabor, Boolean isAtivo);
+    String getMassaAtivaPorSabor(Integer massaId);
 }
+

@@ -1,90 +1,71 @@
 package com.carambolos.carambolosapi.application.usecases;
 
-import com.carambolos.carambolosapi.infrastructure.persistence.entity.*;
+import com.carambolos.carambolosapi.application.exception.EntidadeImprocessavelException;
+import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaException;
+import com.carambolos.carambolosapi.application.gateways.*;
+import com.carambolos.carambolosapi.domain.entity.*;
+import com.carambolos.carambolosapi.domain.entity.PedidoFornada;
+import com.carambolos.carambolosapi.domain.enums.StatusEnum;
+import com.carambolos.carambolosapi.domain.enums.TipoEntregaEnum;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.EnderecoMapper;
-import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoFornada;
-import com.carambolos.carambolosapi.infrastructure.persistence.jpa.*;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.*;
 import com.carambolos.carambolosapi.infrastructure.web.response.DetalhePedidoBoloDTO;
 import com.carambolos.carambolosapi.infrastructure.web.response.DetalhePedidoFornadaDTO;
 import com.carambolos.carambolosapi.infrastructure.web.response.EnderecoResponseDTO;
-import com.carambolos.carambolosapi.domain.entity.*;
-import com.carambolos.carambolosapi.application.exception.EntidadeImprocessavelException;
-import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaException;
-import com.carambolos.carambolosapi.domain.enums.StatusEnum;
-import com.carambolos.carambolosapi.domain.enums.TipoEntregaEnum;
 import com.carambolos.carambolosapi.infrastructure.web.response.ResumoPedidoMensagemResponseDTO;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
-@Service
-@SuppressWarnings("unused")
-public class ResumoPedidoService {
-
-    private final ResumoPedidoRepository resumoPedidoRepository;
-    private final PedidoBoloRepository pedidoBoloRepository;
-    private final PedidoFornadaRepository pedidoFornadaRepository;
-    private final FornadaDaVezRepository fornadaDaVezRepository;
-    private final ProdutoFornadaRepository produtoFornadaRepository;
-    private final BoloRepository boloRepository;
-    private final RecheioPedidoRepository recheioPedidoRepository;
-    private final RecheioExclusivoRepository recheioExclusivoRepository;
-    private final RecheioUnitarioRepository recheioUnitarioRepository;
-    private final MassaRepository massaRepository;
-    private final CoberturaRepository coberturaRepository;
-    private final EnderecoRepository enderecoRepository;
+public class ResumoPedidoUseCase {
+    private final ResumoPedidoGateway resumoPedidoGateway;
+    private final PedidoBoloGateway pedidoBoloGateway;
+    private final PedidoFornadaGateway pedidoFornadaGateway;
+    private final FornadaDaVezGateway fornadaDaVezGateway;
+    private final ProdutoFornadaGateway produtoFornadaGateway;
+    private final BoloGateway boloGateway;
+    private final RecheioPedidoGateway recheioPedidoGateway;
+    private final RecheioExclusivoGateway recheioExclusivoGateway;
+    private final RecheioUnitarioGateway recheioUnitarioGateway;
+    private final MassaGateway massaGateway;
+    private final CoberturaGateway coberturaGateway;
+    private final EnderecoGateway enderecoGateway;
     private final EnderecoMapper enderecoMapper;
 
-    public ResumoPedidoService(
-            ResumoPedidoRepository resumoPedidoRepository,
-            PedidoBoloRepository pedidoBoloRepository,
-            PedidoFornadaRepository pedidoFornadaRepository,
-            FornadaDaVezRepository fornadaDaVezRepository,
-            ProdutoFornadaRepository produtoFornadaRepository,
-            BoloRepository boloRepository,
-            RecheioPedidoRepository recheioPedidoRepository,
-            RecheioExclusivoRepository recheioExclusivoRepository,
-            RecheioUnitarioRepository recheioUnitarioRepository,
-            MassaRepository massaRepository,
-            CoberturaRepository coberturaRepository,
-            EnderecoRepository enderecoRepository,
-            EnderecoMapper enderecoMapper
-    ) {
-        this.resumoPedidoRepository = resumoPedidoRepository;
-        this.pedidoBoloRepository = pedidoBoloRepository;
-        this.pedidoFornadaRepository = pedidoFornadaRepository;
-        this.fornadaDaVezRepository = fornadaDaVezRepository;
-        this.produtoFornadaRepository = produtoFornadaRepository;
-        this.boloRepository = boloRepository;
-        this.recheioPedidoRepository = recheioPedidoRepository;
-        this.recheioExclusivoRepository = recheioExclusivoRepository;
-        this.recheioUnitarioRepository = recheioUnitarioRepository;
-        this.massaRepository = massaRepository;
-        this.coberturaRepository = coberturaRepository;
-        this.enderecoRepository = enderecoRepository;
+    public ResumoPedidoUseCase(ResumoPedidoGateway resumoPedidoGateway, PedidoBoloGateway pedidoBoloGateway, PedidoFornadaGateway pedidoFornadaGateway, FornadaDaVezGateway fornadaDaVezGateway, ProdutoFornadaGateway produtoFornadaGateway, BoloGateway boloGateway, RecheioPedidoGateway recheioPedidoGateway, RecheioExclusivoGateway recheioExclusivoGateway, RecheioUnitarioGateway recheioUnitarioGateway, MassaGateway massaGateway, CoberturaGateway coberturaGateway, EnderecoGateway enderecoGateway, EnderecoMapper enderecoMapper) {
+        this.resumoPedidoGateway = resumoPedidoGateway;
+        this.pedidoBoloGateway = pedidoBoloGateway;
+        this.pedidoFornadaGateway = pedidoFornadaGateway;
+        this.fornadaDaVezGateway = fornadaDaVezGateway;
+        this.produtoFornadaGateway = produtoFornadaGateway;
+        this.boloGateway = boloGateway;
+        this.recheioPedidoGateway = recheioPedidoGateway;
+        this.recheioExclusivoGateway = recheioExclusivoGateway;
+        this.recheioUnitarioGateway = recheioUnitarioGateway;
+        this.massaGateway = massaGateway;
+        this.coberturaGateway = coberturaGateway;
+        this.enderecoGateway = enderecoGateway;
         this.enderecoMapper = enderecoMapper;
     }
 
     public List<ResumoPedido> listarResumosPedidos() {
-        return resumoPedidoRepository.findAllByIsAtivoTrue();
+        return resumoPedidoGateway.findAllByIsAtivoTrue();
     }
 
     public ResumoPedido buscarResumoPedidoPorId(Integer id) {
-        return resumoPedidoRepository.findByIdAndIsAtivoTrue(id)
-                .orElseThrow(() -> new RuntimeException("Resumo de pedido não encontrado"));
+        return resumoPedidoGateway.findByIdAndIsAtivoTrue(id);
     }
 
-    //LocalDateTime?
     public List<ResumoPedido> buscarResumosPedidosPorDataPedido(LocalDate dataPedido) {
         LocalDateTime comecoData = dataPedido.atStartOfDay();
         LocalDateTime fimData = dataPedido.atTime(23, 59, 59);
-        return resumoPedidoRepository.findByDataPedidoBetweenAndIsAtivoTrue(comecoData, fimData);
+        return resumoPedidoGateway.findByDataPedidoBetweenAndIsAtivoTrue(comecoData, fimData);
     }
 
     public List<ResumoPedido> buscarResumosPedidosPorStatus(StatusEnum status) {
-        return resumoPedidoRepository.findByStatusAndIsAtivoTrue(status);
+        return resumoPedidoGateway.findByStatusAndIsAtivoTrue(status);
     }
 
     public ResumoPedido cadastrarResumoPedido(ResumoPedido resumoPedido) {
@@ -99,34 +80,34 @@ public class ResumoPedidoService {
             resumoPedido.setValor(calcularValorPedidoBolo(resumoPedido.getPedidoBoloId()));
         }
 
-        return resumoPedidoRepository.save(resumoPedido);
+        return resumoPedidoGateway.save(resumoPedido);
     }
 
     public ResumoPedido atualizarResumoPedido(Integer id, ResumoPedido resumoPedido) {
-        if (!resumoPedidoRepository.existsByIdAndIsAtivoTrue(id)) {
+        if (!resumoPedidoGateway.existsByIdAndIsAtivoTrue(id)) {
             throw new EntidadeNaoEncontradaException("Resumo de pedido não encontrado");
         }
         validarReferencias(resumoPedido);
         resumoPedido.setId(id);
-        return resumoPedidoRepository.save(resumoPedido);
+        return resumoPedidoGateway.save(resumoPedido);
     }
 
     public void deletarResumoPedido(Integer id) {
-        ResumoPedido resumoPedido = buscarResumoPedidoPorId(id);
+        ResumoPedido resumoPedido = resumoPedidoGateway.findByIdAndIsAtivoTrue(id);
         resumoPedido.setAtivo(false);
-        resumoPedidoRepository.save(resumoPedido);
+        resumoPedidoGateway.save(resumoPedido);
     }
 
     public List<ResumoPedido> listarResumosPedidosBolo() {
-        return resumoPedidoRepository.findByPedidoBoloIdIsNotNullAndIsAtivoTrue();
+        return resumoPedidoGateway.findByPedidoBoloIdIsNotNullAndIsAtivoTrue();
     }
 
     public List<ResumoPedido> listarResumosPedidosFornada() {
-        return resumoPedidoRepository.findByPedidoFornadaIdIsNotNullAndIsAtivoTrue();
+        return resumoPedidoGateway.findByPedidoFornadaIdIsNotNullAndIsAtivoTrue();
     }
 
     public ResumoPedido alterarStatus(Integer id, StatusEnum novoStatus) {
-        ResumoPedido resumoPedido = buscarResumoPedidoPorId(id);
+        ResumoPedido resumoPedido = resumoPedidoGateway.findByIdAndIsAtivoTrue(id);
         StatusEnum statusAtual = resumoPedido.getStatus();
         if (!isTransicaoStatusValida(statusAtual, novoStatus)) {
             throw new EntidadeImprocessavelException("Não é possível alterar o status de %s para %s".formatted(statusAtual, novoStatus));
@@ -134,22 +115,22 @@ public class ResumoPedidoService {
 
         try {
             if (resumoPedido.getPedidoFornadaId() != null) {
-                var pedidoFornadaOpt = pedidoFornadaRepository.findById(resumoPedido.getPedidoFornadaId());
+                var pedidoFornadaOpt = pedidoFornadaGateway.findById(resumoPedido.getPedidoFornadaId());
                 if (pedidoFornadaOpt.isPresent()) {
                     var pedidoFornada = pedidoFornadaOpt.get();
-                    var fdvOpt = fornadaDaVezRepository.findById(pedidoFornada.getFornadaDaVez());
+                    var fdvOpt = fornadaDaVezGateway.findById(pedidoFornada.getFornadaDaVez());
                     if (fdvOpt.isPresent()) {
                         var fdv = fdvOpt.get();
                         if (novoStatus == StatusEnum.CANCELADO && statusAtual != StatusEnum.CANCELADO) {
                             int novaQtd = (fdv.getQuantidade() != null ? fdv.getQuantidade() : 0) + pedidoFornada.getQuantidade();
                             fdv.setQuantidade(novaQtd);
-                            fornadaDaVezRepository.save(fdv);
+                            fornadaDaVezGateway.save(fdv);
                         }
                         if (statusAtual == StatusEnum.CANCELADO && novoStatus != StatusEnum.CANCELADO) {
                             int atual = (fdv.getQuantidade() != null ? fdv.getQuantidade() : 0);
                             int novaQtd = Math.max(0, atual - pedidoFornada.getQuantidade());
                             fdv.setQuantidade(novaQtd);
-                            fornadaDaVezRepository.save(fdv);
+                            fornadaDaVezGateway.save(fdv);
                         }
                     }
                 }
@@ -159,50 +140,44 @@ public class ResumoPedidoService {
         }
 
         resumoPedido.setStatus(novoStatus);
-        return resumoPedidoRepository.save(resumoPedido);
+        return resumoPedidoGateway.save(resumoPedido);
     }
 
     public DetalhePedidoBoloDTO obterDetalhePedidoBolo(Integer pedidoResumoId) {
         try {
-            ResumoPedido resumoPedido = resumoPedidoRepository
-                    .findTop1ByPedidoBoloIdAndIsAtivoTrueOrderByDataPedidoDesc(pedidoResumoId)
-                    .orElseThrow(() -> new EntidadeNaoEncontradaException("Resumo de pedido (bolo) não encontrado"));
+            ResumoPedido resumoPedido = resumoPedidoGateway
+                    .findTop1ByPedidoBoloIdAndIsAtivoTrueOrderByDataPedidoDesc(pedidoResumoId);
 
             if (resumoPedido.getPedidoBoloId() == null) {
                 throw new EntidadeImprocessavelException("O resumo de pedido #" + pedidoResumoId + " não está vinculado a um pedido de bolo");
             }
 
-            PedidoBoloEntity pedido = pedidoBoloRepository.findById(resumoPedido.getPedidoBoloId())
-                    .filter(PedidoBoloEntity::getAtivo)
-                    .orElseThrow(() -> new EntidadeNaoEncontradaException("Pedido com o id %d não encontrado".formatted(resumoPedido.getPedidoBoloId())));
+            PedidoBolo pedido = pedidoBoloGateway.findById(resumoPedido.getPedidoBoloId());
 
-            BoloEntity boloEntity = boloRepository.findById(pedido.getBoloId())
-                    .orElseThrow(() -> new EntidadeNaoEncontradaException("Bolo com id %d não encontrado".formatted(pedido.getBoloId())));
+            Bolo bolo = boloGateway.findById(pedido.getBoloId());
 
-            String massaNome = massaRepository.findById(boloEntity.getMassa())
-                    .map(com.carambolos.carambolosapi.infrastructure.persistence.entity.MassaEntity::getSabor)
-                    .orElse("Não especificada");
+            String massaNome = massaGateway.getMassaAtivaPorSabor(bolo.getMassa());
 
             String recheioNome = "Não especificado";
             try {
-                recheioNome = recheioPedidoRepository.findById(boloEntity.getRecheioPedido())
+                recheioNome = recheioPedidoGateway.findEntityById(bolo.getRecheioPedido())
                         .map(recheioPedido -> {
                             StringBuilder nomes = new StringBuilder();
 
                             if (recheioPedido.getRecheioExclusivo() != null) {
                                 try {
-                                    return recheioExclusivoRepository.buscarRecheioExclusivoPorId(recheioPedido.getRecheioExclusivo())
+                                    return recheioExclusivoGateway.buscarRecheioExclusivoPorId(recheioPedido.getRecheioExclusivo())
                                             .getNome() + " (" +
-                                            recheioExclusivoRepository.buscarRecheioExclusivoPorId(recheioPedido.getRecheioExclusivo()).getSabor1() +
+                                            recheioExclusivoGateway.buscarRecheioExclusivoPorId(recheioPedido.getRecheioExclusivo()).getSabor1() +
                                             " + " +
-                                            recheioExclusivoRepository.buscarRecheioExclusivoPorId(recheioPedido.getRecheioExclusivo()).getSabor2() +
+                                            recheioExclusivoGateway.buscarRecheioExclusivoPorId(recheioPedido.getRecheioExclusivo()).getSabor2() +
                                             ")";
                                 } catch (Exception e) {
                                     return "Recheio exclusivo não encontrado";
                                 }
                             } else {
                                 if (recheioPedido.getRecheioUnitarioId1() != null) {
-                                    recheioUnitarioRepository.findById(recheioPedido.getRecheioUnitarioId1())
+                                    recheioUnitarioGateway.findEntityById(recheioPedido.getRecheioUnitarioId1())
                                             .ifPresent(recheio -> nomes.append(recheio.getSabor()));
                                 }
 
@@ -210,7 +185,7 @@ public class ResumoPedidoService {
                                     if (!nomes.isEmpty()) {
                                         nomes.append(" + ");
                                     }
-                                    recheioUnitarioRepository.findById(recheioPedido.getRecheioUnitarioId2())
+                                    recheioUnitarioGateway.findEntityById(recheioPedido.getRecheioUnitarioId2())
                                             .ifPresent(recheio -> nomes.append(recheio.getSabor()));
                                 }
                                 return nomes.toString();
@@ -222,14 +197,12 @@ public class ResumoPedidoService {
                 recheioNome = "Erro ao carregar recheio";
             }
 
-            String coberturaNome = coberturaRepository.findById(boloEntity.getCobertura())
-                    .map(CoberturaEntity::getDescricao)
-                    .orElse("Não especificada");
+            String coberturaNome = coberturaGateway.findNomeById(bolo.getCobertura());
 
             String imagemUrl = "";
             String[] imagensDecoracao = new String[]{};
             try {
-                List<ImagemDecoracao> imagens = boloRepository.findAllImagensByDecoracao(boloEntity.getDecoracao());
+                List<ImagemDecoracao> imagens = boloGateway.findAllImagensByDecoracao(bolo.getDecoracao());
                 if (imagens != null && !imagens.isEmpty()) {
                     // Usar a primeira imagem como imagem principal
                     imagemUrl = imagens.get(0).getUrl();
@@ -248,7 +221,7 @@ public class ResumoPedidoService {
             EnderecoResponseDTO enderecoDTO = null;
             try {
                 if (pedido.getTipoEntrega() == TipoEntregaEnum.ENTREGA && pedido.getEnderecoId() != null) {
-                    enderecoDTO = enderecoRepository.findById(pedido.getEnderecoId())
+                    enderecoDTO = enderecoGateway.findEntityById(pedido.getEnderecoId())
                             .filter(EnderecoEntity::isAtivo)
                             .map(e -> EnderecoMapper.toResponseDTO(enderecoMapper.toDomain(e)))
                             .orElse(null);
@@ -276,8 +249,8 @@ public class ResumoPedidoService {
 
             return DetalhePedidoBoloDTO.toDetalhePedidoResponse(
                     pedido.getId(),
-                    boloEntity.getTamanho(),
-                    boloEntity.getFormato(),
+                    bolo.getTamanho(),
+                    bolo.getFormato(),
                     massaNome,
                     recheioNome,
                     coberturaNome,
@@ -301,25 +274,24 @@ public class ResumoPedidoService {
 
     public DetalhePedidoFornadaDTO obterDetalhePedidoFornada(Integer pedidoResumoId) {
         try {
-            ResumoPedido resumoPedido = resumoPedidoRepository
-                    .findTop1ByPedidoFornadaIdAndIsAtivoTrueOrderByDataPedidoDesc(pedidoResumoId)
-                    .orElseThrow(() -> new EntidadeNaoEncontradaException("Resumo de pedido (fornada) não encontrado"));
+            ResumoPedido resumoPedido = resumoPedidoGateway
+                    .findTop1ByPedidoFornadaIdAndIsAtivoTrueOrderByDataPedidoDesc(pedidoResumoId);
 
             if (resumoPedido.getPedidoFornadaId() == null) {
                 throw new EntidadeImprocessavelException("O resumo de pedido #" + pedidoResumoId + " não está vinculado a um pedido de fornada");
             }
 
-            PedidoFornada pedidoFornada = pedidoFornadaRepository.findById(resumoPedido.getPedidoFornadaId())
-                    .filter(PedidoFornada::isAtivo)
+            PedidoFornada pedidoFornada = pedidoFornadaGateway.findById(resumoPedido.getPedidoFornadaId())
+                    .filter(PedidoFornada::getisAtivo)
                     .orElseThrow(() -> new EntidadeNaoEncontradaException("Pedido de fornada com ID " + resumoPedido.getPedidoFornadaId() + " não encontrado."));
 
-            FornadaDaVez fornadaDaVez = fornadaDaVezRepository.findById(pedidoFornada.getFornadaDaVez())
+            FornadaDaVez fornadaDaVez = fornadaDaVezGateway.findById(pedidoFornada.getFornadaDaVez())
                     .orElseThrow(() -> new EntidadeNaoEncontradaException("FornadaDaVez com ID " + pedidoFornada.getFornadaDaVez() + " não encontrada."));
 
             String produtoFornada = "Produto não especificado";
             try {
                 if (fornadaDaVez.getProdutoFornada() != null) {
-                    produtoFornada = produtoFornadaRepository.findById(fornadaDaVez.getProdutoFornada())
+                    produtoFornada = produtoFornadaGateway.findById(fornadaDaVez.getProdutoFornada())
                             .map(ProdutoFornada::getProduto)
                             .orElse("Produto não especificado");
                 }
@@ -331,10 +303,7 @@ public class ResumoPedidoService {
             EnderecoResponseDTO enderecoDTO = null;
             try {
                 if (pedidoFornada.getTipoEntrega() == TipoEntregaEnum.ENTREGA && pedidoFornada.getEndereco() != null) {
-                    enderecoDTO = enderecoRepository.findById(pedidoFornada.getEndereco())
-                            .filter(EnderecoEntity::isAtivo)
-                            .map(e -> EnderecoMapper.toResponseDTO(enderecoMapper.toDomain(e)))
-                            .orElse(null);
+                    enderecoDTO = EnderecoMapper.toResponseDTO(enderecoGateway.buscarPorId(pedidoFornada.getEndereco()));
                 }
             } catch (Exception e) {
                 System.err.println("Erro ao buscar endereço da fornada: " + e.getMessage());
@@ -364,11 +333,12 @@ public class ResumoPedidoService {
         }
         StringBuilder sb = new StringBuilder();
         for (Integer id : idsResumo) {
-            var opt = resumoPedidoRepository.findByIdAndIsAtivoTrue(id);
-            if (opt.isEmpty()) continue;
-            var rp = opt.get();
+            var rp = resumoPedidoGateway.findByIdAndIsAtivoTrue(id);
             String msg = ResumoPedidoMensagemResponseDTO
                     .toResumoPedidoMensagemResponse(rp).mensagem();
+
+
+
             if (msg != null && !msg.isBlank()) {
                 if (!sb.isEmpty()) sb.append("\n\n");
                 sb.append(msg);
@@ -392,33 +362,25 @@ public class ResumoPedidoService {
     }
 
     private void validarPedidoBolo(Integer pedidoBoloId) {
-        if (!pedidoBoloRepository.existsByIdAndIsAtivoTrue(pedidoBoloId)) {
+        if (!pedidoBoloGateway.existsByIdAndIsAtivoTrue(pedidoBoloId)) {
             throw new EntidadeNaoEncontradaException("Pedido de bolo com ID %d não encontrado".formatted(pedidoBoloId));
         }
     }
 
     private void validarPedidoFornada(Integer pedidoFornadaId) {
-        if (!pedidoFornadaRepository.existsByIdAndIsAtivoTrue(pedidoFornadaId)) {
+        if (!pedidoFornadaGateway.existsByIdAndIsAtivoTrue(pedidoFornadaId)) {
             throw new EntidadeNaoEncontradaException("Pedido de fornada com ID %d não encontrado".formatted(pedidoFornadaId));
         }
     }
 
-    private boolean isTransicaoStatusValida(StatusEnum statusAtual, StatusEnum novoStatus) {
-        if (statusAtual == novoStatus) {
-            return false;
-        }
-
-        return true;
-    }
-
     private Double calcularValorPedidoFornada(Integer pedidoFornadaId) {
-        var pedidoFornada = pedidoFornadaRepository.findById(pedidoFornadaId)
+        var pedidoFornada = pedidoFornadaGateway.findById(pedidoFornadaId)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Pedido fornada não encontrado"));
 
-        var fornadaDaVez = fornadaDaVezRepository.findById(pedidoFornada.getFornadaDaVez())
+        var fornadaDaVez = fornadaDaVezGateway.findById(pedidoFornada.getFornadaDaVez())
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Fornada da vez não encontrada"));
 
-        var produtoFornada = produtoFornadaRepository.findById(fornadaDaVez.getProdutoFornada())
+        var produtoFornada = produtoFornadaGateway.findById(fornadaDaVez.getProdutoFornada())
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Produto da fornada não encontrado"));
 
         Double valorProduto = produtoFornada.getValor();
@@ -426,11 +388,9 @@ public class ResumoPedidoService {
     }
 
     private Double calcularValorPedidoBolo(Integer pedidoBoloId) {
-        var pedidoBolo = pedidoBoloRepository.findById(pedidoBoloId)
-                .orElseThrow(() -> new EntidadeNaoEncontradaException("Pedido bolo não encontrado"));
+        var pedidoBolo = pedidoBoloGateway.findById(pedidoBoloId);
 
-        var bolo = boloRepository.findById(pedidoBolo.getBoloId())
-                .orElseThrow(() -> new EntidadeNaoEncontradaException("Bolo não encontrado"));
+        var bolo = boloGateway.findById(pedidoBolo.getBoloId());
 
         Double valorTamanho = 0.0;
         if (bolo.getTamanho() != null) {
@@ -445,40 +405,38 @@ public class ResumoPedidoService {
 
         Double valorRecheio = 0.0;
         if (bolo.getRecheioPedido() != null) {
-            var recheioPedido = recheioPedidoRepository.findById(bolo.getRecheioPedido())
-                    .orElseThrow(() -> new EntidadeNaoEncontradaException("Recheio do bolo não encontrado"));
+            var recheioPedido = recheioPedidoGateway.findById(bolo.getRecheioPedido());
 
             if (recheioPedido.getRecheioExclusivo() != null) {
-                var recheioExclusivo = recheioExclusivoRepository.findById(recheioPedido.getRecheioExclusivo())
-                        .orElseThrow(() -> new EntidadeNaoEncontradaException("Recheio exclusivo não encontrado"));
+                var recheioExclusivo = recheioExclusivoGateway.findById(recheioPedido.getRecheioExclusivo());
 
                 if (recheioExclusivo.getRecheioUnitarioId1() != null) {
-                    var recheioUnitario1 = recheioUnitarioRepository.findById(recheioExclusivo.getRecheioUnitarioId1())
-                            .orElse(null);
+                    var recheioUnitario1 = recheioUnitarioGateway.findById(recheioExclusivo.getRecheioUnitarioId1());
+
                     if (recheioUnitario1 != null && recheioUnitario1.getValor() != null) {
                         valorRecheio += recheioUnitario1.getValor();
                     }
                 }
 
                 if (recheioExclusivo.getRecheioUnitarioId2() != null) {
-                    var recheioUnitario2 = recheioUnitarioRepository.findById(recheioExclusivo.getRecheioUnitarioId2())
-                            .orElse(null);
+                    var recheioUnitario2 = recheioUnitarioGateway.findById(recheioExclusivo.getRecheioUnitarioId2());
+
                     if (recheioUnitario2 != null && recheioUnitario2.getValor() != null) {
                         valorRecheio += recheioUnitario2.getValor();
                     }
                 }
             } else {
                 if (recheioPedido.getRecheioUnitarioId1() != null) {
-                    var recheioUnitario1 = recheioUnitarioRepository.findById(recheioPedido.getRecheioUnitarioId1())
-                            .orElse(null);
+                    var recheioUnitario1 = recheioUnitarioGateway.findById(recheioPedido.getRecheioUnitarioId1());
+
                     if (recheioUnitario1 != null && recheioUnitario1.getValor() != null) {
                         valorRecheio += recheioUnitario1.getValor();
                     }
                 }
 
                 if (recheioPedido.getRecheioUnitarioId2() != null) {
-                    var recheioUnitario2 = recheioUnitarioRepository.findById(recheioPedido.getRecheioUnitarioId2())
-                            .orElse(null);
+                    var recheioUnitario2 = recheioUnitarioGateway.findById(recheioPedido.getRecheioUnitarioId2());
+
                     if (recheioUnitario2 != null && recheioUnitario2.getValor() != null) {
                         valorRecheio += recheioUnitario2.getValor();
                     }
@@ -488,8 +446,8 @@ public class ResumoPedidoService {
 
         Double valorMassa = 0.0;
         if (bolo.getMassa() != null) {
-            var massa = massaRepository.findById(bolo.getMassa())
-                    .orElse(null);
+            var massa = massaGateway.findById(bolo.getMassa());
+
             if (massa != null && massa.getValor() != null) {
                 valorMassa = massa.getValor();
             }
@@ -497,5 +455,13 @@ public class ResumoPedidoService {
 
         Double valorTotal = valorTamanho + valorRecheio + valorMassa;
         return valorTotal;
+    }
+
+    private boolean isTransicaoStatusValida(StatusEnum statusAtual, StatusEnum novoStatus) {
+        if (statusAtual == novoStatus) {
+            return false;
+        }
+
+        return true;
     }
 }

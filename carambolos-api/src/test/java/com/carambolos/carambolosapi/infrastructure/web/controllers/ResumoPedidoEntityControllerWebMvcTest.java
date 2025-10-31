@@ -1,6 +1,6 @@
 package com.carambolos.carambolosapi.infrastructure.web.controllers;
 
-import com.carambolos.carambolosapi.application.usecases.ResumoPedidoService;
+import com.carambolos.carambolosapi.application.usecases.ResumoPedidoUseCase;
 import com.carambolos.carambolosapi.domain.entity.ResumoPedido;
 import com.carambolos.carambolosapi.domain.enums.StatusEnum;
 import org.junit.jupiter.api.Test;
@@ -18,38 +18,38 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ResumoPedidoController.class)
-class ResumoPedidoControllerWebMvcTest {
+class ResumoPedidoEntityControllerWebMvcTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
-    private ResumoPedidoService resumoPedidoService;
+    private ResumoPedidoUseCase resumoPedidouseCase;
 
     @Test
     void listarResumosPedidos_quandoVazio_retorna204() throws Exception {
-        when(resumoPedidoService.listarResumosPedidos()).thenReturn(List.of());
+        when(resumoPedidouseCase.listarResumosPedidos()).thenReturn(List.of());
         mockMvc.perform(get("/resumo-pedido"))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     void listarResumosPedidos_quandoExiste_retorna200() throws Exception {
-        when(resumoPedidoService.listarResumosPedidos()).thenReturn(List.of(new ResumoPedido()));
+        when(resumoPedidouseCase.listarResumosPedidos()).thenReturn(List.of(new ResumoPedido()));
         mockMvc.perform(get("/resumo-pedido"))
                 .andExpect(status().isOk());
     }
 
     @Test
     void buscarResumosPorStatus_quandoVazio_retorna204() throws Exception {
-        when(resumoPedidoService.buscarResumosPedidosPorStatus(StatusEnum.PENDENTE)).thenReturn(List.of());
+        when(resumoPedidouseCase.buscarResumosPedidosPorStatus(StatusEnum.PENDENTE)).thenReturn(List.of());
         mockMvc.perform(get("/resumo-pedido/status/PENDENTE"))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     void buscarPorDataPedido_quandoVazio_retorna204() throws Exception {
-        when(resumoPedidoService.buscarResumosPedidosPorDataPedido(LocalDate.of(2025,1,1))).thenReturn(List.of());
+        when(resumoPedidouseCase.buscarResumosPedidosPorDataPedido(LocalDate.of(2025,1,1))).thenReturn(List.of());
         mockMvc.perform(get("/resumo-pedido/data-pedido/2025-01-01"))
                 .andExpect(status().isNoContent());
     }
@@ -58,7 +58,7 @@ class ResumoPedidoControllerWebMvcTest {
     void marcarPedidoComoCancelado_ok() throws Exception {
         ResumoPedido rp = new ResumoPedido();
         rp.setStatus(StatusEnum.CANCELADO);
-        when(resumoPedidoService.alterarStatus(1, StatusEnum.CANCELADO)).thenReturn(rp);
+        when(resumoPedidouseCase.alterarStatus(1, StatusEnum.CANCELADO)).thenReturn(rp);
         mockMvc.perform(patch("/resumo-pedido/1/cancelado").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
