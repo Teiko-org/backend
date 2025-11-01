@@ -53,7 +53,7 @@ public interface BoloRepository extends JpaRepository<BoloEntity, Integer> {
     @Transactional
     @Modifying
     @Query(value = """
-            UPDATE boloEntity SET is_ativo = ?1 where id = ?2
+            UPDATE bolo SET is_ativo = ?1 where id = ?2
             """, nativeQuery = true)
     void atualizarStatusBolo(Integer status, Integer id);
 
