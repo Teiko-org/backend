@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Schema(description = "Entidade que representa uma massa")
+@Table(name = "massa")
 public class MassaEntity {
 
     @Id
