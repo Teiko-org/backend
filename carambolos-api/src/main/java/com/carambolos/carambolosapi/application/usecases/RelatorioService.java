@@ -3,6 +3,7 @@ package com.carambolos.carambolosapi.application.usecases;
 import com.carambolos.carambolosapi.domain.entity.*;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.*;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoFornada;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.ProdutoFornada;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.*;
 import com.lowagie.text.Document;
 import com.lowagie.text.Paragraph;
@@ -212,7 +213,7 @@ public class RelatorioService {
                     Long count = entry.getValue();
 
                     String produtoNome = produtoFornadaRepository.findById(produtoId)
-                            .map(ProdutoFornada::getProduto)
+                            .map(entity -> entity.getProduto())
                             .orElse("Produto ID " + produtoId);
 
                     doc.add(new Paragraph(i + ". " + produtoNome + " (" + count + " pedidos)"));

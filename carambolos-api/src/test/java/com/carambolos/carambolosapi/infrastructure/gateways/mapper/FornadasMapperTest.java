@@ -69,7 +69,7 @@ class FornadasMapperTest {
 
     @Test
     void toEntity_pedidoFornada_shouldMapAllFields() {
-        var d = new PedidoFornada();
+        var d = new com.carambolos.carambolosapi.domain.entity.PedidoFornada();
         d.setId(2);
         d.setFornadaDaVez(11);
         d.setEndereco(21);

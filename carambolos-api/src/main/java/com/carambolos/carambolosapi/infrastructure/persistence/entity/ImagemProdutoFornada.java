@@ -1,9 +1,22 @@
-package com.carambolos.carambolosapi.domain.entity;
+package com.carambolos.carambolosapi.infrastructure.persistence.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "imagem_produto_fornada")
 public class ImagemProdutoFornada {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @Column(length = 500, nullable = false)
     private String url;
+
+    @ManyToOne
+    @JoinColumn(name = "produto_fornada_id", nullable = false)
+    @JsonIgnore
     private ProdutoFornada produtoFornada;
 
     public Integer getId() {
@@ -30,3 +43,5 @@ public class ImagemProdutoFornada {
         this.produtoFornada = produtoFornada;
     }
 }
+
+

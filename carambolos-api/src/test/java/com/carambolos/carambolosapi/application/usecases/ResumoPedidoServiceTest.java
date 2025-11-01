@@ -1,7 +1,7 @@
 package com.carambolos.carambolosapi.application.usecases;
 
 import com.carambolos.carambolosapi.domain.entity.ResumoPedido;
-import com.carambolos.carambolosapi.domain.entity.ProdutoFornada;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.ProdutoFornada;
 import com.carambolos.carambolosapi.domain.enums.StatusEnum;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.EnderecoMapper;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
@@ -103,6 +103,7 @@ class ResumoPedidoServiceTest {
         produto.setProduto("Cookie");
         produto.setValor(5.0);
 
+        when(pedidoFornadaRepository.existsByIdAndIsAtivoTrue(77)).thenReturn(true);
         when(pedidoFornadaRepository.findById(77)).thenReturn(Optional.of(pedidoFornada));
         when(fornadaDaVezRepository.findById(10)).thenReturn(Optional.of(fdv));
         when(produtoFornadaRepository.findById(3)).thenReturn(Optional.of(produto));

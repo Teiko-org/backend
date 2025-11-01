@@ -1,8 +1,10 @@
 package com.carambolos.carambolosapi.application.usecases;
 
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.*;
-import com.carambolos.carambolosapi.infrastructure.gateways.mapper.EnderecoMapper;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoFornada;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.ProdutoFornada;
+import com.carambolos.carambolosapi.infrastructure.gateways.mapper.EnderecoMapper;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.ProdutoFornada;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.*;
 import com.carambolos.carambolosapi.infrastructure.web.response.DetalhePedidoBoloDTO;
 import com.carambolos.carambolosapi.infrastructure.web.response.DetalhePedidoFornadaDTO;
@@ -13,6 +15,8 @@ import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaE
 import com.carambolos.carambolosapi.domain.enums.StatusEnum;
 import com.carambolos.carambolosapi.domain.enums.TipoEntregaEnum;
 import com.carambolos.carambolosapi.infrastructure.web.response.ResumoPedidoMensagemResponseDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -67,8 +71,8 @@ public class ResumoPedidoService {
         this.enderecoMapper = enderecoMapper;
     }
 
-    public List<ResumoPedido> listarResumosPedidos() {
-        return resumoPedidoRepository.findAllByIsAtivoTrue();
+    public Page<ResumoPedido> listarResumosPedidos(Pageable pageable) {
+        return resumoPedidoRepository.findAllByIsAtivoTrue(pageable);
     }
 
     public ResumoPedido buscarResumoPedidoPorId(Integer id) {
@@ -320,7 +324,7 @@ public class ResumoPedidoService {
             try {
                 if (fornadaDaVez.getProdutoFornada() != null) {
                     produtoFornada = produtoFornadaRepository.findById(fornadaDaVez.getProdutoFornada())
-                            .map(ProdutoFornada::getProduto)
+                            .map(entity -> entity.getProduto())
                             .orElse("Produto não especificado");
                 }
             } catch (Exception e) {

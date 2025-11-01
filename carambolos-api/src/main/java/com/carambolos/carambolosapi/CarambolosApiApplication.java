@@ -9,6 +9,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import io.github.cdimascio.dotenv.Dotenv;
 
 @OpenAPIDefinition(
@@ -41,7 +42,8 @@ public class CarambolosApiApplication {
 		SpringApplication.run(CarambolosApiApplication.class, args);
 	}
 
-	@Bean
+    @Bean
+    @ConditionalOnBean(EnderecoRepository.class)
 	@SuppressWarnings("unused")
 	CommandLineRunner backfillEnderecoDedupHash(EnderecoRepository enderecoRepository) {
 		return args -> enderecoRepository.findAll().stream()
