@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Schema(description = "Representa um bolo")
+@Table(name = "bolo")
 public class BoloEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
