@@ -30,10 +30,10 @@ public interface BoloRepository extends JpaRepository<BoloEntity, Integer> {
               (m.valor + COALESCE(ru1.valor + ru2.valor, reu1.valor + reu2.valor)) AS precoTotal,
               b.decoracao_id AS decoracaoId,
               b.is_ativo AS ativo
-            FROM boloEntity b
+            FROM bolo b
             JOIN massa m ON b.massa_id = m.id
             JOIN recheio_pedido rp ON b.recheio_pedido_id = rp.id
-            JOIN coberturaEntity c on b.cobertura_id = c.id
+            JOIN cobertura c on b.cobertura_id = c.id
             LEFT JOIN decoracao d ON b.decoracao_id = d.id
             
             -- Caso o recheio seja dois unitários
@@ -53,7 +53,7 @@ public interface BoloRepository extends JpaRepository<BoloEntity, Integer> {
     @Transactional
     @Modifying
     @Query(value = """
-            UPDATE boloEntity SET is_ativo = ?1 where id = ?2
+            UPDATE bolo SET is_ativo = ?1 where id = ?2
             """, nativeQuery = true)
     void atualizarStatusBolo(Integer status, Integer id);
 
