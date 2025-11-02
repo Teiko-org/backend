@@ -61,23 +61,19 @@ public class SecurityConfiguracao {
             new AntPathRequestMatcher("/fornadas/**", "GET"),
             new AntPathRequestMatcher("/bolos", "GET"),
             new AntPathRequestMatcher("/bolos/**", "GET"),
-            new AntPathRequestMatcher("/bolos/**", "POST"),
             new AntPathRequestMatcher("/decoracoes", "GET"),
-            new AntPathRequestMatcher("/decoracoes", "POST"),
             new AntPathRequestMatcher("/decoracoes/**", "GET"),
             new AntPathRequestMatcher("/files/**", "GET"),
-            new AntPathRequestMatcher("/resumo-pedido"),
-            new AntPathRequestMatcher("/resumo-pedido/**"),
+            // POSTs públicos necessários para fluxo de pedido/cadastro
             new AntPathRequestMatcher("/enderecos", "POST"),
             new AntPathRequestMatcher("/bolos", "POST"),
             new AntPathRequestMatcher("/bolos/pedido", "POST"),
             new AntPathRequestMatcher("/bolos/recheio-pedido", "POST"),
-            new AntPathRequestMatcher("/bolos/recheio-pedido", "GET"),
-            new AntPathRequestMatcher("/bolos/recheio-pedido/**", "GET"),
             new AntPathRequestMatcher("/bolos/recheio-unitario", "POST"),
             new AntPathRequestMatcher("/bolos/cobertura", "POST"),
-            new AntPathRequestMatcher("/bolos/cobertura", "GET"),
-            new AntPathRequestMatcher("/fornadas/pedidos", "POST")
+            new AntPathRequestMatcher("/fornadas/pedidos", "POST"),
+            new AntPathRequestMatcher("/resumo-pedido", "GET"),
+            new AntPathRequestMatcher("/resumo-pedido/**", "GET")
     };
 
     @Bean
@@ -88,7 +84,14 @@ public class SecurityConfiguracao {
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .cors(Customizer.withDefaults())
                 .csrf(CsrfConfigurer<HttpSecurity>::disable)
-                .authorizeHttpRequests(authorize -> authorize.requestMatchers(URLS_PERMITIDAS)
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(HttpMethod.GET,
+                                "/decoracoes/**",
+                                "/bolos/**",
+                                "/fornadas/**",
+                                "/files/**"
+                        ).permitAll()
+                        .requestMatchers(URLS_PERMITIDAS)
                         .permitAll()
                         .anyRequest()
                         .authenticated()
@@ -97,8 +100,6 @@ public class SecurityConfiguracao {
                         .authenticationEntryPoint(jwtAuthenticationEntryPointBean()))
                 .sessionManagement(management -> management
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
-        http.addFilterBefore(jwtAuthenticationFilterBean(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -134,7 +135,7 @@ public class SecurityConfiguracao {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuracao = new CorsConfiguration();
-        configuracao.setAllowedOrigins(List.of("http://localhost:5173"));
+        configuracao.setAllowedOriginPatterns(List.of("*"));
         configuracao.setAllowCredentials(true);
         configuracao.setAllowedMethods(Arrays.asList(
                 HttpMethod.GET.name(),
