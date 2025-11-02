@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(name = "decoracao")
 @Schema(description = "Entidade que representa a decoração de um bolo")
 public class Decoracao {
 
