@@ -758,18 +758,3 @@ SELECT COUNT(*) as total_bolos FROM teiko.bolo;
 -- =====================================================
 
 SELECT * FROM TEIKO.USUARIO;
-
--- Execute apenas o UPDATE (a coluna já existe)
-UPDATE pedido_bolo pb
-SET horario_retirada = (
-    SELECT TIME_FORMAT(rp.data_entrega, '%H:%i')
-    FROM resumo_pedido rp
-    WHERE rp.pedido_bolo_id = pb.id
-      AND rp.is_ativo = 1
-      AND pb.tipo_entrega = 'RETIRADA'
-      AND rp.data_entrega IS NOT NULL
-    ORDER BY rp.data_pedido DESC
-    LIMIT 1
-    )
-WHERE pb.tipo_entrega = 'RETIRADA'
-  AND pb.horario_retirada IS NULL;
