@@ -96,7 +96,8 @@ public class SecurityConfiguracao {
                                 "/decoracoes/**",
                                 "/bolos/**",
                                 "/fornadas/**",
-                                "/files/**"
+                                "/files/**",
+                                "/dashboard/**"
                         ).permitAll()
                         .requestMatchers(URLS_PERMITIDAS)
                         .permitAll()
