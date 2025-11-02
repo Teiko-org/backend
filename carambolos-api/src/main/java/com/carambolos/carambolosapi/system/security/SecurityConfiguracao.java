@@ -65,6 +65,7 @@ public class SecurityConfiguracao {
             new AntPathRequestMatcher("/decoracoes", "GET"),
             new AntPathRequestMatcher("/decoracoes", "POST"),
             new AntPathRequestMatcher("/decoracoes/**", "GET"),
+            new AntPathRequestMatcher("/files/**", "GET"),
             new AntPathRequestMatcher("/resumo-pedido"),
             new AntPathRequestMatcher("/resumo-pedido/**"),
             new AntPathRequestMatcher("/enderecos", "POST"),
@@ -76,8 +77,7 @@ public class SecurityConfiguracao {
             new AntPathRequestMatcher("/bolos/recheio-unitario", "POST"),
             new AntPathRequestMatcher("/bolos/cobertura", "POST"),
             new AntPathRequestMatcher("/bolos/cobertura", "GET"),
-            new AntPathRequestMatcher("/fornadas/pedidos", "POST"),
-            new AntPathRequestMatcher("/dashboard/**", "GET")
+            new AntPathRequestMatcher("/fornadas/pedidos", "POST")
     };
 
     @Bean
