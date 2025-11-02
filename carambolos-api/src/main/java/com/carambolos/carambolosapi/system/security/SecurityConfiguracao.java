@@ -64,7 +64,7 @@ public class SecurityConfiguracao {
             new AntPathRequestMatcher("/decoracoes", "GET"),
             new AntPathRequestMatcher("/decoracoes/**", "GET"),
             new AntPathRequestMatcher("/files/**", "GET"),
-            // POSTs públicos necessários para fluxo de pedido/cadastro
+            new AntPathRequestMatcher("/dashboard/**", "GET"),
             new AntPathRequestMatcher("/enderecos", "POST"),
             new AntPathRequestMatcher("/bolos", "POST"),
             new AntPathRequestMatcher("/bolos/pedido", "POST"),
@@ -89,7 +89,8 @@ public class SecurityConfiguracao {
                                 "/decoracoes/**",
                                 "/bolos/**",
                                 "/fornadas/**",
-                                "/files/**"
+                                "/files/**",
+                                "/dashboard/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.HEAD,
                                 "/decoracoes/**",
