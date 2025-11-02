@@ -91,6 +91,12 @@ public class SecurityConfiguracao {
                                 "/fornadas/**",
                                 "/files/**"
                         ).permitAll()
+                        .requestMatchers(HttpMethod.HEAD,
+                                "/decoracoes/**",
+                                "/bolos/**",
+                                "/fornadas/**",
+                                "/files/**"
+                        ).permitAll()
                         .requestMatchers(URLS_PERMITIDAS)
                         .permitAll()
                         .anyRequest()
