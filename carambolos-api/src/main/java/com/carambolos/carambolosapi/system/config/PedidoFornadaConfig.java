@@ -1,19 +1,18 @@
 package com.carambolos.carambolosapi.system.config;
 
-import com.carambolos.carambolosapi.application.gateways.FornadaDaVezGateway;
-import com.carambolos.carambolosapi.application.gateways.PedidoFornadaGateway;
-import com.carambolos.carambolosapi.application.usecases.PedidoFornadaUseCases;
-import com.carambolos.carambolosapi.application.gateways.PedidoEventosGateway;
-import com.carambolos.carambolosapi.application.gateways.ProdutoFornadaGateway;
- 
-import com.carambolos.carambolosapi.infrastructure.persistence.jpa.ProdutoFornadaRepository;
- 
 import com.carambolos.carambolosapi.application.gateways.EnderecoGateway;
+import com.carambolos.carambolosapi.application.gateways.FornadaDaVezGateway;
+import com.carambolos.carambolosapi.application.gateways.FornadaGateway;
+import com.carambolos.carambolosapi.application.gateways.PedidoEventosGateway;
+import com.carambolos.carambolosapi.application.gateways.PedidoFornadaGateway;
+import com.carambolos.carambolosapi.application.gateways.ProdutoFornadaGateway;
 import com.carambolos.carambolosapi.application.gateways.UsuarioGateway;
+import com.carambolos.carambolosapi.application.usecases.PedidoFornadaUseCases;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.FornadaDaVezRepository;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.PedidoFornadaRepository;
-import org.springframework.context.annotation.Configuration;
+import com.carambolos.carambolosapi.infrastructure.persistence.jpa.ProdutoFornadaRepository;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class PedidoFornadaConfig {
@@ -22,11 +21,12 @@ public class PedidoFornadaConfig {
     public PedidoFornadaUseCases pedidoFornadaUseCases(
             PedidoFornadaGateway pedidos,
             FornadaDaVezGateway fdv,
+            FornadaGateway fornadas,
             EnderecoGateway end,
             UsuarioGateway usu,
             PedidoEventosGateway eventos
     ) {
-        return new PedidoFornadaUseCases(pedidos, fdv, end, usu, eventos);
+        return new PedidoFornadaUseCases(pedidos, fdv, fornadas, end, usu, eventos);
     }
 
     @Bean
