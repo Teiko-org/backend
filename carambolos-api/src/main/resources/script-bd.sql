@@ -25,6 +25,23 @@ CREATE TABLE IF NOT EXISTS teiko.usuario (
 );
 
 -- -----------------------------------------------------
+-- Table teiko.carrinho
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS teiko.carrinho (
+  id INT NOT NULL AUTO_INCREMENT,
+  usuario_id INT NOT NULL,
+  itens TEXT NULL,
+  data_ultima_atualizacao DATETIME NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_carrinho_usuario (usuario_id),
+  INDEX fk_carrinho_usuario_idx (usuario_id ASC) VISIBLE,
+  CONSTRAINT fk_carrinho_usuario
+    FOREIGN KEY (usuario_id)
+    REFERENCES teiko.usuario (id)
+    ON DELETE CASCADE
+);
+
+-- -----------------------------------------------------
 -- Table teiko.endereco
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS teiko.endereco (

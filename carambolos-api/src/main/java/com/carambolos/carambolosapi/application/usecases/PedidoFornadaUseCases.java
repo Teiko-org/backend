@@ -2,28 +2,32 @@ package com.carambolos.carambolosapi.application.usecases;
 
 import com.carambolos.carambolosapi.application.exception.EntidadeImprocessavelException;
 import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaException;
-import com.carambolos.carambolosapi.application.gateways.FornadaDaVezGateway;
-import com.carambolos.carambolosapi.application.gateways.PedidoFornadaGateway;
-import com.carambolos.carambolosapi.application.gateways.PedidoEventosGateway;
 import com.carambolos.carambolosapi.application.gateways.EnderecoGateway;
+import com.carambolos.carambolosapi.application.gateways.FornadaDaVezGateway;
+import com.carambolos.carambolosapi.application.gateways.FornadaGateway;
+import com.carambolos.carambolosapi.application.gateways.PedidoEventosGateway;
+import com.carambolos.carambolosapi.application.gateways.PedidoFornadaGateway;
 import com.carambolos.carambolosapi.application.gateways.UsuarioGateway;
+import com.carambolos.carambolosapi.domain.entity.Fornada;
 import com.carambolos.carambolosapi.domain.entity.PedidoFornada;
-import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
 import com.carambolos.carambolosapi.domain.enums.TipoEntregaEnum;
+import com.carambolos.carambolosapi.infrastructure.gateways.mapper.FornadasMapper;
+import com.carambolos.carambolosapi.infrastructure.messaging.dto.PedidoEvento;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
 import com.carambolos.carambolosapi.infrastructure.web.request.PedidoFornadaRequestDTO;
 import com.carambolos.carambolosapi.infrastructure.web.request.PedidoFornadaUpdateRequestDTO;
-import com.carambolos.carambolosapi.infrastructure.gateways.mapper.FornadasMapper;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import com.carambolos.carambolosapi.infrastructure.messaging.dto.PedidoEvento;
-import java.time.OffsetDateTime;
 
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 public class PedidoFornadaUseCases {
     private final PedidoFornadaGateway pedidos;
     private final FornadaDaVezGateway fdv;
+    private final FornadaGateway fornadas;
     private final EnderecoGateway enderecos;
     private final UsuarioGateway usuarios;
     private final PedidoEventosGateway eventos;
@@ -31,12 +35,14 @@ public class PedidoFornadaUseCases {
     public PedidoFornadaUseCases(
             PedidoFornadaGateway pedidos,
             FornadaDaVezGateway fdv,
+            FornadaGateway fornadas,
             EnderecoGateway enderecos,
             UsuarioGateway usuarios,
             PedidoEventosGateway eventos
     ) {
         this.pedidos = pedidos;
         this.fdv = fdv;
+        this.fornadas = fornadas;
         this.enderecos = enderecos;
         this.usuarios = usuarios;
         this.eventos = eventos;
@@ -46,7 +52,19 @@ public class PedidoFornadaUseCases {
     public PedidoFornada criar(PedidoFornadaRequestDTO request) {
         FornadaDaVez fornadaDaVez = fdv.findById(request.fornadaDaVezId())
                 .filter(fdv -> fdv.isAtivo())
-                .orElseThrow(() -> new EntidadeNaoEncontradaException("FornadaDaVez com ID " + request.fornadaDaVezId() + " não encontrada."));
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("FornadaDaVez com ID " + request.fornadaDaVezId() + " não encontrada ou foi ocultada."));
+
+        Fornada fornada = fornadas.findById(fornadaDaVez.getFornada())
+                .filter(f -> Boolean.TRUE.equals(f.getAtivo()))
+                .orElseThrow(() -> new EntidadeImprocessavelException("A fornada associada a este produto não está mais ativa."));
+
+        LocalDate hoje = LocalDate.now();
+        if (fornada.getDataFim().isBefore(hoje)) {
+            throw new EntidadeImprocessavelException(
+                    String.format("Esta fornada encerrou em %s. Não é mais possível realizar pedidos.",
+                    fornada.getDataFim().toString())
+            );
+        }
 
         if (fornadaDaVez.getQuantidade() < request.quantidade()) {
             throw new EntidadeImprocessavelException(
@@ -74,7 +92,6 @@ public class PedidoFornadaUseCases {
         PedidoFornada pedido = FornadasMapper.toDomain(request.toEntity(request));
         pedido = pedidos.save(pedido);
 
-        // Publica após commit da transação (garantindo persistência antes do evento)
         PedidoFornada pedidoFinal = pedido;
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
@@ -129,7 +146,7 @@ public class PedidoFornadaUseCases {
         try {
             int antigaQtd = pedido.getQuantidade() != null ? pedido.getQuantidade() : 0;
             int novaQtd = request.quantidade();
-            int delta = novaQtd - antigaQtd; // positivo: reservar mais; negativo: devolver
+            int delta = novaQtd - antigaQtd;
             if (delta != 0) {
                 FornadaDaVez fz = fdv.findById(pedido.getFornadaDaVez()).orElse(null);
                 if (fz != null) {
@@ -144,8 +161,6 @@ public class PedidoFornadaUseCases {
             }
         } catch (RuntimeException e) {
             throw e;
-        } catch (Exception e) {
-
         }
 
         pedido.setQuantidade(request.quantidade());
