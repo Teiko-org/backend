@@ -14,7 +14,8 @@ public final class EnderecoHasher {
                 safeLower(e.getNumero()),
                 safeLower(e.getBairro()),
                 safeLower(e.getCidade()),
-                safeUpper(e.getEstado())
+                safeUpper(e.getEstado()),
+                safeLower(e.getComplemento())
         );
         return HashUtils.hmacSha256Base64(base);
     }
