@@ -1,7 +1,7 @@
 package com.carambolos.carambolosapi.infrastructure.web.response;
 
-import com.carambolos.carambolosapi.domain.entity.Decoracao;
-import com.carambolos.carambolosapi.domain.entity.ImagemDecoracao;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.DecoracaoEntity;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.ImagemDecoracaoEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
@@ -23,18 +23,18 @@ public record DecoracaoResponseDTO(
         @Schema(description = "Categoria para exibição (pré-decoração)", example = "Vintage")
         String categoria
 ) {
-    public static DecoracaoResponseDTO fromEntity(Decoracao decoracao) {
-        List<String> urls = decoracao.getImagens()
+    public static DecoracaoResponseDTO fromEntity(DecoracaoEntity decoracaoEntity) {
+        List<String> urls = decoracaoEntity.getImagens()
                 .stream()
-                .map(ImagemDecoracao::getUrl)
+                .map(ImagemDecoracaoEntity::getUrl)
                 .toList();
 
         return new DecoracaoResponseDTO(
-                decoracao.getId(),
+                decoracaoEntity.getId(),
                 urls,
-                decoracao.getObservacao(),
-                decoracao.getNome(),
-                decoracao.getCategoria()
+                decoracaoEntity.getObservacao(),
+                decoracaoEntity.getNome(),
+                decoracaoEntity.getCategoria()
         );
     }
 }

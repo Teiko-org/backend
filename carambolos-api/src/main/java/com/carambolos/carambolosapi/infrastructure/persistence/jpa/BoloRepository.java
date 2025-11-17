@@ -1,7 +1,7 @@
 package com.carambolos.carambolosapi.infrastructure.persistence.jpa;
 
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.BoloEntity;
-import com.carambolos.carambolosapi.domain.entity.ImagemDecoracao;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.ImagemDecoracaoEntity;
 import com.carambolos.carambolosapi.domain.projection.DetalheBoloProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -34,7 +34,7 @@ public interface BoloRepository extends JpaRepository<BoloEntity, Integer> {
             JOIN massa m ON b.massa_id = m.id
             JOIN recheio_pedido rp ON b.recheio_pedido_id = rp.id
             JOIN cobertura c on b.cobertura_id = c.id
-            LEFT JOIN decoracao d ON b.decoracao_id = d.id
+            LEFT JOIN decoracaoEntity d ON b.decoracao_id = d.id
             
             -- Caso o recheio seja dois unitários
             LEFT JOIN recheio_unitario ru1 ON rp.recheio_unitario_id1 = ru1.id
@@ -58,9 +58,9 @@ public interface BoloRepository extends JpaRepository<BoloEntity, Integer> {
     void atualizarStatusBolo(Integer status, Integer id);
 
     @Query(value = "SELECT * FROM imagem_decoracao WHERE decoracao_id = ?1 ORDER BY id DESC LIMIT 1", nativeQuery = true)
-    ImagemDecoracao findImagemByBolo(Integer idDecoracao);
+    ImagemDecoracaoEntity findImagemByBolo(Integer idDecoracao);
 
     @Query(value = "SELECT * FROM imagem_decoracao WHERE decoracao_id = ?1 ORDER BY id ASC", nativeQuery = true)
-    List<ImagemDecoracao> findAllImagensByDecoracao(Integer idDecoracao);
+    List<ImagemDecoracaoEntity> findAllImagensByDecoracao(Integer idDecoracao);
 
 }

@@ -20,17 +20,4 @@ public class AzureStorageService {
                 .buildClient();
         this.containerClient = blobServiceClient.getBlobContainerClient(containerName);
     }
-
-    public String upload(MultipartFile file) {
-        try {
-            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-            BlobClient blobClient = containerClient.getBlobClient(fileName);
-            try (InputStream is = file.getInputStream()) {
-                blobClient.upload(is, file.getSize(), true);
-            }
-            return blobClient.getBlobUrl();
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao fazer upload para o Azure Blob Storage", e);
-        }
-    }
 }
