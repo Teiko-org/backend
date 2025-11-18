@@ -9,4 +9,5 @@ public interface DecoracaoGateway {
     Decoracao save(Decoracao decoracao);
     List<Decoracao> findByIsAtivoTrue();
     List<Decoracao> findByIsAtivoTrueAndCategoriaIsNotNull();
+    Decoracao findById(Integer id);
 }

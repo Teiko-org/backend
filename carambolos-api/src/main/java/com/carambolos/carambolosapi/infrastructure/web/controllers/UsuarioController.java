@@ -1,8 +1,8 @@
 package com.carambolos.carambolosapi.infrastructure.web.controllers;
 
-import com.carambolos.carambolosapi.application.usecases.AzureStorageService;
 import com.carambolos.carambolosapi.application.usecases.UsuarioUseCase;
 import com.carambolos.carambolosapi.domain.entity.Usuario;
+import com.carambolos.carambolosapi.infrastructure.gateways.impl.AzureStorageGatewayImpl;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.UsuarioMapper;
 import com.carambolos.carambolosapi.infrastructure.web.request.AlterarSenhaRequestDTO;
 import com.carambolos.carambolosapi.infrastructure.web.request.AtualizarUsuarioRequestDTO;
@@ -32,12 +32,12 @@ import java.util.List;
 public class UsuarioController {
 
     private final UsuarioUseCase usuarioUseCase;
-    private final AzureStorageService azureStorageService;
+    private final AzureStorageGatewayImpl azureStorageGateway;
     private final UsuarioMapper usuarioMapper;
 
-    public UsuarioController(UsuarioUseCase usuarioUseCase, AzureStorageService azureStorageService, UsuarioMapper usuarioMapper) {
+    public UsuarioController(UsuarioUseCase usuarioUseCase, AzureStorageGatewayImpl azureStorageGateway, UsuarioMapper usuarioMapper) {
         this.usuarioUseCase = usuarioUseCase;
-        this.azureStorageService = azureStorageService;
+        this.azureStorageGateway = azureStorageGateway;
         this.usuarioMapper = usuarioMapper;
     }
 
@@ -242,7 +242,7 @@ public class UsuarioController {
                 return ResponseEntity.badRequest().build();
             }
 
-            String imageUrl = azureStorageService.upload(file);
+            String imageUrl = azureStorageGateway.upload(file);
 
             Usuario usuarioAtualizado = usuarioUseCase.atualizarImagemPerfil(id, imageUrl);
             UsuarioResponseDTO usuarioResponse = UsuarioMapper.toResponseDTO(usuarioAtualizado);

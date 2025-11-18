@@ -23,18 +23,5 @@ public record DecoracaoResponseDTO(
         @Schema(description = "Categoria para exibição (pré-decoração)", example = "Vintage")
         String categoria
 ) {
-    public static DecoracaoResponseDTO fromEntity(DecoracaoEntity decoracaoEntity) {
-        List<String> urls = decoracaoEntity.getImagens()
-                .stream()
-                .map(ImagemDecoracaoEntity::getUrl)
-                .toList();
 
-        return new DecoracaoResponseDTO(
-                decoracaoEntity.getId(),
-                urls,
-                decoracaoEntity.getObservacao(),
-                decoracaoEntity.getNome(),
-                decoracaoEntity.getCategoria()
-        );
-    }
 }

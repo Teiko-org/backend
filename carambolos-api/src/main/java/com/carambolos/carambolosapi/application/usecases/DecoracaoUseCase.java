@@ -1,11 +1,13 @@
 package com.carambolos.carambolosapi.application.usecases;
 
+import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.application.gateways.DecoracaoGateway;
 import com.carambolos.carambolosapi.application.gateways.StorageGateway;
 import com.carambolos.carambolosapi.domain.entity.Decoracao;
 import com.carambolos.carambolosapi.domain.entity.ImagemDecoracao;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.ImagemDecoracaoEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.DecoracaoEntity;
+import com.carambolos.carambolosapi.infrastructure.web.request.DecoracaoRequestDTO;
 import com.carambolos.carambolosapi.infrastructure.web.response.DecoracaoResponseDTO;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -48,9 +50,31 @@ public class DecoracaoUseCase {
     }
 
     public List<Decoracao> listarAtivasComCategoria() {
-        return decoracaoRepository.findByIsAtivoTrueAndCategoriaIsNotNull()
-                .stream()
-                .map(DecoracaoResponseDTO::fromEntity)
-                .collect(Collectors.toList());
+        return decoracaoGateway.findByIsAtivoTrueAndCategoriaIsNotNull();
+    }
+
+    public Decoracao buscarPorId(Integer id) {
+        return decoracaoGateway.findById(id);
+    }
+
+    public void desativar(Integer id) {
+        Decoracao decoracao = decoracaoGateway.findById(id);
+        decoracao.setIsAtivo(false);
+        decoracaoGateway.save(decoracao);
+    }
+
+    public void reativar(Integer id) {
+        Decoracao decoracao = decoracaoGateway.findById(id);
+        decoracao.setIsAtivo(true);
+        decoracaoGateway.save(decoracao);
+    }
+
+    public Decoracao atualizar(Integer id, DecoracaoRequestDTO request) {
+        Decoracao decoracao = decoracaoGateway.findById(id);
+
+        decoracao.setObservacao(request.observacao());
+        decoracao.setCategoria(request.categoria());
+
+        return decoracaoGateway.save(decoracao);
     }
 }

@@ -15,15 +15,15 @@ public class ImagemDecoracaoEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "decoracao_id", nullable = false)
-    private DecoracaoEntity decoracaoEntity;
+    private DecoracaoEntity decoracao;
 
     public ImagemDecoracaoEntity() {
     }
 
-    public ImagemDecoracaoEntity(Integer id, String url, DecoracaoEntity decoracaoEntity) {
+    public ImagemDecoracaoEntity(Integer id, String url, DecoracaoEntity decoracao) {
         this.id = id;
         this.url = url;
-        this.decoracaoEntity = decoracaoEntity;
+        this.decoracao = decoracao;
     }
 
     public Integer getId() {
@@ -50,10 +50,10 @@ public class ImagemDecoracaoEntity {
     }
 
     public DecoracaoEntity getDecoracao() {
-        return decoracaoEntity;
+        return decoracao;
     }
 
     public void setDecoracao(DecoracaoEntity decoracaoEntity) {
-        this.decoracaoEntity = decoracaoEntity;
+        this.decoracao = decoracaoEntity;
     }
 }

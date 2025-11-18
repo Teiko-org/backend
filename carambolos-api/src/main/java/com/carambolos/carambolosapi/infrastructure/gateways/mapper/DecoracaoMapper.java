@@ -1,7 +1,10 @@
 package com.carambolos.carambolosapi.infrastructure.gateways.mapper;
 
 import com.carambolos.carambolosapi.domain.entity.Decoracao;
+import com.carambolos.carambolosapi.domain.entity.ImagemDecoracao;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.DecoracaoEntity;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.ImagemDecoracaoEntity;
+import com.carambolos.carambolosapi.infrastructure.web.response.DecoracaoResponseDTO;
 
 import java.util.List;
 
@@ -62,5 +65,30 @@ public class DecoracaoMapper {
         decoracao.setCategoria(entity.getCategoria());
 
         return decoracao;
+    }
+
+    public DecoracaoResponseDTO toResponse(Decoracao decoracao) {
+        List<String> urls = decoracao.getImagens()
+                .stream()
+                .map(ImagemDecoracao::getUrl)
+                .toList();
+
+        return new DecoracaoResponseDTO(
+                decoracao.getId(),
+                urls,
+                decoracao.getObservacao(),
+                decoracao.getNome(),
+                decoracao.getCategoria()
+        );
+    }
+
+    public List<DecoracaoResponseDTO> toResponse(List<Decoracao> decoracoes) {
+        if (decoracoes == null) {
+            return null;
+        }
+
+        return decoracoes.stream()
+                .map(this::toResponse)
+                .toList();
     }
 }

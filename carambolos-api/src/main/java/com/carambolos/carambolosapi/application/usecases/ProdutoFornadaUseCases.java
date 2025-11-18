@@ -1,5 +1,6 @@
 package com.carambolos.carambolosapi.application.usecases;
 
+import com.carambolos.carambolosapi.application.gateways.StorageGateway;
 import com.carambolos.carambolosapi.infrastructure.web.request.ProdutoFornadaRequestDTO;
 import com.carambolos.carambolosapi.application.exception.EntidadeJaExisteException;
 import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaException;
@@ -19,12 +20,11 @@ import java.util.List;
 public class ProdutoFornadaUseCases {
 
     private final ProdutoFornadaGateway produtoFornadaGateway;
+    private  final StorageGateway storageGateway;
 
-    @Autowired
-    private AzureStorageService azureStorageService;
-
-    public ProdutoFornadaUseCases(ProdutoFornadaGateway produtoFornadaGateway) {
+    public ProdutoFornadaUseCases(ProdutoFornadaGateway produtoFornadaGateway, StorageGateway storageGateway) {
         this.produtoFornadaGateway = produtoFornadaGateway;
+        this.storageGateway = storageGateway;
     }
 
     public ProdutoFornada criarProdutoFornada(String produto, String descricao, Double valor, String categoria, MultipartFile[] arquivos) {
@@ -37,7 +37,7 @@ public class ProdutoFornadaUseCases {
 
         List<ImagemProdutoFornada> imagens = new ArrayList<>();
         for (MultipartFile arquivo : arquivos) {
-            String url = azureStorageService.upload(arquivo);
+            String url = storageGateway.upload(arquivo);
             ImagemProdutoFornada imagem = new ImagemProdutoFornada();
             imagem.setUrl(url);
             imagem.setProdutoFornada(produtoFornada);
