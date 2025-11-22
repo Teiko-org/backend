@@ -1,6 +1,6 @@
 package com.carambolos.carambolosapi.infrastructure.web.response;
 
-import com.carambolos.carambolosapi.domain.projection.ProdutoFornadaDaVezProjection;
+import com.carambolos.carambolosapi.infrastructure.persistence.projection.ProdutoFornadaDaVezProjection;
 
 import java.time.LocalDate;
 import java.util.List;

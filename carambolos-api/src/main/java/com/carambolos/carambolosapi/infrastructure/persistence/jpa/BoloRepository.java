@@ -2,7 +2,7 @@ package com.carambolos.carambolosapi.infrastructure.persistence.jpa;
 
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.BoloEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.ImagemDecoracaoEntity;
-import com.carambolos.carambolosapi.domain.projection.DetalheBoloProjection;
+import com.carambolos.carambolosapi.infrastructure.persistence.projection.DetalheBoloProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

@@ -1,7 +1,10 @@
 package com.carambolos.carambolosapi.infrastructure.web.controllers;
 
+import com.carambolos.carambolosapi.application.usecases.AdicionalDecoracaoUseCase;
 import com.carambolos.carambolosapi.application.usecases.DecoracaoUseCase;
+import com.carambolos.carambolosapi.domain.entity.AdicionalDecoracao;
 import com.carambolos.carambolosapi.domain.entity.Decoracao;
+import com.carambolos.carambolosapi.infrastructure.gateways.mapper.AdicionalDecoracaoMapper;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.DecoracaoMapper;
 import com.carambolos.carambolosapi.infrastructure.web.request.DecoracaoRequestDTO;
 import com.carambolos.carambolosapi.infrastructure.web.response.DecoracaoResponseDTO;
@@ -26,11 +29,15 @@ import java.util.List;
 public class DecoracaoController {
 
     private final DecoracaoUseCase decoracaoUseCase;
-    private final DecoracaoMapper mapper;
+    private final DecoracaoMapper decoracaoMapper;
+    private final AdicionalDecoracaoUseCase adicionalDecoracaoUseCase;
+    private final AdicionalDecoracaoMapper adicionalDecoracaoMapper;
 
-    public DecoracaoController(DecoracaoUseCase decoracaoUseCase, DecoracaoMapper mapper) {
+    public DecoracaoController(DecoracaoUseCase decoracaoUseCase, DecoracaoMapper decoracaoMapper, AdicionalDecoracaoUseCase adicionalDecoracaoUseCase, AdicionalDecoracaoMapper adicionalDecoracaoMapper) {
         this.decoracaoUseCase = decoracaoUseCase;
-        this.mapper = mapper;
+        this.decoracaoMapper = decoracaoMapper;
+        this.adicionalDecoracaoUseCase = adicionalDecoracaoUseCase;
+        this.adicionalDecoracaoMapper = adicionalDecoracaoMapper;
     }
 
     @Operation(summary = "Cadastrar decoração", description = "Cadastra uma nova decoração de bolo")
@@ -50,7 +57,7 @@ public class DecoracaoController {
             @RequestPart("imagens") MultipartFile[] imagens) {
 
         Decoracao decoracao = decoracaoUseCase.cadastrar(nome, observacao, categoria, imagens);
-        return ResponseEntity.ok(mapper.toResponse(decoracao));
+        return ResponseEntity.ok(decoracaoMapper.toResponse(decoracao));
     }
 
     @Operation(summary = "Listar decorações ativas", description = "Retorna todas as decorações de bolo ativas no sistema")
@@ -68,7 +75,7 @@ public class DecoracaoController {
         if (decoracoes.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(mapper.toResponse(decoracoes));
+        return ResponseEntity.ok(decoracaoMapper.toResponse(decoracoes));
     }
 
     @Operation(summary = "Listar pré-decorações para Home", description = "Retorna decorações ativas com categoria não nula")
@@ -85,7 +92,7 @@ public class DecoracaoController {
         if (decoracoes.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(mapper.toResponse(decoracoes));
+        return ResponseEntity.ok(decoracaoMapper.toResponse(decoracoes));
     }
 
     @Operation(summary = "Buscar decoração por ID", description = "Retorna uma decoração pelo seu identificador")
@@ -100,7 +107,7 @@ public class DecoracaoController {
     @GetMapping("/{id}")
     public ResponseEntity<DecoracaoResponseDTO> buscarPorId(@PathVariable Integer id) {
         Decoracao decoracao = decoracaoUseCase.buscarPorId(id);
-        return ResponseEntity.ok(mapper.toResponse(decoracao));
+        return ResponseEntity.ok(decoracaoMapper.toResponse(decoracao));
     }
 
     @Operation(summary = "Atualizar decoração", description = "Atualiza os dados de uma decoração existente")
@@ -117,7 +124,7 @@ public class DecoracaoController {
     public ResponseEntity<DecoracaoResponseDTO> atualizar(@PathVariable Integer id,
                                                           @RequestBody DecoracaoRequestDTO request) {
         Decoracao decoracaoAtualizada = decoracaoUseCase.atualizar(id, request);
-        return ResponseEntity.ok(mapper.toResponse(decoracaoAtualizada));
+        return ResponseEntity.ok(decoracaoMapper.toResponse(decoracaoAtualizada));
     }
 
     @Operation(summary = "Desativar decoração", description = "Desativa uma decoração pelo seu ID")
@@ -141,5 +148,19 @@ public class DecoracaoController {
     public ResponseEntity<Void> reativar(@PathVariable Integer id) {
         decoracaoUseCase.reativar(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Listar adicionais por decoração", description = "Retorna todos os adicionais associados a cada decoração")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de adicionais retornada com sucesso", content = @Content(
+                    mediaType = "application/json"
+            )),
+            @ApiResponse(responseCode = "404", description = "Adicionais de decoração não encontrados", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor", content = @Content)
+    })
+    @GetMapping("/adicionais")
+    public ResponseEntity<List<AdicionalDecoracao>> listarAdicionaisPorDecoracao() {
+        List<AdicionalDecoracao> adicionais = adicionalDecoracaoUseCase.buscarAdicionaisPorDecoracao();
+        return ResponseEntity.ok(adicionais);
     }
 }

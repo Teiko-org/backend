@@ -1,7 +1,7 @@
 package com.carambolos.carambolosapi.infrastructure.gateways.mapper;
 
 import com.carambolos.carambolosapi.domain.entity.RecheioPedido;
-import com.carambolos.carambolosapi.domain.projection.RecheioPedidoProjection;
+import com.carambolos.carambolosapi.infrastructure.persistence.projection.RecheioPedidoProjection;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.RecheioPedidoEntity;
 import com.carambolos.carambolosapi.infrastructure.web.request.RecheioPedidoRequestDTO;
 import com.carambolos.carambolosapi.infrastructure.web.response.RecheioPedidoResponseDTO;
