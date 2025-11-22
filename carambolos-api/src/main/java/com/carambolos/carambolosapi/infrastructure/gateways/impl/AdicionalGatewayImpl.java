@@ -22,9 +22,6 @@ public class AdicionalGatewayImpl implements AdicionalGateway {
     @Override
     public List<Adicional> listarAdicionais() {
         List<AdicionalEntity> entities = repository.findAll().stream().filter(AdicionalEntity::getAtivo).toList();
-        if (entities.isEmpty()) {
-            throw new EntidadeNaoEncontradaException("Adicionais não encontrados.");
-        }
         return mapper.toDomain(entities);
     }
 }

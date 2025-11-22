@@ -161,6 +161,9 @@ public class DecoracaoController {
     @GetMapping("/adicionais")
     public ResponseEntity<List<AdicionalDecoracao>> listarAdicionaisPorDecoracao() {
         List<AdicionalDecoracao> adicionais = adicionalDecoracaoUseCase.buscarAdicionaisPorDecoracao();
+        if (adicionais.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
         return ResponseEntity.ok(adicionais);
     }
 }

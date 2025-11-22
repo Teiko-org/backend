@@ -22,10 +22,6 @@ public class AdicionalDecoracaoGatewayImpl implements AdicionalDecoracaoGateway 
     public List<AdicionalDecoracao> buscarTodosAdicionaisPorDecoracao() {
         List<AdicionalDecoracaoProjection> projections = repository.findAllAdicionaisByDecoracao();
 
-        if (projections.isEmpty()) {
-        throw new EntidadeNaoEncontradaException("Adicionais de decoração não encontrados.");
-        }
-
         return mapper.toDomain(projections);
     }
 }
