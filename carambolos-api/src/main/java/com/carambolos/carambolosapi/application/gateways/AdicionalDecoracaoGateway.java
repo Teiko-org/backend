@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface AdicionalDecoracaoGateway {
     List<AdicionalDecoracao> buscarTodosAdicionaisPorDecoracao();
+    AdicionalDecoracao salvar(Integer decoracaoId, Integer adicionalId);
 }

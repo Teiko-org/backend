@@ -54,6 +54,7 @@ public class DecoracaoController {
             @RequestPart("nome") String nome,
             @RequestPart("observacao") String observacao,
             @RequestPart(value = "categoria", required = false) String categoria,
+            @RequestPart(value = "adicionais", required = true) List<Integer> adicionais,
             @RequestPart("imagens") MultipartFile[] imagens) {
 
         Decoracao decoracao = decoracaoUseCase.cadastrar(nome, observacao, categoria, imagens);
@@ -161,9 +162,11 @@ public class DecoracaoController {
     @GetMapping("/adicionais")
     public ResponseEntity<List<AdicionalDecoracao>> listarAdicionaisPorDecoracao() {
         List<AdicionalDecoracao> adicionais = adicionalDecoracaoUseCase.buscarAdicionaisPorDecoracao();
+
         if (adicionais.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
+
         return ResponseEntity.ok(adicionais);
     }
 }

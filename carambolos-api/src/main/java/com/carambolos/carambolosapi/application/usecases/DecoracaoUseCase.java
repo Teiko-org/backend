@@ -1,26 +1,25 @@
 package com.carambolos.carambolosapi.application.usecases;
 
-import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaException;
+import com.carambolos.carambolosapi.application.gateways.AdicionalDecoracaoGateway;
 import com.carambolos.carambolosapi.application.gateways.DecoracaoGateway;
 import com.carambolos.carambolosapi.application.gateways.StorageGateway;
+import com.carambolos.carambolosapi.domain.entity.AdicionalDecoracao;
 import com.carambolos.carambolosapi.domain.entity.Decoracao;
 import com.carambolos.carambolosapi.domain.entity.ImagemDecoracao;
-import com.carambolos.carambolosapi.infrastructure.persistence.entity.ImagemDecoracaoEntity;
-import com.carambolos.carambolosapi.infrastructure.persistence.entity.DecoracaoEntity;
 import com.carambolos.carambolosapi.infrastructure.web.request.DecoracaoRequestDTO;
-import com.carambolos.carambolosapi.infrastructure.web.response.DecoracaoResponseDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class DecoracaoUseCase {
     private final DecoracaoGateway decoracaoGateway;
+    private final AdicionalDecoracaoGateway adicionalDecoracaoGateway;
     private final StorageGateway storageGateway;
 
-    public DecoracaoUseCase(DecoracaoGateway decoracaoGateway, StorageGateway storageGateway) {
+    public DecoracaoUseCase(DecoracaoGateway decoracaoGateway, AdicionalDecoracaoGateway adicionalDecoracaoGateway, StorageGateway storageGateway) {
         this.decoracaoGateway = decoracaoGateway;
+        this.adicionalDecoracaoGateway = adicionalDecoracaoGateway;
         this.storageGateway = storageGateway;
     }
 
@@ -42,7 +41,9 @@ public class DecoracaoUseCase {
         }
 
         decoracao.setImagens(imagens);
-        return decoracaoGateway.save(decoracao);
+
+        Decoracao decoracaoSalva = decoracaoGateway.save(decoracao);
+
     }
 
     public List<Decoracao> listarAtivas() {
@@ -76,5 +77,12 @@ public class DecoracaoUseCase {
         decoracao.setCategoria(request.categoria());
 
         return decoracaoGateway.save(decoracao);
+    }
+
+    private List<AdicionalDecoracao> salvarAdicionalDecoracao(Decoracao decoracao, List<Integer> adicionaisIds) {
+        return adicionaisIds.stream().map(adicionalId -> {
+            return adicionalDecoracaoGateway.salvar(decoracao.getId(), adicionalId);
+        }).toList(
+        );
     }
 }
