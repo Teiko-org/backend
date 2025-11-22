@@ -208,14 +208,23 @@ CREATE TABLE IF NOT EXISTS teiko.imagem_decoracao (
 CREATE TABLE IF NOT EXISTS teiko.adicional (
 	id INT NOT NULL AUTO_INCREMENT,
     descricao VARCHAR(90),
+    is_ativo TINYINT NULL,
 	PRIMARY KEY (id),
     INDEX adicional_idx (id ASC)
 );
 
 CREATE TABLE IF NOT EXISTS teiko.adicional_decoracao (
+	id INT NOT NULL AUTO_INCREMENT,
 	decoracao_id INT NOT NULL,
     adicional_id INT NOT NULL,
-    PRIMARY KEY (decoracao_id, adicional_id)
+
+    PRIMARY KEY (id),
+    CONSTRAINT fk_decoracao_id_ad
+		FOREIGN KEY (decoracao_id)
+        REFERENCES teiko.decoracao (id),
+	CONSTRAINT fk_adicional_id_ad
+		FOREIGN KEY (adicional_id)
+        REFERENCES teiko.adicional(id)
 );
 
 -- -----------------------------------------------------
@@ -778,17 +787,17 @@ SELECT COUNT(*) as total_bolos FROM teiko.bolo;
 -- insere adicionais para decoração
 
 DESC teiko.adicional;
-INSERT INTO teiko.adicional (descricao) VALUES
-('Disco ball'),
-('Desenho'),
-('Pérolas na finalização'),
-('Metalizado (Prata ou Dourado)'),
-('Glitter'),
-('Cereja (Com ou sem glitter)'),
-('Laços'),
-('Escrita'),
-('Borda (Topo e Base)'),
-('Lacinhos');
+INSERT INTO teiko.adicional (descricao, is_ativo) VALUES
+('Disco ball', 1),
+('Desenho', 1),
+('Pérolas na finalização', 1),
+('Metalizado (Prata ou Dourado)', 1),
+('Glitter', 1),
+('Cereja (Com ou sem glitter)', 1),
+('Laços', 1),
+('Escrita', 1),
+('Borda (Topo e Base)', 1),
+('Lacinhos', 1);
 
 select * from adicional;
 
