@@ -1,6 +1,9 @@
 package com.carambolos.carambolosapi.infrastructure.persistence.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
@@ -8,15 +11,17 @@ import jakarta.persistence.Table;
 @Table(name = "adicional_decoracao")
 public class AdicionalDecoracaoEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @Column(name = "decoracao_id")
     private Integer decoracaoId;
+    @Column(name = "adicional_id")
     private Integer adicionalId;
 
     public AdicionalDecoracaoEntity() {
     }
 
-    public AdicionalDecoracaoEntity(Integer id, Integer decoracaoId, Integer adicionalId) {
-        this.id = id;
+    public AdicionalDecoracaoEntity(Integer decoracaoId, Integer adicionalId) {
         this.decoracaoId = decoracaoId;
         this.adicionalId = adicionalId;
     }

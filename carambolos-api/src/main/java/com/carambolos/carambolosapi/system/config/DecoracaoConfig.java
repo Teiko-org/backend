@@ -21,8 +21,8 @@ import org.springframework.context.annotation.Lazy;
 @Configuration
 public class DecoracaoConfig {
     @Bean
-    public DecoracaoGateway createDecoracaoGateway(DecoracaoRepository repository, DecoracaoMapper mapper) {
-        return new DecoracaoGatewayImpl(repository, mapper);
+    public DecoracaoGateway createDecoracaoGateway(DecoracaoRepository repository, DecoracaoMapper decoracaoMapper, ImagemDecoracaoMapper imagemDecoracaoMapper) {
+        return new DecoracaoGatewayImpl(repository, decoracaoMapper, imagemDecoracaoMapper);
     }
 
     @Bean
@@ -35,13 +35,13 @@ public class DecoracaoConfig {
     }
 
     @Bean
-    public ImagemDecoracaoMapper createImagemMapper(@Lazy DecoracaoMapper decoracaoMapper) {
-        return new ImagemDecoracaoMapper(decoracaoMapper);
+    public ImagemDecoracaoMapper createImagemMapper() {
+        return new ImagemDecoracaoMapper();
     }
 
     @Bean
-    public DecoracaoMapper createDecoracaoMapper(ImagemDecoracaoMapper imagemDecoracaoMapper) {
-        return new DecoracaoMapper(imagemDecoracaoMapper);
+    public DecoracaoMapper createDecoracaoMapper() {
+        return new DecoracaoMapper();
     }
 
     @Bean
@@ -54,9 +54,10 @@ public class DecoracaoConfig {
     @Bean
     public AdicionalDecoracaoGateway createAdicionalDecoracaoGateway(
             AdicionalDecoracaoRepository repository,
-            AdicionalDecoracaoMapper mapper
+            AdicionalDecoracaoMapper mapper,
+            DecoracaoRepository decoracaoRepository
     ) {
-        return new AdicionalDecoracaoGatewayImpl(repository, mapper);
+        return new AdicionalDecoracaoGatewayImpl(repository, mapper, decoracaoRepository);
     }
 
     @Bean

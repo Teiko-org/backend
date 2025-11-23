@@ -7,16 +7,19 @@ import com.carambolos.carambolosapi.infrastructure.gateways.mapper.AdicionalDeco
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.AdicionalDecoracaoEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.AdicionalDecoracaoRepository;
 import com.carambolos.carambolosapi.infrastructure.persistence.projection.AdicionalDecoracaoProjection;
+import com.carambolos.carambolosapi.infrastructure.persistence.jpa.DecoracaoRepository;
 
 import java.util.List;
 
 public class AdicionalDecoracaoGatewayImpl implements AdicionalDecoracaoGateway {
     private final AdicionalDecoracaoRepository repository;
     private final AdicionalDecoracaoMapper mapper;
+    private final DecoracaoRepository decoracaoRepository;
 
-    public AdicionalDecoracaoGatewayImpl(AdicionalDecoracaoRepository repository, AdicionalDecoracaoMapper mapper) {
+    public AdicionalDecoracaoGatewayImpl(AdicionalDecoracaoRepository repository, AdicionalDecoracaoMapper mapper, DecoracaoRepository decoracaoRepository) {
         this.repository = repository;
         this.mapper = mapper;
+        this.decoracaoRepository = decoracaoRepository;
     }
 
     @Override
@@ -28,6 +31,10 @@ public class AdicionalDecoracaoGatewayImpl implements AdicionalDecoracaoGateway 
 
     @Override
     public AdicionalDecoracao salvar(Integer decoracaoId, Integer adicionalId) {
+        // Valida se o decoracaoId existe e está ativo
+        if (!decoracaoRepository.existsByIdAndIsAtivoTrue(decoracaoId)) {
+            throw new IllegalArgumentException("DecoracaoId não existe ou está inativo: " + decoracaoId);
+        }
         AdicionalDecoracaoEntity entity = new AdicionalDecoracaoEntity();
         entity.setDecoracaoId(decoracaoId);
         entity.setAdicionalId(adicionalId);

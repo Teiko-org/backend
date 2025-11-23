@@ -46,7 +46,7 @@ public class DecoracaoUseCase {
         Decoracao decoracaoSalva = decoracaoGateway.save(decoracao);
         salvarAdicionalDecoracao(decoracaoSalva, adicionais);
 
-        return null;
+        return decoracaoSalva;
     }
 
     public List<Decoracao> listarAtivas() {

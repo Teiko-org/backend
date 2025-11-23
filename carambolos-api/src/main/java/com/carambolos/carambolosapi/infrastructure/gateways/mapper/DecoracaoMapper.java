@@ -9,61 +9,52 @@ import com.carambolos.carambolosapi.infrastructure.web.response.DecoracaoRespons
 import java.util.List;
 
 public class DecoracaoMapper {
-    private final ImagemDecoracaoMapper imagemDecoracaoMapper;
 
-    public DecoracaoMapper(ImagemDecoracaoMapper imagemDecoracaoMapper) {
-        this.imagemDecoracaoMapper = imagemDecoracaoMapper;
-    }
-
-    public List<DecoracaoEntity> toEntity(List<Decoracao> decoracoes) {
+    public List<DecoracaoEntity> toEntity(List<Decoracao> decoracoes, ImagemDecoracaoMapper imagemDecoracaoMapper) {
         if (decoracoes == null) {
             return null;
         }
-
         return decoracoes.stream()
-                .map(this::toEntity)
+                .map(decoracao -> toEntity(decoracao, imagemDecoracaoMapper))
                 .toList();
     }
 
-    public DecoracaoEntity toEntity(Decoracao decoracao) {
+    public DecoracaoEntity toEntity(Decoracao decoracao, ImagemDecoracaoMapper imagemDecoracaoMapper) {
         if (decoracao == null) {
             return null;
         }
-
         DecoracaoEntity entity = new DecoracaoEntity();
         entity.setId(decoracao.getId());
-        entity.setImagens(imagemDecoracaoMapper.toEntity(decoracao.getImagens()));
+        // Corrigido: passa DecoracaoEntity para o método shallow
+        entity.setImagens(imagemDecoracaoMapper.toEntityShallow(decoracao.getImagens(), entity));
         entity.setObservacao(decoracao.getObservacao());
         entity.setNome(decoracao.getNome());
         entity.setAtivo(decoracao.getAtivo());
         entity.setCategoria(decoracao.getCategoria());
-
         return entity;
     }
 
-    public List<Decoracao> toDomain(List<DecoracaoEntity> entities) {
+    public List<Decoracao> toDomain(List<DecoracaoEntity> entities, ImagemDecoracaoMapper imagemDecoracaoMapper) {
         if (entities == null) {
             return null;
         }
-
         return entities.stream()
-                .map(this::toDomain)
+                .map(entity -> toDomain(entity, imagemDecoracaoMapper))
                 .toList();
     }
 
-    public Decoracao toDomain(DecoracaoEntity entity) {
+    public Decoracao toDomain(DecoracaoEntity entity, ImagemDecoracaoMapper imagemDecoracaoMapper) {
         if (entity == null) {
             return null;
         }
-
         Decoracao decoracao = new Decoracao();
         decoracao.setId(entity.getId());
-        decoracao.setImagens(imagemDecoracaoMapper.toDomain(entity.getImagens()));
+        // Usa método superficial para evitar recursão
+        decoracao.setImagens(imagemDecoracaoMapper.toDomainShallow(entity.getImagens()));
         decoracao.setObservacao(entity.getObservacao());
         decoracao.setNome(entity.getNome());
         decoracao.setAtivo(entity.getAtivo());
         decoracao.setCategoria(entity.getCategoria());
-
         return decoracao;
     }
 

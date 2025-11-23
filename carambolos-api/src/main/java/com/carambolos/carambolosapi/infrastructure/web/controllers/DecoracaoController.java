@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -54,10 +55,11 @@ public class DecoracaoController {
             @RequestPart("nome") String nome,
             @RequestPart("observacao") String observacao,
             @RequestPart(value = "categoria", required = false) String categoria,
-            @RequestPart(value = "adicionais", required = true) List<Integer> adicionais,
-            @RequestPart("imagens") MultipartFile[] imagens) {
-
-        Decoracao decoracao = decoracaoUseCase.cadastrar(nome, observacao, categoria, adicionais, imagens);
+            @RequestPart(value = "adicionais", required = true) String adicionais,
+            @RequestPart("imagens") MultipartFile[] imagens)
+    {
+        List<Integer> adicionaisIds = Arrays.stream(adicionais.split(",")).map(Integer::parseInt).toList();
+        Decoracao decoracao = decoracaoUseCase.cadastrar(nome, observacao, categoria, adicionaisIds, imagens);
         return ResponseEntity.ok(decoracaoMapper.toResponse(decoracao));
     }
 
