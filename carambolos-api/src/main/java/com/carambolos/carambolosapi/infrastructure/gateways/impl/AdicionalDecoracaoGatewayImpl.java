@@ -31,7 +31,6 @@ public class AdicionalDecoracaoGatewayImpl implements AdicionalDecoracaoGateway 
 
     @Override
     public AdicionalDecoracao salvar(Integer decoracaoId, Integer adicionalId) {
-        // Valida se o decoracaoId existe e está ativo
         if (!decoracaoRepository.existsByIdAndIsAtivoTrue(decoracaoId)) {
             throw new IllegalArgumentException("DecoracaoId não existe ou está inativo: " + decoracaoId);
         }

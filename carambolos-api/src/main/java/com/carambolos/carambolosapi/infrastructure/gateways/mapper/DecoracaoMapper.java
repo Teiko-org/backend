@@ -25,7 +25,6 @@ public class DecoracaoMapper {
         }
         DecoracaoEntity entity = new DecoracaoEntity();
         entity.setId(decoracao.getId());
-        // Corrigido: passa DecoracaoEntity para o método shallow
         entity.setImagens(imagemDecoracaoMapper.toEntityShallow(decoracao.getImagens(), entity));
         entity.setObservacao(decoracao.getObservacao());
         entity.setNome(decoracao.getNome());
@@ -49,7 +48,6 @@ public class DecoracaoMapper {
         }
         Decoracao decoracao = new Decoracao();
         decoracao.setId(entity.getId());
-        // Usa método superficial para evitar recursão
         decoracao.setImagens(imagemDecoracaoMapper.toDomainShallow(entity.getImagens()));
         decoracao.setObservacao(entity.getObservacao());
         decoracao.setNome(entity.getNome());
