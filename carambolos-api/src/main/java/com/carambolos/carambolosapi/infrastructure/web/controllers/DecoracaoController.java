@@ -2,7 +2,7 @@ package com.carambolos.carambolosapi.infrastructure.web.controllers;
 
 import com.carambolos.carambolosapi.application.usecases.AdicionalDecoracaoUseCase;
 import com.carambolos.carambolosapi.application.usecases.DecoracaoUseCase;
-import com.carambolos.carambolosapi.domain.entity.AdicionalDecoracao;
+import com.carambolos.carambolosapi.domain.entity.AdicionalDecoracaoSummary;
 import com.carambolos.carambolosapi.domain.entity.Decoracao;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.AdicionalDecoracaoMapper;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.DecoracaoMapper;
@@ -57,7 +57,7 @@ public class DecoracaoController {
             @RequestPart(value = "adicionais", required = true) List<Integer> adicionais,
             @RequestPart("imagens") MultipartFile[] imagens) {
 
-        Decoracao decoracao = decoracaoUseCase.cadastrar(nome, observacao, categoria, imagens);
+        Decoracao decoracao = decoracaoUseCase.cadastrar(nome, observacao, categoria, adicionais, imagens);
         return ResponseEntity.ok(decoracaoMapper.toResponse(decoracao));
     }
 
@@ -160,8 +160,8 @@ public class DecoracaoController {
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor", content = @Content)
     })
     @GetMapping("/adicionais")
-    public ResponseEntity<List<AdicionalDecoracao>> listarAdicionaisPorDecoracao() {
-        List<AdicionalDecoracao> adicionais = adicionalDecoracaoUseCase.buscarAdicionaisPorDecoracao();
+    public ResponseEntity<List<AdicionalDecoracaoSummary>> listarAdicionaisPorDecoracao() {
+        List<AdicionalDecoracaoSummary> adicionais = adicionalDecoracaoUseCase.buscarAdicionaisPorDecoracao();
 
         if (adicionais.isEmpty()) {
             return ResponseEntity.noContent().build();

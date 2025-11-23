@@ -1,7 +1,7 @@
 package com.carambolos.carambolosapi.application.usecases;
 
 import com.carambolos.carambolosapi.application.gateways.AdicionalDecoracaoGateway;
-import com.carambolos.carambolosapi.domain.entity.AdicionalDecoracao;
+import com.carambolos.carambolosapi.domain.entity.AdicionalDecoracaoSummary;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ public class AdicionalDecoracaoUseCase {
         this.gateway = gateway;
     }
 
-    public List<AdicionalDecoracao> buscarAdicionaisPorDecoracao() {
+    public List<AdicionalDecoracaoSummary> buscarAdicionaisPorDecoracao() {
         return gateway.buscarTodosAdicionaisPorDecoracao();
     }
 }

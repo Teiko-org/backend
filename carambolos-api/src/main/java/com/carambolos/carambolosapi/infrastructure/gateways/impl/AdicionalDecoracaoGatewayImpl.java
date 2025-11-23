@@ -1,8 +1,8 @@
 package com.carambolos.carambolosapi.infrastructure.gateways.impl;
 
-import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.application.gateways.AdicionalDecoracaoGateway;
 import com.carambolos.carambolosapi.domain.entity.AdicionalDecoracao;
+import com.carambolos.carambolosapi.domain.entity.AdicionalDecoracaoSummary;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.AdicionalDecoracaoMapper;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.AdicionalDecoracaoEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.AdicionalDecoracaoRepository;
@@ -20,7 +20,7 @@ public class AdicionalDecoracaoGatewayImpl implements AdicionalDecoracaoGateway 
     }
 
     @Override
-    public List<AdicionalDecoracao> buscarTodosAdicionaisPorDecoracao() {
+    public List<AdicionalDecoracaoSummary> buscarTodosAdicionaisPorDecoracao() {
         List<AdicionalDecoracaoProjection> projections = repository.findAllAdicionaisByDecoracao();
 
         return mapper.toDomain(projections);
@@ -32,8 +32,8 @@ public class AdicionalDecoracaoGatewayImpl implements AdicionalDecoracaoGateway 
         entity.setDecoracaoId(decoracaoId);
         entity.setAdicionalId(adicionalId);
 
-        repository.save(new AdicionalDecoracaoEntity());
-        // TODO - retornar entidade salva e terminar fluxo de save de decorações
-        return null;
+        AdicionalDecoracaoEntity entitySalva = repository.save(entity);
+
+        return mapper.toDomain(entitySalva);
     }
 }

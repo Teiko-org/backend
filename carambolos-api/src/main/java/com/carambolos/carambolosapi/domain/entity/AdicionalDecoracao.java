@@ -1,19 +1,25 @@
 package com.carambolos.carambolosapi.domain.entity;
 
-import java.util.List;
-
 public class AdicionalDecoracao {
+    private Integer id;
     private Integer decoracaoId;
-    private String nomeDecoracao;
-    private List<String> adicionaisPossiveis;
+    private Integer adicionalId;
 
     public AdicionalDecoracao() {
     }
 
-    public AdicionalDecoracao(Integer decoracaoId, String nomeDecoracao, List<String> adicionaisPossiveis) {
+    public AdicionalDecoracao(Integer id, Integer decoracaoId, Integer adicionalId) {
+        this.id = id;
         this.decoracaoId = decoracaoId;
-        this.nomeDecoracao = nomeDecoracao;
-        this.adicionaisPossiveis = adicionaisPossiveis;
+        this.adicionalId = adicionalId;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public Integer getDecoracaoId() {
@@ -24,19 +30,11 @@ public class AdicionalDecoracao {
         this.decoracaoId = decoracaoId;
     }
 
-    public String getNomeDecoracao() {
-        return nomeDecoracao;
+    public Integer getAdicionalId() {
+        return adicionalId;
     }
 
-    public void setNomeDecoracao(String nomeDecoracao) {
-        this.nomeDecoracao = nomeDecoracao;
-    }
-
-    public List<String> getAdicionaisPossiveis() {
-        return adicionaisPossiveis;
-    }
-
-    public void setAdicionaisPossiveis(List<String> adicionaisPossiveis) {
-        this.adicionaisPossiveis = adicionaisPossiveis;
+    public void setAdicionalId(Integer adicionalId) {
+        this.adicionalId = adicionalId;
     }
 }

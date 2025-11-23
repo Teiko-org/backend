@@ -11,17 +11,19 @@ public class Decoracao {
     private String observacao;
     private String nome;
     private Boolean isAtivo = true;
+    private List<Integer> adicionaisIds = new ArrayList<>();
     private String categoria;
 
     public Decoracao() {
     }
 
-    public Decoracao(Integer id, List<ImagemDecoracao> imagens, String observacao, String nome, Boolean isAtivo, String categoria) {
+    public Decoracao(Integer id, List<ImagemDecoracao> imagens, String observacao, String nome, Boolean isAtivo, List<Integer> adicionaisIds, String categoria) {
         this.id = id;
         this.imagens = imagens;
         this.observacao = observacao;
         this.nome = nome;
         this.isAtivo = isAtivo;
+        this.adicionaisIds = adicionaisIds;
         this.categoria = categoria;
     }
 
@@ -71,6 +73,14 @@ public class Decoracao {
 
     public void setIsAtivo(Boolean isAtivo) {
         this.isAtivo = isAtivo;
+    }
+
+    public List<Integer> getAdicionaisIds() {
+        return adicionaisIds;
+    }
+
+    public void setAdicionaisIds(List<Integer> adicionaisIds) {
+        this.adicionaisIds = adicionaisIds;
     }
 
     public String getCategoria() {

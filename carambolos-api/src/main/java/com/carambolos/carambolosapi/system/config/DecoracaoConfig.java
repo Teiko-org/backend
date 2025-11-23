@@ -28,9 +28,10 @@ public class DecoracaoConfig {
     @Bean
     public DecoracaoUseCase createDecoracaoUseCase(
             DecoracaoGateway decoracaoGateway,
+            AdicionalDecoracaoGateway adicionalDecoracaoGateway,
             StorageGateway storageGateway
     ) {
-        return new DecoracaoUseCase(decoracaoGateway, storageGateway);
+        return new DecoracaoUseCase(decoracaoGateway, adicionalDecoracaoGateway, storageGateway);
     }
 
     @Bean

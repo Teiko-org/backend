@@ -4,6 +4,7 @@ import com.carambolos.carambolosapi.application.gateways.AdicionalDecoracaoGatew
 import com.carambolos.carambolosapi.application.gateways.DecoracaoGateway;
 import com.carambolos.carambolosapi.application.gateways.StorageGateway;
 import com.carambolos.carambolosapi.domain.entity.AdicionalDecoracao;
+import com.carambolos.carambolosapi.domain.entity.AdicionalDecoracaoSummary;
 import com.carambolos.carambolosapi.domain.entity.Decoracao;
 import com.carambolos.carambolosapi.domain.entity.ImagemDecoracao;
 import com.carambolos.carambolosapi.infrastructure.web.request.DecoracaoRequestDTO;
@@ -23,7 +24,7 @@ public class DecoracaoUseCase {
         this.storageGateway = storageGateway;
     }
 
-    public Decoracao cadastrar(String nome, String observacao, String categoria, MultipartFile[] arquivos) {
+    public Decoracao cadastrar(String nome, String observacao, String categoria, List<Integer> adicionais, MultipartFile[] arquivos) {
         Decoracao decoracao = new Decoracao();
         decoracao.setNome(nome);
         decoracao.setObservacao(observacao);
@@ -43,7 +44,9 @@ public class DecoracaoUseCase {
         decoracao.setImagens(imagens);
 
         Decoracao decoracaoSalva = decoracaoGateway.save(decoracao);
+        salvarAdicionalDecoracao(decoracaoSalva, adicionais);
 
+        return null;
     }
 
     public List<Decoracao> listarAtivas() {
@@ -82,7 +85,6 @@ public class DecoracaoUseCase {
     private List<AdicionalDecoracao> salvarAdicionalDecoracao(Decoracao decoracao, List<Integer> adicionaisIds) {
         return adicionaisIds.stream().map(adicionalId -> {
             return adicionalDecoracaoGateway.salvar(decoracao.getId(), adicionalId);
-        }).toList(
-        );
+        }).toList();
     }
 }
