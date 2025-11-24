@@ -5,7 +5,7 @@ import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaE
 import com.carambolos.carambolosapi.application.gateways.RecheioExclusivoGateway;
 import com.carambolos.carambolosapi.application.gateways.RecheioUnitarioGateway;
 import com.carambolos.carambolosapi.domain.entity.RecheioExclusivo;
-import com.carambolos.carambolosapi.domain.projection.RecheioExclusivoProjection;
+import com.carambolos.carambolosapi.infrastructure.persistence.projection.RecheioExclusivoProjection;
 
 import java.util.List;
 

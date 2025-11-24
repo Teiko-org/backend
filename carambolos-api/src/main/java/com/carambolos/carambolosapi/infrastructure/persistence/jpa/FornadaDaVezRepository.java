@@ -1,7 +1,7 @@
 package com.carambolos.carambolosapi.infrastructure.persistence.jpa;
 
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
-import com.carambolos.carambolosapi.domain.projection.ProdutoFornadaDaVezProjection;
+import com.carambolos.carambolosapi.infrastructure.persistence.projection.ProdutoFornadaDaVezProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

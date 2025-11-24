@@ -1,7 +1,7 @@
 package com.carambolos.carambolosapi.infrastructure.persistence.jpa;
 
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.RecheioPedidoEntity;
-import com.carambolos.carambolosapi.domain.projection.RecheioPedidoProjection;
+import com.carambolos.carambolosapi.infrastructure.persistence.projection.RecheioPedidoProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

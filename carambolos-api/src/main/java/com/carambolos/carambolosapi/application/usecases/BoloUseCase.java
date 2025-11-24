@@ -5,11 +5,10 @@ import com.carambolos.carambolosapi.application.gateways.CoberturaGateway;
 import com.carambolos.carambolosapi.application.gateways.MassaGateway;
 import com.carambolos.carambolosapi.application.gateways.RecheioPedidoGateway;
 import com.carambolos.carambolosapi.domain.entity.Bolo;
-import com.carambolos.carambolosapi.domain.projection.DetalheBoloProjection;
+import com.carambolos.carambolosapi.infrastructure.persistence.projection.DetalheBoloProjection;
 import com.carambolos.carambolosapi.application.exception.EntidadeJaExisteException;
 import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.*;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 

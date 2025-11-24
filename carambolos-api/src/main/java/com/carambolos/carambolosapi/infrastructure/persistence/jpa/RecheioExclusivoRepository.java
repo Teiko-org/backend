@@ -1,6 +1,6 @@
 package com.carambolos.carambolosapi.infrastructure.persistence.jpa;
 
-import com.carambolos.carambolosapi.domain.projection.RecheioExclusivoProjection;
+import com.carambolos.carambolosapi.infrastructure.persistence.projection.RecheioExclusivoProjection;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.RecheioExclusivoEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

@@ -2,9 +2,7 @@ package com.carambolos.carambolosapi.application.usecases;
 
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.*;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoFornada;
-import com.carambolos.carambolosapi.infrastructure.persistence.entity.ProdutoFornada;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.EnderecoMapper;
-import com.carambolos.carambolosapi.infrastructure.persistence.entity.ProdutoFornada;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.*;
 import com.carambolos.carambolosapi.infrastructure.web.response.DetalhePedidoBoloDTO;
 import com.carambolos.carambolosapi.infrastructure.web.response.DetalhePedidoFornadaDTO;
@@ -233,13 +231,13 @@ public class ResumoPedidoService {
             String imagemUrl = "";
             String[] imagensDecoracao = new String[]{};
             try {
-                List<ImagemDecoracao> imagens = boloRepository.findAllImagensByDecoracao(boloEntity.getDecoracao());
+                List<ImagemDecoracaoEntity> imagens = boloRepository.findAllImagensByDecoracao(boloEntity.getDecoracao());
                 if (imagens != null && !imagens.isEmpty()) {
                     // Usar a primeira imagem como imagem principal
                     imagemUrl = imagens.get(0).getUrl();
                     // Converter todas as imagens para array de strings
                     imagensDecoracao = imagens.stream()
-                            .map(ImagemDecoracao::getUrl)
+                            .map(ImagemDecoracaoEntity::getUrl)
                             .filter(url -> url != null && !url.trim().isEmpty())
                             .toArray(String[]::new);
                 }

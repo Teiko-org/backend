@@ -5,7 +5,7 @@ import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaE
 import com.carambolos.carambolosapi.application.gateways.FornadaDaVezGateway;
 import com.carambolos.carambolosapi.application.gateways.FornadaGateway;
 import com.carambolos.carambolosapi.application.gateways.ProdutoFornadaGateway;
-import com.carambolos.carambolosapi.domain.projection.ProdutoFornadaDaVezProjection;
+import com.carambolos.carambolosapi.infrastructure.persistence.projection.ProdutoFornadaDaVezProjection;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
 import com.carambolos.carambolosapi.infrastructure.web.request.FornadaDaVezRequestDTO;
 import com.carambolos.carambolosapi.infrastructure.web.request.FornadaDaVezUpdateRequestDTO;

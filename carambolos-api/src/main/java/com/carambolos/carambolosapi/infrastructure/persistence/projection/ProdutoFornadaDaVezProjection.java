@@ -1,4 +1,4 @@
-package com.carambolos.carambolosapi.domain.projection;
+package com.carambolos.carambolosapi.infrastructure.persistence.projection;
 
 import java.sql.Date;
 import java.time.LocalDate;

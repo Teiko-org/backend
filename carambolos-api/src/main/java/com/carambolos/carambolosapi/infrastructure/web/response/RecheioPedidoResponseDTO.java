@@ -1,9 +1,6 @@
 package com.carambolos.carambolosapi.infrastructure.web.response;
 
-import com.carambolos.carambolosapi.domain.projection.RecheioPedidoProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
-
-import java.util.List;
 
 @Schema(description = "DTO de resposta para dados do Recheio Pedido")
 public record RecheioPedidoResponseDTO(

@@ -1,16 +1,16 @@
 package com.carambolos.carambolosapi.infrastructure.persistence.jpa;
 
-import com.carambolos.carambolosapi.domain.entity.Decoracao;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.DecoracaoEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface DecoracaoRepository extends JpaRepository<Decoracao, Integer> {
-    List<Decoracao> findByIsAtivoTrue();
+public interface DecoracaoRepository extends JpaRepository<DecoracaoEntity, Integer> {
+    List<DecoracaoEntity> findByIsAtivoTrue();
 
     boolean existsByIdAndIsAtivoTrue(Integer id);
 
-    List<Decoracao> findByIsAtivoTrueAndCategoriaIsNotNull();
+    List<DecoracaoEntity> findByIsAtivoTrueAndCategoriaIsNotNull();
 }

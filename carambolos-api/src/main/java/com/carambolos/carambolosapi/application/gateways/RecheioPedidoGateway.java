@@ -1,7 +1,7 @@
 package com.carambolos.carambolosapi.application.gateways;
 
 import com.carambolos.carambolosapi.domain.entity.RecheioPedido;
-import com.carambolos.carambolosapi.domain.projection.RecheioPedidoProjection;
+import com.carambolos.carambolosapi.infrastructure.persistence.projection.RecheioPedidoProjection;
 
 import java.util.List;
 
