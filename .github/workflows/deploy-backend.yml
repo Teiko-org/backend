@@ -20,7 +20,8 @@ jobs:
         uses: appleboy/ssh-action@v1.2.0
         with:
           # Conectamos nas instâncias privadas via bastion (proxy SSH).
-          host: ${{ secrets.BACKEND_PRIVATE_HOSTS }}
+          # Usamos o secret já existente BACKEND_EC2_HOSTS com os IPs privados.
+          host: ${{ secrets.BACKEND_EC2_HOSTS }}
           username: ${{ secrets.BACKEND_EC2_USER }}
           key: ${{ secrets.BACKEND_EC2_SSH_KEY }}
           proxy_host: ${{ secrets.BASTION_HOSTS }}
