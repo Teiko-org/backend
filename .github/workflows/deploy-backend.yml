@@ -19,9 +19,13 @@ jobs:
       - name: Deploy backend em EC2 privadas
         uses: appleboy/ssh-action@v1.2.0
         with:
-          host: ${{ secrets.BACKEND_EC2_HOSTS }}
+          # Conectamos nas instâncias privadas via bastion (proxy SSH).
+          host: ${{ secrets.BACKEND_PRIVATE_HOSTS }}
           username: ${{ secrets.BACKEND_EC2_USER }}
           key: ${{ secrets.BACKEND_EC2_SSH_KEY }}
+          proxy_host: ${{ secrets.BASTION_HOSTS }}
+          proxy_username: ${{ secrets.BASTION_USER }}
+          proxy_key: ${{ secrets.BASTION_SSH_KEY }}
           script: |
             set -euo pipefail
 
