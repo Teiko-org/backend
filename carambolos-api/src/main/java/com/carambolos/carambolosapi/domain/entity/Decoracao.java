@@ -1,36 +1,29 @@
 package com.carambolos.carambolosapi.domain.entity;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.*;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.ImagemDecoracaoEntity;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Table(name = "decoracao")
-@Schema(description = "Entidade que representa a decoração de um bolo")
 public class Decoracao {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Schema(description = "Identificador único da decoração", example = "1")
     private Integer id;
-
-    @OneToMany(mappedBy = "decoracao", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ImagemDecoracao> imagens = new ArrayList<>();
-
-    @Schema(description = "Observação adicional sobre a decoração", example = "Tema do Homem-Aranha com cores azul e vermelha")
     private String observacao;
-
-    @Schema(description = "Nome do tipo da decoração", example = "Bolo de natal")
     private String nome;
-
-    @Column(name = "is_ativo")
-    @Schema(description = "Indica se a decoração está ativa", example = "true")
     private Boolean isAtivo = true;
-
-    @Schema(description = "Categoria para exibição (pré-decoração)", example = "Vintage")
     private String categoria;
+
+    public Decoracao() {
+    }
+
+    public Decoracao(Integer id, List<ImagemDecoracao> imagens, String observacao, String nome, Boolean isAtivo, String categoria) {
+        this.id = id;
+        this.imagens = imagens;
+        this.observacao = observacao;
+        this.nome = nome;
+        this.isAtivo = isAtivo;
+        this.categoria = categoria;
+    }
 
     public Integer getId() {
         return id;

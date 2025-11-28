@@ -3,7 +3,7 @@ package com.carambolos.carambolosapi.infrastructure.gateways.impl;
 import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.application.gateways.BoloGateway;
 import com.carambolos.carambolosapi.domain.entity.Bolo;
-import com.carambolos.carambolosapi.domain.projection.DetalheBoloProjection;
+import com.carambolos.carambolosapi.infrastructure.persistence.projection.DetalheBoloProjection;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.BoloMapper;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.BoloEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.BoloRepository;

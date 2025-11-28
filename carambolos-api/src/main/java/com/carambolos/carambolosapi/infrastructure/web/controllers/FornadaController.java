@@ -9,7 +9,7 @@ import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaV
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoFornada;
  
 import com.carambolos.carambolosapi.domain.entity.ProdutoFornada;
-import com.carambolos.carambolosapi.domain.projection.ProdutoFornadaDaVezProjection;
+import com.carambolos.carambolosapi.infrastructure.persistence.projection.ProdutoFornadaDaVezProjection;
 import com.carambolos.carambolosapi.application.usecases.FornadaDaVezUseCases;
 import com.carambolos.carambolosapi.application.usecases.FornadasUseCases;
 import com.carambolos.carambolosapi.application.usecases.PedidoFornadaUseCases;

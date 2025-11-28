@@ -1,7 +1,7 @@
 package com.carambolos.carambolosapi.infrastructure.web.response;
 
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.Fornada;
-import com.carambolos.carambolosapi.domain.projection.ProdutoFornadaDaVezProjection;
+import com.carambolos.carambolosapi.infrastructure.persistence.projection.ProdutoFornadaDaVezProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;

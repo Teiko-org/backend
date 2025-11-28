@@ -1,7 +1,7 @@
 package com.carambolos.carambolosapi.application.gateways;
 
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
-import com.carambolos.carambolosapi.domain.projection.ProdutoFornadaDaVezProjection;
+import com.carambolos.carambolosapi.infrastructure.persistence.projection.ProdutoFornadaDaVezProjection;
 
 import java.time.LocalDate;
 import java.util.List;

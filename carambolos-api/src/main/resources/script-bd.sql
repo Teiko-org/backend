@@ -25,6 +25,23 @@ CREATE TABLE IF NOT EXISTS teiko.usuario (
 );
 
 -- -----------------------------------------------------
+-- Table teiko.carrinho
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS teiko.carrinho (
+  id INT NOT NULL AUTO_INCREMENT,
+  usuario_id INT NOT NULL,
+  itens TEXT NULL,
+  data_ultima_atualizacao DATETIME NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_carrinho_usuario (usuario_id),
+  INDEX fk_carrinho_usuario_idx (usuario_id ASC) VISIBLE,
+  CONSTRAINT fk_carrinho_usuario
+    FOREIGN KEY (usuario_id)
+    REFERENCES teiko.usuario (id)
+    ON DELETE CASCADE
+);
+
+-- -----------------------------------------------------
 -- Table teiko.endereco
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS teiko.endereco (
@@ -186,6 +203,28 @@ CREATE TABLE IF NOT EXISTS teiko.imagem_decoracao (
     INDEX decoracao_idx (decoracao_id ASC),
     CONSTRAINT fk_imagem_decoracao_decoracao FOREIGN KEY (decoracao_id)
     REFERENCES teiko.decoracao (id)
+);
+
+CREATE TABLE IF NOT EXISTS teiko.adicional (
+	id INT NOT NULL AUTO_INCREMENT,
+    descricao VARCHAR(90),
+    is_ativo TINYINT NULL,
+	PRIMARY KEY (id),
+    INDEX adicional_idx (id ASC)
+);
+
+CREATE TABLE IF NOT EXISTS teiko.adicional_decoracao (
+	id INT NOT NULL AUTO_INCREMENT,
+	decoracao_id INT NOT NULL,
+    adicional_id INT NOT NULL,
+
+    PRIMARY KEY (id),
+    CONSTRAINT fk_decoracao_id_ad
+		FOREIGN KEY (decoracao_id)
+        REFERENCES teiko.decoracao (id),
+	CONSTRAINT fk_adicional_id_ad
+		FOREIGN KEY (adicional_id)
+        REFERENCES teiko.adicional(id)
 );
 
 -- -----------------------------------------------------
@@ -411,12 +450,10 @@ INSERT INTO teiko.cobertura (cor, descricao, is_ativo) VALUES
 
 -- Decorações
 INSERT INTO teiko.decoracao (observacao, nome, categoria, is_ativo) VALUES
-('Decoração com flores naturais', 'Flores Silvestres', 'Natureza', 1),
-('Decoração com tema de festa junina', 'Festa Junina', 'Temática', 1),
-('Decoração com tema de aniversário infantil', 'Aniversário Infantil', 'Infantil', 1),
-('Decoração elegante para casamento', 'Casamento Elegante', 'Casamento', 1),
-('Decoração com tema natalino', 'Natal', 'Temática', 1),
-('Decoração minimalista', 'Minimalista', 'Simples', 1);
+('Decoração com tema de festa junina', 'Flores Silvestres', 'Vintage', 1),
+('Decoração com flores naturais', 'Festa Junina', 'Floral', 1),
+('Decoração com tema de aniversário infantil', 'Aniversário Infantil', 'My Carambolo', 1),
+('Decoração elegante para casamento', 'Casamento Elegante', 'Shag Cake', 1);
 
 -- Imagens Decoração
 INSERT INTO teiko.imagem_decoracao (decoracao_id, url) VALUES
@@ -431,14 +468,7 @@ INSERT INTO teiko.imagem_decoracao (decoracao_id, url) VALUES
 (3, 'https://picsum.photos/seed/infantil2/320/320'),
 -- Casamento (mantém uma imagem que já estava carregando)
 (4, 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=320&h=320&fit=crop&crop=center'),
-(4, 'https://picsum.photos/seed/casamento1/320/320'),
--- Natal
-(5, 'https://picsum.photos/seed/natal1/320/320'),
-(5, 'https://picsum.photos/seed/natal2/320/320'),
--- Minimalista / Simples
-(6, 'https://picsum.photos/seed/minimal1/320/320'),
-(6, 'https://picsum.photos/seed/minimal2/320/320');
-
+(4, 'https://picsum.photos/seed/casamento1/320/320');
 -- Recheios Unitários
 INSERT INTO teiko.recheio_unitario (sabor, descricao, valor, is_ativo) VALUES
 ('creamcheese_frosting', 'Creamcheese Frosting', 10.00, 1),
@@ -484,8 +514,8 @@ INSERT INTO teiko.bolo (recheio_pedido_id, massa_id, cobertura_id, decoracao_id,
 (2, 2, 2, 2, 'CORACAO', 'TAMANHO_7', 'Casamento', 1),
 (3, 3, 3, 3, 'CIRCULO', 'TAMANHO_12', 'Aniversário', 1),
 (4, 1, 2, 4, 'CIRCULO', 'TAMANHO_15', 'Casamento', 1),
-(5, 2, 3, 5, 'CORACAO', 'TAMANHO_17', 'Natal', 1),
-(6, 3, 1, 6, 'CIRCULO', 'TAMANHO_5', 'Infantil', 1),
+(5, 2, 3, 1, 'CORACAO', 'TAMANHO_17', 'Natal', 1),
+(6, 3, 1, 2, 'CIRCULO', 'TAMANHO_5', 'Infantil', 1),
 (7, 1, 3, 1, 'CIRCULO', 'TAMANHO_7', 'Carambolo', 1),
 (8, 2, 1, 2, 'CORACAO', 'TAMANHO_12', 'Festa Junina', 1);
 
@@ -752,6 +782,50 @@ SELECT COUNT(*) as total_imagens_produtos FROM teiko.imagem_produto_fornada;
 SELECT COUNT(*) as total_decoracoes FROM teiko.decoracao;
 SELECT COUNT(*) as total_imagens_decoracoes FROM teiko.imagem_decoracao;
 SELECT COUNT(*) as total_bolos FROM teiko.bolo;
+
+
+-- insere adicionais para decoração
+
+DESC teiko.adicional;
+INSERT INTO teiko.adicional (descricao, is_ativo) VALUES
+('Disco ball', 1),
+('Desenho', 1),
+('Pérolas na finalização', 1),
+('Metalizado (Prata ou Dourado)', 1),
+('Glitter', 1),
+('Cereja (Com ou sem glitter)', 1),
+('Laços', 1),
+('Escrita', 1),
+('Borda (Topo e Base)', 1),
+('Lacinhos', 1);
+
+select * from adicional;
+
+DESC teiko.adicional_decoracao;
+INSERT INTO teiko.adicional_decoracao (decoracao_id, adicional_id) VAlUES
+-- VINTAGE
+(1, 1),
+(1, 2),
+(1, 3),
+(1, 4),
+(1, 5),
+(1, 6),
+(1, 7),
+(1, 8),
+
+-- FLORAL
+(2, 1),
+(2, 3),
+(2, 5),
+(2, 8),
+(2, 9),
+
+-- MY CARAMBOLO
+(3, 9),
+(3, 10),
+
+-- SHAG CAKE
+(4, 5);
 
 -- =====================================================
 -- SCRIPT FINALIZADO COM SUCESSO

@@ -13,6 +13,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -48,14 +52,23 @@ class ResumoPedidoServiceTest {
 
     @Test
     void listarResumosPedidos_deveRetornarSomenteAtivos() {
-        when(resumoPedidoRepository.findAllByIsAtivoTrue()).thenReturn(List.of(new ResumoPedido()))
-                .thenReturn(List.of());
+        Pageable pageable = PageRequest.of(0, 10);
 
-        var list1 = service.listarResumosPedidos();
-        assertEquals(1, list1.size());
+        List<ResumoPedido> listaPrimeiraPagina = List.of(new ResumoPedido());
+        Page<ResumoPedido> pagina1 = new PageImpl<>(listaPrimeiraPagina, pageable, listaPrimeiraPagina.size());
+        Page<ResumoPedido> paginaVazia = new PageImpl<>(List.of(), pageable, 0);
 
-        var list2 = service.listarResumosPedidos();
-        assertEquals(0, list2.size());
+        when(resumoPedidoRepository.findAllByIsAtivoTrue(pageable))
+                .thenReturn(pagina1)
+                .thenReturn(paginaVazia);
+
+        var page1 = service.listarResumosPedidos(pageable);
+        assertEquals(1, page1.getContent().size());
+
+        var page2 = service.listarResumosPedidos(pageable);
+        assertEquals(0, page2.getContent().size());
+
+        verify(resumoPedidoRepository, times(2)).findAllByIsAtivoTrue(pageable);
     }
 
     @Test
