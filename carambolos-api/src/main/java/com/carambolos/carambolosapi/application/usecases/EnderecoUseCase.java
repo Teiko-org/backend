@@ -5,6 +5,7 @@ import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaE
 import com.carambolos.carambolosapi.application.gateways.EnderecoGateway;
 import com.carambolos.carambolosapi.domain.entity.Endereco;
 import com.carambolos.carambolosapi.domain.entity.Usuario;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -23,10 +24,12 @@ public class EnderecoUseCase {
         return enderecoGateway.listar(pageable);
     }
 
+    @Cacheable(value = "enderecosPorUsuario", key = "#usuarioId")
     public List<Endereco> listarPorUsuario(Integer usuarioId) {
         return enderecoGateway.listarPorUsuario(usuarioId);
     }
 
+    @Cacheable(value = "enderecos", key = "#id")
     public Endereco buscarPorId(Integer id) {
         Endereco endereco = enderecoGateway.buscarPorId(id);
         if (endereco == null) {
