@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -22,6 +23,7 @@ import io.github.cdimascio.dotenv.Dotenv;
     }
 )
 @SpringBootApplication
+@EnableCaching
 public class CarambolosApiApplication {
 
 	public static void main(String[] args) {

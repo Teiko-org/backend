@@ -24,7 +24,7 @@ public class EnderecoUseCase {
         return enderecoGateway.listar(pageable);
     }
 
-    @Cacheable(value = "enderecosPorUsuario", key = "#usuarioId")
+    @Cacheable(value = "enderecos-usuario", key = "#usuarioId")
     public List<Endereco> listarPorUsuario(Integer usuarioId) {
         return enderecoGateway.listarPorUsuario(usuarioId);
     }
