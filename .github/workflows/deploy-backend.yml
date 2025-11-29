@@ -49,6 +49,7 @@ jobs:
             SHARED_JWT="${SHARED_JWT:-${JWT_SECRET:-${{ secrets.SHARED_JWT }}}}" \
             AZURE_STORAGE_CONNECTION_STRING="${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" \
             AZURE_STORAGE_CONTAINER_NAME="${{ secrets.AZURE_STORAGE_CONTAINER_NAME }}" \
+            BACKEND_IMAGE="${{ secrets.BACKEND_IMAGE }}" \
             DB_HOST="${{ secrets.DB_HOST }}" \
             DB_NAME="${{ secrets.DB_NAME }}" \
             DB_USERNAME="${{ secrets.DB_USERNAME }}" \
