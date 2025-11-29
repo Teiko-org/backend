@@ -24,6 +24,12 @@ public class JwtBlacklistFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
         String path = request.getRequestURI();
+
+        // Endpoints públicos que não devem falhar por token em blacklist
+        if (path.startsWith("/decoracoes")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         if (("/usuarios/login".equals(path) && "POST".equalsIgnoreCase(request.getMethod())) ||
                 ("/usuarios".equals(path) && "POST".equalsIgnoreCase(request.getMethod()))) {
             filterChain.doFilter(request, response);

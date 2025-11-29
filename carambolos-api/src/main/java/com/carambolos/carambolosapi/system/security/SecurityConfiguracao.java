@@ -76,6 +76,8 @@ public class SecurityConfiguracao {
             new AntPathRequestMatcher("/resumo-pedido/**", "GET"),
             new AntPathRequestMatcher("/decoracoes/adicionais", "GET"),
             new AntPathRequestMatcher("/adicionais", "GET"),
+            // Permitir criação de decorações (imagens de referência) sem login
+            new AntPathRequestMatcher("/decoracoes", "POST"),
 
     };
 
