@@ -83,8 +83,12 @@ public class DecoracaoUseCase {
     }
 
     private List<AdicionalDecoracao> salvarAdicionalDecoracao(Decoracao decoracao, List<Integer> adicionaisIds) {
-        return adicionaisIds.stream().map(adicionalId -> {
-            return adicionalDecoracaoGateway.salvar(decoracao.getId(), adicionalId);
-        }).toList();
+        if (adicionaisIds == null || adicionaisIds.isEmpty()) {
+            return List.of();
+        }
+
+        return adicionaisIds.stream()
+                .map(adicionalId -> adicionalDecoracaoGateway.salvar(decoracao.getId(), adicionalId))
+                .toList();
     }
 }
