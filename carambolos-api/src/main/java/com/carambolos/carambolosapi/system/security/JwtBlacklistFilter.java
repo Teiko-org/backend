@@ -26,7 +26,7 @@ public class JwtBlacklistFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
 
         // Endpoints públicos que não devem falhar por token em blacklist
-        if (path.startsWith("/decoracoes")) {
+        if (path.startsWith("/decoracoes") || path.startsWith("/resumo-pedido")) {
             filterChain.doFilter(request, response);
             return;
         }
