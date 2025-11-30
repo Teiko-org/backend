@@ -6,6 +6,7 @@ import com.carambolos.carambolosapi.infrastructure.gateways.mapper.EnderecoMappe
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.EnderecoEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.EnderecoRepository;
 import com.carambolos.carambolosapi.system.security.EnderecoHasher;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -26,12 +27,14 @@ public class EnderecoGatewayImpl implements EnderecoGateway {
         return enderecoMapper.toDomain(enderecos);
     }
 
+    @Cacheable(value = "enderecos-usuario", key = "#usuarioId")
     @Override
     public List<Endereco> listarPorUsuario(Integer usuarioId) {
         List<EnderecoEntity> enderecos = enderecoRepository.findByUsuarioAndIsAtivoTrue(usuarioId);
         return enderecoMapper.toDomain(enderecos);
     }
 
+    @Cacheable(value = "enderecos", key = "#id")
     @Override
     public Endereco buscarPorId(Integer id) {
         EnderecoEntity enderecoExistente = enderecoRepository.findByIdAndIsAtivoTrue(id);
