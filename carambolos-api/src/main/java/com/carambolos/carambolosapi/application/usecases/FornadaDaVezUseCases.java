@@ -80,5 +80,3 @@ public class FornadaDaVezUseCases {
         return fornadaDaVezGateway.findResumoKpiByFornadaId(fornadaId);
     }
 }
-
-
