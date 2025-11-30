@@ -55,10 +55,17 @@ public class DecoracaoController {
             @RequestPart("nome") String nome,
             @RequestPart("observacao") String observacao,
             @RequestPart(value = "categoria", required = false) String categoria,
-            @RequestPart(value = "adicionais", required = true) String adicionais,
+            // Para usos públicos (referência de cliente), adicionais podem ser omitidos
+            @RequestPart(value = "adicionais", required = false) String adicionais,
             @RequestPart("imagens") MultipartFile[] imagens)
     {
-        List<Integer> adicionaisIds = Arrays.stream(adicionais.split(",")).map(Integer::parseInt).toList();
+        List<Integer> adicionaisIds = (adicionais == null || adicionais.isBlank())
+                ? List.of()
+                : Arrays.stream(adicionais.split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .map(Integer::parseInt)
+                    .toList();
         Decoracao decoracao = decoracaoUseCase.cadastrar(nome, observacao, categoria, adicionaisIds, imagens);
         return ResponseEntity.ok(decoracaoMapper.toResponse(decoracao));
     }
