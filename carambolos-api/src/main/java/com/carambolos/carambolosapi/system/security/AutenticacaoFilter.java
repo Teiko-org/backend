@@ -37,7 +37,10 @@ public class AutenticacaoFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
 
         // Endpoints públicos que não devem falhar por token inválido/ausente
-        if (path.startsWith("/decoracoes") || path.startsWith("/resumo-pedido")) {
+        // - /decoracoes: qualquer método (upload referência + listagens públicas)
+        // - /resumo-pedido: apenas POST (criação de resumo anônimo para WhatsApp)
+        if (path.startsWith("/decoracoes") ||
+                (path.startsWith("/resumo-pedido") && "POST".equalsIgnoreCase(request.getMethod()))) {
             filterChain.doFilter(request, response);
             return;
         }
