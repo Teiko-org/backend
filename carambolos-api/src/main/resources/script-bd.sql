@@ -25,6 +25,17 @@ CREATE TABLE IF NOT EXISTS teiko.usuario (
 );
 
 -- -----------------------------------------------------
+-- Table teiko.jwt_token_blacklist
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS teiko.jwt_token_blacklist (
+  id INT NOT NULL AUTO_INCREMENT,
+  token VARCHAR(500) NOT NULL,
+  blacklisted_at DATETIME NOT NULL,
+  PRIMARY KEY (id),
+  INDEX token_idx (token ASC) VISIBLE
+);
+
+-- -----------------------------------------------------
 -- Table teiko.carrinho
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS teiko.carrinho (
