@@ -34,7 +34,7 @@ public interface BoloRepository extends JpaRepository<BoloEntity, Integer> {
             JOIN massa m ON b.massa_id = m.id
             JOIN recheio_pedido rp ON b.recheio_pedido_id = rp.id
             JOIN cobertura c on b.cobertura_id = c.id
-            LEFT JOIN decoracaoEntity d ON b.decoracao_id = d.id
+            LEFT JOIN decoracao d ON b.decoracao_id = d.id
             
             -- Caso o recheio seja dois unitários
             LEFT JOIN recheio_unitario ru1 ON rp.recheio_unitario_id1 = ru1.id

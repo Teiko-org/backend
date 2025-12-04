@@ -28,7 +28,6 @@ import java.util.List;
 @Tag(name = "Decoração Controller", description = "Gerencia decorações de bolos")
 @SecurityRequirement(name = "Bearer")
 public class DecoracaoController {
-
     private final DecoracaoUseCase decoracaoUseCase;
     private final DecoracaoMapper decoracaoMapper;
     private final AdicionalDecoracaoUseCase adicionalDecoracaoUseCase;
@@ -130,10 +129,24 @@ public class DecoracaoController {
             @ApiResponse(responseCode = "404", description = "Decoração não encontrada", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor", content = @Content)
     })
-    @PutMapping("/{id}")
-    public ResponseEntity<DecoracaoResponseDTO> atualizar(@PathVariable Integer id,
-                                                          @RequestBody DecoracaoRequestDTO request) {
-        Decoracao decoracaoAtualizada = decoracaoUseCase.atualizar(id, request);
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<DecoracaoResponseDTO> atualizar(
+            @PathVariable Integer id,
+            @RequestPart("nome") String nome,
+            @RequestPart("observacao") String observacao,
+            @RequestPart(value = "categoria", required = false) String categoria,
+            // Para usos públicos (referência de cliente), adicionais podem ser omitidos
+            @RequestPart(value = "adicionais", required = false) String adicionais,
+            @RequestPart("imagens") MultipartFile[] imagens
+    ) {
+        List<Integer> adicionaisIds = (adicionais == null || adicionais.isBlank())
+                ? List.of()
+                : Arrays.stream(adicionais.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(Integer::parseInt)
+                .toList();
+        Decoracao decoracaoAtualizada = decoracaoUseCase.atualizar(id, nome, observacao, categoria, adicionaisIds, imagens);
         return ResponseEntity.ok(decoracaoMapper.toResponse(decoracaoAtualizada));
     }
 
