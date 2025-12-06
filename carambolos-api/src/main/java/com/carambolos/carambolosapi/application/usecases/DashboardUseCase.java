@@ -68,17 +68,14 @@ public class DashboardUseCase {
         return dashboardGateway.countPedidosFornadaPorPeriodo(periodo);
     }
 
-    @Cacheable(cacheNames = "dashboard:kpiFornada")
     public Map<String, Object> getKPIFornada(Integer fornadaId) {
         return dashboardGateway.getKPIFornada(fornadaId);
     }
 
-    @Cacheable(cacheNames = "dashboard:kpiFornadaMaisRecente")
     public Map<String, Object> getKPIFornadaMaisRecente() {
         return dashboardGateway.getKPIFornadaMaisRecente();
     }
 
-    @Cacheable(cacheNames = "dashboard:kpiFornadasPorMesAno")
     public Map<String, Object> getKPIFornadasPorMesAno(int ano, int mes) {
         return dashboardGateway.getKPIFornadasPorMesAno(ano, mes);
     }
