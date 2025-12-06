@@ -5,9 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProdutoFornada implements Serializable {
-
     private static final long serialVersionUID = 1L;
-
     private Integer id;
     private String produto;
     private String descricao;

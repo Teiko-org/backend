@@ -5,8 +5,8 @@ import java.sql.Date;
 import java.time.LocalDate;
 
 public class ProdutoFornadaDaVezProjection implements Serializable {
-
     private static final long serialVersionUID = 1L;
+    
     Integer fornadaDaVezId;
     Integer produtoFornadaId;
     String produto;
