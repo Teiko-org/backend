@@ -1,6 +1,10 @@
 package com.carambolos.carambolosapi.domain.entity;
 
-public class ImagemProdutoFornada {
+import java.io.Serializable;
+
+public class ImagemProdutoFornada implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private Integer id;
     private String url;
