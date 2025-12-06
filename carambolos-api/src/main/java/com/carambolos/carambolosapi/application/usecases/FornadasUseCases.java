@@ -18,7 +18,14 @@ public class FornadasUseCases {
     }
 
     @Transactional
-    @CacheEvict(cacheNames = "fornadas:todas", allEntries = true)
+    @CacheEvict(cacheNames = {
+            "fornadas:ativas",
+            "fornadas:todas",
+            "fornadas:porMesAno",
+            "fornadas:maisRecente",
+            "fornadas:proxima",
+            "fornadas:porId"
+    }, allEntries = true)
     public Fornada criar(Integer id, LocalDate inicio, LocalDate fim) {
         if (id != null && gateway.existsAtivaById(id)) {
             throw new IllegalArgumentException("Fornada com cadastro " + id + " já existe.");
@@ -29,7 +36,14 @@ public class FornadasUseCases {
     }
 
     @Transactional
-    @CacheEvict(cacheNames = {"fornadas:todas", "fornadas:ativas", "fornadas:porId"}, allEntries = true)
+    @CacheEvict(cacheNames = {
+            "fornadas:ativas",
+            "fornadas:todas",
+            "fornadas:porMesAno",
+            "fornadas:maisRecente",
+            "fornadas:proxima",
+            "fornadas:porId"
+    }, allEntries = true)
     public Fornada atualizar(Integer id, LocalDate inicio, LocalDate fim) {
         var f = buscarPorId(id);
         f.setDataInicio(inicio);
@@ -38,7 +52,14 @@ public class FornadasUseCases {
     }
 
     @Transactional
-    @CacheEvict(cacheNames = {"fornadas:todas", "fornadas:ativas", "fornadas:porId"}, allEntries = true)
+    @CacheEvict(cacheNames = {
+            "fornadas:ativas",
+            "fornadas:todas",
+            "fornadas:porMesAno",
+            "fornadas:maisRecente",
+            "fornadas:proxima",
+            "fornadas:porId"
+    }, allEntries = true)
     public void encerrar(Integer id) {
         var f = gateway.findById(id).orElseThrow(() -> new RuntimeException(
             "Fornada com id " + id + " não encontrada."

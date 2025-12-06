@@ -9,6 +9,7 @@ import com.carambolos.carambolosapi.infrastructure.persistence.projection.Produt
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
 import com.carambolos.carambolosapi.infrastructure.web.request.FornadaDaVezRequestDTO;
 import com.carambolos.carambolosapi.infrastructure.web.request.FornadaDaVezUpdateRequestDTO;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +32,12 @@ public class FornadaDaVezUseCases {
         this.fornadaGateway = fornadaGateway;
     }
 
+    @CacheEvict(cacheNames = {
+            "fornadasDaVez:ativas",
+            "fornadasDaVez:porId",
+            "fornadasDaVez:produtosPorPeriodo",
+            "fornadasDaVez:produtosPorFornadaId"
+    }, allEntries = true)
     public FornadaDaVez criarFornadaDaVez(FornadaDaVezRequestDTO request) {
         produtoFornadaGateway.findById(request.produtoFornadaId())
                 .filter(produto -> Boolean.TRUE.equals(produto.isAtivo()))
@@ -57,12 +64,24 @@ public class FornadaDaVezUseCases {
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("FornadaDaVez com ID " + id + " não encontrada."));
     }
 
+    @CacheEvict(cacheNames = {
+            "fornadasDaVez:ativas",
+            "fornadasDaVez:porId",
+            "fornadasDaVez:produtosPorPeriodo",
+            "fornadasDaVez:produtosPorFornadaId"
+    }, allEntries = true)
     public void excluirFornadaDaVez(Integer id) {
         FornadaDaVez fornadaDaVez = buscarFornadaDaVez(id);
         fornadaDaVez.setAtivo(false);
         fornadaDaVezGateway.save(fornadaDaVez);
     }
 
+    @CacheEvict(cacheNames = {
+            "fornadasDaVez:ativas",
+            "fornadasDaVez:porId",
+            "fornadasDaVez:produtosPorPeriodo",
+            "fornadasDaVez:produtosPorFornadaId"
+    }, allEntries = true)
     public FornadaDaVez atualizarQuantidade(Integer id, FornadaDaVezUpdateRequestDTO request) {
         FornadaDaVez fornadaDaVez = buscarFornadaDaVez(id);
 
@@ -75,13 +94,12 @@ public class FornadaDaVezUseCases {
         return fornadaDaVezGateway.save(fornadaDaVez);
     }
 
-    @Cacheable(cacheNames = "fornadasDaVez:produtosPorPeriodo", key = "#dataInicio.toString() + ':' + #dataFim.toString()")
     public List<ProdutoFornadaDaVezProjection> buscarProdutosFornadaDaVez(LocalDate dataInicio, LocalDate dataFim) {
         return fornadaDaVezGateway.findProductsByFornada(dataInicio, dataFim);
     }
 
-    @Cacheable(cacheNames = "fornadasDaVez:produtosPorFornadaId", key = "#fornadaId")
     public List<ProdutoFornadaDaVezProjection> buscarProdutosPorFornadaId(Integer fornadaId) {
-        return fornadaDaVezGateway.findResumoKpiByFornadaId(fornadaId);
+        // Para a tela de Fornada queremos a visão simples (sem agregações de KPI)
+        return fornadaDaVezGateway.findByFornadaId(fornadaId);
     }
 }

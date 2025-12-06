@@ -18,6 +18,10 @@ jobs:
 
       - name: Deploy backend em EC2 privadas
         uses: appleboy/ssh-action@v1.2.0
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         with:
           # Conectamos nas instâncias privadas via bastion (proxy SSH).
           # Usamos o secret já existente BACKEND_EC2_HOSTS com os IPs privados.
@@ -27,6 +31,7 @@ jobs:
           proxy_host: ${{ secrets.BASTION_HOSTS }}
           proxy_username: ${{ secrets.BASTION_USER }}
           proxy_key: ${{ secrets.BASTION_SSH_KEY }}
+          envs: AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY,AWS_SESSION_TOKEN
           script: |
             set -euo pipefail
 
@@ -47,8 +52,6 @@ jobs:
 
             echo "[ci-backend] Rodando setup-aws-private.sh (backend + RabbitMQ, banco externo)..."
             SHARED_JWT="${SHARED_JWT:-${JWT_SECRET:-${{ secrets.SHARED_JWT }}}}" \
-            AZURE_STORAGE_CONNECTION_STRING="${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" \
-            AZURE_STORAGE_CONTAINER_NAME="${{ secrets.AZURE_STORAGE_CONTAINER_NAME }}" \
             BACKEND_IMAGE="${{ secrets.BACKEND_IMAGE }}" \
             DB_HOST="${{ secrets.DB_HOST }}" \
             DB_NAME="${{ secrets.DB_NAME }}" \
