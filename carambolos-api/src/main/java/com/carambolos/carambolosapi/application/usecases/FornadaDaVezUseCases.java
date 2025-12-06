@@ -94,12 +94,10 @@ public class FornadaDaVezUseCases {
         return fornadaDaVezGateway.save(fornadaDaVez);
     }
 
-    @Cacheable(cacheNames = "fornadasDaVez:produtosPorPeriodo", key = "#dataInicio.toString() + ':' + #dataFim.toString()")
     public List<ProdutoFornadaDaVezProjection> buscarProdutosFornadaDaVez(LocalDate dataInicio, LocalDate dataFim) {
         return fornadaDaVezGateway.findProductsByFornada(dataInicio, dataFim);
     }
 
-    @Cacheable(cacheNames = "fornadasDaVez:produtosPorFornadaId", key = "#fornadaId")
     public List<ProdutoFornadaDaVezProjection> buscarProdutosPorFornadaId(Integer fornadaId) {
         return fornadaDaVezGateway.findResumoKpiByFornadaId(fornadaId);
     }
