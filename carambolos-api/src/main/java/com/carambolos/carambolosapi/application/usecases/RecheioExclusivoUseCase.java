@@ -6,6 +6,7 @@ import com.carambolos.carambolosapi.application.gateways.RecheioExclusivoGateway
 import com.carambolos.carambolosapi.application.gateways.RecheioUnitarioGateway;
 import com.carambolos.carambolosapi.domain.entity.RecheioExclusivo;
 import com.carambolos.carambolosapi.infrastructure.persistence.projection.RecheioExclusivoProjection;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.util.List;
 
@@ -38,10 +39,12 @@ public class RecheioExclusivoUseCase {
         return recheioExclusivoGateway.buscarRecheioExclusivoPorId(recheioSalvo.getId());
     }
 
+    @Cacheable(cacheNames = "recheiosExclusivos:porId", key = "#id")
     public RecheioExclusivoProjection buscarRecheioExclusivoPorId(Integer id) {
         return recheioExclusivoGateway.buscarRecheioExclusivoPorId(id);
     }
 
+    @Cacheable(cacheNames = "recheiosExclusivos")
     public List<RecheioExclusivoProjection> listarRecheiosExclusivos() {
         return recheioExclusivoGateway.listarRecheiosExclusivos();
     }
