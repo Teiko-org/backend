@@ -1,6 +1,8 @@
 package com.carambolos.carambolosapi.infrastructure.gateways.impl;
 
 import com.carambolos.carambolosapi.application.gateways.StorageGateway;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,9 +15,12 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.InputStream;
 import java.util.UUID;
+import java.util.UUID;
 
 @Component
 public class S3StorageGatewayImpl implements StorageGateway {
+
+    private static final Logger logger = LoggerFactory.getLogger(S3StorageGatewayImpl.class);
 
     private final S3Client s3Client;
     private final String bucketName;
@@ -53,10 +58,13 @@ public class S3StorageGatewayImpl implements StorageGateway {
 
             return String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, region.id(), key);
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao fazer upload para o AWS S3", e);
+            logger.error("Erro ao fazer upload para o AWS S3. bucket={}, region={}, fileName={}, contentType={}",
+                    bucketName,
+                    region,
+                    file != null ? file.getOriginalFilename() : "null",
+                    file != null ? file.getContentType() : "null",
+                    e);
+            throw new RuntimeException("Erro ao fazer upload para o AWS S3: " + e.getMessage(), e);
         }
     }
 }
-
-
-

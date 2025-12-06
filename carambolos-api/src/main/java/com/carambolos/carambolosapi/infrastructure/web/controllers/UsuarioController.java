@@ -19,6 +19,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +32,8 @@ import java.util.List;
 @RequestMapping("/usuarios")
 @Tag(name = "Usuário Controller", description = "Gerencia usuários do sistema")
 public class UsuarioController {
+
+    private static final Logger logger = LoggerFactory.getLogger(UsuarioController.class);
 
     private final UsuarioUseCase usuarioUseCase;
     private final StorageGateway storageGateway;
@@ -235,10 +239,12 @@ public class UsuarioController {
 
         try {
             if (file.isEmpty()) {
+                logger.warn("Upload de imagem de perfil vazio para usuário {}", id);
                 return ResponseEntity.badRequest().build();
             }
 
             if (!file.getContentType().startsWith("image/")) {
+                logger.warn("Upload de arquivo não-imagem para usuário {}. contentType={}", id, file.getContentType());
                 return ResponseEntity.badRequest().build();
             }
 
@@ -250,6 +256,7 @@ public class UsuarioController {
             return ResponseEntity.ok(usuarioResponse);
 
         } catch (Exception e) {
+            logger.error("Erro ao fazer upload de imagem de perfil para usuário {}", id, e);
             return ResponseEntity.internalServerError().build();
         }
     }
