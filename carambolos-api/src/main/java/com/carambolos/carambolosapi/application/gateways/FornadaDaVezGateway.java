@@ -14,6 +14,9 @@ public interface FornadaDaVezGateway {
     // Os métodos abaixo DEVEM retornar ProdutoFornadaDaVezProjection com o campo quantidadeTotal preenchido corretamente,
     // representando a quantidade original planejada do produto na fornada.
     List<ProdutoFornadaDaVezProjection> findProductsByFornada(LocalDate dataInicio, LocalDate dataFim);
+    // Lista produtos de uma fornada específica (usado pela tela de Fornada)
+    List<ProdutoFornadaDaVezProjection> findByFornadaId(Integer fornadaId);
+    // Versão agregada para KPI (usa vendas e quantidade planejada)
     List<ProdutoFornadaDaVezProjection> findResumoKpiByFornadaId(Integer fornadaId);
     FornadaDaVez findByFornadaAndProdutoFornadaAndIsAtivoTrue(Integer fornadaId, Integer produtoFornadaId);
     FornadaDaVez saveSummingIfExists(Integer fornadaId, Integer produtoFornadaId, Integer quantidade);
