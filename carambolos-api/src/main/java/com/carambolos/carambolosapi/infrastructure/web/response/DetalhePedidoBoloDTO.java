@@ -4,6 +4,7 @@ import com.carambolos.carambolosapi.domain.enums.FormatoEnum;
 import com.carambolos.carambolosapi.domain.enums.TamanhoEnum;
 import com.carambolos.carambolosapi.domain.enums.TipoEntregaEnum;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 public record DetalhePedidoBoloDTO(
@@ -23,7 +24,7 @@ public record DetalhePedidoBoloDTO(
     String telefone,
     String horarioRetirada,
     EnderecoResponseDTO endereco
-) {
+) implements Serializable {
 
     public static DetalhePedidoBoloDTO toDetalhePedidoResponse(
             Integer numeroPedido,
