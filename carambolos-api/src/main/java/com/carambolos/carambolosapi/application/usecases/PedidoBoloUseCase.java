@@ -12,6 +12,7 @@ import com.carambolos.carambolosapi.infrastructure.persistence.jpa.BoloRepositor
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.EnderecoRepository;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.PedidoBoloRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -29,10 +30,12 @@ public class PedidoBoloUseCase {
         this.enderecoGateway = enderecoGateway;
     }
 
+    @Cacheable(cacheNames = "pedidosBolo")
     public List<PedidoBolo> listarPedidos() {
         return pedidoBoloGateway.findAll();
     }
 
+    @Cacheable(cacheNames = "pedidosBolo:porId", key = "#id")
     public PedidoBolo buscarPedidoPorId(Integer id) {
         return pedidoBoloGateway.findById(id);
     }
