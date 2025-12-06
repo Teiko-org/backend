@@ -1,9 +1,12 @@
 package com.carambolos.carambolosapi.infrastructure.persistence.projection;
 
+import java.io.Serializable;
 import java.sql.Date;
 import java.time.LocalDate;
 
-public class ProdutoFornadaDaVezProjection {
+public class ProdutoFornadaDaVezProjection implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
     Integer fornadaDaVezId;
     Integer produtoFornadaId;
     String produto;

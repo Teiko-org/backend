@@ -1,6 +1,9 @@
 package com.carambolos.carambolosapi.infrastructure.persistence.projection;
 
-public class DetalheBoloProjection {
+import java.io.Serializable;
+
+public class DetalheBoloProjection implements Serializable {
+    private static final long serialVersionUID = 1L;
     Integer boloId;
     String produto;
     String categoria;

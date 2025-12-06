@@ -2,6 +2,7 @@ package com.carambolos.carambolosapi.infrastructure.web.response;
 
 import com.carambolos.carambolosapi.domain.enums.TipoEntregaEnum;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 public record DetalhePedidoFornadaDTO(
@@ -13,7 +14,7 @@ public record DetalhePedidoFornadaDTO(
         String observacao,
         LocalDateTime dataPedido,
         EnderecoResponseDTO endereco
-) {
+) implements Serializable {
     public static DetalhePedidoFornadaDTO toDetalhePedidoResponse(
             Integer quantidade,
             String produtoFornada,

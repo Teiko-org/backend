@@ -3,8 +3,11 @@ package com.carambolos.carambolosapi.infrastructure.web.response;
 import com.carambolos.carambolosapi.domain.entity.Endereco;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.io.Serializable;
+
 @Schema(description = "DTO de resposta contendo informações do endereço de um usuário")
-public class EnderecoResponseDTO {
+public class EnderecoResponseDTO implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     @Schema(description = "ID do endereço", example = "1")
     private int id;
