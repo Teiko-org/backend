@@ -1,13 +1,14 @@
 package com.carambolos.carambolosapi.domain.entity;
 
 import com.carambolos.carambolosapi.domain.enums.TipoEntregaEnum;
-import com.carambolos.carambolosapi.system.security.CryptoAttributeConverter;
-import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public class PedidoBolo {
+public class PedidoBolo implements Serializable {
+
+    private static final long serialVersionUID = 1L;
     private Integer id;
     private Integer enderecoId;
     private Integer boloId;

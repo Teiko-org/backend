@@ -1,12 +1,13 @@
 package com.carambolos.carambolosapi.domain.entity;
 
 import com.carambolos.carambolosapi.domain.enums.StatusEnum;
-import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-@Entity(name = "resumo_pedido")
-public class ResumoPedido {
+public class ResumoPedido implements Serializable {
+
+    private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
