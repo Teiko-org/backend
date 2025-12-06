@@ -2,10 +2,12 @@ package com.carambolos.carambolosapi.domain.entity;
 
 import com.carambolos.carambolosapi.domain.enums.FormatoEnum;
 import com.carambolos.carambolosapi.domain.enums.TamanhoEnum;
-import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.*;
 
-public class Bolo {
+import java.io.Serializable;
+
+public class Bolo implements Serializable {
+
+    private static final long serialVersionUID = 1L;
     private Integer id;
     private Integer recheioPedido;
     private Integer massa;
