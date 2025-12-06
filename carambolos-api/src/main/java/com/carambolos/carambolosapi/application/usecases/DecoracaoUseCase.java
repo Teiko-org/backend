@@ -49,6 +49,39 @@ public class DecoracaoUseCase {
         return decoracaoSalva;
     }
 
+    public Decoracao atualizar(
+            Integer id,
+            String nome,
+            String observacao,
+            String categoria,
+            List<Integer> adicionais,
+            MultipartFile[] arquivos
+    ) {
+        Decoracao decoracao = decoracaoGateway.findById(id);
+        decoracao.setNome(nome);
+        decoracao.setObservacao(observacao);
+        decoracao.setCategoria(categoria);
+
+        List<ImagemDecoracao> imagens = new ArrayList<>();
+
+        for (MultipartFile arquivo : arquivos) {
+            String url = storageGateway.upload(arquivo);
+            ImagemDecoracao imagem = new ImagemDecoracao();
+            imagem.setUrl(url);
+            imagem.setDecoracao(decoracao);
+            imagens.add(imagem);
+        }
+        decoracao.setImagens(imagens);
+
+        try {
+            salvarAdicionalDecoracao(decoracao, adicionais);
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao salvar adicionais de decoração: " + e.getMessage());
+        }
+
+        return decoracaoGateway.save(decoracao);
+    }
+
     public List<Decoracao> listarAtivas() {
         return decoracaoGateway.findByIsAtivoTrue();
     }
@@ -73,18 +106,13 @@ public class DecoracaoUseCase {
         decoracaoGateway.save(decoracao);
     }
 
-    public Decoracao atualizar(Integer id, DecoracaoRequestDTO request) {
-        Decoracao decoracao = decoracaoGateway.findById(id);
-
-        decoracao.setObservacao(request.observacao());
-        decoracao.setCategoria(request.categoria());
-
-        return decoracaoGateway.save(decoracao);
-    }
-
     private List<AdicionalDecoracao> salvarAdicionalDecoracao(Decoracao decoracao, List<Integer> adicionaisIds) {
-        return adicionaisIds.stream().map(adicionalId -> {
-            return adicionalDecoracaoGateway.salvar(decoracao.getId(), adicionalId);
-        }).toList();
+        if (adicionaisIds == null || adicionaisIds.isEmpty()) {
+            return List.of();
+        }
+
+        return adicionaisIds.stream()
+                .map(adicionalId -> adicionalDecoracaoGateway.salvar(decoracao.getId(), adicionalId))
+                .toList();
     }
 }

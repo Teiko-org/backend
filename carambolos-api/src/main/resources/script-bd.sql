@@ -203,6 +203,11 @@ CREATE TABLE IF NOT EXISTS teiko.decoracao (
   PRIMARY KEY (id)
 );
 
+-- Alias para compatibilidade com queries antigas que referenciam "decoracaoEntity"
+-- (mantém os mesmos campos de teiko.decoracao)
+CREATE TABLE IF NOT EXISTS teiko.decoracaoEntity LIKE teiko.decoracao;
+INSERT IGNORE INTO teiko.decoracaoEntity SELECT * FROM teiko.decoracao;
+
 -- -----------------------------------------------------
 -- Table teiko.imagem_decoracao
 -- -----------------------------------------------------

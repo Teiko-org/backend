@@ -35,6 +35,16 @@ public class AutenticacaoFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String path = request.getRequestURI();
+
+        // Endpoints públicos que não devem falhar por token inválido/ausente
+        // - /decoracoes: qualquer método (upload referência + listagens públicas)
+        // - /resumo-pedido: apenas POST (criação de resumo anônimo para WhatsApp)
+        if (path.startsWith("/decoracoes") ||
+                (path.startsWith("/resumo-pedido") && "POST".equalsIgnoreCase(request.getMethod()))) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         if (("/usuarios/login".equals(path) && "POST".equalsIgnoreCase(request.getMethod())) ||
                 ("/usuarios".equals(path) && "POST".equalsIgnoreCase(request.getMethod()))) {
             filterChain.doFilter(request, response);
