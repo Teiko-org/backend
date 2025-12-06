@@ -1,6 +1,10 @@
 package com.carambolos.carambolosapi.infrastructure.persistence.projection;
 
-public class RecheioExclusivoProjection {
+import java.io.Serializable;
+
+public class RecheioExclusivoProjection implements Serializable {
+
+    private static final long serialVersionUID = 1L;
     private Integer id;
     private String nome;
     private String sabor1;

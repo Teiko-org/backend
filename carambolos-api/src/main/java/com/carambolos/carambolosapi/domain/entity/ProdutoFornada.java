@@ -1,9 +1,12 @@
 package com.carambolos.carambolosapi.domain.entity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProdutoFornada {
+public class ProdutoFornada implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private Integer id;
     private String produto;
