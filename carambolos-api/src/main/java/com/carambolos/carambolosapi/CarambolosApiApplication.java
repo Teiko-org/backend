@@ -36,8 +36,8 @@ public class CarambolosApiApplication {
 		System.setProperty("jwt.validity", dotenv.get("JWT_VALIDITY"));
 		System.setProperty("jwt.secret", dotenv.get("JWT_SECRET"));
 
-		System.setProperty("azure.storage.connection-string", dotenv.get("AZURE_STORAGE_CONNECTION_STRING"));
-		System.setProperty("azure.storage.container-name", dotenv.get("AZURE_STORAGE_CONTAINER_NAME"));
+		System.setProperty("aws.s3.bucket-name", dotenv.get("AWS_S3_BUCKET_NAME"));
+		System.setProperty("aws.region", dotenv.get("AWS_REGION"));
 
 		SpringApplication.run(CarambolosApiApplication.class, args);
 	}

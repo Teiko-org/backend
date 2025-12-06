@@ -1,8 +1,8 @@
 package com.carambolos.carambolosapi.infrastructure.web.controllers;
 
+import com.carambolos.carambolosapi.application.gateways.StorageGateway;
 import com.carambolos.carambolosapi.application.usecases.UsuarioUseCase;
 import com.carambolos.carambolosapi.domain.entity.Usuario;
-import com.carambolos.carambolosapi.infrastructure.gateways.impl.AzureStorageGatewayImpl;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.UsuarioMapper;
 import com.carambolos.carambolosapi.infrastructure.web.request.AlterarSenhaRequestDTO;
 import com.carambolos.carambolosapi.infrastructure.web.request.AtualizarUsuarioRequestDTO;
@@ -32,12 +32,12 @@ import java.util.List;
 public class UsuarioController {
 
     private final UsuarioUseCase usuarioUseCase;
-    private final AzureStorageGatewayImpl azureStorageGateway;
+    private final StorageGateway storageGateway;
     private final UsuarioMapper usuarioMapper;
 
-    public UsuarioController(UsuarioUseCase usuarioUseCase, AzureStorageGatewayImpl azureStorageGateway, UsuarioMapper usuarioMapper) {
+    public UsuarioController(UsuarioUseCase usuarioUseCase, StorageGateway storageGateway, UsuarioMapper usuarioMapper) {
         this.usuarioUseCase = usuarioUseCase;
-        this.azureStorageGateway = azureStorageGateway;
+        this.storageGateway = storageGateway;
         this.usuarioMapper = usuarioMapper;
     }
 
@@ -214,7 +214,7 @@ public class UsuarioController {
 
     @Operation(
             summary = "Upload de imagem de perfil do usuário",
-            description = "Faz upload da imagem de perfil do usuário para o Azure Storage e atualiza a URL no banco de dados."
+            description = "Faz upload da imagem de perfil do usuário para o storage configurado (S3) e atualiza a URL no banco de dados."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Imagem de perfil atualizada com sucesso",
@@ -242,7 +242,7 @@ public class UsuarioController {
                 return ResponseEntity.badRequest().build();
             }
 
-            String imageUrl = azureStorageGateway.upload(file);
+            String imageUrl = storageGateway.upload(file);
 
             Usuario usuarioAtualizado = usuarioUseCase.atualizarImagemPerfil(id, imageUrl);
             UsuarioResponseDTO usuarioResponse = UsuarioMapper.toResponseDTO(usuarioAtualizado);
