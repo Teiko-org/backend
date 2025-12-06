@@ -39,6 +39,11 @@ public class FornadaDaVezGatewayImpl implements FornadaDaVezGateway {
     }
 
     @Override
+    public List<ProdutoFornadaDaVezProjection> findByFornadaId(Integer fornadaId) {
+        return repository.findByFornadaId(fornadaId);
+    }
+
+    @Override
     public List<ProdutoFornadaDaVezProjection> findResumoKpiByFornadaId(Integer fornadaId) {
         return repository.findResumoKpiByFornadaId(fornadaId);
     }

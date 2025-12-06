@@ -99,6 +99,7 @@ public class FornadaDaVezUseCases {
     }
 
     public List<ProdutoFornadaDaVezProjection> buscarProdutosPorFornadaId(Integer fornadaId) {
-        return fornadaDaVezGateway.findResumoKpiByFornadaId(fornadaId);
+        // Para a tela de Fornada queremos a visão simples (sem agregações de KPI)
+        return fornadaDaVezGateway.findByFornadaId(fornadaId);
     }
 }
