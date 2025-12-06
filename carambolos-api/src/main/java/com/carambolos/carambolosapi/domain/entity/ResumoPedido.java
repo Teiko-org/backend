@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 
 @Entity(name = "resumo_pedido")
 public class ResumoPedido implements Serializable {
-
     private static final long serialVersionUID = 1L;
 
     @Id
