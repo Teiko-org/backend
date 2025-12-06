@@ -8,6 +8,7 @@ import com.carambolos.carambolosapi.domain.entity.ImagemProdutoFornada;
 import com.carambolos.carambolosapi.domain.entity.ProdutoFornada;
 import com.carambolos.carambolosapi.application.gateways.ProdutoFornadaGateway;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -48,6 +49,7 @@ public class ProdutoFornadaUseCases {
         return produtoFornadaGateway.save(produtoFornada);
     }
 
+    @Cacheable(cacheNames = "produtosFornada", key = "#pageable.pageNumber + ':' + #pageable.pageSize + ':' + (#categorias == null || #categorias.isEmpty() ? 'ALL' : #categorias)")
     public Page<ProdutoFornada> listarProdutosFornada(Pageable pageable, List<String> categorias) {
         if (categorias != null && !categorias.isEmpty()) {
             return produtoFornadaGateway.findAtivosByCategoriaIn(pageable, categorias);
@@ -55,6 +57,7 @@ public class ProdutoFornadaUseCases {
         return produtoFornadaGateway.findAtivos(pageable);
     }
 
+    @Cacheable(cacheNames = "produtosFornada:porId", key = "#id")
     public ProdutoFornada buscarProdutoFornada(Integer id) {
         return produtoFornadaGateway.findById(id)
                 .filter(ProdutoFornada::isAtivo)
