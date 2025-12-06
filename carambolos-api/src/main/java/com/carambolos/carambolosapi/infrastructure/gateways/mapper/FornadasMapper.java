@@ -7,10 +7,11 @@ public final class FornadasMapper {
     public static com.carambolos.carambolosapi.domain.entity.Fornada toDomain(
             com.carambolos.carambolosapi.infrastructure.persistence.entity.Fornada e) {
         if (e == null) return null;
-        var d = new com.carambolos.carambolosapi.domain.entity.Fornada(
-                e.getDataInicio(), e.getDataFim(), e.isAtivo()
-        );
+        var d = new com.carambolos.carambolosapi.domain.entity.Fornada();
         d.setId(e.getId());
+        d.setDataInicio(e.getDataInicio());
+        d.setDataFim(e.getDataFim());
+        d.setAtivo(e.isAtivo());
         return d;
     }
 
