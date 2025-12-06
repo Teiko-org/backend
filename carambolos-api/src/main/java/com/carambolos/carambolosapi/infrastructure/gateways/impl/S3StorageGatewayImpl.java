@@ -49,7 +49,8 @@ public class S3StorageGatewayImpl implements StorageGateway {
                     .bucket(bucketName)
                     .key(key)
                     .contentType(file.getContentType())
-                    .acl(ObjectCannedACL.PUBLIC_READ)
+                    // Não usamos mais ACL porque o bucket está com Object Ownership = Bucket owner enforced.
+                    // A visibilidade pública deve ser controlada via Bucket Policy / Block Public Access.
                     .build();
 
             try (InputStream is = file.getInputStream()) {
