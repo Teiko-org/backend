@@ -16,6 +16,7 @@ import com.carambolos.carambolosapi.infrastructure.web.response.ResumoPedidoMens
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -166,6 +167,7 @@ public class ResumoPedidoService {
         return resumoPedidoRepository.save(resumoPedido);
     }
 
+    @Transactional(readOnly = true)
     public DetalhePedidoBoloDTO obterDetalhePedidoBolo(Integer pedidoResumoId) {
         try {
             ResumoPedido resumoPedido = resumoPedidoRepository
@@ -303,6 +305,7 @@ public class ResumoPedidoService {
         }
     }
 
+    @Transactional(readOnly = true)
     public DetalhePedidoFornadaDTO obterDetalhePedidoFornada(Integer pedidoResumoId) {
         try {
             ResumoPedido resumoPedido = resumoPedidoRepository

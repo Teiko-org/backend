@@ -437,9 +437,9 @@ public class DashboardGatewayImpl implements DashboardGateway {
 
     @Override
     public List<Map<String, Object>> getUltimosPedidos() {
-        // Buscar por data mais recente (independente do status) e limitar para performance
+        // Buscar apenas pedidos ativos por data mais recente e limitar para performance
         List<ResumoPedido> resumoPedidos = resumoPedidoRepository
-                .findAllByOrderByDataPedidoDesc();
+                .findAllByIsAtivoTrueOrderByDataPedidoDesc();
 
         List<Map<String, Object>> ultimosPedidos = new ArrayList<>();
 
@@ -451,28 +451,36 @@ public class DashboardGatewayImpl implements DashboardGateway {
             pedido.put("dataPedido", resumo.getDataPedido());
             pedido.put("status", resumo.getStatus());
 
+            boolean pedidoValido = false;
+
             if (resumo.getPedidoBoloId() != null) {
                 PedidoBoloEntity pedidoBoloEntity = pedidoBoloRepository.findById(resumo.getPedidoBoloId()).orElse(null);
 
-                if (pedidoBoloEntity != null) {
+                if (pedidoBoloEntity != null && Boolean.TRUE.equals(pedidoBoloEntity.getAtivo())) {
                     pedido.put("nomeDoCliente", pedidoBoloEntity.getNomeCliente());
                     pedido.put("telefoneDoCliente", pedidoBoloEntity.getTelefoneCliente());
                     pedido.put("tipoDoPedido", pedidoBoloEntity.getTipoEntrega());
                     pedido.put("tipoProduto", "BOLO");
                     pedido.put("pedidoBoloId", resumo.getPedidoBoloId());
+                    pedidoValido = true;
                 }
             } else if (resumo.getPedidoFornadaId() != null) {
                 PedidoFornada pedidoFornada = pedidoFornadaRepository.findById(resumo.getPedidoFornadaId()).orElse(null);
 
-                if(pedidoFornada != null) {
+                if(pedidoFornada != null && pedidoFornada.isAtivo()) {
                     pedido.put("nomeDoCliente", pedidoFornada.getNomeCliente());
                     pedido.put("telefoneDoCliente", pedidoFornada.getTelefoneCliente());
                     pedido.put("tipoDoPedido", pedidoFornada.getTipoEntrega());
                     pedido.put("tipoProduto", "FORNADA");
                     pedido.put("pedidoFornadaId", resumo.getPedidoFornadaId());
+                    pedidoValido = true;
                 }
             }
-            ultimosPedidos.add(pedido);
+            
+            // Só adiciona se o pedido for válido (tem pedidoBolo ou pedidoFornada ativo)
+            if (pedidoValido) {
+                ultimosPedidos.add(pedido);
+            }
         }
         return ultimosPedidos;
     }
