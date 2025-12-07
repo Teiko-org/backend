@@ -16,7 +16,33 @@ public class DashboardConfig {
     }
 
     @Bean
-    DashboardGateway dashboardGateway(PedidoBoloRepository pedidoBoloRepository, BoloRepository boloRepository, PedidoFornadaRepository pedidoFornadaRepository, ProdutoFornadaRepository produtoFornadaRepository, FornadaDaVezRepository fornadaDaVezRepository, ResumoPedidoRepository resumoPedidoRepository, DecoracaoRepository decoracaoRepository, FornadaRepository fornadaRepository) {
-        return new DashboardGatewayImpl(pedidoBoloRepository, boloRepository, pedidoFornadaRepository, produtoFornadaRepository, fornadaDaVezRepository, resumoPedidoRepository, decoracaoRepository, fornadaRepository);
+    DashboardGateway dashboardGateway(
+            PedidoBoloRepository pedidoBoloRepository,
+            BoloRepository boloRepository,
+            PedidoFornadaRepository pedidoFornadaRepository,
+            ProdutoFornadaRepository produtoFornadaRepository,
+            FornadaDaVezRepository fornadaDaVezRepository,
+            ResumoPedidoRepository resumoPedidoRepository,
+            DecoracaoRepository decoracaoRepository,
+            FornadaRepository fornadaRepository,
+            MassaRepository massaRepository,
+            RecheioPedidoRepository recheioPedidoRepository,
+            RecheioUnitarioRepository recheioUnitarioRepository,
+            RecheioExclusivoRepository recheioExclusivoRepository
+    ) {
+        return new DashboardGatewayImpl(
+                pedidoBoloRepository,
+                boloRepository,
+                pedidoFornadaRepository,
+                produtoFornadaRepository,
+                fornadaDaVezRepository,
+                resumoPedidoRepository,
+                decoracaoRepository,
+                fornadaRepository,
+                massaRepository,
+                recheioPedidoRepository,
+                recheioUnitarioRepository,
+                recheioExclusivoRepository
+        );
     }
 }

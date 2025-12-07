@@ -308,4 +308,58 @@ public class ResumoPedidoController {
         String mensagem = resumoPedidoService.gerarMensagensConsolidadas(request.idsResumo());
         return ResponseEntity.ok(mensagem);
     }
+
+    @Operation(summary = "Lista pedidos por massa", 
+              description = "Retorna todos os pedidos de bolo que usam uma massa específica")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de pedidos retornada com sucesso"),
+            @ApiResponse(responseCode = "204", description = "Nenhum pedido encontrado")
+    })
+    @GetMapping("/pedido-bolo/por-massa/{massaId}")
+    public ResponseEntity<List<ResumoPedidoResponseDTO>> listarPedidosPorMassa(
+            @PathVariable Integer massaId,
+            @RequestParam(required = false) StatusEnum status
+    ) {
+        List<ResumoPedido> pedidos = resumoPedidoService.listarPedidosPorMassa(massaId, status);
+        if (pedidos.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.ok(ResumoPedidoResponseDTO.toResumoPedidoResponse(pedidos));
+    }
+
+    @Operation(summary = "Lista pedidos por recheio", 
+              description = "Retorna todos os pedidos de bolo que usam um recheio específico")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de pedidos retornada com sucesso"),
+            @ApiResponse(responseCode = "204", description = "Nenhum pedido encontrado")
+    })
+    @GetMapping("/pedido-bolo/por-recheio/{recheioPedidoId}")
+    public ResponseEntity<List<ResumoPedidoResponseDTO>> listarPedidosPorRecheio(
+            @PathVariable Integer recheioPedidoId,
+            @RequestParam(required = false) StatusEnum status
+    ) {
+        List<ResumoPedido> pedidos = resumoPedidoService.listarPedidosPorRecheio(recheioPedidoId, status);
+        if (pedidos.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.ok(ResumoPedidoResponseDTO.toResumoPedidoResponse(pedidos));
+    }
+
+    @Operation(summary = "Lista pedidos por data de entrega", 
+              description = "Retorna todos os pedidos com data de entrega em uma data específica")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de pedidos retornada com sucesso"),
+            @ApiResponse(responseCode = "204", description = "Nenhum pedido encontrado")
+    })
+    @GetMapping("/pedido-bolo/por-data-entrega")
+    public ResponseEntity<List<ResumoPedidoResponseDTO>> listarPedidosPorDataEntrega(
+            @RequestParam LocalDate dataEntrega,
+            @RequestParam(required = false) StatusEnum status
+    ) {
+        List<ResumoPedido> pedidos = resumoPedidoService.listarPedidosPorDataEntrega(dataEntrega, status);
+        if (pedidos.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.ok(ResumoPedidoResponseDTO.toResumoPedidoResponse(pedidos));
+    }
 }

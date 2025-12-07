@@ -5,6 +5,8 @@ import com.carambolos.carambolosapi.domain.enums.StatusEnum;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,4 +35,11 @@ public interface ResumoPedidoRepository extends JpaRepository<ResumoPedido, Inte
    long countByPedidoFornadaIdIsNotNull();
    List<ResumoPedido> findByStatusInAndPedidoBoloIdIsNotNull(List<StatusEnum> status);
    List<ResumoPedido> findByStatusInAndPedidoFornadaIdIsNotNull(List<StatusEnum> status);
+   List<ResumoPedido> findByStatusInAndIsAtivoTrue(List<StatusEnum> status);
+   
+   @Query(value = "SELECT * FROM resumo_pedido WHERE data_entrega BETWEEN :dataInicio AND :dataFim AND is_ativo = true ORDER BY data_entrega ASC", nativeQuery = true)
+   List<ResumoPedido> findByDataEntregaBetweenAndIsAtivoTrueOrderByDataEntregaAsc(
+       @Param("dataInicio") LocalDateTime dataInicio,
+       @Param("dataFim") LocalDateTime dataFim
+   );
 }
