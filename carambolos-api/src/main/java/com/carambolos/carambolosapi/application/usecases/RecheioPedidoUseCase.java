@@ -4,11 +4,10 @@ import com.carambolos.carambolosapi.application.exception.EntidadeImprocessavelE
 import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.application.gateways.RecheioPedidoGateway;
 import com.carambolos.carambolosapi.domain.entity.RecheioPedido;
-import com.carambolos.carambolosapi.domain.projection.RecheioPedidoProjection;
-import com.carambolos.carambolosapi.infrastructure.persistence.entity.RecheioPedidoEntity;
+import com.carambolos.carambolosapi.infrastructure.persistence.projection.RecheioPedidoProjection;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.util.List;
-import java.util.Optional;
 
 public class RecheioPedidoUseCase {
     private final RecheioPedidoGateway gateway;
@@ -40,6 +39,7 @@ public class RecheioPedidoUseCase {
         return gateway.buscarRecheioPedidoUnitariosPorId(recheioSalvo.getId());
     }
 
+    @Cacheable(cacheNames = "recheiosPedido:porId", key = "#id")
     public RecheioPedidoProjection buscarRecheioPedidoPorId(Integer id) {
         if (!gateway.existsById(id)) {
             throw new EntidadeNaoEncontradaException("Recheio do pedido com id %d não encontrado".formatted(id));
@@ -52,6 +52,7 @@ public class RecheioPedidoUseCase {
         return gateway.buscarRecheioPedidoUnitariosPorId(recheio.getId());
     }
 
+    @Cacheable(cacheNames = "recheiosPedido")
     public List<RecheioPedidoProjection> listarRecheiosPedido() {
         return gateway.listarRecheiosPedido();
     }

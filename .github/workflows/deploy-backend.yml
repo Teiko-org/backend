@@ -1,0 +1,65 @@
+name: Deploy Backend to EC2
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Ambiente de destino (ex: lab, prod)"
+        required: false
+        default: "lab"
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout (somente para referência)
+        uses: actions/checkout@v4
+
+      - name: Deploy backend em EC2 privadas
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+        with:
+          # Conectamos nas instâncias privadas via bastion (proxy SSH).
+          # Usamos o secret já existente BACKEND_EC2_HOSTS com os IPs privados.
+          host: ${{ secrets.BACKEND_EC2_HOSTS }}
+          username: ${{ secrets.BACKEND_EC2_USER }}
+          key: ${{ secrets.BACKEND_EC2_SSH_KEY }}
+          proxy_host: ${{ secrets.BASTION_HOSTS }}
+          proxy_username: ${{ secrets.BASTION_USER }}
+          proxy_key: ${{ secrets.BASTION_SSH_KEY }}
+          envs: AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY,AWS_SESSION_TOKEN
+          script: |
+            set -euo pipefail
+
+            echo "[ci-backend] Preparando /opt/teiko..."
+            sudo mkdir -p /opt/teiko
+            sudo chown -R "$USER":"$USER" /opt/teiko
+            cd /opt/teiko
+
+            # Atualiza/clona infra
+            if [ -d infra ]; then
+              sudo git -C infra fetch --all --prune || true
+              sudo git -C infra reset --hard origin/main || true
+            else
+              sudo git clone https://github.com/Teiko-org/infra.git infra
+            fi
+
+            cd /opt/teiko
+
+            echo "[ci-backend] Rodando setup-aws-private.sh (backend + RabbitMQ, banco externo)..."
+            SHARED_JWT="${SHARED_JWT:-${JWT_SECRET:-${{ secrets.SHARED_JWT }}}}" \
+            BACKEND_IMAGE="${{ secrets.BACKEND_IMAGE }}" \
+            DB_HOST="${{ secrets.DB_HOST }}" \
+            DB_NAME="${{ secrets.DB_NAME }}" \
+            DB_USERNAME="${{ secrets.DB_USERNAME }}" \
+            DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+            AWS_S3_BUCKET_NAME="${{ secrets.AWS_S3_BUCKET_NAME }}" \
+            AWS_REGION="${{ secrets.AWS_REGION }}" \
+            FORCE_INFRA_UPDATE=1 \
+            sudo -E bash /opt/teiko/infra/aws-ec2/setup-aws-private.sh
+
+

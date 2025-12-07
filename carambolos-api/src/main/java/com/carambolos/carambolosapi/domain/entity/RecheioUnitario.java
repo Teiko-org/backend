@@ -1,9 +1,10 @@
 package com.carambolos.carambolosapi.domain.entity;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.*;
+import java.io.Serializable;
 
-public class RecheioUnitario {
+public class RecheioUnitario implements Serializable {
+
+    private static final long serialVersionUID = 1L;
     private Integer id;
     private String sabor;
     private String descricao;

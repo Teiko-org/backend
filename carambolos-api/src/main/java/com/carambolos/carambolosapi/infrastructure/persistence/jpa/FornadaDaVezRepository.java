@@ -1,19 +1,20 @@
 package com.carambolos.carambolosapi.infrastructure.persistence.jpa;
 
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
-import com.carambolos.carambolosapi.domain.projection.ProdutoFornadaDaVezProjection;
+import com.carambolos.carambolosapi.infrastructure.persistence.projection.ProdutoFornadaDaVezProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface FornadaDaVezRepository extends JpaRepository<FornadaDaVez, Integer> {
     List<FornadaDaVez> findByFornada(Integer id);
     
-    // Buscar produto específico em uma fornada específica
-    FornadaDaVez findByFornadaAndProdutoFornadaAndIsAtivoTrue(Integer fornadaId, Integer produtoFornadaId);
+    // Buscar produto específico em uma fornada específica (pega o primeiro se houver duplicados)
+    Optional<FornadaDaVez> findFirstByFornadaAndProdutoFornadaAndIsAtivoTrue(Integer fornadaId, Integer produtoFornadaId);
 
     @Query(value = """
             select
@@ -27,7 +28,8 @@ public interface FornadaDaVezRepository extends JpaRepository<FornadaDaVez, Inte
                 CAST(pf.is_ativo AS SIGNED) is_ativo_pf,
                 CAST(fdv.is_ativo AS SIGNED) is_ativo_fdv,
                 f.data_inicio,
-                f.data_fim
+                f.data_fim,
+                fdv.quantidade as quantidade_total
             from fornada_da_vez fdv
             join produto_fornada pf on fdv.produto_fornada_id = pf.id
             join fornada f on f.data_inicio = ?1 AND f.data_fim = ?2
@@ -47,7 +49,8 @@ public interface FornadaDaVezRepository extends JpaRepository<FornadaDaVez, Inte
                 CAST(pf.is_ativo AS SIGNED) is_ativo_pf,
                 CAST(fdv.is_ativo AS SIGNED) is_ativo_fdv,
                 f.data_inicio,
-                f.data_fim
+                f.data_fim,
+                fdv.quantidade as quantidade_total
             from fornada_da_vez fdv
             join produto_fornada pf on fdv.produto_fornada_id = pf.id
             join fornada f on fdv.fornada_id = f.id
@@ -69,7 +72,8 @@ public interface FornadaDaVezRepository extends JpaRepository<FornadaDaVez, Inte
                 CAST(pf.is_ativo AS SIGNED) is_ativo_pf,
                 CAST(fdv.is_ativo AS SIGNED) is_ativo_fdv,
                 f.data_inicio,
-                f.data_fim
+                f.data_fim,
+                fdv.quantidade as quantidade_total
             from fornada_da_vez fdv
             join produto_fornada pf on fdv.produto_fornada_id = pf.id
             join fornada f on fdv.fornada_id = f.id
@@ -92,7 +96,8 @@ public interface FornadaDaVezRepository extends JpaRepository<FornadaDaVez, Inte
                 CAST(pf.is_ativo AS SIGNED) is_ativo_pf,
                 CAST(fdv.is_ativo AS SIGNED) is_ativo_fdv,
                 f.data_inicio,
-                f.data_fim
+                f.data_fim,
+                fdv.quantidade as quantidade_total
             from fornada_da_vez fdv
             join produto_fornada pf on fdv.produto_fornada_id = pf.id
             join fornada f on fdv.fornada_id = f.id
@@ -114,7 +119,8 @@ public interface FornadaDaVezRepository extends JpaRepository<FornadaDaVez, Inte
                 CAST(pf.is_ativo AS SIGNED) is_ativo_pf,
                 CAST(fdv.is_ativo AS SIGNED) is_ativo_fdv,
                 f.data_inicio,
-                f.data_fim
+                f.data_fim,
+                fdv.quantidade as quantidade_total
             from fornada_da_vez fdv
             join produto_fornada pf on fdv.produto_fornada_id = pf.id
             join fornada f on fdv.fornada_id = f.id

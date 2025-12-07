@@ -3,7 +3,7 @@ package com.carambolos.carambolosapi.infrastructure.gateways.impl;
 import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.application.gateways.RecheioExclusivoGateway;
 import com.carambolos.carambolosapi.domain.entity.RecheioExclusivo;
-import com.carambolos.carambolosapi.domain.projection.RecheioExclusivoProjection;
+import com.carambolos.carambolosapi.infrastructure.persistence.projection.RecheioExclusivoProjection;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.RecheioExclusivoMapper;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.RecheioExclusivoEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.RecheioExclusivoRepository;

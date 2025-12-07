@@ -9,7 +9,7 @@ import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaV
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoFornada;
  
 import com.carambolos.carambolosapi.domain.entity.ProdutoFornada;
-import com.carambolos.carambolosapi.domain.projection.ProdutoFornadaDaVezProjection;
+import com.carambolos.carambolosapi.infrastructure.persistence.projection.ProdutoFornadaDaVezProjection;
 import com.carambolos.carambolosapi.application.usecases.FornadaDaVezUseCases;
 import com.carambolos.carambolosapi.application.usecases.FornadasUseCases;
 import com.carambolos.carambolosapi.application.usecases.PedidoFornadaUseCases;
@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -67,6 +68,7 @@ public class FornadaController {
             @ApiResponse(responseCode = "400", description = "Requisição inválida")
     })
     @PostMapping
+    @CacheEvict(cacheNames = "fornadas:todas", allEntries = true)
     public ResponseEntity<Fornada> criarFornada(@RequestBody @Valid FornadaRequestDTO request) {
         var created = fornadasUseCases.criar(request.id(), request.dataInicio(), request.dataFim());
         // manter resposta como Entity JPA no contrato atual

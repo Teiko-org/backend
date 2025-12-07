@@ -48,7 +48,7 @@ public class ResumoPedidoController {
     @GetMapping
     public ResponseEntity<Page<ResumoPedidoResponseDTO>> listarResumosPedidos(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "99999") int size
+            @RequestParam(defaultValue = "100") int size
     ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<ResumoPedido> resumosPedidos = resumoPedidoService.listarResumosPedidos(pageable);

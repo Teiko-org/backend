@@ -32,6 +32,9 @@ build/
 .vscode/
 /.idea/
 .idea\
-.idea\
 workspace.xml
 dev.env
+
+# Local tools (não versionar)
+apache-jmeter-*/
+*.jmx

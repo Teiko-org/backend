@@ -1,8 +1,8 @@
 package com.carambolos.carambolosapi.infrastructure.persistence.jpa;
 
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.BoloEntity;
-import com.carambolos.carambolosapi.domain.entity.ImagemDecoracao;
-import com.carambolos.carambolosapi.domain.projection.DetalheBoloProjection;
+import com.carambolos.carambolosapi.infrastructure.persistence.entity.ImagemDecoracaoEntity;
+import com.carambolos.carambolosapi.infrastructure.persistence.projection.DetalheBoloProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -58,9 +58,9 @@ public interface BoloRepository extends JpaRepository<BoloEntity, Integer> {
     void atualizarStatusBolo(Integer status, Integer id);
 
     @Query(value = "SELECT * FROM imagem_decoracao WHERE decoracao_id = ?1 ORDER BY id DESC LIMIT 1", nativeQuery = true)
-    ImagemDecoracao findImagemByBolo(Integer idDecoracao);
+    ImagemDecoracaoEntity findImagemByBolo(Integer idDecoracao);
 
     @Query(value = "SELECT * FROM imagem_decoracao WHERE decoracao_id = ?1 ORDER BY id ASC", nativeQuery = true)
-    List<ImagemDecoracao> findAllImagensByDecoracao(Integer idDecoracao);
+    List<ImagemDecoracaoEntity> findAllImagensByDecoracao(Integer idDecoracao);
 
 }

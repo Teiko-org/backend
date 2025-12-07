@@ -1,9 +1,12 @@
-package com.carambolos.carambolosapi.domain.projection;
+package com.carambolos.carambolosapi.infrastructure.persistence.projection;
 
+import java.io.Serializable;
 import java.sql.Date;
 import java.time.LocalDate;
 
-public class ProdutoFornadaDaVezProjection {
+public class ProdutoFornadaDaVezProjection implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
     Integer fornadaDaVezId;
     Integer produtoFornadaId;
     String produto;
@@ -16,9 +19,10 @@ public class ProdutoFornadaDaVezProjection {
     Boolean isAtivoFdv;
     LocalDate dataInicio;
     LocalDate dataFim;
+    Integer quantidadeTotal; // NOVO CAMPO
 
     // Construtor único que aceita Object para lidar com diferentes tipos do MySQL
-    public ProdutoFornadaDaVezProjection(Integer fornadaDaVezId, Integer produtoFornadaId, String produto, String descricao, Double valor, String categoria, Integer quantidade, Object quantidadeVendida, Object isAtivoPf, Object isAtivoFdv, Date dataInicio, Date dataFim) {
+    public ProdutoFornadaDaVezProjection(Integer fornadaDaVezId, Integer produtoFornadaId, String produto, String descricao, Double valor, String categoria, Integer quantidade, Object quantidadeVendida, Object isAtivoPf, Object isAtivoFdv, Date dataInicio, Date dataFim, Integer quantidadeTotal) {
         this.fornadaDaVezId = fornadaDaVezId;
         this.produtoFornadaId = produtoFornadaId;
         this.produto = produto;
@@ -27,17 +31,15 @@ public class ProdutoFornadaDaVezProjection {
         this.categoria = categoria;
         this.quantidade = quantidade;
         this.quantidadeVendida = convertToInteger(quantidadeVendida);
-        
-        // Converter Object para Boolean de forma segura
         this.isAtivoPf = convertToBoolean(isAtivoPf);
         this.isAtivoFdv = convertToBoolean(isAtivoFdv);
-        
         this.dataInicio = (dataInicio != null ? dataInicio.toLocalDate() : null);
         this.dataFim = (dataFim != null ? dataFim.toLocalDate() : null);
+        this.quantidadeTotal = quantidadeTotal;
     }
 
     // Construtor alternativo para consultas que não retornam quantidadeVendida (11 colunas)
-    public ProdutoFornadaDaVezProjection(Integer fornadaDaVezId, Integer produtoFornadaId, String produto, String descricao, Double valor, String categoria, Integer quantidade, Object isAtivoPf, Object isAtivoFdv, Date dataInicio, Date dataFim) {
+    public ProdutoFornadaDaVezProjection(Integer fornadaDaVezId, Integer produtoFornadaId, String produto, String descricao, Double valor, String categoria, Integer quantidade, Object isAtivoPf, Object isAtivoFdv, Date dataInicio, Date dataFim, Integer quantidadeTotal) {
         this.fornadaDaVezId = fornadaDaVezId;
         this.produtoFornadaId = produtoFornadaId;
         this.produto = produto;
@@ -46,12 +48,11 @@ public class ProdutoFornadaDaVezProjection {
         this.categoria = categoria;
         this.quantidade = quantidade;
         this.quantidadeVendida = 0; // padrão quando a consulta não agrega vendas
-
         this.isAtivoPf = convertToBoolean(isAtivoPf);
         this.isAtivoFdv = convertToBoolean(isAtivoFdv);
-
         this.dataInicio = (dataInicio != null ? dataInicio.toLocalDate() : null);
         this.dataFim = (dataFim != null ? dataFim.toLocalDate() : null);
+        this.quantidadeTotal = quantidadeTotal;
     }
     
     // Método auxiliar para converter Object para Boolean
@@ -190,5 +191,13 @@ public class ProdutoFornadaDaVezProjection {
 
     public void setDataFim(LocalDate dataFim) {
         this.dataFim = dataFim;
+    }
+
+    public Integer getQuantidadeTotal() {
+        return quantidadeTotal;
+    }
+
+    public void setQuantidadeTotal(Integer quantidadeTotal) {
+        this.quantidadeTotal = quantidadeTotal;
     }
 }

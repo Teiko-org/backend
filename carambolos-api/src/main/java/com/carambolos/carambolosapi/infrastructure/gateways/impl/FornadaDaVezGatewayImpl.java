@@ -1,7 +1,7 @@
 package com.carambolos.carambolosapi.infrastructure.gateways.impl;
 
 import com.carambolos.carambolosapi.application.gateways.FornadaDaVezGateway;
-import com.carambolos.carambolosapi.domain.projection.ProdutoFornadaDaVezProjection;
+import com.carambolos.carambolosapi.infrastructure.persistence.projection.ProdutoFornadaDaVezProjection;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.FornadasMapper;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.FornadaDaVez;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.FornadaDaVezRepository;
@@ -39,21 +39,30 @@ public class FornadaDaVezGatewayImpl implements FornadaDaVezGateway {
     }
 
     @Override
+    public List<ProdutoFornadaDaVezProjection> findByFornadaId(Integer fornadaId) {
+        return repository.findByFornadaId(fornadaId);
+    }
+
+    @Override
     public List<ProdutoFornadaDaVezProjection> findResumoKpiByFornadaId(Integer fornadaId) {
         return repository.findResumoKpiByFornadaId(fornadaId);
     }
 
     @Override
     public FornadaDaVez findByFornadaAndProdutoFornadaAndIsAtivoTrue(Integer fornadaId, Integer produtoFornadaId) {
-        return repository.findByFornadaAndProdutoFornadaAndIsAtivoTrue(fornadaId, produtoFornadaId);
+        return repository.findFirstByFornadaAndProdutoFornadaAndIsAtivoTrue(fornadaId, produtoFornadaId)
+                .map(FornadasMapper::toDomain)
+                .orElse(null);
     }
 
     @Override
     public FornadaDaVez saveSummingIfExists(Integer fornadaId, Integer produtoFornadaId, Integer quantidade) {
-        var existente = repository.findByFornadaAndProdutoFornadaAndIsAtivoTrue(fornadaId, produtoFornadaId);
-        if (existente != null) {
+        var existenteOpt = repository.findFirstByFornadaAndProdutoFornadaAndIsAtivoTrue(fornadaId, produtoFornadaId);
+        if (existenteOpt.isPresent()) {
+            var existente = existenteOpt.get();
             existente.setQuantidade((existente.getQuantidade() != null ? existente.getQuantidade() : 0) + quantidade);
-            return repository.save(existente);
+            var saved = repository.save(existente);
+            return FornadasMapper.toDomain(saved);
         }
         var novo = new FornadaDaVez();
         novo.setFornada(fornadaId);

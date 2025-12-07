@@ -1,6 +1,10 @@
 package com.carambolos.carambolosapi.domain.entity;
 
-public class Massa {
+import java.io.Serializable;
+
+public class Massa implements Serializable {
+
+    private static final long serialVersionUID = 1L;
     private Integer id;
     private String sabor;
     private Double valor;

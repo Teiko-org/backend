@@ -15,6 +15,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -34,14 +40,21 @@ class ResumoPedidoControllerWebMvcTest {
 
     @Test
     void listarResumosPedidos_quandoVazio_retorna204() throws Exception {
-        when(resumoPedidoService.listarResumosPedidos()).thenReturn(List.of());
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<ResumoPedido> paginaVazia = new PageImpl<>(List.of(), pageable, 0);
+
+        when(resumoPedidoService.listarResumosPedidos(any(Pageable.class))).thenReturn(paginaVazia);
         mockMvc.perform(get("/resumo-pedido"))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     void listarResumosPedidos_quandoExiste_retorna200() throws Exception {
-        when(resumoPedidoService.listarResumosPedidos()).thenReturn(List.of(new ResumoPedido()));
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<ResumoPedido> paginaComConteudo =
+                new PageImpl<>(List.of(new ResumoPedido()), pageable, 1);
+
+        when(resumoPedidoService.listarResumosPedidos(any(Pageable.class))).thenReturn(paginaComConteudo);
         mockMvc.perform(get("/resumo-pedido"))
                 .andExpect(status().isOk());
     }

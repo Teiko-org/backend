@@ -1,15 +1,20 @@
 package com.carambolos.carambolosapi.domain.entity;
 
-import org.springframework.cglib.core.Local;
-
+import java.io.Serializable;
 import java.time.LocalDate;
 
-public class Fornada {
+public class Fornada implements Serializable {
+    private static final long serialVersionUID = 1L;
     private Integer id;
     private LocalDate dataInicio;
     private LocalDate dataFim;
     private Boolean isAtivo = true;
 
+    // Construtor padrão para uso em mapeamentos (sem validação)
+    public Fornada() {
+    }
+
+    // Construtor com validação para criação de novas fornadas pela aplicação
     public Fornada(LocalDate dataInicio, LocalDate dataFim, Boolean isAtivo) {
         if (dataInicio == null || dataFim == null) {
             throw new IllegalArgumentException("Data de início e data de fim não podem ser nulas.");

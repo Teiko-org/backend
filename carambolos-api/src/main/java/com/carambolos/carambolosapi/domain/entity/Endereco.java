@@ -1,6 +1,9 @@
 package com.carambolos.carambolosapi.domain.entity;
 
-public class Endereco {
+import java.io.Serializable;
+
+public class Endereco implements Serializable {
+    private static final long serialVersionUID = 1L;
     private int id;
     private String nome;
     private String cep;

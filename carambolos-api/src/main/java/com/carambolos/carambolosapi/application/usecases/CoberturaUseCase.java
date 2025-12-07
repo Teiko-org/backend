@@ -6,6 +6,7 @@ import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaE
 import com.carambolos.carambolosapi.application.gateways.CoberturaGateway;
 import com.carambolos.carambolosapi.domain.entity.Cobertura;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.CoberturaEntity;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.util.List;
 import java.util.Optional;
@@ -50,10 +51,12 @@ public class CoberturaUseCase {
         );
     }
 
+    @Cacheable(cacheNames = "coberturas")
     public List<Cobertura> listarCoberturas() {
         return gateway.findAll().stream().filter(Cobertura::getAtivo).toList();
     }
 
+    @Cacheable(cacheNames = "coberturas:porId", key = "#id")
     public Cobertura buscarCoberturaPorId(Integer id) {
         return gateway.findById(id);
     }

@@ -2,11 +2,13 @@ package com.carambolos.carambolosapi.application.usecases;
 
 import com.carambolos.carambolosapi.application.gateways.FornadaGateway;
 import com.carambolos.carambolosapi.domain.entity.Fornada;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.transaction.annotation.Transactional;
 
 public class FornadasUseCases {
     private final FornadaGateway gateway;
@@ -16,6 +18,14 @@ public class FornadasUseCases {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = {
+            "fornadas:ativas",
+            "fornadas:todas",
+            "fornadas:porMesAno",
+            "fornadas:maisRecente",
+            "fornadas:proxima",
+            "fornadas:porId"
+    }, allEntries = true)
     public Fornada criar(Integer id, LocalDate inicio, LocalDate fim) {
         if (id != null && gateway.existsAtivaById(id)) {
             throw new IllegalArgumentException("Fornada com cadastro " + id + " já existe.");
@@ -26,6 +36,14 @@ public class FornadasUseCases {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = {
+            "fornadas:ativas",
+            "fornadas:todas",
+            "fornadas:porMesAno",
+            "fornadas:maisRecente",
+            "fornadas:proxima",
+            "fornadas:porId"
+    }, allEntries = true)
     public Fornada atualizar(Integer id, LocalDate inicio, LocalDate fim) {
         var f = buscarPorId(id);
         f.setDataInicio(inicio);
@@ -34,6 +52,14 @@ public class FornadasUseCases {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = {
+            "fornadas:ativas",
+            "fornadas:todas",
+            "fornadas:porMesAno",
+            "fornadas:maisRecente",
+            "fornadas:proxima",
+            "fornadas:porId"
+    }, allEntries = true)
     public void encerrar(Integer id) {
         var f = gateway.findById(id).orElseThrow(() -> new RuntimeException(
             "Fornada com id " + id + " não encontrada."
@@ -42,24 +68,29 @@ public class FornadasUseCases {
         gateway.save(f);
     }
 
+    @Cacheable(cacheNames = "fornadas:ativas")
     public List<Fornada> listarAtivas() {
         return gateway.findAllAtivas();
     }
 
+    @Cacheable(cacheNames = "fornadas:todas")
     public List<Fornada> listarTodas() {
         return gateway.findAll();
     }
 
+    @Cacheable(cacheNames = "fornadas:porMesAno", key = "#ano + '-' + #mes")
     public List<Fornada> listarPorMesAno(int ano, int mes) {
         var inicio = LocalDate.of(ano, mes, 1);
         var fim = inicio.withDayOfMonth(inicio.lengthOfMonth());
         return gateway.findByDataInicioBetweenOrderByDataInicioAsc(inicio, fim);
     }
 
+    @Cacheable(cacheNames = "fornadas:maisRecente")
     public List<Fornada> buscarMaisRecente() {
         return gateway.findTop1ByAtivaTrueOrderByDataInicioDesc().stream().toList();
     }
 
+    @Cacheable(cacheNames = "fornadas:proxima")
     public Optional<Fornada> buscarProxima() {
         var hoje = java.time.LocalDate.now();
         return gateway.findAllByAtivaTrueOrderByDataInicioAsc()
@@ -69,6 +100,7 @@ public class FornadasUseCases {
                 .findFirst();
     }
 
+    @Cacheable(cacheNames = "fornadas:porId", key = "#id")
     public Fornada buscarPorId(Integer id) {
         return gateway.findById(id)
                 .filter(f -> Boolean.TRUE.equals(f.getAtivo())).orElseThrow(() -> new RuntimeException("Fornada com cadastro "+id+" não encontrada."));

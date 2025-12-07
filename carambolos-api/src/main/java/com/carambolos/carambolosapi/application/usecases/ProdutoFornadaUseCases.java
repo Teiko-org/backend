@@ -1,5 +1,6 @@
 package com.carambolos.carambolosapi.application.usecases;
 
+import com.carambolos.carambolosapi.application.gateways.StorageGateway;
 import com.carambolos.carambolosapi.infrastructure.web.request.ProdutoFornadaRequestDTO;
 import com.carambolos.carambolosapi.application.exception.EntidadeJaExisteException;
 import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaException;
@@ -7,6 +8,7 @@ import com.carambolos.carambolosapi.domain.entity.ImagemProdutoFornada;
 import com.carambolos.carambolosapi.domain.entity.ProdutoFornada;
 import com.carambolos.carambolosapi.application.gateways.ProdutoFornadaGateway;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,12 +21,11 @@ import java.util.List;
 public class ProdutoFornadaUseCases {
 
     private final ProdutoFornadaGateway produtoFornadaGateway;
+    private  final StorageGateway storageGateway;
 
-    @Autowired
-    private AzureStorageService azureStorageService;
-
-    public ProdutoFornadaUseCases(ProdutoFornadaGateway produtoFornadaGateway) {
+    public ProdutoFornadaUseCases(ProdutoFornadaGateway produtoFornadaGateway, StorageGateway storageGateway) {
         this.produtoFornadaGateway = produtoFornadaGateway;
+        this.storageGateway = storageGateway;
     }
 
     public ProdutoFornada criarProdutoFornada(String produto, String descricao, Double valor, String categoria, MultipartFile[] arquivos) {
@@ -37,7 +38,7 @@ public class ProdutoFornadaUseCases {
 
         List<ImagemProdutoFornada> imagens = new ArrayList<>();
         for (MultipartFile arquivo : arquivos) {
-            String url = azureStorageService.upload(arquivo);
+            String url = storageGateway.upload(arquivo);
             ImagemProdutoFornada imagem = new ImagemProdutoFornada();
             imagem.setUrl(url);
             imagem.setProdutoFornada(produtoFornada);
@@ -48,6 +49,7 @@ public class ProdutoFornadaUseCases {
         return produtoFornadaGateway.save(produtoFornada);
     }
 
+    @Cacheable(cacheNames = "produtosFornada", key = "#pageable.pageNumber + ':' + #pageable.pageSize + ':' + (#categorias == null || #categorias.isEmpty() ? 'ALL' : #categorias)")
     public Page<ProdutoFornada> listarProdutosFornada(Pageable pageable, List<String> categorias) {
         if (categorias != null && !categorias.isEmpty()) {
             return produtoFornadaGateway.findAtivosByCategoriaIn(pageable, categorias);
@@ -55,6 +57,7 @@ public class ProdutoFornadaUseCases {
         return produtoFornadaGateway.findAtivos(pageable);
     }
 
+    @Cacheable(cacheNames = "produtosFornada:porId", key = "#id")
     public ProdutoFornada buscarProdutoFornada(Integer id) {
         return produtoFornadaGateway.findById(id)
                 .filter(ProdutoFornada::isAtivo)
