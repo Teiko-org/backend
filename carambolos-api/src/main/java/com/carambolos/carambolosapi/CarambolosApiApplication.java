@@ -23,6 +23,7 @@ import io.github.cdimascio.dotenv.Dotenv;
         }
 )
 @SpringBootApplication(exclude = {
+    org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration.class,
     org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration.class
 })
 public class CarambolosApiApplication {
@@ -55,9 +56,7 @@ public class CarambolosApiApplication {
             // Se dev.env não estiver presente ou der erro, seguimos só com env vars normais.
         }
 
-        SpringApplication app = new SpringApplication(CarambolosApiApplication.class);
-        app.addListeners(new com.carambolos.carambolosapi.system.config.RedisConnectionFailureHandler());
-        app.run(args);
+        SpringApplication.run(CarambolosApiApplication.class, args);
     }
 
     private static void setIfPresent(String sysPropKey, Dotenv dotenv, String envKey) {
