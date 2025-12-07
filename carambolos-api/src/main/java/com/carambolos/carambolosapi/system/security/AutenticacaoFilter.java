@@ -37,6 +37,17 @@ public class AutenticacaoFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
 
         // Endpoints públicos que não devem falhar por token inválido/ausente
+        // - Swagger/OpenAPI
+        if (path.startsWith("/swagger-ui") || 
+            path.startsWith("/swagger-resources") ||
+            path.startsWith("/v3/api-docs") ||
+            path.startsWith("/configuration") ||
+            path.startsWith("/webjars") ||
+            path.equals("/swagger-ui.html")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+        
         // - /decoracoes: qualquer método (upload referência + listagens públicas)
         // - /resumo-pedido: apenas POST (criação de resumo anônimo para WhatsApp)
         if (path.startsWith("/decoracoes") ||
@@ -68,12 +79,14 @@ public class AutenticacaoFilter extends OncePerRequestFilter {
             } catch (ExpiredJwtException exception) {
                 LOGGER.info("[FALHA AUTENTICACAO] - Token expirado, usuario: {} - {}",
                         exception.getClaims().getSubject(), exception.getMessage());
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                return;
+                // Não retorna 401 para URLs públicas, apenas continua sem autenticação
+                jwtToken = null;
+                username = null;
             } catch (Exception exception) {
                 LOGGER.warn("[FALHA AUTENTICACAO] - Token inválido: {}", exception.getMessage());
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                return;
+                // Não retorna 401 para URLs públicas, apenas continua sem autenticação
+                jwtToken = null;
+                username = null;
             }
         }
 

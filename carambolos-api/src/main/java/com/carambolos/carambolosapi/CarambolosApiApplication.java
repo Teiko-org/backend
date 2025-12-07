@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.servers.Server;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -23,8 +22,9 @@ import io.github.cdimascio.dotenv.Dotenv;
                 @Server(url = "http://localhost:8080", description = "Servidor Local")
         }
 )
-@SpringBootApplication
-// @EnableCaching - DESABILITADO TEMPORARIAMENTE: Redis pode não estar conectado
+@SpringBootApplication(exclude = {
+    org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration.class
+})
 public class CarambolosApiApplication {
 
     public static void main(String[] args) {
