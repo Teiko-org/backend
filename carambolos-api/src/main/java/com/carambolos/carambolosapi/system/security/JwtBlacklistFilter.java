@@ -26,6 +26,17 @@ public class JwtBlacklistFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
 
         // Endpoints públicos que não devem falhar por token em blacklist
+        // - Swagger/OpenAPI
+        if (path.startsWith("/swagger-ui") || 
+            path.startsWith("/swagger-resources") ||
+            path.startsWith("/v3/api-docs") ||
+            path.startsWith("/configuration") ||
+            path.startsWith("/webjars") ||
+            path.equals("/swagger-ui.html")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+        
         // - /decoracoes: qualquer método
         // - /resumo-pedido: apenas POST
         if (path.startsWith("/decoracoes") ||
