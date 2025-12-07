@@ -57,7 +57,7 @@ public class PedidoFornadaUseCases {
         Fornada fornada = fornadas.findById(fornadaDaVez.getFornada())
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Fornada com ID " + fornadaDaVez.getFornada() + " não encontrada."));
         
-        if (fornada.isAtivo() == null || !Boolean.TRUE.equals(fornada.isAtivo())) {
+        if (fornada.getAtivo() == null || !Boolean.TRUE.equals(fornada.getAtivo())) {
             throw new EntidadeImprocessavelException("A fornada associada a este produto não está mais ativa.");
         }
 
