@@ -5,7 +5,6 @@ import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaE
 import com.carambolos.carambolosapi.application.gateways.RecheioUnitarioGateway;
 import com.carambolos.carambolosapi.domain.entity.RecheioUnitario;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.RecheioUnitarioEntity;
-import org.springframework.cache.annotation.Cacheable;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,12 +23,10 @@ public class RecheioUnitarioUseCase {
         return gateway.save(recheioUnitario);
     }
 
-    @Cacheable(cacheNames = "recheiosUnitarios")
     public List<RecheioUnitario> listarRecheiosUnitarios() {
         return gateway.findAll().stream().filter(RecheioUnitario::getAtivo).toList();
     }
 
-    @Cacheable(cacheNames = "recheiosUnitarios:porId", key = "#id")
     public RecheioUnitario buscarPorId(Integer id) {
         return gateway.findById(id);
     }

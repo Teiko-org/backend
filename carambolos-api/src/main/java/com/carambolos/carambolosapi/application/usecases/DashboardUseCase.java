@@ -1,7 +1,6 @@
 package com.carambolos.carambolosapi.application.usecases;
 
 import com.carambolos.carambolosapi.application.gateways.DashboardGateway;
-import org.springframework.cache.annotation.Cacheable;
 
 import java.util.List;
 import java.util.Map;
@@ -13,32 +12,26 @@ public class DashboardUseCase {
         this.dashboardGateway = dashboardGateway;
     }
 
-    @Cacheable(cacheNames = "dashboard:qtdClientesUnicos")
     public long qtdClientesUnicos() {
         return dashboardGateway.qtdClientesUnicos();
     }
 
-    @Cacheable(cacheNames = "dashboard:qtdPedidos")
     public Map<String, Long> countPedidos() {
         return dashboardGateway.countPedidos();
     }
 
-    @Cacheable(cacheNames = "dashboard:qtdPedidosBolos")
     public Map<String, Long> countPedidosBolos() {
         return dashboardGateway.countPedidosBolos();
     }
 
-    @Cacheable(cacheNames = "dashboard:qtdPedidosFornada")
     public Map<String, Long> countPedidosFornada() {
         return dashboardGateway.countPedidosFornada();
     }
 
-    @Cacheable(cacheNames = "dashboard:bolosMaisPedidos")
     public List<Map<String, Object>> getBolosMaisPedidos() {
         return dashboardGateway.getBolosMaisPedidos();
     }
 
-    @Cacheable(cacheNames = "dashboard:fornadasMaisPedidas")
     public List<Map<String, Object>> getFornadasMaisPedidas() {
         return dashboardGateway.getFornadasMaisPedidas();
     }

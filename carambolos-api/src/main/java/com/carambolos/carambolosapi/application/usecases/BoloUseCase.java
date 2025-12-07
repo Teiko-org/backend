@@ -9,7 +9,6 @@ import com.carambolos.carambolosapi.infrastructure.persistence.projection.Detalh
 import com.carambolos.carambolosapi.application.exception.EntidadeJaExisteException;
 import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.*;
-import org.springframework.cache.annotation.Cacheable;
 
 import java.util.List;
 
@@ -34,7 +33,6 @@ public class BoloUseCase {
     }
 
 
-    @Cacheable(cacheNames = "bolos", key = "#categorias == null || #categorias.isEmpty() ? 'ALL' : #categorias")
     public List<Bolo> listarBolos(List<String> categorias) {
         List<Bolo> boloEntities;
 
@@ -46,12 +44,10 @@ public class BoloUseCase {
         return boloEntities;
     }
 
-    @Cacheable(cacheNames = "bolos:detalhes")
     public List<DetalheBoloProjection> listarDetalhesBolos() {
         return boloGateway.listarDetalheBolo();
     }
 
-    @Cacheable(cacheNames = "bolos:porId", key = "#id")
     public Bolo buscarBoloPorId(Integer id) {
         return boloGateway.findById(id);
     }

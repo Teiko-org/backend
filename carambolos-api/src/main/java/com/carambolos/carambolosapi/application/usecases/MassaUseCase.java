@@ -4,7 +4,6 @@ import com.carambolos.carambolosapi.application.exception.EntidadeJaExisteExcept
 import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.application.gateways.MassaGateway;
 import com.carambolos.carambolosapi.domain.entity.Massa;
-import org.springframework.cache.annotation.Cacheable;
 
 import java.util.List;
 
@@ -32,12 +31,10 @@ public class MassaUseCase {
         return massaGateway.atualizarMassa(massa, id);
     }
 
-    @Cacheable(cacheNames = "massas")
     public List<Massa> listarMassas() {
         return massaGateway.listarMassas();
     }
 
-    @Cacheable(cacheNames = "massas:porId", key = "#id")
     public Massa buscarMassaPorId(Integer id) {
         return massaGateway.findById(id);
     }
