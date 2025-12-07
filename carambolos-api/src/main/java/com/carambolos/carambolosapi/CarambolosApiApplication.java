@@ -23,7 +23,6 @@ import io.github.cdimascio.dotenv.Dotenv;
         }
 )
 @SpringBootApplication(exclude = {
-    org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration.class,
     org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration.class
 })
 public class CarambolosApiApplication {
@@ -47,6 +46,10 @@ public class CarambolosApiApplication {
             // AWS S3
             setIfPresent("aws.s3.bucket-name", dotenv, "AWS_S3_BUCKET_NAME");
             setIfPresent("aws.region", dotenv, "AWS_REGION");
+            // Variáveis AWS para S3StorageGatewayImpl (via @Value)
+            setIfPresent("AWS_ACCESS_KEY_ID", dotenv, "AWS_ACCESS_KEY_ID");
+            setIfPresent("AWS_SECRET_ACCESS_KEY", dotenv, "AWS_SECRET_ACCESS_KEY");
+            setIfPresent("AWS_SESSION_TOKEN", dotenv, "AWS_SESSION_TOKEN");
 
             // Redis (opcional)
             setIfPresent("REDIS_HOST", dotenv, "REDIS_HOST");
