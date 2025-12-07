@@ -50,11 +50,14 @@ public class CarambolosApiApplication {
             // Redis (opcional)
             setIfPresent("REDIS_HOST", dotenv, "REDIS_HOST");
             setIfPresent("REDIS_PORT", dotenv, "REDIS_PORT");
+            setIfPresent("CACHE_TYPE", dotenv, "CACHE_TYPE");
         } catch (Exception ignored) {
             // Se dev.env não estiver presente ou der erro, seguimos só com env vars normais.
         }
 
-        SpringApplication.run(CarambolosApiApplication.class, args);
+        SpringApplication app = new SpringApplication(CarambolosApiApplication.class);
+        app.addListeners(new com.carambolos.carambolosapi.system.config.RedisConnectionFailureHandler());
+        app.run(args);
     }
 
     private static void setIfPresent(String sysPropKey, Dotenv dotenv, String envKey) {
