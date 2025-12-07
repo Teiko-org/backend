@@ -57,10 +57,16 @@ public class FornadaDaVezGatewayImpl implements FornadaDaVezGateway {
 
     @Override
     public FornadaDaVez saveSummingIfExists(Integer fornadaId, Integer produtoFornadaId, Integer quantidade) {
+        // Validar quantidade antes de salvar
+        if (quantidade == null || quantidade <= 0) {
+            throw new IllegalArgumentException("Quantidade deve ser maior que zero");
+        }
+        
         var existenteOpt = repository.findFirstByFornadaAndProdutoFornadaAndIsAtivoTrue(fornadaId, produtoFornadaId);
         if (existenteOpt.isPresent()) {
             var existente = existenteOpt.get();
-            existente.setQuantidade((existente.getQuantidade() != null ? existente.getQuantidade() : 0) + quantidade);
+            // Substitui a quantidade ao invés de somar
+            existente.setQuantidade(quantidade);
             var saved = repository.save(existente);
             return FornadasMapper.toDomain(saved);
         }
