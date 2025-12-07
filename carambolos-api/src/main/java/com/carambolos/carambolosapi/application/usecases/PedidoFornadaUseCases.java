@@ -55,8 +55,11 @@ public class PedidoFornadaUseCases {
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("FornadaDaVez com ID " + request.fornadaDaVezId() + " não encontrada ou foi ocultada."));
 
         Fornada fornada = fornadas.findById(fornadaDaVez.getFornada())
-                .filter(f -> Boolean.TRUE.equals(f.getAtivo()))
-                .orElseThrow(() -> new EntidadeImprocessavelException("A fornada associada a este produto não está mais ativa."));
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Fornada com ID " + fornadaDaVez.getFornada() + " não encontrada."));
+        
+        if (fornada.getAtivo() == null || !Boolean.TRUE.equals(fornada.getAtivo())) {
+            throw new EntidadeImprocessavelException("A fornada associada a este produto não está mais ativa.");
+        }
 
         LocalDate hoje = LocalDate.now();
         if (fornada.getDataFim().isBefore(hoje)) {
