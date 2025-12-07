@@ -24,7 +24,7 @@ import io.github.cdimascio.dotenv.Dotenv;
         }
 )
 @SpringBootApplication
-@EnableCaching
+// @EnableCaching - DESABILITADO TEMPORARIAMENTE: Redis pode não estar conectado
 public class CarambolosApiApplication {
 
     public static void main(String[] args) {
