@@ -80,4 +80,20 @@ public class DashboardUseCase {
         return dashboardGateway.getKPIFornadasPorMesAno(ano, mes);
     }
 
+    public List<Map<String, Object>> getMassasPendentes() {
+        return dashboardGateway.getMassasPendentes();
+    }
+
+    public List<Map<String, Object>> getRecheiosPendentes() {
+        return dashboardGateway.getRecheiosPendentes();
+    }
+
+    public List<Map<String, Object>> getPedidosProximosDaEntrega(int diasProximos) {
+        return dashboardGateway.getPedidosProximosDaEntrega(diasProximos);
+    }
+
+    public List<Map<String, Object>> getItensMaisPedidosPorPeriodo(String tipoItem, String periodo, Integer ano, Integer mes) {
+        return dashboardGateway.getItensMaisPedidosPorPeriodo(tipoItem, periodo, ano, mes);
+    }
+
 }

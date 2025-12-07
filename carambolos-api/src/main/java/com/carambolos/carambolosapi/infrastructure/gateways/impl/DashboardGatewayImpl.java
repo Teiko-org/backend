@@ -14,6 +14,7 @@ import com.carambolos.carambolosapi.infrastructure.gateways.mapper.FornadasMappe
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class DashboardGatewayImpl implements DashboardGateway {
@@ -25,8 +26,25 @@ public class DashboardGatewayImpl implements DashboardGateway {
     private final ResumoPedidoRepository resumoPedidoRepository;
     private final DecoracaoRepository decoracaoRepository;
     private final FornadaRepository fornadaRepository;
+    private final MassaRepository massaRepository;
+    private final RecheioPedidoRepository recheioPedidoRepository;
+    private final RecheioUnitarioRepository recheioUnitarioRepository;
+    private final RecheioExclusivoRepository recheioExclusivoRepository;
 
-    public DashboardGatewayImpl(PedidoBoloRepository pedidoBoloRepository, BoloRepository boloRepository, PedidoFornadaRepository pedidoFornadaRepository, ProdutoFornadaRepository produtoFornadaRepository, FornadaDaVezRepository fornadaDaVezRepository, ResumoPedidoRepository resumoPedidoRepository, DecoracaoRepository decoracaoRepository, FornadaRepository fornadaRepository) {
+    public DashboardGatewayImpl(
+            PedidoBoloRepository pedidoBoloRepository,
+            BoloRepository boloRepository,
+            PedidoFornadaRepository pedidoFornadaRepository,
+            ProdutoFornadaRepository produtoFornadaRepository,
+            FornadaDaVezRepository fornadaDaVezRepository,
+            ResumoPedidoRepository resumoPedidoRepository,
+            DecoracaoRepository decoracaoRepository,
+            FornadaRepository fornadaRepository,
+            MassaRepository massaRepository,
+            RecheioPedidoRepository recheioPedidoRepository,
+            RecheioUnitarioRepository recheioUnitarioRepository,
+            RecheioExclusivoRepository recheioExclusivoRepository
+    ) {
         this.pedidoBoloRepository = pedidoBoloRepository;
         this.boloRepository = boloRepository;
         this.pedidoFornadaRepository = pedidoFornadaRepository;
@@ -35,6 +53,10 @@ public class DashboardGatewayImpl implements DashboardGateway {
         this.resumoPedidoRepository = resumoPedidoRepository;
         this.decoracaoRepository = decoracaoRepository;
         this.fornadaRepository = fornadaRepository;
+        this.massaRepository = massaRepository;
+        this.recheioPedidoRepository = recheioPedidoRepository;
+        this.recheioUnitarioRepository = recheioUnitarioRepository;
+        this.recheioExclusivoRepository = recheioExclusivoRepository;
     }
 
     @Override
@@ -682,5 +704,524 @@ public class DashboardGatewayImpl implements DashboardGateway {
             }
         }
         return resultado;
+    }
+
+    @Override
+    public List<Map<String, Object>> getMassasPendentes() {
+        try {
+            // Buscar todos os resumos de pedidos pendentes e pagos que são de bolo
+            // (pedidos que ainda não foram entregues e precisam ser produzidos)
+            List<ResumoPedido> pedidosPendentes = resumoPedidoRepository
+                    .findByStatusInAndPedidoBoloIdIsNotNull(
+                            List.of(StatusEnum.PENDENTE, StatusEnum.PAGO)
+                    );
+
+            if (pedidosPendentes.isEmpty()) {
+                return new ArrayList<>();
+            }
+
+            // Agrupar por massaId e contar
+            Map<Integer, Long> contagemPorMassa = new HashMap<>();
+            Map<Integer, String> nomesMassas = new HashMap<>();
+
+            for (ResumoPedido resumo : pedidosPendentes) {
+                try {
+                    PedidoBoloEntity pedidoBolo = pedidoBoloRepository
+                            .findById(resumo.getPedidoBoloId())
+                            .orElse(null);
+
+                    if (pedidoBolo == null || !Boolean.TRUE.equals(pedidoBolo.getAtivo())) {
+                        continue;
+                    }
+
+                    BoloEntity bolo = boloRepository
+                            .findById(pedidoBolo.getBoloId())
+                            .orElse(null);
+
+                    if (bolo == null || bolo.getMassa() == null) {
+                        continue;
+                    }
+
+                    Integer massaId = bolo.getMassa();
+                    contagemPorMassa.put(massaId, contagemPorMassa.getOrDefault(massaId, 0L) + 1);
+
+                    // Buscar nome da massa se ainda não foi buscado
+                    if (!nomesMassas.containsKey(massaId)) {
+                        massaRepository.findById(massaId)
+                                .ifPresent(massa -> nomesMassas.put(massaId, massa.getSabor()));
+                    }
+                } catch (Exception e) {
+                    System.err.println("Erro ao processar pedido: " + e.getMessage());
+                }
+            }
+
+            // Converter para lista de Map
+            return contagemPorMassa.entrySet().stream()
+                    .map(entry -> {
+                        Map<String, Object> resultado = new HashMap<>();
+                        resultado.put("massaId", entry.getKey());
+                        resultado.put("nomeMassa", nomesMassas.getOrDefault(entry.getKey(), "Massa Desconhecida"));
+                        resultado.put("quantidade", entry.getValue());
+                        return resultado;
+                    })
+                    .sorted((m1, m2) -> Long.compare(
+                            (Long) m2.get("quantidade"),
+                            (Long) m1.get("quantidade")
+                    ))
+                    .collect(Collectors.toList());
+
+        } catch (Exception e) {
+            System.err.println("Erro em getMassasPendentes: " + e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public List<Map<String, Object>> getRecheiosPendentes() {
+        try {
+            // Buscar todos os resumos de pedidos pendentes e pagos que são de bolo
+            // (pedidos que ainda não foram entregues e precisam ser produzidos)
+            List<ResumoPedido> pedidosPendentes = resumoPedidoRepository
+                    .findByStatusInAndPedidoBoloIdIsNotNull(
+                            List.of(StatusEnum.PENDENTE, StatusEnum.PAGO)
+                    );
+
+            if (pedidosPendentes.isEmpty()) {
+                return new ArrayList<>();
+            }
+
+            // Agrupar por recheio e contar
+            Map<String, Long> contagemPorRecheio = new HashMap<>();
+            Map<String, Integer> recheioIds = new HashMap<>();
+
+            for (ResumoPedido resumo : pedidosPendentes) {
+                try {
+                    PedidoBoloEntity pedidoBolo = pedidoBoloRepository
+                            .findById(resumo.getPedidoBoloId())
+                            .orElse(null);
+
+                    if (pedidoBolo == null || !Boolean.TRUE.equals(pedidoBolo.getAtivo())) {
+                        continue;
+                    }
+
+                    BoloEntity bolo = boloRepository
+                            .findById(pedidoBolo.getBoloId())
+                            .orElse(null);
+
+                    if (bolo == null || bolo.getRecheioPedido() == null) {
+                        continue;
+                    }
+
+                    Integer recheioPedidoId = bolo.getRecheioPedido();
+                    String nomeRecheio = obterNomeRecheio(recheioPedidoId);
+
+                    if (nomeRecheio != null && !nomeRecheio.isEmpty()) {
+                        contagemPorRecheio.put(nomeRecheio,
+                                contagemPorRecheio.getOrDefault(nomeRecheio, 0L) + 1);
+                        recheioIds.put(nomeRecheio, recheioPedidoId);
+                    }
+                } catch (Exception e) {
+                    System.err.println("Erro ao processar pedido: " + e.getMessage());
+                }
+            }
+
+            // Converter para lista de Map
+            return contagemPorRecheio.entrySet().stream()
+                    .map(entry -> {
+                        Map<String, Object> resultado = new HashMap<>();
+                        resultado.put("recheioId", recheioIds.get(entry.getKey()));
+                        resultado.put("nomeRecheio", entry.getKey());
+                        resultado.put("quantidade", entry.getValue());
+                        return resultado;
+                    })
+                    .sorted((m1, m2) -> Long.compare(
+                            (Long) m2.get("quantidade"),
+                            (Long) m1.get("quantidade")
+                    ))
+                    .collect(Collectors.toList());
+
+        } catch (Exception e) {
+            System.err.println("Erro em getRecheiosPendentes: " + e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    private String obterNomeRecheio(Integer recheioPedidoId) {
+        try {
+            RecheioPedidoEntity recheioPedido = recheioPedidoRepository
+                    .findById(recheioPedidoId)
+                    .orElse(null);
+
+            if (recheioPedido == null) {
+                return null;
+            }
+
+            // Caso 1: Recheio Exclusivo
+            if (recheioPedido.getRecheioExclusivo() != null) {
+                RecheioExclusivoEntity recheioExclusivo = recheioExclusivoRepository
+                        .findById(recheioPedido.getRecheioExclusivo())
+                        .orElse(null);
+
+                if (recheioExclusivo != null && recheioExclusivo.getNome() != null) {
+                    return recheioExclusivo.getNome();
+                }
+            }
+
+            // Caso 2: Dois Recheios Unitários
+            List<String> sabores = new ArrayList<>();
+
+            if (recheioPedido.getRecheioUnitarioId1() != null) {
+                recheioUnitarioRepository.findById(recheioPedido.getRecheioUnitarioId1())
+                        .ifPresent(recheio -> {
+                            if (recheio.getSabor() != null) {
+                                sabores.add(recheio.getSabor());
+                            }
+                        });
+            }
+
+            if (recheioPedido.getRecheioUnitarioId2() != null) {
+                recheioUnitarioRepository.findById(recheioPedido.getRecheioUnitarioId2())
+                        .ifPresent(recheio -> {
+                            if (recheio.getSabor() != null) {
+                                sabores.add(recheio.getSabor());
+                            }
+                        });
+            }
+
+            if (sabores.isEmpty()) {
+                return null;
+            }
+
+            // Formatar nome: "Sabor1 com Sabor2" ou apenas "Sabor1" se houver apenas um
+            return sabores.size() == 1
+                    ? sabores.get(0)
+                    : String.join(" com ", sabores);
+
+        } catch (Exception e) {
+            System.err.println("Erro ao obter nome do recheio: " + e.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public List<Map<String, Object>> getPedidosProximosDaEntrega(int diasProximos) {
+        try {
+            LocalDate hoje = LocalDate.now();
+            LocalDate dataFim = hoje.plusDays(diasProximos);
+            LocalDateTime hojeDateTime = hoje.atStartOfDay();
+            LocalDateTime dataFimDateTime = dataFim.atTime(23, 59, 59);
+
+            // Buscar todos os pedidos ativos que ainda não foram entregues
+            List<ResumoPedido> resumosPedidos = resumoPedidoRepository
+                    .findByStatusInAndIsAtivoTrue(List.of(StatusEnum.PENDENTE, StatusEnum.PAGO));
+
+            if (resumosPedidos.isEmpty()) {
+                return new ArrayList<>();
+            }
+
+            List<Map<String, Object>> resultado = new ArrayList<>();
+
+            for (ResumoPedido resumo : resumosPedidos) {
+                try {
+                    LocalDate dataEntregaPedido = null;
+                    Map<String, Object> pedido = new HashMap<>();
+                    pedido.put("resumoPedidoId", resumo.getId());
+                    pedido.put("valor", resumo.getValor());
+                    pedido.put("status", resumo.getStatus());
+
+                    // Buscar detalhes do pedido e obter data de entrega
+                    if (resumo.getPedidoBoloId() != null) {
+                        PedidoBoloEntity pedidoBolo = pedidoBoloRepository
+                                .findById(resumo.getPedidoBoloId())
+                                .orElse(null);
+
+                        if (pedidoBolo != null && Boolean.TRUE.equals(pedidoBolo.getAtivo())) {
+                            // Usar dataPrevisaoEntrega do pedido como data de entrega
+                            dataEntregaPedido = pedidoBolo.getDataPrevisaoEntrega();
+                            
+                            pedido.put("nomeCliente", pedidoBolo.getNomeCliente());
+                            pedido.put("telefoneCliente", pedidoBolo.getTelefoneCliente());
+                            pedido.put("tipoEntrega", pedidoBolo.getTipoEntrega());
+                            pedido.put("dataPrevisaoEntrega", pedidoBolo.getDataPrevisaoEntrega());
+                            pedido.put("tipoProduto", "BOLO");
+                            pedido.put("pedidoBoloId", resumo.getPedidoBoloId());
+                        } else {
+                            continue; // Pular se pedido não está ativo
+                        }
+                    } else if (resumo.getPedidoFornadaId() != null) {
+                        PedidoFornada pedidoFornada = pedidoFornadaRepository
+                                .findById(resumo.getPedidoFornadaId())
+                                .orElse(null);
+
+                        if (pedidoFornada != null && Boolean.TRUE.equals(pedidoFornada.getAtivo())) {
+                            // Usar dataPrevisaoEntrega do pedido como data de entrega
+                            dataEntregaPedido = pedidoFornada.getDataPrevisaoEntrega();
+                            
+                            pedido.put("nomeCliente", pedidoFornada.getNomeCliente());
+                            pedido.put("telefoneCliente", pedidoFornada.getTelefoneCliente());
+                            pedido.put("tipoEntrega", pedidoFornada.getTipoEntrega());
+                            pedido.put("dataPrevisaoEntrega", pedidoFornada.getDataPrevisaoEntrega());
+                            pedido.put("tipoProduto", "FORNADA");
+                            pedido.put("pedidoFornadaId", resumo.getPedidoFornadaId());
+                        } else {
+                            continue; // Pular se pedido não está ativo
+                        }
+                    } else {
+                        continue; // Pular se não tem pedido associado
+                    }
+
+                    // Filtrar pedidos por data de entrega (priorizar pedidos futuros de 2025, excluir antigos de 2024)
+                    if (dataEntregaPedido != null) {
+                        int anoDataEntrega = dataEntregaPedido.getYear();
+                        int anoAtual = hoje.getYear();
+                        
+                        // Verificar também o ano do pedido para garantir que são pedidos recentes
+                        int anoPedido = resumo.getDataPedido() != null ? resumo.getDataPedido().getYear() : anoAtual;
+                        
+                        // EXCLUIR pedidos de anos muito antigos (2023 ou anteriores)
+                        if (anoDataEntrega < anoAtual - 1 || anoPedido < anoAtual - 1) {
+                            continue; // Excluir pedidos de 2023 ou anteriores
+                        }
+                        
+                        // Se estamos em 2025 ou posterior, excluir explicitamente pedidos de 2024
+                        // Isso garante que apenas pedidos de 2025 ou futuros sejam exibidos
+                        if (anoAtual >= 2025) {
+                            if (anoDataEntrega < 2025) {
+                                continue; // Excluir pedidos de 2024 quando estamos em 2025 ou posterior
+                            }
+                        }
+                        
+                        // Focar em pedidos futuros ou muito recentes
+                        LocalDate limiteAtrasado = hoje.minusDays(2); // Apenas últimos 2 dias para atrasados
+                        LocalDate limiteFuturo = hoje.plusDays(90); // Até 90 dias no futuro
+                        
+                        // PRIORIDADE 1: Pedidos nos próximos N dias (entre hoje e hoje + N dias)
+                        boolean estaNoIntervaloProximo = !dataEntregaPedido.isBefore(hoje) && !dataEntregaPedido.isAfter(dataFim);
+                        
+                        // PRIORIDADE 2: Pedidos futuros além do intervalo mas dentro de 90 dias
+                        boolean estaFuturoAlemIntervalo = dataEntregaPedido.isAfter(dataFim) && !dataEntregaPedido.isAfter(limiteFuturo);
+                        
+                        // PRIORIDADE 3: Pedidos atrasados muito recentes (apenas últimos 2 dias) do ano atual
+                        // Isso evita incluir pedidos de 2024 que estão muito atrasados
+                        boolean estaAtrasadoMuitoRecente = dataEntregaPedido.isBefore(hoje) 
+                                && !dataEntregaPedido.isBefore(limiteAtrasado)
+                                && anoDataEntrega == anoAtual; // Apenas do ano atual
+                        
+                        // Incluir apenas pedidos futuros relevantes ou atrasados muito recentemente
+                        // Priorizar pedidos futuros de 2025 e excluir pedidos antigos de 2024
+                        if (estaNoIntervaloProximo || estaFuturoAlemIntervalo || estaAtrasadoMuitoRecente) {
+                            // Converter para LocalDateTime para manter consistência
+                            LocalDateTime dataEntregaDateTime = dataEntregaPedido.atStartOfDay();
+                            pedido.put("dataEntrega", dataEntregaDateTime);
+                            resultado.add(pedido);
+                        }
+                    }
+                    // Se dataPrevisaoEntrega for null, não incluir (evitar pedidos sem data clara)
+                } catch (Exception e) {
+                    System.err.println("Erro ao processar pedido próximo: " + e.getMessage());
+                }
+            }
+
+            // Ordenar por data de entrega
+            resultado.sort((p1, p2) -> {
+                try {
+                    LocalDateTime data1 = (LocalDateTime) p1.get("dataEntrega");
+                    LocalDateTime data2 = (LocalDateTime) p2.get("dataEntrega");
+                    if (data1 == null && data2 == null) return 0;
+                    if (data1 == null) return 1;
+                    if (data2 == null) return -1;
+                    return data1.compareTo(data2);
+                } catch (Exception e) {
+                    return 0;
+                }
+            });
+
+            return resultado;
+
+        } catch (Exception e) {
+            System.err.println("Erro em getPedidosProximosDaEntrega: " + e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public List<Map<String, Object>> getItensMaisPedidosPorPeriodo(String tipoItem, String periodo, Integer ano, Integer mes) {
+        try {
+            // Buscar todos os resumos de pedidos de bolo ativos
+            List<ResumoPedido> todosResumosPedidos = resumoPedidoRepository
+                    .findByPedidoBoloIdIsNotNullAndIsAtivoTrue();
+
+            if (todosResumosPedidos.isEmpty()) {
+                return new ArrayList<>();
+            }
+
+            // Filtrar por período se fornecido
+            LocalDateTime dataInicio = null;
+            LocalDateTime dataFim = null;
+            LocalDateTime agora = LocalDateTime.now();
+
+            if (ano != null) {
+                if (mes != null) {
+                    // Filtrar por mês específico
+                    dataInicio = LocalDateTime.of(ano, mes, 1, 0, 0);
+                    dataFim = LocalDateTime.of(ano, mes, dataInicio.toLocalDate().lengthOfMonth(), 23, 59, 59);
+                } else {
+                    // Filtrar por ano completo - ajustar para incluir até o último dia do ano
+                    dataInicio = LocalDateTime.of(ano, 1, 1, 0, 0, 0);
+                    dataFim = LocalDateTime.of(ano, 12, 31, 23, 59, 59);
+                }
+            } else if (periodo != null) {
+                switch (periodo.toUpperCase()) {
+                    case "SEMANA":
+                        dataInicio = agora.minusWeeks(1);
+                        dataFim = agora;
+                        break;
+                    case "MES":
+                        dataInicio = agora.minusMonths(1);
+                        dataFim = agora;
+                        break;
+                    case "ANO":
+                        dataInicio = agora.minusYears(1);
+                        dataFim = agora;
+                        break;
+                }
+            }
+
+            // Filtrar por período e excluir apenas CANCELADOS
+            final LocalDateTime inicio = dataInicio;
+            final LocalDateTime fim = dataFim;
+            List<ResumoPedido> resumosPedidos = todosResumosPedidos.stream()
+                    .filter(rp -> {
+                        // Excluir apenas pedidos cancelados
+                        if (rp.getStatus() == StatusEnum.CANCELADO) {
+                            return false;
+                        }
+                        // Filtrar por período se fornecido
+                        if (inicio != null && fim != null) {
+                            return rp.getDataPedido() != null &&
+                                    !rp.getDataPedido().isBefore(inicio) &&
+                                    !rp.getDataPedido().isAfter(fim);
+                        }
+                        return true;
+                    })
+                    .collect(Collectors.toList());
+
+            if (resumosPedidos.isEmpty()) {
+                return new ArrayList<>();
+            }
+
+            Map<String, Long> contagemPorItem = new HashMap<>();
+            Map<String, Integer> itemIds = new HashMap<>();
+
+            for (ResumoPedido resumo : resumosPedidos) {
+                try {
+                    // Pular pedidos cancelados
+                    if (resumo.getStatus() == StatusEnum.CANCELADO) {
+                        continue;
+                    }
+                    
+                    PedidoBoloEntity pedidoBolo = pedidoBoloRepository
+                            .findById(resumo.getPedidoBoloId())
+                            .orElse(null);
+
+                    if (pedidoBolo == null || !Boolean.TRUE.equals(pedidoBolo.getAtivo())) {
+                        continue;
+                    }
+
+                    BoloEntity bolo = boloRepository
+                            .findById(pedidoBolo.getBoloId())
+                            .orElse(null);
+
+                    if (bolo == null) {
+                        continue;
+                    }
+
+                    AtomicReference<String> nomeItem = new AtomicReference<>();
+                    Integer itemId = null;
+                    String periodoKey = null;
+
+                    switch (tipoItem.toUpperCase()) {
+                        case "MASSA":
+                            if (bolo.getMassa() != null) {
+                                itemId = bolo.getMassa();
+                                massaRepository.findById(itemId)
+                                        .ifPresent(massa -> nomeItem.set(massa.getSabor()));
+                            }
+                            break;
+                        case "RECHEIO":
+                            if (bolo.getRecheioPedido() != null) {
+                                itemId = bolo.getRecheioPedido();
+                                nomeItem.set(obterNomeRecheio(itemId));
+                            }
+                            break;
+                        case "DECORACAO":
+                            if (bolo.getDecoracao() != null) {
+                                itemId = bolo.getDecoracao();
+                                decoracaoRepository.findById(itemId)
+                                        .ifPresent(decoracao -> nomeItem.set(decoracao.getNome()));
+                            }
+                            break;
+                    }
+
+                    if (nomeItem.get() != null && !nomeItem.get().isEmpty()) {
+                        // Criar chave de período
+                        if (periodo != null && periodo.equalsIgnoreCase("MES") && resumo.getDataPedido() != null) {
+                            // Quando período=MES e ano é fornecido, agrupar por mês dentro do ano
+                            int anoPedido = resumo.getDataPedido().getYear();
+                            int mesPedido = resumo.getDataPedido().getMonthValue();
+                            
+                            // Se ano foi fornecido, validar se o pedido pertence ao ano e incluir todos os meses (1-12)
+                            if (ano != null && anoPedido == ano && mesPedido >= 1 && mesPedido <= 12) {
+                                periodoKey = String.format("%04d-%02d", anoPedido, mesPedido);
+                            } else if (ano == null) {
+                                // Se ano não foi fornecido, usar o ano do pedido (incluir todos os meses)
+                                if (mesPedido >= 1 && mesPedido <= 12) {
+                                    periodoKey = String.format("%04d-%02d", anoPedido, mesPedido);
+                                }
+                            } else {
+                                continue; // Pular pedidos de outros anos
+                            }
+                        } else if (periodo != null && periodo.equalsIgnoreCase("ANO") && resumo.getDataPedido() != null) {
+                            periodoKey = String.valueOf(resumo.getDataPedido().getYear());
+                        } else if (periodo != null && periodo.equalsIgnoreCase("SEMANA") && resumo.getDataPedido() != null) {
+                            // Calcular semana do ano
+                            int semana = resumo.getDataPedido().getDayOfYear() / 7 + 1;
+                            periodoKey = String.format("%04d-S%02d", resumo.getDataPedido().getYear(), semana);
+                        } else {
+                            periodoKey = "TODOS";
+                        }
+
+                        if (periodoKey != null) {
+                            String chave = nomeItem + "|" + periodoKey;
+                            contagemPorItem.put(chave, contagemPorItem.getOrDefault(chave, 0L) + 1);
+                            itemIds.put(chave, itemId);
+                        }
+                    }
+                } catch (Exception e) {
+                    System.err.println("Erro ao processar pedido: " + e.getMessage());
+                }
+            }
+
+            // Converter para lista de Map
+            return contagemPorItem.entrySet().stream()
+                    .map(entry -> {
+                        String[] parts = entry.getKey().split("\\|");
+                        Map<String, Object> resultado = new HashMap<>();
+                        resultado.put("itemId", itemIds.get(entry.getKey()));
+                        resultado.put("nomeItem", parts[0]);
+                        resultado.put("periodo", parts.length > 1 ? parts[1] : "TODOS");
+                        resultado.put("quantidade", entry.getValue());
+                        return resultado;
+                    })
+                    .sorted((m1, m2) -> Long.compare(
+                            (Long) m2.get("quantidade"),
+                            (Long) m1.get("quantidade")
+                    ))
+                    .collect(Collectors.toList());
+
+        } catch (Exception e) {
+            System.err.println("Erro em getItensMaisPedidosPorPeriodo: " + e.getMessage());
+            return new ArrayList<>();
+        }
     }
 }

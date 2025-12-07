@@ -20,4 +20,8 @@ public interface DashboardGateway {
     Map<String, Object> getKPIFornada(Integer fornadaId);
     Map<String, Object> getKPIFornadaMaisRecente();
     Map<String, Object> getKPIFornadasPorMesAno(int ano, int mes);
+    List<Map<String, Object>> getMassasPendentes();
+    List<Map<String, Object>> getRecheiosPendentes();
+    List<Map<String, Object>> getPedidosProximosDaEntrega(int diasProximos);
+    List<Map<String, Object>> getItensMaisPedidosPorPeriodo(String tipoItem, String periodo, Integer ano, Integer mes);
 }
