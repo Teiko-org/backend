@@ -8,7 +8,6 @@ import com.carambolos.carambolosapi.domain.entity.AdicionalDecoracaoSummary;
 import com.carambolos.carambolosapi.domain.entity.Decoracao;
 import com.carambolos.carambolosapi.domain.entity.ImagemDecoracao;
 import com.carambolos.carambolosapi.infrastructure.web.request.DecoracaoRequestDTO;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -83,17 +82,14 @@ public class DecoracaoUseCase {
         return decoracaoGateway.save(decoracao);
     }
 
-    @Cacheable(cacheNames = "decoracoes:ativas")
     public List<Decoracao> listarAtivas() {
         return decoracaoGateway.findByIsAtivoTrue();
     }
 
-    @Cacheable(cacheNames = "decoracoes:featured")
     public List<Decoracao> listarAtivasComCategoria() {
         return decoracaoGateway.findByIsAtivoTrueAndCategoriaIsNotNull();
     }
 
-    @Cacheable(cacheNames = "decoracoes:porId", key = "#id")
     public Decoracao buscarPorId(Integer id) {
         return decoracaoGateway.findById(id);
     }
