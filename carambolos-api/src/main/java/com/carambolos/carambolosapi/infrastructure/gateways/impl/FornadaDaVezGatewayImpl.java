@@ -50,15 +50,19 @@ public class FornadaDaVezGatewayImpl implements FornadaDaVezGateway {
 
     @Override
     public FornadaDaVez findByFornadaAndProdutoFornadaAndIsAtivoTrue(Integer fornadaId, Integer produtoFornadaId) {
-        return repository.findByFornadaAndProdutoFornadaAndIsAtivoTrue(fornadaId, produtoFornadaId);
+        return repository.findFirstByFornadaAndProdutoFornadaAndIsAtivoTrue(fornadaId, produtoFornadaId)
+                .map(FornadasMapper::toDomain)
+                .orElse(null);
     }
 
     @Override
     public FornadaDaVez saveSummingIfExists(Integer fornadaId, Integer produtoFornadaId, Integer quantidade) {
-        var existente = repository.findByFornadaAndProdutoFornadaAndIsAtivoTrue(fornadaId, produtoFornadaId);
-        if (existente != null) {
+        var existenteOpt = repository.findFirstByFornadaAndProdutoFornadaAndIsAtivoTrue(fornadaId, produtoFornadaId);
+        if (existenteOpt.isPresent()) {
+            var existente = existenteOpt.get();
             existente.setQuantidade((existente.getQuantidade() != null ? existente.getQuantidade() : 0) + quantidade);
-            return repository.save(existente);
+            var saved = repository.save(existente);
+            return FornadasMapper.toDomain(saved);
         }
         var novo = new FornadaDaVez();
         novo.setFornada(fornadaId);
