@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "cobertura")
 @Schema(description = "Entidade que representa uma cobertura")
 public class CoberturaEntity {
 
