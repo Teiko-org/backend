@@ -36,27 +36,22 @@ public class DashboardUseCase {
         return dashboardGateway.getFornadasMaisPedidas();
     }
 
-    @Cacheable(cacheNames = "dashboard:produtosMaisPedidos")
     public List<Map<String, Object>> getProdutosMaisPedidos() {
         return dashboardGateway.getProdutosMaisPedidos();
     }
 
-    @Cacheable(cacheNames = "dashboard:produtosCadastrados")
     public List<Map<String, Object>> getProdutosCadastrados() {
         return dashboardGateway.getProdutosCadastrados();
     }
 
-    @Cacheable(cacheNames = "dashboard:ultimosPedidos")
     public List<Map<String, Object>> getUltimosPedidos() {
         return dashboardGateway.getUltimosPedidos();
     }
 
-    @Cacheable(cacheNames = "dashboard:qtdPedidosBolosPorPeriodo")
     public Map<String, Map<String, Long>> countPedidosBolosPorPeriodo(String periodo) {
         return dashboardGateway.countPedidosBolosPorPeriodo(periodo);
     }
 
-    @Cacheable(cacheNames = "dashboard:qtdPedidosFornadaPorPeriodo")
     public Map<String, Map<String, Long>> countPedidosFornadaPorPeriodo(String periodo) {
         return dashboardGateway.countPedidosFornadaPorPeriodo(periodo);
     }
