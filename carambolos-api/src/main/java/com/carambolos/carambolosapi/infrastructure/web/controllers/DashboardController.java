@@ -229,4 +229,69 @@ public class DashboardController {
         return ResponseEntity.ok(kpi);
     }
 
+    @Operation(summary = "Lista massas pendentes", description = "Retorna a contagem de pedidos pendentes agrupados por massa")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de massas pendentes retornada com sucesso"),
+            @ApiResponse(responseCode = "204", description = "Nenhuma massa pendente encontrada")
+    })
+    @GetMapping("/massas-pendentes")
+    public ResponseEntity<List<Map<String, Object>>> getMassasPendentes() {
+        List<Map<String, Object>> massasPendentes = dashboardUseCase.getMassasPendentes();
+        if (massasPendentes.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.ok(massasPendentes);
+    }
+
+    @Operation(summary = "Lista recheios pendentes", description = "Retorna a contagem de pedidos pendentes agrupados por recheio")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de recheios pendentes retornada com sucesso"),
+            @ApiResponse(responseCode = "204", description = "Nenhum recheio pendente encontrado")
+    })
+    @GetMapping("/recheios-pendentes")
+    public ResponseEntity<List<Map<String, Object>>> getRecheiosPendentes() {
+        List<Map<String, Object>> recheiosPendentes = dashboardUseCase.getRecheiosPendentes();
+        if (recheiosPendentes.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.ok(recheiosPendentes);
+    }
+
+    @Operation(summary = "Lista pedidos próximos da data de entrega", 
+              description = "Retorna pedidos cuja data de entrega está nos próximos N dias")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de pedidos retornada com sucesso"),
+            @ApiResponse(responseCode = "204", description = "Nenhum pedido encontrado")
+    })
+    @GetMapping("/pedidos-proximos-entrega")
+    public ResponseEntity<List<Map<String, Object>>> getPedidosProximosDaEntrega(
+            @RequestParam(defaultValue = "7") int diasProximos
+    ) {
+        List<Map<String, Object>> pedidos = dashboardUseCase.getPedidosProximosDaEntrega(diasProximos);
+        if (pedidos.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.ok(pedidos);
+    }
+
+    @Operation(summary = "Lista itens mais pedidos por período", 
+              description = "Retorna massas, recheios ou decorações mais pedidas por semana, mês ou ano")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de itens retornada com sucesso"),
+            @ApiResponse(responseCode = "204", description = "Nenhum item encontrado")
+    })
+    @GetMapping("/itens-mais-pedidos-por-periodo")
+    public ResponseEntity<List<Map<String, Object>>> getItensMaisPedidosPorPeriodo(
+            @RequestParam String tipoItem,
+            @RequestParam(required = false) String periodo,
+            @RequestParam(required = false) Integer ano,
+            @RequestParam(required = false) Integer mes
+    ) {
+        List<Map<String, Object>> itens = dashboardUseCase.getItensMaisPedidosPorPeriodo(tipoItem, periodo, ano, mes);
+        if (itens.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.ok(itens);
+    }
+
 }

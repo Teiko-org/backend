@@ -21,7 +21,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @SuppressWarnings("unused")
@@ -501,5 +503,102 @@ public class ResumoPedidoService {
 
         Double valorTotal = valorTamanho + valorRecheio + valorMassa;
         return valorTotal;
+    }
+
+    public List<ResumoPedido> listarPedidosPorMassa(Integer massaId, StatusEnum status) {
+        // Buscar todos os resumos de pedidos de bolo
+        List<ResumoPedido> resumosPedidos = resumoPedidoRepository
+                .findByPedidoBoloIdIsNotNullAndIsAtivoTrue();
+
+        // Filtrar por status se fornecido
+        if (status != null) {
+            resumosPedidos = resumosPedidos.stream()
+                    .filter(rp -> rp.getStatus() == status)
+                    .collect(Collectors.toList());
+        }
+
+        // Filtrar por massa
+        List<ResumoPedido> resultado = new ArrayList<>();
+        for (ResumoPedido resumo : resumosPedidos) {
+            try {
+                PedidoBoloEntity pedidoBolo = pedidoBoloRepository
+                        .findById(resumo.getPedidoBoloId())
+                        .orElse(null);
+
+                if (pedidoBolo == null || !Boolean.TRUE.equals(pedidoBolo.getAtivo())) {
+                    continue;
+                }
+
+                BoloEntity bolo = boloRepository
+                        .findById(pedidoBolo.getBoloId())
+                        .orElse(null);
+
+                if (bolo != null && massaId.equals(bolo.getMassa())) {
+                    resultado.add(resumo);
+                }
+            } catch (Exception e) {
+                System.err.println("Erro ao processar pedido: " + e.getMessage());
+            }
+        }
+
+        return resultado;
+    }
+
+    public List<ResumoPedido> listarPedidosPorRecheio(Integer recheioPedidoId, StatusEnum status) {
+        // Buscar todos os resumos de pedidos de bolo
+        List<ResumoPedido> resumosPedidos = resumoPedidoRepository
+                .findByPedidoBoloIdIsNotNullAndIsAtivoTrue();
+
+        // Filtrar por status se fornecido
+        if (status != null) {
+            resumosPedidos = resumosPedidos.stream()
+                    .filter(rp -> rp.getStatus() == status)
+                    .collect(Collectors.toList());
+        }
+
+        // Filtrar por recheio
+        List<ResumoPedido> resultado = new ArrayList<>();
+        for (ResumoPedido resumo : resumosPedidos) {
+            try {
+                PedidoBoloEntity pedidoBolo = pedidoBoloRepository
+                        .findById(resumo.getPedidoBoloId())
+                        .orElse(null);
+
+                if (pedidoBolo == null || !Boolean.TRUE.equals(pedidoBolo.getAtivo())) {
+                    continue;
+                }
+
+                BoloEntity bolo = boloRepository
+                        .findById(pedidoBolo.getBoloId())
+                        .orElse(null);
+
+                if (bolo != null && recheioPedidoId.equals(bolo.getRecheioPedido())) {
+                    resultado.add(resumo);
+                }
+            } catch (Exception e) {
+                System.err.println("Erro ao processar pedido: " + e.getMessage());
+            }
+        }
+
+        return resultado;
+    }
+
+    public List<ResumoPedido> listarPedidosPorDataEntrega(LocalDate dataEntrega, StatusEnum status) {
+        // Converter LocalDate para LocalDateTime (início e fim do dia)
+        LocalDateTime dataInicio = dataEntrega.atStartOfDay();
+        LocalDateTime dataFim = dataEntrega.atTime(23, 59, 59);
+
+        // Buscar pedidos pela data de entrega
+        List<ResumoPedido> resumosPedidos = resumoPedidoRepository
+                .findByDataEntregaBetweenAndIsAtivoTrueOrderByDataEntregaAsc(dataInicio, dataFim);
+
+        // Filtrar por status se fornecido
+        if (status != null) {
+            resumosPedidos = resumosPedidos.stream()
+                    .filter(rp -> rp.getStatus() == status)
+                    .collect(Collectors.toList());
+        }
+
+        return resumosPedidos;
     }
 }
