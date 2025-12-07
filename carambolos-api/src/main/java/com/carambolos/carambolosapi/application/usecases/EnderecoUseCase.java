@@ -5,6 +5,8 @@ import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaE
 import com.carambolos.carambolosapi.application.gateways.EnderecoGateway;
 import com.carambolos.carambolosapi.domain.entity.Endereco;
 import com.carambolos.carambolosapi.domain.entity.Usuario;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -23,10 +25,12 @@ public class EnderecoUseCase {
         return enderecoGateway.listar(pageable);
     }
 
+    @Cacheable(cacheNames = "enderecos:porUsuario", key = "#usuarioId")
     public List<Endereco> listarPorUsuario(Integer usuarioId) {
         return enderecoGateway.listarPorUsuario(usuarioId);
     }
 
+    @Cacheable(cacheNames = "enderecos:porId", key = "#id")
     public Endereco buscarPorId(Integer id) {
         Endereco endereco = enderecoGateway.buscarPorId(id);
         if (endereco == null) {
@@ -35,6 +39,7 @@ public class EnderecoUseCase {
         return endereco;
     }
 
+    @CacheEvict(cacheNames = {"enderecos:porUsuario", "enderecos:porId"}, allEntries = true)
     public Endereco cadastrar(Endereco endereco) {
         if (endereco.getUsuario() != null) {
             if (enderecoGateway.existeEnderecoDuplicado(endereco) && endereco.isAtivo()) {
@@ -46,9 +51,11 @@ public class EnderecoUseCase {
                 throw new EntidadeNaoEncontradaException("Usuariofk não existe no banco");
             }
         }
-        return enderecoGateway.cadastrar(endereco);
+        Endereco enderecoSalvo = enderecoGateway.cadastrar(endereco);
+        return enderecoSalvo;
     }
 
+    @CacheEvict(cacheNames = {"enderecos:porUsuario", "enderecos:porId"}, allEntries = true)
     public Endereco atualizar(Integer id, Endereco endereco) {
         Endereco enderecoExistente = enderecoGateway.buscarPorId(id);
         if (enderecoExistente == null) {
@@ -59,9 +66,11 @@ public class EnderecoUseCase {
             throw new EntidadeJaExisteException("Endereço já cadastrado");
         }
 
-        return enderecoGateway.atualizar(id, endereco);
+        Endereco enderecoAtualizado = enderecoGateway.atualizar(id, endereco);
+        return enderecoAtualizado;
     }
 
+    @CacheEvict(cacheNames = {"enderecos:porUsuario", "enderecos:porId"}, allEntries = true)
     public void deletar(Integer id) {
         Endereco endereco = enderecoGateway.buscarPorId(id);
         if (endereco == null) {
