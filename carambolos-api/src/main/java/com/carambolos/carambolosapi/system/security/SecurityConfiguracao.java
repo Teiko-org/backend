@@ -53,34 +53,33 @@ public class SecurityConfiguracao {
             new AntPathRequestMatcher("/usuarios/login", "POST"),
             new AntPathRequestMatcher("/usuarios", "POST"),
             new AntPathRequestMatcher("/usuarios", "GET"),
+            new AntPathRequestMatcher("/api/usuarios/login", "POST"),
+            new AntPathRequestMatcher("/api/usuarios", "POST"),
+            new AntPathRequestMatcher("/api/usuarios", "GET"),
             new AntPathRequestMatcher("/h2-console/**"),
             new AntPathRequestMatcher("/h2-console/**/**"),
             new AntPathRequestMatcher("/error/**"),
             new AntPathRequestMatcher("/**", "OPTIONS"),
-            new AntPathRequestMatcher("/fornadas", "GET"),
-            new AntPathRequestMatcher("/fornadas/**", "GET"),
-            new AntPathRequestMatcher("/bolos", "GET"),
-            new AntPathRequestMatcher("/bolos/**", "GET"),
-            new AntPathRequestMatcher("/decoracoes", "GET"),
-            new AntPathRequestMatcher("/decoracoes/**", "GET"),
-            new AntPathRequestMatcher("/files/**", "GET"),
-            new AntPathRequestMatcher("/dashboard/**", "GET"),
-            new AntPathRequestMatcher("/enderecos", "POST"),
-            new AntPathRequestMatcher("/bolos", "POST"),
-            new AntPathRequestMatcher("/bolos/pedido", "POST"),
-            new AntPathRequestMatcher("/bolos/recheio-pedido", "POST"),
-            new AntPathRequestMatcher("/bolos/recheio-unitario", "POST"),
-            new AntPathRequestMatcher("/bolos/cobertura", "POST"),
-            new AntPathRequestMatcher("/fornadas/pedidos", "POST"),
-            new AntPathRequestMatcher("/resumo-pedido", "GET"),
-            new AntPathRequestMatcher("/resumo-pedido/**", "GET"),
-            new AntPathRequestMatcher("/decoracoes/adicionais", "GET"),
-            new AntPathRequestMatcher("/adicionais", "GET"),
-            // Permitir criação de decorações (imagens de referência) sem login
-            new AntPathRequestMatcher("/decoracoes", "POST"),
-            new AntPathRequestMatcher("/decoracoes/**", "PUT"),
-            // Permitir criação de resumo de pedido (WhatsApp) sem login
-            new AntPathRequestMatcher("/resumo-pedido", "POST"),
+            // Liberar TODOS os endpoints de bolos (GET e POST) - com e sem /api/
+            new AntPathRequestMatcher("/fornadas/**"),
+            new AntPathRequestMatcher("/bolos/**"),
+            new AntPathRequestMatcher("/decoracoes/**"),
+            new AntPathRequestMatcher("/api/fornadas/**"),
+            new AntPathRequestMatcher("/api/bolos/**"),
+            new AntPathRequestMatcher("/api/decoracoes/**"),
+            new AntPathRequestMatcher("/api/adicionais/**"),
+            new AntPathRequestMatcher("/adicionais/**"),
+            new AntPathRequestMatcher("/files/**"),
+            new AntPathRequestMatcher("/api/files/**"),
+            new AntPathRequestMatcher("/dashboard/**"),
+            new AntPathRequestMatcher("/api/dashboard/**"),
+            // Endereços e pedidos
+            new AntPathRequestMatcher("/enderecos/**"),
+            new AntPathRequestMatcher("/api/enderecos/**"),
+            new AntPathRequestMatcher("/resumo-pedido/**"),
+            new AntPathRequestMatcher("/api/resumo-pedido/**"),
+            new AntPathRequestMatcher("/pedidos/**"),
+            new AntPathRequestMatcher("/api/pedidos/**"),
 
     };
 
@@ -98,14 +97,39 @@ public class SecurityConfiguracao {
                                 "/bolos/**",
                                 "/fornadas/**",
                                 "/files/**",
-                                "/dashboard/**"
+                                "/dashboard/**",
+                                "/api/decoracoes/**",
+                                "/api/bolos/**",
+                                "/api/fornadas/**",
+                                "/api/files/**",
+                                "/api/dashboard/**",
+                                "/api/adicionais/**",
+                                "/api/resumo-pedido/**"
+                        ).permitAll()
+                        .requestMatchers(HttpMethod.POST,
+                                "/bolos/**",
+                                "/fornadas/**",
+                                "/decoracoes/**",
+                                "/enderecos/**",
+                                "/resumo-pedido/**",
+                                "/api/bolos/**",
+                                "/api/fornadas/**",
+                                "/api/decoracoes/**",
+                                "/api/enderecos/**",
+                                "/api/resumo-pedido/**",
+                                "/api/pedidos/**"
+                        ).permitAll()
+                        .requestMatchers(HttpMethod.PUT,
+                                "/decoracoes/**",
+                                "/api/decoracoes/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.HEAD,
                                 "/decoracoes/**",
                                 "/bolos/**",
                                 "/fornadas/**",
                                 "/files/**",
-                                "/dashboard/**"
+                                "/dashboard/**",
+                                "/api/**"
                         ).permitAll()
                         .requestMatchers(URLS_PERMITIDAS)
                         .permitAll()
