@@ -8,12 +8,13 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface FornadaDaVezRepository extends JpaRepository<FornadaDaVez, Integer> {
     List<FornadaDaVez> findByFornada(Integer id);
     
-    // Buscar produto específico em uma fornada específica
-    FornadaDaVez findByFornadaAndProdutoFornadaAndIsAtivoTrue(Integer fornadaId, Integer produtoFornadaId);
+    // Buscar produto específico em uma fornada específica (pega o primeiro se houver duplicados)
+    Optional<FornadaDaVez> findFirstByFornadaAndProdutoFornadaAndIsAtivoTrue(Integer fornadaId, Integer produtoFornadaId);
 
     @Query(value = """
             select
