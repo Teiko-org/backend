@@ -13,7 +13,6 @@ import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaE
 import com.carambolos.carambolosapi.domain.enums.StatusEnum;
 import com.carambolos.carambolosapi.domain.enums.TipoEntregaEnum;
 import com.carambolos.carambolosapi.infrastructure.web.response.ResumoPedidoMensagemResponseDTO;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -72,26 +71,22 @@ public class ResumoPedidoService {
         this.enderecoMapper = enderecoMapper;
     }
 
-    @Cacheable(cacheNames = "resumosPedidos", key = "#pageable.pageNumber + ':' + #pageable.pageSize")
     public Page<ResumoPedido> listarResumosPedidos(Pageable pageable) {
         return resumoPedidoRepository.findAllByIsAtivoTrue(pageable);
     }
 
-    @Cacheable(cacheNames = "resumoPedido:porId", key = "#id")
     public ResumoPedido buscarResumoPedidoPorId(Integer id) {
         return resumoPedidoRepository.findByIdAndIsAtivoTrue(id)
                 .orElseThrow(() -> new RuntimeException("Resumo de pedido não encontrado"));
     }
 
     //LocalDateTime?
-    @Cacheable(cacheNames = "resumosPedidos:porData", key = "#dataPedido")
     public List<ResumoPedido> buscarResumosPedidosPorDataPedido(LocalDate dataPedido) {
         LocalDateTime comecoData = dataPedido.atStartOfDay();
         LocalDateTime fimData = dataPedido.atTime(23, 59, 59);
         return resumoPedidoRepository.findByDataPedidoBetweenAndIsAtivoTrue(comecoData, fimData);
     }
 
-    @Cacheable(cacheNames = "resumosPedidos:porStatus", key = "#status")
     public List<ResumoPedido> buscarResumosPedidosPorStatus(StatusEnum status) {
         return resumoPedidoRepository.findByStatusAndIsAtivoTrue(status);
     }
@@ -126,12 +121,10 @@ public class ResumoPedidoService {
         resumoPedidoRepository.save(resumoPedido);
     }
 
-    @Cacheable(cacheNames = "resumosPedidos:bolo")
     public List<ResumoPedido> listarResumosPedidosBolo() {
         return resumoPedidoRepository.findByPedidoBoloIdIsNotNullAndIsAtivoTrue();
     }
 
-    @Cacheable(cacheNames = "resumosPedidos:fornada")
     public List<ResumoPedido> listarResumosPedidosFornada() {
         return resumoPedidoRepository.findByPedidoFornadaIdIsNotNullAndIsAtivoTrue();
     }
@@ -173,7 +166,6 @@ public class ResumoPedidoService {
         return resumoPedidoRepository.save(resumoPedido);
     }
 
-    @Cacheable(cacheNames = "detalhePedidoBolo", key = "#pedidoResumoId")
     public DetalhePedidoBoloDTO obterDetalhePedidoBolo(Integer pedidoResumoId) {
         try {
             ResumoPedido resumoPedido = resumoPedidoRepository
@@ -203,11 +195,11 @@ public class ResumoPedidoService {
 
                             if (recheioPedido.getRecheioExclusivo() != null) {
                                 try {
-                                    return recheioExclusivoRepository.buscarRecheioExclusivoPorId(recheioPedido.getRecheioExclusivo())
-                                            .getNome() + " (" +
-                                            recheioExclusivoRepository.buscarRecheioExclusivoPorId(recheioPedido.getRecheioExclusivo()).getSabor1() +
+                                    var recheioExclusivo = recheioExclusivoRepository.buscarRecheioExclusivoPorId(recheioPedido.getRecheioExclusivo());
+                                    return recheioExclusivo.getNome() + " (" +
+                                            recheioExclusivo.getSabor1() +
                                             " + " +
-                                            recheioExclusivoRepository.buscarRecheioExclusivoPorId(recheioPedido.getRecheioExclusivo()).getSabor2() +
+                                            recheioExclusivo.getSabor2() +
                                             ")";
                                 } catch (Exception e) {
                                     return "Recheio exclusivo não encontrado";
@@ -311,7 +303,6 @@ public class ResumoPedidoService {
         }
     }
 
-    @Cacheable(cacheNames = "detalhePedidoFornada", key = "#pedidoResumoId")
     public DetalhePedidoFornadaDTO obterDetalhePedidoFornada(Integer pedidoResumoId) {
         try {
             ResumoPedido resumoPedido = resumoPedidoRepository
