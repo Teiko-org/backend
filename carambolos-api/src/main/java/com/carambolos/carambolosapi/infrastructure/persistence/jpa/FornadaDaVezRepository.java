@@ -55,7 +55,11 @@ public interface FornadaDaVezRepository extends JpaRepository<FornadaDaVez, Inte
             join produto_fornada pf on fdv.produto_fornada_id = pf.id
             join fornada f on fdv.fornada_id = f.id
             left join pedido_fornada pf_pedidos on pf_pedidos.fornada_da_vez_id = fdv.id and pf_pedidos.is_ativo = 1
-            where f.id = ?1 and f.is_ativo = 1 and fdv.is_ativo = 1 and pf.is_ativo = 1
+            where f.id = ?1 
+            and f.is_ativo = 1 
+            and fdv.is_ativo = 1 
+            and pf.is_ativo = 1
+            and fdv.quantidade > 0
             group by fdv.id, pf.id, pf.produto, pf.descricao, pf.valor, pf.categoria, fdv.quantidade, pf.is_ativo, fdv.is_ativo, f.data_inicio, f.data_fim
             """, nativeQuery = true)
     List<ProdutoFornadaDaVezProjection> findProductsByFornadaId(Integer fornadaId);
@@ -78,7 +82,10 @@ public interface FornadaDaVezRepository extends JpaRepository<FornadaDaVez, Inte
             join produto_fornada pf on fdv.produto_fornada_id = pf.id
             join fornada f on fdv.fornada_id = f.id
             where f.id = :fornadaId 
-            and f.is_ativo = 1 and fdv.is_ativo = 1 and pf.is_ativo = 1
+            and f.is_ativo = 1 
+            and fdv.is_ativo = 1 
+            and pf.is_ativo = 1
+            and fdv.quantidade > 0
             """, nativeQuery = true)
     List<ProdutoFornadaDaVezProjection> findByFornadaId(@Param("fornadaId") Integer fornadaId);
 
