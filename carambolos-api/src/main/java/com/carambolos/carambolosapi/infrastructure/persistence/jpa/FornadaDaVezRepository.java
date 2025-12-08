@@ -50,7 +50,7 @@ public interface FornadaDaVezRepository extends JpaRepository<FornadaDaVez, Inte
                 CAST(fdv.is_ativo AS SIGNED) is_ativo_fdv,
                 f.data_inicio,
                 f.data_fim,
-                fdv.quantidade as quantidade_total
+                (fdv.quantidade + COALESCE(SUM(pf_pedidos.quantidade), 0)) as quantidade_total
             from fornada_da_vez fdv
             join produto_fornada pf on fdv.produto_fornada_id = pf.id
             join fornada f on fdv.fornada_id = f.id
@@ -104,7 +104,7 @@ public interface FornadaDaVezRepository extends JpaRepository<FornadaDaVez, Inte
                 CAST(fdv.is_ativo AS SIGNED) is_ativo_fdv,
                 f.data_inicio,
                 f.data_fim,
-                fdv.quantidade as quantidade_total
+                (fdv.quantidade + COALESCE(SUM(pf_pedidos.quantidade), 0)) as quantidade_total
             from fornada_da_vez fdv
             join produto_fornada pf on fdv.produto_fornada_id = pf.id
             join fornada f on fdv.fornada_id = f.id
