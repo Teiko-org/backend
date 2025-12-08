@@ -18,14 +18,19 @@ public class AdicionalDecoracaoMapper {
         adicionalDecoracaoSummary.setDecoracaoId(projection.getDecoracaoId());
         adicionalDecoracaoSummary.setNomeDecoracao(projection.getNomeDecoracao());
 
-        var adicionaisPossiveis = List.of(projection.getAdicionais().split(","));
-        var adicionaisPossiveisTrimmed = adicionaisPossiveis.stream()
-                .map(String::trim)
-                .toList();
+        // Tratar caso quando getAdicionais() retorna null (quando decoração não tem adicionais)
+        String adicionaisStr = projection.getAdicionais();
+        if (adicionaisStr == null || adicionaisStr.trim().isEmpty()) {
+            adicionalDecoracaoSummary.setAdicionaisPossiveis(List.of());
+        } else {
+            var adicionaisPossiveis = List.of(adicionaisStr.split(","));
+            var adicionaisPossiveisTrimmed = adicionaisPossiveis.stream()
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty()) // Remover strings vazias após trim
+                    .toList();
 
-        adicionalDecoracaoSummary.setAdicionaisPossiveis(
-                adicionaisPossiveisTrimmed
-        );
+            adicionalDecoracaoSummary.setAdicionaisPossiveis(adicionaisPossiveisTrimmed);
+        }
 
 
         return adicionalDecoracaoSummary;
