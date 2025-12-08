@@ -411,16 +411,12 @@ INSERT INTO teiko.produto_fornada (produto, descricao, valor, categoria, is_ativ
 INSERT INTO teiko.imagem_produto_fornada (produto_fornada_id, url) VALUES
 -- Pão de Queijo
 (1, 'https://picsum.photos/seed/paoqueijo1/320/320'),
-(1, 'https://picsum.photos/seed/paoqueijo2/320/320'),
 -- Pão Francês
 (2, 'https://picsum.photos/seed/paofrances1/320/320'),
-(2, 'https://picsum.photos/seed/paofrances2/320/320'),
 -- Croissant
 (3, 'https://picsum.photos/seed/croissant1/320/320'),
-(3, 'https://picsum.photos/seed/croissant2/320/320'),
 -- Brioche
-(4, 'https://picsum.photos/seed/brioche1/320/320'),
-(4, 'https://picsum.photos/seed/brioche2/320/320');
+(4, 'https://picsum.photos/seed/brioche1/320/320');
 
 -- Fornadas
 INSERT INTO teiko.fornada (data_inicio, data_fim, is_ativo) VALUES
@@ -433,8 +429,7 @@ INSERT INTO teiko.fornada_da_vez (produto_fornada_id, fornada_id, quantidade, is
 (1, 1, 100, 1),
 (2, 1, 100, 1),
 (2, 2, 80, 1),
-(3, 3, 50, 1),
-(4, 3, 30, 1);
+(3, 3, 50, 1);
 
 -- Regras de venda simuladas para fornadas:
 -- Fornadas 1 e 3: todos os itens vendidos
@@ -444,10 +439,6 @@ INSERT INTO teiko.fornada_da_vez (produto_fornada_id, fornada_id, quantidade, is
 INSERT INTO teiko.pedido_fornada (fornada_da_vez_id, endereco_id, usuario_id, quantidade, data_previsao_entrega, tipo_entrega, nome_cliente, telefone_cliente, is_ativo) VALUES
 (1, 1, 1, 90, '2024-12-12', 'ENTREGA', 'Cliente 1', '11911111111', 1), -- soma 90 + 10 (já existente) = 100
 (3, 2, 2, 50, '2024-12-06', 'RETIRADA', 'Cliente 2', '11922222222', 1),
-(4, 3, 3, 30, '2024-12-06', 'RETIRADA', 'Cliente 3', '11933333333', 1);
-
--- Pedidos adicionais para garantir IDs suficientes (FKs nos resumos 2025 usam até id 8)
-INSERT INTO teiko.pedido_fornada (fornada_da_vez_id, endereco_id, usuario_id, quantidade, data_previsao_entrega, tipo_entrega, nome_cliente, telefone_cliente, is_ativo) VALUES
 (2, 1, 1, 5,  '2025-01-05', 'ENTREGA', 'Cliente 4', '11944444444', 1),
 (2, 2, 2, 10, '2025-10-10', 'RETIRADA', 'Cliente 5', '11955555555', 1);
 
@@ -475,16 +466,12 @@ INSERT INTO teiko.decoracao (observacao, nome, categoria, is_ativo) VALUES
 INSERT INTO teiko.imagem_decoracao (decoracao_id, url) VALUES
 -- Natureza (flores/folhagens)
 (1, 'https://picsum.photos/seed/nature1/320/320'),
-(1, 'https://picsum.photos/seed/nature2/320/320'),
 -- Festa Junina (temática)
 (2, 'https://picsum.photos/seed/festajunina1/320/320'),
-(2, 'https://picsum.photos/seed/festajunina2/320/320'),
 -- Infantil (ilustrações suaves)
 (3, 'https://picsum.photos/seed/infantil1/320/320'),
-(3, 'https://picsum.photos/seed/infantil2/320/320'),
 -- Casamento (mantém uma imagem que já estava carregando)
-(4, 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=320&h=320&fit=crop&crop=center'),
-(4, 'https://picsum.photos/seed/casamento1/320/320');
+(4, 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=320&h=320&fit=crop&crop=center');
 -- Recheios Unitários
 INSERT INTO teiko.recheio_unitario (sabor, descricao, valor, is_ativo) VALUES
 ('creamcheese_frosting', 'Creamcheese Frosting', 10.00, 1),
@@ -518,268 +505,30 @@ INSERT INTO teiko.recheio_pedido (recheio_unitario_id1, recheio_unitario_id2, re
 (1, 2, NULL, 1),
 (NULL, NULL, 1, 1),
 (3, 4, NULL, 1),
-(5, 6, NULL, 1),
-(7, 8, NULL, 1),
-(9, 10, NULL, 1),
-(1, 3, NULL, 1),
-(2, 4, NULL, 1);
+(5, 6, NULL, 1);
 
 -- Bolos com categorias diferentes
 INSERT INTO teiko.bolo (recheio_pedido_id, massa_id, cobertura_id, decoracao_id, formato, tamanho, categoria, is_ativo) VALUES
 (1, 1, 1, 1, 'CIRCULO', 'TAMANHO_5', 'Carambolo', 1),
 (2, 2, 2, 2, 'CORACAO', 'TAMANHO_7', 'Casamento', 1),
 (3, 3, 3, 3, 'CIRCULO', 'TAMANHO_12', 'Aniversário', 1),
-(4, 1, 2, 4, 'CIRCULO', 'TAMANHO_15', 'Casamento', 1),
-(5, 2, 3, 1, 'CORACAO', 'TAMANHO_17', 'Natal', 1),
-(6, 3, 1, 2, 'CIRCULO', 'TAMANHO_5', 'Infantil', 1),
-(7, 1, 3, 1, 'CIRCULO', 'TAMANHO_7', 'Carambolo', 1),
-(8, 2, 1, 2, 'CORACAO', 'TAMANHO_12', 'Festa Junina', 1);
+(4, 1, 2, 4, 'CIRCULO', 'TAMANHO_15', 'Casamento', 1);
 
 -- Pedidos Bolo
 INSERT INTO teiko.pedido_bolo (endereco_id, bolo_id, usuario_id, observacao, data_previsao_entrega, data_ultima_atualizacao, tipo_entrega, nome_cliente, telefone_cliente, is_ativo) VALUES
 (1, 1, 1, 'Sem cobertura de chocolate', '2024-12-15', NOW(), 'ENTREGA', 'João Silva', '11987654321', 1),
 (NULL, 2, 1, 'Com tema de casamento', '2024-12-20', NOW(), 'RETIRADA', 'Maria Oliveira', '11912345678', 1),
 (1, 3, NULL, 'Com tema de festa junina', '2024-12-25', NOW(), 'ENTREGA', 'Carlos Souza', '11998765432', 1),
-(2, 4, 2, 'Bolo de casamento elegante', '2024-12-18', NOW(), 'ENTREGA', 'Ana Costa', '11987654322', 1),
-(3, 5, 3, 'Bolo natalino especial', '2024-12-24', NOW(), 'RETIRADA', 'Pedro Santos', '11987654323', 1),
-(1, 6, 1, 'Bolo infantil colorido', '2024-12-22', NOW(), 'ENTREGA', 'Lucia Ferreira', '11987654324', 1),
-(NULL, 7, 2, 'Carambolo premium', '2024-12-19', NOW(), 'RETIRADA', 'Roberto Lima', '11987654325', 1),
-(2, 8, 3, 'Bolo festa junina', '2024-12-21', NOW(), 'ENTREGA', 'Fernanda Alves', '11987654326', 1);
+(2, 4, 2, 'Bolo de casamento elegante', '2024-12-18', NOW(), 'ENTREGA', 'Ana Costa', '11987654322', 1);
 
--- Pedidos Fornada
-INSERT INTO teiko.pedido_fornada (fornada_da_vez_id, endereco_id, usuario_id, quantidade, data_previsao_entrega, tipo_entrega, nome_cliente, telefone_cliente, is_ativo) VALUES
-(1, 1, 1, 10, '2024-12-11', 'ENTREGA', 'Maria Silva', '11999999999', 1),
-(1, 2, 2, 15, '2024-12-11', 'ENTREGA', 'João Souza', '11988888888', 1),
-(2, 3, 3, 20, '2024-12-13', 'ENTREGA', 'Ana Oliveira', '11977777777', 1);
 
 -- Resumo Pedidos - Setembro 2024 (atual)
 INSERT INTO teiko.resumo_pedido (status, valor, data_pedido, data_entrega, pedido_fornada_id, pedido_bolo_id, is_ativo) VALUES
 ('PENDENTE', 100.00, '2024-09-15 10:30:00', '2024-09-20', NULL, 1, 1),
 ('PAGO', 150.00, '2024-09-14 14:20:00', '2024-09-18', NULL, 2, 1),
 ('CONCLUIDO', 120.00, '2024-09-13 09:15:00', '2024-09-16', NULL, 3, 1),
-('PENDENTE', 180.00, '2024-09-12 16:45:00', '2024-09-17', NULL, 4, 1),
-('PAGO', 200.00, '2024-09-11 11:30:00', '2024-09-15', NULL, 5, 1),
-('CONCLUIDO', 140.00, '2024-09-10 13:20:00', '2024-09-14', NULL, 6, 1),
-('PENDENTE', 160.00, '2024-09-09 15:10:00', '2024-09-13', NULL, 7, 1),
-('PAGO', 170.00, '2024-09-08 12:45:00', '2024-09-12', NULL, 8, 1),
-('PENDENTE', 80.00, '2024-09-07 10:00:00', '2024-09-11', 1, NULL, 1),
-('PAGO', 120.00, '2024-09-06 14:30:00', '2024-09-10', 2, NULL, 1),
-('CONCLUIDO', 160.00, '2024-09-05 09:45:00', '2024-09-09', 3, NULL, 1);
+('PENDENTE', 80.00, '2024-09-07 10:00:00', '2024-09-11', 1, NULL, 1);
 
--- Dados mockados para meses anteriores (Janeiro a Agosto 2024)
-
--- Janeiro 2024
-INSERT INTO teiko.resumo_pedido (status, valor, data_pedido, data_entrega, pedido_fornada_id, pedido_bolo_id, is_ativo) VALUES
-('CONCLUIDO', 95.00, '2024-01-15 10:30:00', '2024-01-20', NULL, 1, 1),
-('CONCLUIDO', 145.00, '2024-01-20 14:20:00', '2024-01-25', NULL, 2, 1),
-('CONCLUIDO', 115.00, '2024-01-25 09:15:00', '2024-01-30', NULL, 3, 1),
-('CONCLUIDO', 175.00, '2024-01-10 16:45:00', '2024-01-15', NULL, 4, 1),
-('CONCLUIDO', 195.00, '2024-01-05 11:30:00', '2024-01-10', NULL, 5, 1),
-('CONCLUIDO', 75.00, '2024-01-12 10:00:00', '2024-01-17', 1, NULL, 1),
-('CONCLUIDO', 115.00, '2024-01-18 14:30:00', '2024-01-23', 2, NULL, 1);
-
--- Fevereiro 2024
-INSERT INTO teiko.resumo_pedido (status, valor, data_pedido, data_entrega, pedido_fornada_id, pedido_bolo_id, is_ativo) VALUES
-('CONCLUIDO', 105.00, '2024-02-14 10:30:00', '2024-02-19', NULL, 1, 1),
-('CONCLUIDO', 155.00, '2024-02-20 14:20:00', '2024-02-25', NULL, 2, 1),
-('CONCLUIDO', 125.00, '2024-02-25 09:15:00', '2024-02-28', NULL, 3, 1),
-('CONCLUIDO', 185.00, '2024-02-10 16:45:00', '2024-02-15', NULL, 4, 1),
-('CONCLUIDO', 205.00, '2024-02-05 11:30:00', '2024-02-10', NULL, 5, 1),
-('CONCLUIDO', 85.00, '2024-02-12 10:00:00', '2024-02-17', 1, NULL, 1),
-('CONCLUIDO', 125.00, '2024-02-18 14:30:00', '2024-02-23', 2, NULL, 1);
-
--- Março 2024
-INSERT INTO teiko.resumo_pedido (status, valor, data_pedido, data_entrega, pedido_fornada_id, pedido_bolo_id, is_ativo) VALUES
-('CONCLUIDO', 110.00, '2024-03-15 10:30:00', '2024-03-20', NULL, 1, 1),
-('CONCLUIDO', 160.00, '2024-03-20 14:20:00', '2024-03-25', NULL, 2, 1),
-('CONCLUIDO', 130.00, '2024-03-25 09:15:00', '2024-03-30', NULL, 3, 1),
-('CONCLUIDO', 190.00, '2024-03-10 16:45:00', '2024-03-15', NULL, 4, 1),
-('CONCLUIDO', 210.00, '2024-03-05 11:30:00', '2024-03-10', NULL, 5, 1),
-('CONCLUIDO', 90.00, '2024-03-12 10:00:00', '2024-03-17', 1, NULL, 1),
-('CONCLUIDO', 130.00, '2024-03-18 14:30:00', '2024-03-23', 2, NULL, 1);
-
--- Abril 2024
-INSERT INTO teiko.resumo_pedido (status, valor, data_pedido, data_entrega, pedido_fornada_id, pedido_bolo_id, is_ativo) VALUES
-('CONCLUIDO', 115.00, '2024-04-15 10:30:00', '2024-04-20', NULL, 1, 1),
-('CONCLUIDO', 165.00, '2024-04-20 14:20:00', '2024-04-25', NULL, 2, 1),
-('CONCLUIDO', 135.00, '2024-04-25 09:15:00', '2024-04-30', NULL, 3, 1),
-('CONCLUIDO', 195.00, '2024-04-10 16:45:00', '2024-04-15', NULL, 4, 1),
-('CONCLUIDO', 215.00, '2024-04-05 11:30:00', '2024-04-10', NULL, 5, 1),
-('CONCLUIDO', 95.00, '2024-04-12 10:00:00', '2024-04-17', 1, NULL, 1),
-('CONCLUIDO', 135.00, '2024-04-18 14:30:00', '2024-04-23', 2, NULL, 1);
-
--- Maio 2024
-INSERT INTO teiko.resumo_pedido (status, valor, data_pedido, data_entrega, pedido_fornada_id, pedido_bolo_id, is_ativo) VALUES
-('CONCLUIDO', 120.00, '2024-05-15 10:30:00', '2024-05-20', NULL, 1, 1),
-('CONCLUIDO', 170.00, '2024-05-20 14:20:00', '2024-05-25', NULL, 2, 1),
-('CONCLUIDO', 140.00, '2024-05-25 09:15:00', '2024-05-30', NULL, 3, 1),
-('CONCLUIDO', 200.00, '2024-05-10 16:45:00', '2024-05-15', NULL, 4, 1),
-('CONCLUIDO', 220.00, '2024-05-05 11:30:00', '2024-05-10', NULL, 5, 1),
-('CONCLUIDO', 100.00, '2024-05-12 10:00:00', '2024-05-17', 1, NULL, 1),
-('CONCLUIDO', 140.00, '2024-05-18 14:30:00', '2024-05-23', 2, NULL, 1);
-
--- Junho 2024
-INSERT INTO teiko.resumo_pedido (status, valor, data_pedido, data_entrega, pedido_fornada_id, pedido_bolo_id, is_ativo) VALUES
-('CONCLUIDO', 125.00, '2024-06-15 10:30:00', '2024-06-20', NULL, 1, 1),
-('CONCLUIDO', 175.00, '2024-06-20 14:20:00', '2024-06-25', NULL, 2, 1),
-('CONCLUIDO', 145.00, '2024-06-25 09:15:00', '2024-06-30', NULL, 3, 1),
-('CONCLUIDO', 205.00, '2024-06-10 16:45:00', '2024-06-15', NULL, 4, 1),
-('CONCLUIDO', 225.00, '2024-06-05 11:30:00', '2024-06-10', NULL, 5, 1),
-('CONCLUIDO', 105.00, '2024-06-12 10:00:00', '2024-06-17', 1, NULL, 1),
-('CONCLUIDO', 145.00, '2024-06-18 14:30:00', '2024-06-23', 2, NULL, 1);
-
--- Julho 2024
-INSERT INTO teiko.resumo_pedido (status, valor, data_pedido, data_entrega, pedido_fornada_id, pedido_bolo_id, is_ativo) VALUES
-('CONCLUIDO', 130.00, '2024-07-15 10:30:00', '2024-07-20', NULL, 1, 1),
-('CONCLUIDO', 180.00, '2024-07-20 14:20:00', '2024-07-25', NULL, 2, 1),
-('CONCLUIDO', 150.00, '2024-07-25 09:15:00', '2024-07-30', NULL, 3, 1),
-('CONCLUIDO', 210.00, '2024-07-10 16:45:00', '2024-07-15', NULL, 4, 1),
-('CONCLUIDO', 230.00, '2024-07-05 11:30:00', '2024-07-10', NULL, 5, 1),
-('CONCLUIDO', 110.00, '2024-07-12 10:00:00', '2024-07-17', 1, NULL, 1),
-('CONCLUIDO', 150.00, '2024-07-18 14:30:00', '2024-07-23', 2, NULL, 1);
-
--- Agosto 2024
-INSERT INTO teiko.resumo_pedido (status, valor, data_pedido, data_entrega, pedido_fornada_id, pedido_bolo_id, is_ativo) VALUES
-('CONCLUIDO', 135.00, '2024-08-15 10:30:00', '2024-08-20', NULL, 1, 1),
-('CONCLUIDO', 185.00, '2024-08-20 14:20:00', '2024-08-25', NULL, 2, 1),
-('CONCLUIDO', 155.00, '2024-08-25 09:15:00', '2024-08-30', NULL, 3, 1),
-('CONCLUIDO', 215.00, '2024-08-10 16:45:00', '2024-08-15', NULL, 4, 1),
-('CONCLUIDO', 235.00, '2024-08-05 11:30:00', '2024-08-10', NULL, 5, 1),
-('CONCLUIDO', 115.00, '2024-08-12 10:00:00', '2024-08-17', 1, NULL, 1),
-('CONCLUIDO', 155.00, '2024-08-18 14:30:00', '2024-08-23', 2, NULL, 1);
-
--- =====================================================
--- DADOS ADICIONAIS MOCKADOS PARA MESES ANTERIORES
--- =====================================================
-
--- Dados adicionais para Janeiro 2024
-INSERT INTO teiko.resumo_pedido (status, valor, data_pedido, data_entrega, pedido_fornada_id, pedido_bolo_id, is_ativo) VALUES
-('CONCLUIDO', 85.00, '2024-01-08 09:30:00', '2024-01-13', NULL, NULL, 1),
-('CONCLUIDO', 125.00, '2024-01-22 15:45:00', '2024-01-27', NULL, NULL, 1),
-('CONCLUIDO', 95.00, '2024-01-28 11:20:00', '2024-02-02', NULL, NULL, 1),
-('CONCLUIDO', 65.00, '2024-01-14 08:15:00', '2024-01-19', 1, NULL, 1),
-('CONCLUIDO', 105.00, '2024-01-30 16:30:00', '2024-02-04', 2, NULL, 1),
-('CONCLUIDO', 75.00, '2024-01-03 14:20:00', '2024-01-08', NULL, NULL, 1),
-('CONCLUIDO', 110.00, '2024-01-17 10:15:00', '2024-01-22', NULL, NULL, 1),
-('CONCLUIDO', 90.00, '2024-01-25 16:45:00', '2024-01-30', NULL, NULL, 1),
-('CONCLUIDO', 55.00, '2024-01-11 12:30:00', '2024-01-16', 1, NULL, 1),
-('CONCLUIDO', 80.00, '2024-01-29 09:00:00', '2024-02-03', 2, NULL, 1);
-
--- Dados adicionais para Fevereiro 2024
-INSERT INTO teiko.resumo_pedido (status, valor, data_pedido, data_entrega, pedido_fornada_id, pedido_bolo_id, is_ativo) VALUES
-('CONCLUIDO', 90.00, '2024-02-08 10:15:00', '2024-02-13', NULL, NULL, 1),
-('CONCLUIDO', 130.00, '2024-02-22 14:30:00', '2024-02-27', NULL, NULL, 1),
-('CONCLUIDO', 100.00, '2024-02-28 12:45:00', '2024-03-05', NULL, NULL, 1),
-('CONCLUIDO', 70.00, '2024-02-14 09:00:00', '2024-02-19', 1, NULL, 1),
-('CONCLUIDO', 110.00, '2024-02-29 17:20:00', '2024-03-06', 2, NULL, 1),
-('CONCLUIDO', 85.00, '2024-02-05 11:30:00', '2024-02-10', NULL, NULL, 1),
-('CONCLUIDO', 140.00, '2024-02-18 15:45:00', '2024-02-23', NULL, NULL, 1),
-('CONCLUIDO', 95.00, '2024-02-26 13:20:00', '2024-03-03', NULL, NULL, 1),
-('CONCLUIDO', 60.00, '2024-02-12 08:30:00', '2024-02-17', 1, NULL, 1),
-('CONCLUIDO', 115.00, '2024-02-27 16:15:00', '2024-03-04', 2, NULL, 1);
-
--- Dados adicionais para Março 2024
-INSERT INTO teiko.resumo_pedido (status, valor, data_pedido, data_entrega, pedido_fornada_id, pedido_bolo_id, is_ativo) VALUES
-('CONCLUIDO', 95.00, '2024-03-08 11:30:00', '2024-03-13', NULL, NULL, 1),
-('CONCLUIDO', 135.00, '2024-03-22 15:15:00', '2024-03-27', NULL, NULL, 1),
-('CONCLUIDO', 105.00, '2024-03-28 13:20:00', '2024-04-02', NULL, NULL, 1),
-('CONCLUIDO', 75.00, '2024-03-14 10:45:00', '2024-03-19', 1, NULL, 1),
-('CONCLUIDO', 115.00, '2024-03-30 18:10:00', '2024-04-04', 2, NULL, 1),
-('CONCLUIDO', 88.00, '2024-03-06 09:15:00', '2024-03-11', NULL, 1, 1),
-('CONCLUIDO', 145.00, '2024-03-20 16:30:00', '2024-03-25', NULL, 2, 1),
-('CONCLUIDO', 98.00, '2024-03-29 14:45:00', '2024-04-03', NULL, 3, 1),
-('CONCLUIDO', 68.00, '2024-03-16 12:00:00', '2024-03-21', 1, NULL, 1),
-('CONCLUIDO', 120.00, '2024-03-31 19:20:00', '2024-04-05', 2, NULL, 1);
-
--- Dados adicionais para Abril 2024
-INSERT INTO teiko.resumo_pedido (status, valor, data_pedido, data_entrega, pedido_fornada_id, pedido_bolo_id, is_ativo) VALUES
-('CONCLUIDO', 100.00, '2024-04-08 12:45:00', '2024-04-13', NULL, 1, 1),
-('CONCLUIDO', 140.00, '2024-04-22 16:00:00', '2024-04-27', NULL, 2, 1),
-('CONCLUIDO', 110.00, '2024-04-28 14:15:00', '2024-05-03', NULL, 3, 1),
-('CONCLUIDO', 80.00, '2024-04-14 11:30:00', '2024-04-19', 1, NULL, 1),
-('CONCLUIDO', 120.00, '2024-04-30 19:20:00', '2024-05-05', 2, NULL, 1),
-('CONCLUIDO', 92.00, '2024-04-05 10:20:00', '2024-04-10', NULL, 1, 1),
-('CONCLUIDO', 155.00, '2024-04-19 17:15:00', '2024-04-24', NULL, 2, 1),
-('CONCLUIDO', 108.00, '2024-04-26 15:30:00', '2024-05-01', NULL, 3, 1),
-('CONCLUIDO', 72.00, '2024-04-12 09:45:00', '2024-04-17', 1, NULL, 1),
-('CONCLUIDO', 125.00, '2024-04-29 20:10:00', '2024-05-04', 2, NULL, 1);
-
--- Dados adicionais para Maio 2024
-INSERT INTO teiko.resumo_pedido (status, valor, data_pedido, data_entrega, pedido_fornada_id, pedido_bolo_id, is_ativo) VALUES
-('CONCLUIDO', 105.00, '2024-05-08 13:20:00', '2024-05-13', NULL, 1, 1),
-('CONCLUIDO', 145.00, '2024-05-22 16:45:00', '2024-05-27', NULL, 2, 1),
-('CONCLUIDO', 115.00, '2024-05-28 15:00:00', '2024-06-02', NULL, 3, 1),
-('CONCLUIDO', 85.00, '2024-05-14 12:15:00', '2024-05-19', 1, NULL, 1),
-('CONCLUIDO', 125.00, '2024-05-30 20:30:00', '2024-06-04', 2, NULL, 1),
-('CONCLUIDO', 98.00, '2024-05-06 11:10:00', '2024-05-11', NULL, 1, 1),
-('CONCLUIDO', 150.00, '2024-05-20 18:00:00', '2024-05-25', NULL, 2, 1),
-('CONCLUIDO', 112.00, '2024-05-27 16:15:00', '2024-06-01', NULL, 3, 1),
-('CONCLUIDO', 78.00, '2024-05-13 10:30:00', '2024-05-18', 1, NULL, 1),
-('CONCLUIDO', 130.00, '2024-05-31 21:45:00', '2024-06-05', 2, NULL, 1);
-
--- Dados adicionais para Junho 2024
-INSERT INTO teiko.resumo_pedido (status, valor, data_pedido, data_entrega, pedido_fornada_id, pedido_bolo_id, is_ativo) VALUES
-('CONCLUIDO', 110.00, '2024-06-08 14:10:00', '2024-06-13', NULL, 1, 1),
-('CONCLUIDO', 150.00, '2024-06-22 17:30:00', '2024-06-27', NULL, 2, 1),
-('CONCLUIDO', 120.00, '2024-06-28 15:45:00', '2024-07-03', NULL, 3, 1),
-('CONCLUIDO', 90.00, '2024-06-14 13:00:00', '2024-06-19', 1, NULL, 1),
-('CONCLUIDO', 130.00, '2024-06-30 21:40:00', '2024-07-05', 2, NULL, 1),
-('CONCLUIDO', 102.00, '2024-06-07 12:25:00', '2024-06-12', NULL, 1, 1),
-('CONCLUIDO', 158.00, '2024-06-21 18:45:00', '2024-06-26', NULL, 2, 1),
-('CONCLUIDO', 118.00, '2024-06-29 16:20:00', '2024-07-04', NULL, 3, 1),
-('CONCLUIDO', 85.00, '2024-06-15 11:15:00', '2024-06-20', 1, NULL, 1),
-('CONCLUIDO', 135.00, '2024-06-30 22:30:00', '2024-07-05', 2, NULL, 1);
-
--- Dados adicionais para Julho 2024
-INSERT INTO teiko.resumo_pedido (status, valor, data_pedido, data_entrega, pedido_fornada_id, pedido_bolo_id, is_ativo) VALUES
-('CONCLUIDO', 115.00, '2024-07-08 15:00:00', '2024-07-13', NULL, 1, 1),
-('CONCLUIDO', 155.00, '2024-07-22 18:15:00', '2024-07-27', NULL, 2, 1),
-('CONCLUIDO', 125.00, '2024-07-28 16:30:00', '2024-08-02', NULL, 3, 1),
-('CONCLUIDO', 95.00, '2024-07-14 13:45:00', '2024-07-19', 1, NULL, 1),
-('CONCLUIDO', 135.00, '2024-07-30 22:50:00', '2024-08-04', 2, NULL, 1),
-('CONCLUIDO', 108.00, '2024-07-06 14:20:00', '2024-07-11', NULL, 1, 1),
-('CONCLUIDO', 162.00, '2024-07-20 19:30:00', '2024-07-25', NULL, 2, 1),
-('CONCLUIDO', 122.00, '2024-07-29 17:15:00', '2024-08-03', NULL, 3, 1),
-('CONCLUIDO', 88.00, '2024-07-16 12:30:00', '2024-07-21', 1, NULL, 1),
-('CONCLUIDO', 142.00, '2024-07-31 23:15:00', '2024-08-05', 2, NULL, 1);
-
--- Dados adicionais para Agosto 2024
-INSERT INTO teiko.resumo_pedido (status, valor, data_pedido, data_entrega, pedido_fornada_id, pedido_bolo_id, is_ativo) VALUES
-('CONCLUIDO', 120.00, '2024-08-08 15:50:00', '2024-08-13', NULL, 1, 1),
-('CONCLUIDO', 160.00, '2024-08-22 19:00:00', '2024-08-27', NULL, 2, 1),
-('CONCLUIDO', 130.00, '2024-08-28 17:15:00', '2024-09-02', NULL, 3, 1),
-('CONCLUIDO', 100.00, '2024-08-14 14:30:00', '2024-08-19', 1, NULL, 1),
-('CONCLUIDO', 140.00, '2024-08-30 23:00:00', '2024-09-04', 2, NULL, 1),
-('CONCLUIDO', 112.00, '2024-08-06 16:25:00', '2024-08-11', NULL, 1, 1),
-('CONCLUIDO', 168.00, '2024-08-21 20:15:00', '2024-08-26', NULL, 2, 1),
-('CONCLUIDO', 128.00, '2024-08-29 18:30:00', '2024-09-03', NULL, 3, 1),
-('CONCLUIDO', 95.00, '2024-08-15 13:45:00', '2024-08-20', 1, NULL, 1),
-('CONCLUIDO', 145.00, '2024-08-31 23:30:00', '2024-09-05', 2, NULL, 1);
-
--- ============================================================
--- Bloco de dados VARIADOS para 2025 (Bolo e Fornada)
--- ============================================================
-INSERT INTO teiko.resumo_pedido (status, valor, data_pedido, data_entrega, pedido_fornada_id, pedido_bolo_id, is_ativo) VALUES
--- Janeiro 2025
-('CONCLUIDO', 220.00, '2025-01-10 12:00:00', '2025-01-15', NULL, 1, 1),
-('CANCELADO',  80.00, '2025-01-12 14:00:00', '2025-01-18', NULL, 2, 1),
-('CONCLUIDO', 180.00, '2025-01-20 10:00:00', '2025-01-25', 1, NULL, 1),
-('PAGO',      160.00, '2025-01-22 09:00:00', '2025-01-27', 2, NULL, 1),
--- Abril 2025
-('CONCLUIDO', 195.00, '2025-04-05 09:00:00', '2025-04-10', NULL, 3, 1),
-('PAGO',      140.00, '2025-04-07 11:30:00', '2025-04-12', NULL, 4, 1),
-('CONCLUIDO', 210.00, '2025-04-15 15:20:00', '2025-04-20', 3, NULL, 1),
-('CANCELADO',  90.00, '2025-04-18 18:40:00', '2025-04-23', 4, NULL, 1),
--- Julho 2025
-('PAGO',      175.00, '2025-07-03 10:10:00', '2025-07-08', NULL, 5, 1),
-('CONCLUIDO', 205.00, '2025-07-10 08:35:00', '2025-07-15', NULL, 6, 1),
-('CONCLUIDO', 230.00, '2025-07-18 12:55:00', '2025-07-23', 5, NULL, 1),
-('PAGO',      150.00, '2025-07-22 14:25:00', '2025-07-27', 6, NULL, 1),
--- Outubro 2025
-('CONCLUIDO', 185.00, '2025-10-02 13:15:00', '2025-10-07', NULL, 7, 1),
-('CANCELADO',  95.00, '2025-10-08 16:45:00', '2025-10-13', NULL, 8, 1),
-('CONCLUIDO', 240.00, '2025-10-16 09:30:00', '2025-10-21', 7, NULL, 1),
-('PAGO',      165.00, '2025-10-20 17:05:00', '2025-10-25', 8, NULL, 1);
 
 -- =====================================================
 -- VERIFICAÇÕES FINAIS
