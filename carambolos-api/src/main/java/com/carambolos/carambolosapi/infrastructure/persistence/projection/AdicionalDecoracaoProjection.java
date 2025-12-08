@@ -4,14 +4,16 @@ public class AdicionalDecoracaoProjection {
     private Integer decoracaoId;
     private String nomeDecoracao;
     private String adicionais;
+    private String adicionaisIds;
 
     public AdicionalDecoracaoProjection() {
     }
 
-    public AdicionalDecoracaoProjection(Integer decoracaoId, String nomeDecoracao, String adicionais) {
+    public AdicionalDecoracaoProjection(Integer decoracaoId, String nomeDecoracao, String adicionais, String adicionaisIds) {
         this.decoracaoId = decoracaoId;
         this.nomeDecoracao = nomeDecoracao;
         this.adicionais = adicionais;
+        this.adicionaisIds = adicionaisIds;
     }
 
     public Integer getDecoracaoId() {
@@ -36,5 +38,13 @@ public class AdicionalDecoracaoProjection {
 
     public void setAdicionais(String adicionais) {
         this.adicionais = adicionais;
+    }
+
+    public String getAdicionaisIds() {
+        return adicionaisIds;
+    }
+
+    public void setAdicionaisIds(String adicionaisIds) {
+        this.adicionaisIds = adicionaisIds;
     }
 }

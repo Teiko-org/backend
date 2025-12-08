@@ -5,12 +5,12 @@ import java.util.List;
 public class AdicionalDecoracaoSummary {
     private Integer decoracaoId;
     private String nomeDecoracao;
-    private List<String> adicionaisPossiveis;
+    private List<AdicionalItem> adicionaisPossiveis;
 
     public AdicionalDecoracaoSummary() {
     }
 
-    public AdicionalDecoracaoSummary(Integer decoracaoId, String nomeDecoracao, List<String> adicionaisPossiveis) {
+    public AdicionalDecoracaoSummary(Integer decoracaoId, String nomeDecoracao, List<AdicionalItem> adicionaisPossiveis) {
         this.decoracaoId = decoracaoId;
         this.nomeDecoracao = nomeDecoracao;
         this.adicionaisPossiveis = adicionaisPossiveis;
@@ -32,11 +32,11 @@ public class AdicionalDecoracaoSummary {
         this.nomeDecoracao = nomeDecoracao;
     }
 
-    public List<String> getAdicionaisPossiveis() {
+    public List<AdicionalItem> getAdicionaisPossiveis() {
         return adicionaisPossiveis;
     }
 
-    public void setAdicionaisPossiveis(List<String> adicionaisPossiveis) {
+    public void setAdicionaisPossiveis(List<AdicionalItem> adicionaisPossiveis) {
         this.adicionaisPossiveis = adicionaisPossiveis;
     }
 }
