@@ -4,6 +4,7 @@ import com.carambolos.carambolosapi.application.gateways.AdicionalDecoracaoGatew
 import com.carambolos.carambolosapi.domain.entity.AdicionalDecoracaoSummary;
 
 import java.util.List;
+import java.util.Optional;
 
 public class AdicionalDecoracaoUseCase {
     private final AdicionalDecoracaoGateway gateway;
@@ -14,5 +15,9 @@ public class AdicionalDecoracaoUseCase {
 
     public List<AdicionalDecoracaoSummary> buscarAdicionaisPorDecoracao() {
         return gateway.buscarTodosAdicionaisPorDecoracao();
+    }
+
+    public Optional<AdicionalDecoracaoSummary> buscarAdicionaisPorDecoracaoId(Integer decoracaoId) {
+        return gateway.buscarAdicionaisPorDecoracaoId(decoracaoId);
     }
 }

@@ -10,6 +10,7 @@ import com.carambolos.carambolosapi.infrastructure.persistence.projection.Adicio
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.DecoracaoRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public class AdicionalDecoracaoGatewayImpl implements AdicionalDecoracaoGateway {
     private final AdicionalDecoracaoRepository repository;
@@ -27,6 +28,12 @@ public class AdicionalDecoracaoGatewayImpl implements AdicionalDecoracaoGateway 
         List<AdicionalDecoracaoProjection> projections = repository.findAllAdicionaisByDecoracao();
 
         return mapper.toDomain(projections);
+    }
+
+    @Override
+    public Optional<AdicionalDecoracaoSummary> buscarAdicionaisPorDecoracaoId(Integer decoracaoId) {
+        Optional<AdicionalDecoracaoProjection> projection = repository.findAdicionaisByDecoracaoId(decoracaoId);
+        return projection.map(mapper::toDomain);
     }
 
     @Override

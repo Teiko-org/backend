@@ -288,6 +288,7 @@ public class ResumoPedidoService {
                     recheioNome,
                     coberturaNome,
                     imagemUrl,
+                    boloEntity.getDecoracao(),
                     imagensDecoracao,
                     adicionais,
                     pedido.getObservacao(),
