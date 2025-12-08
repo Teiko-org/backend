@@ -2,9 +2,11 @@ package com.carambolos.carambolosapi.infrastructure.gateways.mapper;
 
 import com.carambolos.carambolosapi.domain.entity.AdicionalDecoracao;
 import com.carambolos.carambolosapi.domain.entity.AdicionalDecoracaoSummary;
+import com.carambolos.carambolosapi.domain.entity.AdicionalItem;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.AdicionalDecoracaoEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.projection.AdicionalDecoracaoProjection;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AdicionalDecoracaoMapper {
@@ -18,19 +20,37 @@ public class AdicionalDecoracaoMapper {
         adicionalDecoracaoSummary.setDecoracaoId(projection.getDecoracaoId());
         adicionalDecoracaoSummary.setNomeDecoracao(projection.getNomeDecoracao());
 
-        // Tratar caso quando getAdicionais() retorna null (quando decoração não tem adicionais)
-        String adicionaisStr = projection.getAdicionais();
-        if (adicionaisStr == null || adicionaisStr.trim().isEmpty()) {
-            adicionalDecoracaoSummary.setAdicionaisPossiveis(List.of());
-        } else {
-            var adicionaisPossiveis = List.of(adicionaisStr.split(","));
-            var adicionaisPossiveisTrimmed = adicionaisPossiveis.stream()
-                    .map(String::trim)
-                    .filter(s -> !s.isEmpty()) // Remover strings vazias após trim
-                    .toList();
+        // Handle null adicionais - return empty list instead of throwing NPE
+        List<AdicionalItem> adicionaisPossiveisTrimmed;
+        if (projection.getAdicionais() != null && !projection.getAdicionais().isBlank()) {
+            var adicionaisDescricoes = List.of(projection.getAdicionais().split(","));
+            var adicionaisIds = projection.getAdicionaisIds() != null ? 
+                List.of(projection.getAdicionaisIds().split(",")) : 
+                new ArrayList<String>();
 
-            adicionalDecoracaoSummary.setAdicionaisPossiveis(adicionaisPossiveisTrimmed);
+            adicionaisPossiveisTrimmed = new ArrayList<>();
+            for (int i = 0; i < adicionaisDescricoes.size(); i++) {
+                String descricao = adicionaisDescricoes.get(i).trim();
+                if (descricao.isEmpty()) {
+                    continue; // Pular strings vazias após trim
+                }
+                
+                Integer id = null;
+                if (i < adicionaisIds.size()) {
+                    try {
+                        id = Integer.parseInt(adicionaisIds.get(i).trim());
+                    } catch (NumberFormatException e) {
+                        id = null;
+                    }
+                }
+                
+                adicionaisPossiveisTrimmed.add(new AdicionalItem(id, descricao));
+            }
+        } else {
+            adicionaisPossiveisTrimmed = List.of();
         }
+
+        adicionalDecoracaoSummary.setAdicionaisPossiveis(adicionaisPossiveisTrimmed);
 
 
         return adicionalDecoracaoSummary;

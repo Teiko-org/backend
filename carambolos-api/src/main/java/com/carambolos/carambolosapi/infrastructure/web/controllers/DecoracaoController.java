@@ -191,4 +191,24 @@ public class DecoracaoController {
 
         return ResponseEntity.ok(adicionais);
     }
+
+    @Operation(summary = "Listar adicionais de uma decoração específica", description = "Retorna todos os adicionais associados a uma decoração específica pelo ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Adicionais retornados com sucesso", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = AdicionalDecoracaoSummary.class)
+            )),
+            @ApiResponse(responseCode = "404", description = "Decoração não encontrada", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor", content = @Content)
+    })
+    @GetMapping("/{id}/adicionais")
+    public ResponseEntity<AdicionalDecoracaoSummary> buscarAdicionaisPorDecoracaoId(@PathVariable Integer id) {
+        var adicionais = adicionalDecoracaoUseCase.buscarAdicionaisPorDecoracaoId(id);
+
+        if (adicionais.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(adicionais.get());
+    }
 }
