@@ -31,8 +31,11 @@ public class AdicionalDecoracaoMapper {
             adicionaisPossiveisTrimmed = new ArrayList<>();
             for (int i = 0; i < adicionaisDescricoes.size(); i++) {
                 String descricao = adicionaisDescricoes.get(i).trim();
-                Integer id = null;
+                if (descricao.isEmpty()) {
+                    continue; // Pular strings vazias após trim
+                }
                 
+                Integer id = null;
                 if (i < adicionaisIds.size()) {
                     try {
                         id = Integer.parseInt(adicionaisIds.get(i).trim());
@@ -47,9 +50,7 @@ public class AdicionalDecoracaoMapper {
             adicionaisPossiveisTrimmed = List.of();
         }
 
-        adicionalDecoracaoSummary.setAdicionaisPossiveis(
-                adicionaisPossiveisTrimmed
-        );
+        adicionalDecoracaoSummary.setAdicionaisPossiveis(adicionaisPossiveisTrimmed);
 
 
         return adicionalDecoracaoSummary;

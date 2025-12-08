@@ -62,16 +62,33 @@ public class DecoracaoUseCase {
         decoracao.setObservacao(observacao);
         decoracao.setCategoria(categoria);
 
-        List<ImagemDecoracao> imagens = new ArrayList<>();
+        // Atualizar imagens se arquivos forem fornecidos
+        if (arquivos != null && arquivos.length > 0) {
+            List<ImagemDecoracao> imagens = new ArrayList<>();
 
-        for (MultipartFile arquivo : arquivos) {
-            String url = storageGateway.upload(arquivo);
-            ImagemDecoracao imagem = new ImagemDecoracao();
-            imagem.setUrl(url);
-            imagem.setDecoracao(decoracao);
-            imagens.add(imagem);
+            for (MultipartFile arquivo : arquivos) {
+                if (arquivo != null && !arquivo.isEmpty()) {
+                    // Verificar se é um arquivo vazio (indicando remoção de todas as imagens)
+                    if (arquivo.getSize() == 0 && arquivo.getOriginalFilename() != null && 
+                        arquivo.getOriginalFilename().equals("empty.png")) {
+                        // Arquivo vazio indica que todas as imagens devem ser removidas
+                        decoracao.setImagens(new ArrayList<>());
+                        break;
+                    }
+                    
+                    String url = storageGateway.upload(arquivo);
+                    ImagemDecoracao imagem = new ImagemDecoracao();
+                    imagem.setUrl(url);
+                    imagem.setDecoracao(decoracao);
+                    imagens.add(imagem);
+                }
+            }
+            // Só substituir imagens se houver novas imagens válidas (e não foi um arquivo vazio)
+            if (!imagens.isEmpty()) {
+                decoracao.setImagens(imagens);
+            }
         }
-        decoracao.setImagens(imagens);
+        // Se não houver novas imagens, manter as imagens existentes
 
         try {
             salvarAdicionalDecoracao(decoracao, adicionais);
