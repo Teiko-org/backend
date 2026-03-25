@@ -7,6 +7,7 @@ import com.carambolos.carambolosapi.infrastructure.gateways.mapper.PedidoBoloMap
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoBoloEntity;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.PedidoBoloRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class PedidoBoloGatewayImpl implements PedidoBoloGateway {
@@ -21,6 +22,12 @@ public class PedidoBoloGatewayImpl implements PedidoBoloGateway {
     @Override
     public List<PedidoBolo> findAll() {
         List<PedidoBoloEntity> entities = repository.findAll().stream().filter(PedidoBoloEntity::getAtivo).toList();
+        return mapper.toDomain(entities);
+    }
+
+    @Override
+    public List<PedidoBolo> findAllByDataUltimaAtualizacaoBetween(LocalDateTime dataInicio, LocalDateTime dataFim) {
+        List<PedidoBoloEntity> entities = repository.findAllByIsAtivoTrueAndDataUltimaAtualizacaoBetween(dataInicio, dataFim);
         return mapper.toDomain(entities);
     }
 

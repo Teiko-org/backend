@@ -649,7 +649,7 @@ public class BoloController {
 //        DecoracaoResponseDTO response = DecoracaoResponseDTO.toDecoracaoResponse(decoracaoSalva);
 //        return ResponseEntity.status(201).body(response);
 //    }
-    @Operation(summary = "Listar pedidos", description = "Retorna uma lista com todos os pedidos ativos")
+    @Operation(summary = "Listar pedidos", description = "Retorna pedidos ativos, com filtro opcional por ano e mes da data de ultima atualizacao")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de pedidos retornada com sucesso", content = @Content(
                     mediaType = "application/json",
@@ -660,8 +660,11 @@ public class BoloController {
     })
 
     @GetMapping("/pedido")
-    public ResponseEntity<List<PedidoBoloResponseDTO>> listarPedidos() {
-        List<PedidoBolo> pedidos = pedidoBoloUseCase.listarPedidos();
+    public ResponseEntity<List<PedidoBoloResponseDTO>> listarPedidos(
+            @RequestParam(required = false) Integer ano,
+            @RequestParam(required = false) Integer mes
+    ) {
+        List<PedidoBolo> pedidos = pedidoBoloUseCase.listarPedidos(ano, mes);
         if (pedidos.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
