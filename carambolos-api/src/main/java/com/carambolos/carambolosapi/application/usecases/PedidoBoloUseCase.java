@@ -46,6 +46,10 @@ public class PedidoBoloUseCase {
         return pedidoBoloGateway.findAllByDataUltimaAtualizacaoBetween(dataInicio, dataFim);
     }
 
+    public List<PedidoBolo> listarPedidosCompleto(Integer ano, Integer mes) {
+        return listarPedidos(ano, mes);
+    }
+
     public PedidoBolo buscarPedidoPorId(Integer id) {
         return pedidoBoloGateway.findById(id);
     }

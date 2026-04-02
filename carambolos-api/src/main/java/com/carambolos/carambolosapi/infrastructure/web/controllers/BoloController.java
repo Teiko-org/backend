@@ -673,6 +673,29 @@ public class BoloController {
         );
     }
 
+    @Operation(summary = "Listar pedidos completo", description = "Retorna pedidos ativos com os objetos completos de bolo, endereco e usuario, com filtro opcional por ano e mes da data de ultima atualizacao")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de pedidos completos retornada com sucesso", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = PedidoBoloCompletoResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "204", description = "Nenhum pedido encontrado", content = @Content()),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @GetMapping("/pedido/completo")
+    public ResponseEntity<List<PedidoBoloCompletoResponseDTO>> listarPedidosCompleto(
+            @RequestParam(required = false) Integer ano,
+            @RequestParam(required = false) Integer mes
+    ) {
+        List<PedidoBolo> pedidos = pedidoBoloUseCase.listarPedidosCompleto(ano, mes);
+        if (pedidos.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.status(200).body(
+                pedidoBoloMapper.toPedidoBoloCompletoResponse(pedidos)
+        );
+    }
+
     @Operation(summary = "Buscar pedido por ID", description = "Retorna um pedido específico com base no ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Pedido encontrado com sucesso", content = @Content(
