@@ -7,6 +7,7 @@ import com.carambolos.carambolosapi.application.gateways.UsuarioGateway;
 import com.carambolos.carambolosapi.application.usecases.PedidoBoloUseCase;
 import com.carambolos.carambolosapi.infrastructure.gateways.impl.PedidoBoloGatewayImpl;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.BoloMapper;
+import com.carambolos.carambolosapi.infrastructure.gateways.mapper.PedidoBoloCompletoMapper;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.PedidoBoloMapper;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.PedidoBoloRepository;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.ResumoPedidoRepository;
@@ -37,13 +38,18 @@ public class PedidoBoloConfig {
     }
 
     @Bean
-    PedidoBoloMapper createPedidoBoloMapper(
+    PedidoBoloMapper createPedidoBoloMapper() {
+        return new PedidoBoloMapper();
+    }
+
+    @Bean
+    PedidoBoloCompletoMapper createPedidoBoloCompletoMapper(
             BoloGateway boloGateway,
             EnderecoGateway enderecoGateway,
             UsuarioGateway usuarioGateway,
             BoloMapper boloMapper,
             ResumoPedidoRepository resumoPedidoRepository
     ) {
-        return new PedidoBoloMapper(boloGateway, enderecoGateway, usuarioGateway, boloMapper, resumoPedidoRepository);
+        return new PedidoBoloCompletoMapper(boloGateway, enderecoGateway, usuarioGateway, boloMapper, resumoPedidoRepository);
     }
 }

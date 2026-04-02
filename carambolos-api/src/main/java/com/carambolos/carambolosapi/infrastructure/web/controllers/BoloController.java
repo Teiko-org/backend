@@ -41,6 +41,7 @@ public class BoloController {
     private final BoloMapper boloMapper;
     private final PedidoBoloUseCase pedidoBoloUseCase;
     private final PedidoBoloMapper pedidoBoloMapper;
+    private final PedidoBoloCompletoMapper pedidoBoloCompletoMapper;
 
     public BoloController(
             MassaUseCase massaUseCase,
@@ -52,7 +53,12 @@ public class BoloController {
             RecheioPedidoUseCase recheioPedidoUseCase,
             RecheioPedidoMapper recheioPedidoMapper,
             RecheioExclusivoUseCase recheioExclusivoUseCase,
-            RecheioExclusivoMapper recheioExclusivoMapper, BoloUseCase boloUseCase, BoloMapper boloMapper, PedidoBoloUseCase pedidoBoloUseCase, PedidoBoloMapper pedidoBoloMapper
+            RecheioExclusivoMapper recheioExclusivoMapper,
+            BoloUseCase boloUseCase,
+            BoloMapper boloMapper,
+            PedidoBoloUseCase pedidoBoloUseCase,
+            PedidoBoloMapper pedidoBoloMapper,
+            PedidoBoloCompletoMapper pedidoBoloCompletoMapper
     ) {
         this.massaUseCase = massaUseCase;
         this.coberturaUseCase = coberturaUseCase;
@@ -68,6 +74,7 @@ public class BoloController {
         this.boloMapper = boloMapper;
         this.pedidoBoloUseCase = pedidoBoloUseCase;
         this.pedidoBoloMapper = pedidoBoloMapper;
+        this.pedidoBoloCompletoMapper = pedidoBoloCompletoMapper;
     }
 
     @Operation(summary = "Listar bolos", description = "Retorna todos os bolos cadastrados no sistema.")
@@ -688,11 +695,8 @@ public class BoloController {
             @RequestParam(required = false) Integer mes
     ) {
         List<PedidoBolo> pedidos = pedidoBoloUseCase.listarPedidosCompleto(ano, mes);
-        if (pedidos.isEmpty()) {
-            return ResponseEntity.status(204).build();
-        }
         return ResponseEntity.status(200).body(
-                pedidoBoloMapper.toPedidoBoloCompletoResponse(pedidos)
+                pedidoBoloCompletoMapper.toResponse(pedidos)
         );
     }
 
