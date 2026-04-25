@@ -73,6 +73,8 @@ public class SecurityConfiguracao {
             new AntPathRequestMatcher("/api/files/**"),
             new AntPathRequestMatcher("/dashboard/**"),
             new AntPathRequestMatcher("/api/dashboard/**"),
+            new AntPathRequestMatcher("/relatorios/**"),
+            new AntPathRequestMatcher("/api/relatorios/**"),
             // Endereços e pedidos
             new AntPathRequestMatcher("/enderecos/**"),
             new AntPathRequestMatcher("/api/enderecos/**"),
@@ -98,11 +100,13 @@ public class SecurityConfiguracao {
                                 "/fornadas/**",
                                 "/files/**",
                                 "/dashboard/**",
+                                "/relatorios/**",
                                 "/api/decoracoes/**",
                                 "/api/bolos/**",
                                 "/api/fornadas/**",
                                 "/api/files/**",
                                 "/api/dashboard/**",
+                                "/api/relatorios/**",
                                 "/api/adicionais/**",
                                 "/api/resumo-pedido/**"
                         ).permitAll()
