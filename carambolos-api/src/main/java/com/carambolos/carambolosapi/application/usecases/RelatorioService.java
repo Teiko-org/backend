@@ -128,10 +128,10 @@ public class RelatorioService {
                     "ocorrências");
 
             addSectionTitle(doc, "5", "Top clientes — pedidos de bolo");
-            addClientesTable(doc, data.top3UsuariosBolo, data.usuarioEntities);
+            addClientesTable(doc, data.top3UsuariosBolo);
 
             addSectionTitle(doc, "6", "Top clientes — pedidos de fornada");
-            addClientesTable(doc, data.top3UsuariosFornada, data.usuarioEntities);
+            addClientesTable(doc, data.top3UsuariosFornada);
 
             doc.close();
             return out.toByteArray();
@@ -152,6 +152,13 @@ public class RelatorioService {
         d.adminIds = d.usuarioEntities.stream()
                 .filter(u -> Boolean.TRUE.equals(u.getSysAdmin()))
                 .map(UsuarioEntity::getId)
+                .collect(Collectors.toSet());
+
+        Set<String> adminNames = d.usuarioEntities.stream()
+                .filter(u -> Boolean.TRUE.equals(u.getSysAdmin()))
+                .map(UsuarioEntity::getNome)
+                .filter(Objects::nonNull)
+                .map(s -> s.trim().toLowerCase(Locale.ROOT))
                 .collect(Collectors.toSet());
 
         d.top3Bolos = topN(d.pedidosBolo.stream()
@@ -189,14 +196,20 @@ public class RelatorioService {
                 .collect(Collectors.groupingBy(id -> id, Collectors.counting())), 3);
 
         d.top3UsuariosBolo = topN(d.pedidosBolo.stream()
-                .filter(p -> p.getUsuarioId() != null)
-                .filter(p -> !d.adminIds.contains(p.getUsuarioId()))
-                .collect(Collectors.groupingBy(PedidoBoloEntity::getUsuarioId, Collectors.counting())), 3);
+                .filter(p -> p.getUsuarioId() == null || !d.adminIds.contains(p.getUsuarioId()))
+                .map(PedidoBoloEntity::getNomeCliente)
+                .filter(n -> n != null && !n.isBlank())
+                .map(String::trim)
+                .filter(n -> !adminNames.contains(n.toLowerCase(Locale.ROOT)))
+                .collect(Collectors.groupingBy(n -> n, Collectors.counting())), 3);
 
         d.top3UsuariosFornada = topN(d.pedidosFornada.stream()
-                .filter(p -> p.getUsuario() != null)
-                .filter(p -> !d.adminIds.contains(p.getUsuario()))
-                .collect(Collectors.groupingBy(PedidoFornada::getUsuario, Collectors.counting())), 3);
+                .filter(p -> p.getUsuario() == null || !d.adminIds.contains(p.getUsuario()))
+                .map(PedidoFornada::getNomeCliente)
+                .filter(n -> n != null && !n.isBlank())
+                .map(String::trim)
+                .filter(n -> !adminNames.contains(n.toLowerCase(Locale.ROOT)))
+                .collect(Collectors.groupingBy(n -> n, Collectors.counting())), 3);
 
         d.combinacaoMaisPedida = d.pedidosBolo.stream()
                 .map(p -> buildCombinacao(p, d))
@@ -307,9 +320,10 @@ public class RelatorioService {
         long totalBolos = d.pedidosBolo.size();
         long totalFornadas = d.pedidosFornada.size();
         long totalClientesBolo = d.pedidosBolo.stream()
-                .map(PedidoBoloEntity::getUsuarioId)
-                .filter(Objects::nonNull)
-                .filter(uid -> !d.adminIds.contains(uid))
+                .filter(p -> p.getUsuarioId() == null || !d.adminIds.contains(p.getUsuarioId()))
+                .map(PedidoBoloEntity::getNomeCliente)
+                .filter(n -> n != null && !n.isBlank())
+                .map(n -> n.trim().toLowerCase(Locale.ROOT))
                 .distinct().count();
         long totalProdutosBolo = d.boloEntities.size();
 
@@ -446,8 +460,7 @@ public class RelatorioService {
         doc.add(t);
     }
 
-    private void addClientesTable(Document doc, List<Map.Entry<Integer, Long>> top,
-                                  List<UsuarioEntity> usuarios) throws DocumentException {
+    private void addClientesTable(Document doc, List<Map.Entry<String, Long>> top) throws DocumentException {
         if (top.isEmpty()) {
             addEmptyState(doc, "Nenhum cliente encontrado.");
             return;
@@ -455,12 +468,7 @@ public class RelatorioService {
         PdfPTable t = buildRankingTableHeader();
         int i = 1;
         for (var entry : top) {
-            String nome = usuarios.stream()
-                    .filter(u -> u.getId().equals(entry.getKey()))
-                    .map(UsuarioEntity::getNome)
-                    .findFirst()
-                    .orElse("Cliente #" + entry.getKey());
-            addRankingRow(t, i, nome, entry.getValue(), "pedidos", i % 2 == 0);
+            addRankingRow(t, i, entry.getKey(), entry.getValue(), "pedidos", i % 2 == 0);
             i++;
         }
         doc.add(t);
@@ -644,8 +652,8 @@ public class RelatorioService {
         List<Map.Entry<Integer, Long>> top3Fornadas;
         List<Map.Entry<Integer, Long>> top3Massas;
         List<Map.Entry<Integer, Long>> top3Recheios;
-        List<Map.Entry<Integer, Long>> top3UsuariosBolo;
-        List<Map.Entry<Integer, Long>> top3UsuariosFornada;
+        List<Map.Entry<String, Long>> top3UsuariosBolo;
+        List<Map.Entry<String, Long>> top3UsuariosFornada;
         Optional<Map.Entry<String, Long>> combinacaoMaisPedida = Optional.empty();
     }
 }
