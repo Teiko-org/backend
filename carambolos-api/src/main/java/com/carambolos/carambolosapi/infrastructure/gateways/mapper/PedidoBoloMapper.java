@@ -8,6 +8,7 @@ import com.carambolos.carambolosapi.infrastructure.web.response.PedidoBoloRespon
 import java.util.List;
 
 public class PedidoBoloMapper {
+
     public List<PedidoBolo> toDomain(List<com.carambolos.carambolosapi.infrastructure.persistence.entity.PedidoBoloEntity> entities) {
         return entities.stream()
                 .map(this::toDomain)
@@ -74,6 +75,7 @@ public class PedidoBoloMapper {
     public List<PedidoBoloResponseDTO> toPedidoBoloResponse(List<PedidoBolo> pedidos) {
         return pedidos.stream().map(this::toPedidoBoloResponse).toList();
     }
+
 
     public static PedidoBolo toPedidoBolo(PedidoBoloRequestDTO request) {
         if (request == null) {
