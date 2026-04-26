@@ -31,18 +31,6 @@ public class DecoracaoUseCase {
         decoracao.setCategoria(categoria);
         decoracao.setIsAtivo(true);
 
-        List<ImagemDecoracao> imagens = new ArrayList<>();
-
-        for (MultipartFile arquivo : arquivos) {
-            String url = storageGateway.upload(arquivo);
-            ImagemDecoracao imagem = new ImagemDecoracao();
-            imagem.setUrl(url);
-            imagem.setDecoracao(decoracao);
-            imagens.add(imagem);
-        }
-
-        decoracao.setImagens(imagens);
-
         Decoracao decoracaoSalva = decoracaoGateway.save(decoracao);
         salvarAdicionalDecoracao(decoracaoSalva, adicionais);
 

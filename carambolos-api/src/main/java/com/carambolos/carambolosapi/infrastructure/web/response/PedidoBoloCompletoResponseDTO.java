@@ -8,7 +8,8 @@ import java.time.LocalDateTime;
 
 public record PedidoBoloCompletoResponseDTO(
         Integer id,
-        BoloCompletoResponseDTO bolo,
+        Integer resumoPedidoId,
+        BoloResponseDTO bolo,
         EnderecoResponseDTO endereco,
         UsuarioResponseDTO usuario,
         StatusEnum status,

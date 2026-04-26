@@ -35,16 +35,6 @@ public class ProdutoFornadaUseCases {
         produtoFornada.setCategoria(categoria);
         produtoFornada.setIsAtivo(true);
 
-        List<ImagemProdutoFornada> imagens = new ArrayList<>();
-        for (MultipartFile arquivo : arquivos) {
-            String url = storageGateway.upload(arquivo);
-            ImagemProdutoFornada imagem = new ImagemProdutoFornada();
-            imagem.setUrl(url);
-            imagem.setProdutoFornada(produtoFornada);
-            imagens.add(imagem);
-        }
-        produtoFornada.setImagens(imagens);
-
         return produtoFornadaGateway.save(produtoFornada);
     }
 

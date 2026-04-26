@@ -225,8 +225,8 @@ public class FornadaController {
 
     @PostMapping(value = "/produto-fornada", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(
-            summary = "Cria um novo produto da fornada com imagens",
-            description = "Cadastra um novo produto da fornada e faz upload de imagens associadas."
+            summary = "Cria um novo produto da fornada",
+            description = "Cadastra um novo produto da fornada."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Produto da fornada criado com sucesso",
@@ -238,7 +238,7 @@ public class FornadaController {
             @RequestPart("descricao") String descricao,
             @RequestPart("valor") String valor,
             @RequestPart("categoria") String categoria,
-            @RequestPart("imagens") MultipartFile[] imagens
+            @RequestParam(value = "imagens", required = false) MultipartFile[] imagens
     ) {
         Double valorDouble = Double.valueOf(valor);
         ProdutoFornada produtoFornada = produtoFornadaService.criarProdutoFornada(produto, descricao, valorDouble, categoria, imagens);
