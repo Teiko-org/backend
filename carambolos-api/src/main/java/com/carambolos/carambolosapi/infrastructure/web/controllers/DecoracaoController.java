@@ -54,9 +54,8 @@ public class DecoracaoController {
             @RequestPart("nome") String nome,
             @RequestPart("observacao") String observacao,
             @RequestPart(value = "categoria", required = false) String categoria,
-            // Para usos públicos (referência de cliente), adicionais podem ser omitidos
             @RequestPart(value = "adicionais", required = false) String adicionais,
-            @RequestPart("imagens") MultipartFile[] imagens)
+            @RequestParam(value = "imagens", required = false) MultipartFile[] imagens)
     {
         List<Integer> adicionaisIds = (adicionais == null || adicionais.isBlank())
                 ? List.of()

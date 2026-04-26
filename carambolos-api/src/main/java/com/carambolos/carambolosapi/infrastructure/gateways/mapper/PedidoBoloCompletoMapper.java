@@ -8,7 +8,6 @@ import com.carambolos.carambolosapi.domain.entity.Endereco;
 import com.carambolos.carambolosapi.domain.entity.PedidoBolo;
 import com.carambolos.carambolosapi.domain.entity.ResumoPedido;
 import com.carambolos.carambolosapi.domain.entity.Usuario;
-import com.carambolos.carambolosapi.domain.enums.StatusEnum;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.ResumoPedidoRepository;
 import com.carambolos.carambolosapi.infrastructure.web.response.PedidoBoloCompletoResponseDTO;
 
@@ -42,13 +41,13 @@ public class PedidoBoloCompletoMapper {
             return List.of();
         }
 
-        Map<Integer, StatusEnum> statusByPedidoBoloId = carregarStatusPorPedidoBoloId(pedidos);
+        Map<Integer, ResumoPedido> resumoByPedidoBoloId = carregarResumoPorPedidoBoloId(pedidos);
         return pedidos.stream()
-                .map(pedido -> toResponse(pedido, statusByPedidoBoloId.get(pedido.getId())))
+                .map(pedido -> toResponse(pedido, resumoByPedidoBoloId.get(pedido.getId())))
                 .toList();
     }
 
-    private PedidoBoloCompletoResponseDTO toResponse(PedidoBolo pedido, StatusEnum status) {
+    private PedidoBoloCompletoResponseDTO toResponse(PedidoBolo pedido, ResumoPedido resumo) {
         Bolo bolo = null;
         if (pedido.getBoloId() != null && Boolean.TRUE.equals(boloGateway.existsByIdAndIsAtivoTrue(pedido.getBoloId()))) {
             bolo = boloGateway.findById(pedido.getBoloId());
@@ -66,10 +65,11 @@ public class PedidoBoloCompletoMapper {
 
         return new PedidoBoloCompletoResponseDTO(
                 pedido.getId(),
+                resumo != null ? resumo.getId() : null,
                 bolo == null ? null : boloMapper.toBoloResponse(bolo),
                 EnderecoMapper.toResponseDTO(endereco),
                 usuario == null ? null : UsuarioMapper.toResponseDTO(usuario),
-                status,
+                resumo != null ? resumo.getStatus() : null,
                 pedido.getObservacao(),
                 pedido.getDataPrevisaoEntrega(),
                 pedido.getDataUltimaAtualizacao(),
@@ -79,16 +79,16 @@ public class PedidoBoloCompletoMapper {
         );
     }
 
-    private Map<Integer, StatusEnum> carregarStatusPorPedidoBoloId(List<PedidoBolo> pedidos) {
+    private Map<Integer, ResumoPedido> carregarResumoPorPedidoBoloId(List<PedidoBolo> pedidos) {
         List<Integer> pedidoIds = pedidos.stream().map(PedidoBolo::getId).toList();
         List<ResumoPedido> resumos = resumoPedidoRepository
                 .findByPedidoBoloIdInAndIsAtivoTrueOrderByDataPedidoDesc(pedidoIds);
 
-        Map<Integer, StatusEnum> statusByPedidoBoloId = new LinkedHashMap<>();
+        Map<Integer, ResumoPedido> resumoByPedidoBoloId = new LinkedHashMap<>();
         for (ResumoPedido resumo : resumos) {
-            statusByPedidoBoloId.putIfAbsent(resumo.getPedidoBoloId(), resumo.getStatus());
+            resumoByPedidoBoloId.putIfAbsent(resumo.getPedidoBoloId(), resumo);
         }
-        return statusByPedidoBoloId;
+        return resumoByPedidoBoloId;
     }
 }
 
