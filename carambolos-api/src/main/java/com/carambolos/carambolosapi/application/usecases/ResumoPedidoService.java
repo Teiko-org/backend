@@ -299,6 +299,8 @@ public class ResumoPedidoService {
                     pedido.getHorarioRetirada(),
                     enderecoDTO
             );
+        } catch (EntidadeNaoEncontradaException | EntidadeImprocessavelException e) {
+            throw e;
         } catch (Exception e) {
             System.err.println("Erro geral em obterDetalhePedidoBolo: " + e.getMessage());
             e.printStackTrace();
@@ -359,6 +361,8 @@ public class ResumoPedidoService {
                     resumoPedido.getDataPedido(),
                     enderecoDTO
             );
+        } catch (EntidadeNaoEncontradaException | EntidadeImprocessavelException e) {
+            throw e;
         } catch (Exception e) {
             System.err.println("Erro geral em obterDetalhePedidoFornada: " + e.getMessage());
             e.printStackTrace();
