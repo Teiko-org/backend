@@ -1,5 +1,6 @@
 package com.carambolos.carambolosapi.application.usecases;
 
+import com.carambolos.carambolosapi.application.exception.EntidadeImprocessavelException;
 import com.carambolos.carambolosapi.application.gateways.FornadaGateway;
 import com.carambolos.carambolosapi.domain.entity.Fornada;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,14 @@ public class FornadasUseCases {
     public Fornada criar(Integer id, LocalDate inicio, LocalDate fim) {
         if (id != null && gateway.existsAtivaById(id)) {
             throw new IllegalArgumentException("Fornada com cadastro " + id + " já existe.");
+        }
+        var ativas = gateway.findAllAtivas();
+        if (!ativas.isEmpty()) {
+            var existente = ativas.get(0);
+            throw new EntidadeImprocessavelException(
+                "Ja existe uma fornada ativa (#" + existente.getId()
+                    + "). Encerre-a antes de criar outra."
+            );
         }
         var f = new Fornada(inicio, fim, true);
         if (id != null) f.setId(id);
