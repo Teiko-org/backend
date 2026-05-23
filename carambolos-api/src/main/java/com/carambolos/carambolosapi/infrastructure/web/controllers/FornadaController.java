@@ -64,7 +64,8 @@ public class FornadaController {
     @Operation(summary = "Cria uma nova fornada")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Fornada criada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Requisição inválida")
+            @ApiResponse(responseCode = "400", description = "Requisição inválida"),
+            @ApiResponse(responseCode = "422", description = "Ja existe fornada ativa")
     })
     @PostMapping
     public ResponseEntity<Fornada> criarFornada(@RequestBody @Valid FornadaRequestDTO request) {
