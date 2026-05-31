@@ -12,6 +12,7 @@ services:
       - "3307:3306"
     volumes:
       - carambolos-mysql-data:/var/lib/mysql
+      - ./carambolos-api/src/main/resources/script-bd.sql:/docker-entrypoint-initdb.d/01-script-bd.sql:ro
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci

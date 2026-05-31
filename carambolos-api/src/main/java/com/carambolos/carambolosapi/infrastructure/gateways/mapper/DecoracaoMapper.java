@@ -57,10 +57,12 @@ public class DecoracaoMapper {
     }
 
     public DecoracaoResponseDTO toResponse(Decoracao decoracao) {
-        List<String> urls = decoracao.getImagens()
-                .stream()
-                .map(ImagemDecoracao::getUrl)
-                .toList();
+        List<String> urls = decoracao.getImagens() == null
+                ? List.of()
+                : decoracao.getImagens()
+                        .stream()
+                        .map(ImagemDecoracao::getUrl)
+                        .toList();
 
         return new DecoracaoResponseDTO(
                 decoracao.getId(),

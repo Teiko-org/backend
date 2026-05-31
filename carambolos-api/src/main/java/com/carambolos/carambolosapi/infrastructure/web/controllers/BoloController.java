@@ -700,6 +700,27 @@ public class BoloController {
         );
     }
 
+    @Operation(summary = "Buscar pedido completo por ID", description = "Retorna um pedido de bolo ativo com massa, recheio, decoração e resumo")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pedido completo encontrado", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = PedidoBoloCompletoResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content()),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @GetMapping("/pedido/completo/{id}")
+    public ResponseEntity<PedidoBoloCompletoResponseDTO> buscarPedidoCompletoPorId(
+            @PathVariable Integer id
+    ) {
+        PedidoBolo pedido = pedidoBoloUseCase.buscarPedidoPorId(id);
+        List<PedidoBoloCompletoResponseDTO> response = pedidoBoloCompletoMapper.toResponse(List.of(pedido));
+        if (response.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(response.get(0));
+    }
+
     @Operation(summary = "Buscar pedido por ID", description = "Retorna um pedido específico com base no ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Pedido encontrado com sucesso", content = @Content(
