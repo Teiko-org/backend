@@ -9,7 +9,6 @@ import com.carambolos.carambolosapi.infrastructure.gateways.impl.PedidoBoloGatew
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.BoloMapper;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.PedidoBoloCompletoMapper;
 import com.carambolos.carambolosapi.infrastructure.gateways.mapper.PedidoBoloMapper;
-import com.carambolos.carambolosapi.infrastructure.persistence.jpa.PedidoBoloRepository;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.ResumoPedidoRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,7 +29,7 @@ public class PedidoBoloConfig {
     }
 
     @Bean
-    PedidoBoloGateway createPedidoBoloGateway(PedidoBoloRepository repository, PedidoBoloMapper mapper) {
+    PedidoBoloGateway createPedidoBoloGateway(com.carambolos.carambolosapi.infrastructure.persistence.jpa.PedidoBoloRepository repository, PedidoBoloMapper mapper) {
         return new PedidoBoloGatewayImpl(
                 repository,
                 mapper

@@ -656,7 +656,7 @@ public class BoloController {
 //        DecoracaoResponseDTO response = DecoracaoResponseDTO.toDecoracaoResponse(decoracaoSalva);
 //        return ResponseEntity.status(201).body(response);
 //    }
-    @Operation(summary = "Listar pedidos", description = "Retorna pedidos ativos, com filtro opcional por ano e mes da data de ultima atualizacao")
+    @Operation(summary = "Listar pedidos", description = "Retorna pedidos ativos, com filtro opcional por ano, mes ou ambos, usando a data de previsao de entrega.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de pedidos retornada com sucesso", content = @Content(
                     mediaType = "application/json",
@@ -680,7 +680,7 @@ public class BoloController {
         );
     }
 
-    @Operation(summary = "Listar pedidos completo", description = "Retorna pedidos ativos com os objetos completos de bolo, endereco e usuario, com filtro opcional por ano e mes da data de ultima atualizacao")
+    @Operation(summary = "Listar pedidos completo", description = "Retorna pedidos ativos com os objetos completos de bolo, endereco e usuario, com filtro opcional por ano, mes ou ambos, usando a data de previsao de entrega.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de pedidos completos retornada com sucesso", content = @Content(
                     mediaType = "application/json",
