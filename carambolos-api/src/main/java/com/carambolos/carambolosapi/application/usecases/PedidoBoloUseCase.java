@@ -9,7 +9,7 @@ import com.carambolos.carambolosapi.domain.entity.PedidoBolo;
 import com.carambolos.carambolosapi.domain.enums.TipoEntregaEnum;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalTime;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
@@ -31,19 +31,28 @@ public class PedidoBoloUseCase {
             return pedidoBoloGateway.findAll();
         }
 
-        if (ano == null || mes == null) {
-            throw new EntidadeImprocessavelException("Para filtrar pedidos, informe ano e mes juntos.");
-        }
-
-        if (mes < 1 || mes > 12) {
+        if (mes != null && (mes < 1 || mes > 12)) {
             throw new EntidadeImprocessavelException("Mes invalido. Informe um valor entre 1 e 12.");
         }
 
-        YearMonth anoMes = YearMonth.of(ano, mes);
-        LocalDateTime dataInicio = anoMes.atDay(1).atStartOfDay();
-        LocalDateTime dataFim = anoMes.atEndOfMonth().atTime(LocalTime.MAX);
+        if (ano != null && ano < 1) {
+            throw new EntidadeImprocessavelException("Ano invalido. Informe um valor positivo.");
+        }
 
-        return pedidoBoloGateway.findAllByDataUltimaAtualizacaoBetween(dataInicio, dataFim);
+        if (ano != null && mes != null) {
+            YearMonth anoMes = YearMonth.of(ano, mes);
+            LocalDate dataInicio = anoMes.atDay(1);
+            LocalDate dataFim = anoMes.atEndOfMonth();
+            return pedidoBoloGateway.findAllByDataPrevisaoEntregaBetween(dataInicio, dataFim);
+        }
+
+        if (ano != null) {
+            LocalDate dataInicio = LocalDate.of(ano, 1, 1);
+            LocalDate dataFim = LocalDate.of(ano, 12, 31);
+            return pedidoBoloGateway.findAllByDataPrevisaoEntregaBetween(dataInicio, dataFim);
+        }
+
+        return pedidoBoloGateway.findAllByDataPrevisaoEntregaMonth(mes);
     }
 
     public List<PedidoBolo> listarPedidosCompleto(Integer ano, Integer mes) {
