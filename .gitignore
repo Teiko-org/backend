@@ -38,3 +38,4 @@ dev.env
 # Local tools (não versionar)
 apache-jmeter-*/
 *.jmx
+carambolos-api/.mvn/wrapper/maven-wrapper.properties

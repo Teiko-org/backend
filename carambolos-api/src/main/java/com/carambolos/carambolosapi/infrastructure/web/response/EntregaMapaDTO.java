@@ -10,6 +10,10 @@ public class EntregaMapaDTO {
     private String tipoPedido;
     private String observacoes;
     private String status;
+    private String logradouro;
+    private String numero;
+    private String cidade;
+    private String estado;
 
     public EntregaMapaDTO(Integer resumoPedidoId, String nomeCliente, String telefoneCliente, String enderecoCompleto, Double latitude, Double longitude, String tipoPedido, String observacoes, String status) {
         this.resumoPedidoId = resumoPedidoId;
@@ -21,6 +25,14 @@ public class EntregaMapaDTO {
         this.tipoPedido = tipoPedido;
         this.observacoes = observacoes;
         this.status = status;
+    }
+
+    public EntregaMapaDTO(Integer resumoPedidoId, String nomeCliente, String telefoneCliente, String enderecoCompleto, Double latitude, Double longitude, String tipoPedido, String observacoes, String status, String logradouro, String numero, String cidade, String estado) {
+        this(resumoPedidoId, nomeCliente, telefoneCliente, enderecoCompleto, latitude, longitude, tipoPedido, observacoes, status);
+        this.logradouro = logradouro;
+        this.numero = numero;
+        this.cidade = cidade;
+        this.estado = estado;
     }
 
     public Integer getResumoPedidoId() { return resumoPedidoId; }
@@ -41,4 +53,12 @@ public class EntregaMapaDTO {
     public void setObservacoes(String observacoes) { this.observacoes = observacoes; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+    public String getLogradouro() { return logradouro; }
+    public void setLogradouro(String logradouro) { this.logradouro = logradouro; }
+    public String getNumero() { return numero; }
+    public void setNumero(String numero) { this.numero = numero; }
+    public String getCidade() { return cidade; }
+    public void setCidade(String cidade) { this.cidade = cidade; }
+    public String getEstado() { return estado; }
+    public void setEstado(String estado) { this.estado = estado; }
 }
