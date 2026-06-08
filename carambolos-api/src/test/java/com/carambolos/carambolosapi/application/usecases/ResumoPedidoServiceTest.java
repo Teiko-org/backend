@@ -1,5 +1,6 @@
 package com.carambolos.carambolosapi.application.usecases;
 
+import com.carambolos.carambolosapi.application.exception.EntidadeImprocessavelException;
 import com.carambolos.carambolosapi.domain.entity.ResumoPedido;
 import com.carambolos.carambolosapi.infrastructure.persistence.entity.ProdutoFornada;
 import com.carambolos.carambolosapi.domain.enums.StatusEnum;
@@ -144,6 +145,41 @@ class ResumoPedidoServiceTest {
 
         service.deletarResumoPedido(5);
         assertFalse(rp.getAtivo());
+    }
+
+    @Test
+    void alterarStatus_deConcluido_deveRejeitarQualquerMudanca() {
+        ResumoPedido rp = new ResumoPedido();
+        rp.setStatus(StatusEnum.CONCLUIDO);
+        when(resumoPedidoRepository.findByIdAndIsAtivoTrue(1)).thenReturn(Optional.of(rp));
+
+        assertThrows(
+                EntidadeImprocessavelException.class,
+                () -> service.alterarStatus(1, StatusEnum.PAGO)
+        );
+    }
+
+    @Test
+    void alterarStatus_dePendenteParaConcluido_deveRejeitar() {
+        ResumoPedido rp = new ResumoPedido();
+        rp.setStatus(StatusEnum.PENDENTE);
+        when(resumoPedidoRepository.findByIdAndIsAtivoTrue(1)).thenReturn(Optional.of(rp));
+
+        assertThrows(
+                EntidadeImprocessavelException.class,
+                () -> service.alterarStatus(1, StatusEnum.CONCLUIDO)
+        );
+    }
+
+    @Test
+    void alterarStatus_deCanceladoParaPendente_devePermitir() {
+        ResumoPedido rp = new ResumoPedido();
+        rp.setStatus(StatusEnum.CANCELADO);
+        when(resumoPedidoRepository.findByIdAndIsAtivoTrue(1)).thenReturn(Optional.of(rp));
+        when(resumoPedidoRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        var updated = service.alterarStatus(1, StatusEnum.PENDENTE);
+        assertEquals(StatusEnum.PENDENTE, updated.getStatus());
     }
 
     @Test
