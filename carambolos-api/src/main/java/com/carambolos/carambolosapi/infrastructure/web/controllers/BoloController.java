@@ -656,7 +656,7 @@ public class BoloController {
 //        DecoracaoResponseDTO response = DecoracaoResponseDTO.toDecoracaoResponse(decoracaoSalva);
 //        return ResponseEntity.status(201).body(response);
 //    }
-    @Operation(summary = "Listar pedidos", description = "Retorna pedidos ativos, com filtro opcional por ano e mes da data de ultima atualizacao")
+    @Operation(summary = "Listar pedidos", description = "Retorna pedidos ativos, com filtro opcional por ano, mes ou ambos, usando a data de previsao de entrega.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de pedidos retornada com sucesso", content = @Content(
                     mediaType = "application/json",
@@ -680,7 +680,7 @@ public class BoloController {
         );
     }
 
-    @Operation(summary = "Listar pedidos completo", description = "Retorna pedidos ativos com os objetos completos de bolo, endereco e usuario, com filtro opcional por ano e mes da data de ultima atualizacao")
+    @Operation(summary = "Listar pedidos completo", description = "Retorna pedidos ativos com os objetos completos de bolo, endereco e usuario, com filtro opcional por ano, mes ou ambos, usando a data de previsao de entrega.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de pedidos completos retornada com sucesso", content = @Content(
                     mediaType = "application/json",
@@ -698,6 +698,27 @@ public class BoloController {
         return ResponseEntity.status(200).body(
                 pedidoBoloCompletoMapper.toResponse(pedidos)
         );
+    }
+
+    @Operation(summary = "Buscar pedido completo por ID", description = "Retorna um pedido de bolo ativo com massa, recheio, decoração e resumo")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pedido completo encontrado", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = PedidoBoloCompletoResponseDTO.class)
+            )),
+            @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content()),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @GetMapping("/pedido/completo/{id}")
+    public ResponseEntity<PedidoBoloCompletoResponseDTO> buscarPedidoCompletoPorId(
+            @PathVariable Integer id
+    ) {
+        PedidoBolo pedido = pedidoBoloUseCase.buscarPedidoPorId(id);
+        List<PedidoBoloCompletoResponseDTO> response = pedidoBoloCompletoMapper.toResponse(List.of(pedido));
+        if (response.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(response.get(0));
     }
 
     @Operation(summary = "Buscar pedido por ID", description = "Retorna um pedido específico com base no ID")
