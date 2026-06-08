@@ -1,4 +1,24 @@
 services:
+  app:
+    build: .
+    container_name: carambolos-app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/teiko?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: teiko
+      SPRING_DATASOURCE_PASSWORD: teiko123
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_RABBITMQ_HOST: rabbitmq
+
   mysql:
     image: mysql:8.0
     container_name: carambolos-mysql
@@ -18,7 +38,17 @@ services:
       - --collation-server=utf8mb4_unicode_ci
       - --default-time-zone=-03:00
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-pteiko_root"]
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "127.0.0.1",
+          "-u",
+          "root",
+          "-pteiko_root",
+        ]
       interval: 10s
       timeout: 5s
       retries: 10

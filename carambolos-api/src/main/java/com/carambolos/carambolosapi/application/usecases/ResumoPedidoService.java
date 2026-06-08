@@ -616,4 +616,57 @@ public class ResumoPedidoService {
 
         return resumosPedidos;
     }
+
+    public List<com.carambolos.carambolosapi.infrastructure.web.response.EntregaMapaDTO> listarEntregasMapaPorData(LocalDate dataEntrega) {
+        List<com.carambolos.carambolosapi.infrastructure.web.response.EntregaMapaDTO> entregas = new ArrayList<>();
+        
+        LocalDateTime dataInicio = dataEntrega.atStartOfDay();
+        LocalDateTime dataFim = dataEntrega.atTime(23, 59, 59);
+        
+        List<ResumoPedido> resumosPedidos = resumoPedidoRepository
+                .findByDataEntregaBetweenAndIsAtivoTrueOrderByDataEntregaAsc(dataInicio, dataFim);
+                
+        for (ResumoPedido resumo : resumosPedidos) {
+            if (resumo.getPedidoBoloId() != null) {
+                pedidoBoloRepository.findById(resumo.getPedidoBoloId())
+                    .filter(PedidoBoloEntity::getAtivo)
+                    .filter(p -> p.getTipoEntrega() == TipoEntregaEnum.ENTREGA)
+                    .ifPresent(p -> {
+                        if (p.getEnderecoId() != null) {
+                            enderecoRepository.findById(p.getEnderecoId())
+                                .filter(EnderecoEntity::isAtivo)
+                                .ifPresent(e -> {
+                                    String endCompleto = String.format("%s, %s - %s, %s - %s. %s",
+                                            e.getLogradouro(), e.getNumero(), e.getBairro(), e.getCidade(), e.getEstado(), 
+                                            (e.getComplemento() != null ? e.getComplemento() : ""));
+                                    entregas.add(new com.carambolos.carambolosapi.infrastructure.web.response.EntregaMapaDTO(
+                                            resumo.getId(), p.getNomeCliente(), p.getTelefoneCliente(), endCompleto,
+                                            e.getLatitude(), e.getLongitude(), "BOLO", p.getObservacao(), resumo.getStatus().name()
+                                    ));
+                                });
+                        }
+                    });
+            } else if (resumo.getPedidoFornadaId() != null) {
+                pedidoFornadaRepository.findById(resumo.getPedidoFornadaId())
+                    .filter(PedidoFornada::isAtivo)
+                    .filter(p -> p.getTipoEntrega() == TipoEntregaEnum.ENTREGA)
+                    .ifPresent(p -> {
+                        if (p.getEndereco() != null) {
+                            enderecoRepository.findById(p.getEndereco())
+                                .filter(EnderecoEntity::isAtivo)
+                                .ifPresent(e -> {
+                                    String endCompleto = String.format("%s, %s - %s, %s - %s. %s",
+                                            e.getLogradouro(), e.getNumero(), e.getBairro(), e.getCidade(), e.getEstado(),
+                                            (e.getComplemento() != null ? e.getComplemento() : ""));
+                                    entregas.add(new com.carambolos.carambolosapi.infrastructure.web.response.EntregaMapaDTO(
+                                            resumo.getId(), p.getNomeCliente(), p.getTelefoneCliente(), endCompleto,
+                                            e.getLatitude(), e.getLongitude(), "FORNADA", p.getObservacoes(), resumo.getStatus().name()
+                                    ));
+                                });
+                        }
+                    });
+            }
+        }
+        return entregas;
+    }
 }

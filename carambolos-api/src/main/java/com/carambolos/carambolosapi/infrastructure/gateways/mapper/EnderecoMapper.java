@@ -23,7 +23,9 @@ public class EnderecoMapper {
                 enderecoDomain.getReferencia(),
                 enderecoDomain.isAtivo(),
                 enderecoDomain.getUsuario(),
-                enderecoDomain.getDedupHash()
+                enderecoDomain.getDedupHash(),
+                enderecoDomain.getLatitude(),
+                enderecoDomain.getLongitude()
         );
     }
 
@@ -41,7 +43,9 @@ public class EnderecoMapper {
                 enderecoEntity.getReferencia(),
                 enderecoEntity.isAtivo(),
                 enderecoEntity.getUsuario(),
-                enderecoEntity.getDedupHash()
+                enderecoEntity.getDedupHash(),
+                enderecoEntity.getLatitude(),
+                enderecoEntity.getLongitude()
         );
     }
 
@@ -71,6 +75,8 @@ public class EnderecoMapper {
         responseDto.setReferencia(endereco.getReferencia());
         responseDto.setAtivo(endereco.isAtivo());
         responseDto.setUsuario(endereco.getUsuario());
+        responseDto.setLatitude(endereco.getLatitude());
+        responseDto.setLongitude(endereco.getLongitude());
 
         return responseDto;
     }
@@ -91,6 +97,8 @@ public class EnderecoMapper {
         endereco.setComplemento(requestDto.getComplemento());
         endereco.setReferencia(requestDto.getReferencia());
         endereco.setUsuario(requestDto.getUsuario());
+        endereco.setLatitude(requestDto.getLatitude());
+        endereco.setLongitude(requestDto.getLongitude());
 
         return endereco;
     }

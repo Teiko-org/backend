@@ -69,6 +69,8 @@ CREATE TABLE IF NOT EXISTS teiko.endereco (
   usuario_id INT NULL,
   is_ativo TINYINT NULL,
   dedup_hash VARCHAR(64) NULL,
+  latitude DOUBLE NULL,
+  longitude DOUBLE NULL,
   PRIMARY KEY (id),
   INDEX fk_endereco_usuario1_idx (usuario_id ASC) VISIBLE,
   INDEX cep_idx (cep ASC) VISIBLE,
