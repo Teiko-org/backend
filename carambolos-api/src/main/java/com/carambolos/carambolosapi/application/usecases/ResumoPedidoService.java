@@ -419,8 +419,17 @@ public class ResumoPedidoService {
         if (statusAtual == novoStatus) {
             return false;
         }
-
-        return true;
+        if (statusAtual == StatusEnum.CONCLUIDO) {
+            return false;
+        }
+        return switch (statusAtual) {
+            case PENDENTE -> novoStatus == StatusEnum.PAGO || novoStatus == StatusEnum.CANCELADO;
+            case PAGO -> novoStatus == StatusEnum.CONCLUIDO || novoStatus == StatusEnum.CANCELADO;
+            case CANCELADO -> novoStatus == StatusEnum.PENDENTE
+                    || novoStatus == StatusEnum.PAGO
+                    || novoStatus == StatusEnum.CONCLUIDO;
+            case CONCLUIDO -> false;
+        };
     }
 
     private Double calcularValorPedidoFornada(Integer pedidoFornadaId) {
