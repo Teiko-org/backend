@@ -641,7 +641,8 @@ public class ResumoPedidoService {
                                             (e.getComplemento() != null ? e.getComplemento() : ""));
                                     entregas.add(new com.carambolos.carambolosapi.infrastructure.web.response.EntregaMapaDTO(
                                             resumo.getId(), p.getNomeCliente(), p.getTelefoneCliente(), endCompleto,
-                                            e.getLatitude(), e.getLongitude(), "BOLO", p.getObservacao(), resumo.getStatus().name()
+                                            e.getLatitude(), e.getLongitude(), "BOLO", p.getObservacao(), resumo.getStatus().name(),
+                                            e.getLogradouro(), e.getNumero(), e.getCidade(), e.getEstado()
                                     ));
                                 });
                         }
@@ -660,7 +661,8 @@ public class ResumoPedidoService {
                                             (e.getComplemento() != null ? e.getComplemento() : ""));
                                     entregas.add(new com.carambolos.carambolosapi.infrastructure.web.response.EntregaMapaDTO(
                                             resumo.getId(), p.getNomeCliente(), p.getTelefoneCliente(), endCompleto,
-                                            e.getLatitude(), e.getLongitude(), "FORNADA", p.getObservacoes(), resumo.getStatus().name()
+                                            e.getLatitude(), e.getLongitude(), "FORNADA", p.getObservacoes(), resumo.getStatus().name(),
+                                            e.getLogradouro(), e.getNumero(), e.getCidade(), e.getEstado()
                                     ));
                                 });
                         }

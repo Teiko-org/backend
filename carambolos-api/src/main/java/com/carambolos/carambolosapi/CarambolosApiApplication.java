@@ -2,6 +2,8 @@ package com.carambolos.carambolosapi;
 
 import com.carambolos.carambolosapi.system.security.EnderecoHasher;
 import com.carambolos.carambolosapi.infrastructure.persistence.jpa.EnderecoRepository;
+import com.carambolos.carambolosapi.application.gateways.GeocodingGateway;
+import com.carambolos.carambolosapi.infrastructure.gateways.mapper.EnderecoMapper;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.servers.Server;
@@ -79,6 +81,33 @@ public class CarambolosApiApplication {
                 .forEach(e -> {
                     e.setDedupHash(EnderecoHasher.computeDedupHash(e));
                     enderecoRepository.save(e);
+                });
+    }
+
+    @Bean
+    @ConditionalOnBean(EnderecoRepository.class)
+    @SuppressWarnings("unused")
+    CommandLineRunner backfillEnderecoCoordinates(EnderecoRepository enderecoRepository, GeocodingGateway geocodingGateway) {
+        EnderecoMapper mapper = new EnderecoMapper();
+        return args -> enderecoRepository.findAll().stream()
+                .filter(e -> e.getLatitude() == null || e.getLongitude() == null)
+                .forEach(e -> {
+                    try {
+                        com.carambolos.carambolosapi.domain.entity.Endereco domain = mapper.toDomain(e);
+                        geocodingGateway.geocodeEndereco(domain);
+                        if (domain.getLatitude() != null && domain.getLongitude() != null) {
+                            e.setLatitude(domain.getLatitude());
+                            e.setLongitude(domain.getLongitude());
+                            enderecoRepository.save(e);
+                            System.out.printf("Geocoded endereço id=%d -> (%.6f, %.6f)%n",
+                                    e.getId(), e.getLatitude(), e.getLongitude());
+                        } else {
+                            System.err.printf("Could not geocode endereço id=%d: %s, %s, %s%n",
+                                    e.getId(), e.getLogradouro(), e.getNumero(), e.getCidade());
+                        }
+                    } catch (Exception ex) {
+                        System.err.printf("Error geocoding endereço id=%d: %s%n", e.getId(), ex.getMessage());
+                    }
                 });
     }
 }
