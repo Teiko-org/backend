@@ -55,6 +55,12 @@ public class EnderecoRequestDTO {
     @Schema(description = "ID do usuário associado ao endereço", example = "1")
     private Integer usuario;
 
+    @Schema(description = "Latitude do endereço", example = "-23.550520")
+    private Double latitude;
+
+    @Schema(description = "Longitude do endereço", example = "-46.633308")
+    private Double longitude;
+
     public String getCep() {
         return cep;
     }
@@ -133,5 +139,21 @@ public class EnderecoRequestDTO {
 
     public void setUsuario(Integer usuario) {
         this.usuario = usuario;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
     }
 }

@@ -48,7 +48,11 @@ public class EnderecoEntity {
     @Column(name = "dedup_hash", length = 64)
     private String dedupHash;
 
-    public EnderecoEntity(int id, String nome, String cep, String estado, String cidade, String bairro, String logradouro, String numero, String complemento, String referencia, boolean isAtivo, Integer usuario, String dedupHash) {
+    private Double latitude;
+
+    private Double longitude;
+
+    public EnderecoEntity(int id, String nome, String cep, String estado, String cidade, String bairro, String logradouro, String numero, String complemento, String referencia, boolean isAtivo, Integer usuario, String dedupHash, Double latitude, Double longitude) {
         this.id = id;
         this.nome = nome;
         this.cep = cep;
@@ -62,6 +66,8 @@ public class EnderecoEntity {
         this.isAtivo = isAtivo;
         this.usuario = usuario;
         this.dedupHash = dedupHash;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     public EnderecoEntity() {}
@@ -168,5 +174,21 @@ public class EnderecoEntity {
 
     public void setAtivo(boolean ativo) {
         isAtivo = ativo;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
     }
 }

@@ -3,6 +3,7 @@ package com.carambolos.carambolosapi.application.usecases;
 import com.carambolos.carambolosapi.application.exception.EntidadeJaExisteException;
 import com.carambolos.carambolosapi.application.exception.EntidadeNaoEncontradaException;
 import com.carambolos.carambolosapi.application.gateways.EnderecoGateway;
+import com.carambolos.carambolosapi.application.gateways.GeocodingGateway;
 import com.carambolos.carambolosapi.domain.entity.Endereco;
 import com.carambolos.carambolosapi.domain.entity.Usuario;
 import org.springframework.cache.annotation.CacheEvict;
@@ -15,10 +16,12 @@ import java.util.List;
 public class EnderecoUseCase {
     private final EnderecoGateway enderecoGateway;
     private final UsuarioUseCase usuarioUseCase;
+    private final GeocodingGateway geocodingGateway;
 
-    public EnderecoUseCase(EnderecoGateway enderecoGateway, UsuarioUseCase usuarioUseCase) {
+    public EnderecoUseCase(EnderecoGateway enderecoGateway, UsuarioUseCase usuarioUseCase, GeocodingGateway geocodingGateway) {
         this.enderecoGateway = enderecoGateway;
         this.usuarioUseCase = usuarioUseCase;
+        this.geocodingGateway = geocodingGateway;
     }
 
     public Page<Endereco> listar(Pageable pageable) {
@@ -51,6 +54,7 @@ public class EnderecoUseCase {
                 throw new EntidadeNaoEncontradaException("Usuariofk não existe no banco");
             }
         }
+        geocodingGateway.geocodeEndereco(endereco);
         Endereco enderecoSalvo = enderecoGateway.cadastrar(endereco);
         return enderecoSalvo;
     }
@@ -66,6 +70,7 @@ public class EnderecoUseCase {
             throw new EntidadeJaExisteException("Endereço já cadastrado");
         }
 
+        geocodingGateway.geocodeEndereco(endereco);
         Endereco enderecoAtualizado = enderecoGateway.atualizar(id, endereco);
         return enderecoAtualizado;
     }

@@ -362,4 +362,21 @@ public class ResumoPedidoController {
         }
         return ResponseEntity.ok(ResumoPedidoResponseDTO.toResumoPedidoResponse(pedidos));
     }
+
+    @Operation(summary = "Lista entregas do dia para exibição no mapa", 
+              description = "Retorna todos os pedidos (bolo e fornada) do tipo ENTREGA para a data especificada, contendo informações do cliente, endereço e coordenadas")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de entregas retornada com sucesso"),
+            @ApiResponse(responseCode = "204", description = "Nenhuma entrega encontrada para o dia")
+    })
+    @GetMapping("/entregas-mapa")
+    public ResponseEntity<List<com.carambolos.carambolosapi.infrastructure.web.response.EntregaMapaDTO>> listarEntregasMapa(
+            @RequestParam LocalDate dataEntrega
+    ) {
+        List<com.carambolos.carambolosapi.infrastructure.web.response.EntregaMapaDTO> entregas = resumoPedidoService.listarEntregasMapaPorData(dataEntrega);
+        if (entregas.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.ok(entregas);
+    }
 }

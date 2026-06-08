@@ -43,6 +43,12 @@ public class EnderecoResponseDTO implements Serializable {
     @Schema(description = "ID do usuário associado ao endereço", example = "5")
     private Integer usuario;
 
+    @Schema(description = "Latitude do endereço", example = "-23.550520")
+    private Double latitude;
+
+    @Schema(description = "Longitude do endereço", example = "-46.633308")
+    private Double longitude;
+
     public int getId() {
         return id;
     }
@@ -137,5 +143,21 @@ public class EnderecoResponseDTO implements Serializable {
 
     public void setUsuario(Integer usuario) {
         this.usuario = usuario;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
     }
 }
